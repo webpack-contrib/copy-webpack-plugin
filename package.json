@@ -1,0 +1,31 @@
+{
+  "name": "copy-webpack-plugin",
+  "version": "0.1.0",
+  "description": "Copy files and directories in webpack",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevlened/copy-webpack-plugin.git"
+  },
+  "keywords": [
+    "webpack",
+    "plugin",
+    "transfer",
+    "move",
+    "copy"
+  ],
+  "author": "Len Boyette",
+  "license": "MIT",
+  "homepage": "https://github.com/kevlened/copy-webpack-plugin",
+  "dependencies": {
+    "bluebird": "^2.10.2",
+    "lodash": "^3.10.1",
+    "node-dir": "^0.1.10"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "chai": "^3.4.0"
+  }
+}
