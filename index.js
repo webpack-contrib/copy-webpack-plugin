@@ -14,13 +14,15 @@ function apply(patterns, compiler) {
         var relSrc = pattern.from;
         var absSrc = path.resolve(baseDir, relSrc);
         var relDest = pattern.to || '';
+        var forceWrite = !!pattern.force;
 
         return fs.statAsync(absSrc)
         .then(function(stat) {
           if (stat.isDirectory()) {
             return writeDirectoryToAssets(compilation,
                                           absSrc,
-                                          relDest);
+                                          relDest,
+                                          forceWrite);
           } else {
             if ((path.extname(relDest) === '' ||  // doesn't have an extension
                 _.last(relDest) === '/' ||        // doesn't end in a slash
@@ -32,7 +34,8 @@ function apply(patterns, compiler) {
             }
             return writeFileToAssets(compilation,
                                      absSrc,
-                                     relDest);
+                                     relDest,
+                                     forceWrite);
           }
         });
       })
@@ -43,7 +46,10 @@ function apply(patterns, compiler) {
   });
 }
 
-function writeFileToAssets(compilation, absFileSrc, relFileDest) {
+function writeFileToAssets(compilation, absFileSrc, relFileDest, forceWrite) {
+  if (compilation.assets[relFileDest] && !forceWrite) {
+    return Promise();
+  }
   return fs.statAsync(absFileSrc)
     .then(function(stat) {
       compilation.assets[relFileDest] = {
@@ -57,7 +63,7 @@ function writeFileToAssets(compilation, absFileSrc, relFileDest) {
     });
 }
 
-function writeDirectoryToAssets(compilation, absDirSrc, relDirDest) {
+function writeDirectoryToAssets(compilation, absDirSrc, relDirDest, forceWrite) {
   return dir.filesAsync(absDirSrc)
   .each(function(absFileSrc) {
     var relFileSrc = absFileSrc.replace(absDirSrc, '');
@@ -68,7 +74,7 @@ function writeDirectoryToAssets(compilation, absDirSrc, relDirDest) {
       relFileDest = relFileDest.substr(1);
     }
 
-    return writeFileToAssets(compilation, absFileSrc, relFileDest);
+    return writeFileToAssets(compilation, absFileSrc, relFileDest, forceWrite);
   });
 }
 

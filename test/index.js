@@ -1,6 +1,8 @@
 var expect = require('chai').expect;
 var CopyWebpackPlugin = require('../index');
 var path = require('path');
+var _ = require('lodash');
+var Promise = require('bluebird');
 
 function MockCompiler() {
 	this.options = {
@@ -15,41 +17,67 @@ MockCompiler.prototype.plugin = function(type, fn) {
 describe('apply function', function() {
 
 	// Ideally we pass in patterns and confirm the resulting assets
-	function run(patterns, expectedAssetKeys, done) {
-		var plugin = new CopyWebpackPlugin(patterns);
+	function run(opts) {
+		return new Promise(function(resolve, reject) {
+			var plugin = new CopyWebpackPlugin(opts.patterns);
 
-		// Get a mock compiler to pass to plugin.apply
-		var compiler = new MockCompiler();
-		plugin.apply(compiler);
+			// Get a mock compiler to pass to plugin.apply
+			var compiler = new MockCompiler();
+			plugin.apply(compiler);
 
-		// Call the registered function with a mock compilation and callback
-		var compilation = {
-			errors: [],
+			// Call the registered function with a mock compilation and callback
+			var defaultCompilation = {
+				errors: [],
+				assets: {}
+			};
+			var compilation = _.extend(defaultCompilation, opts.compilation);
+
+			try {
+				compiler.emitFn(compilation, function() {
+					resolve(compilation);
+				});
+			} catch(e) {
+				reject(e);
+			}
+		});
+	}
+
+	function runEmit(opts) {
+		return run(opts)
+		.then(function(compilation) {
+			if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
+				expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
+			} else {
+				expect(compilation.assets).to.be.empty;
+			}
+			expect(compilation.errors).to.be.empty;
+		});
+	}
+
+	function runForce(opts) {
+		opts.compilation = {
 			assets: {}
 		};
-
-		compiler.emitFn(compilation, function() {
-			// After the callback has been called, check the compilation assets
-			try {
-				if (expectedAssetKeys.length > 0) {
-					expect(compilation.assets).to.have.all.keys(expectedAssetKeys);
-				} else {
-					expect(compilation.assets).to.be.empty;
-				}
-
-				expect(compilation.errors).to.be.empty;
-		    done();
-			} catch(e) {
-		    done(e);
+		opts.compilation.assets[opts.existingAsset] = {
+			source: function() {
+				return 'existing';
 			}
+		};
+		return run(opts)
+		.then(function(compilation) {
+			var assetContent = compilation.assets[opts.existingAsset].source().toString();
+			expect(assetContent).to.equal(opts.expectedAssetContent);
 		});
 	}
 
 	describe('error handling', function() {
 		it('doesn\'t throw an error if no patterns are passed', function(done) {
-			run(undefined,
-					[],
-					done);
+			runEmit({
+				patterns: undefined,
+				expectedAssetKeys: []
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('throws an error if the patterns are an object', function() {
@@ -70,83 +98,162 @@ describe('apply function', function() {
 	describe('with file in from', function() {
 
 		it('can move a file to the root directory', function(done) {
-			run([{ from: 'file.txt' }],
-					['file.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'file.txt' }],
+				expectedAssetKeys: ['file.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a file to a new directory without a forward slash', function(done) {
-			run([{ from: 'file.txt', to: 'newdirectory' }],
-					['newdirectory/file.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'file.txt', to: 'newdirectory' }],
+				expectedAssetKeys: ['newdirectory/file.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a file to a new directory with a forward slash', function(done) {
-			run([{ from: 'file.txt', to: 'newdirectory/' }],
-					['newdirectory/file.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'file.txt', to: 'newdirectory/' }],
+				expectedAssetKeys: ['newdirectory/file.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a file to a new directory with an extension', function(done) {
-			run([{ from: 'file.txt', to: 'newdirectory.ext', toType: 'dir' }],
-					['newdirectory.ext/file.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'file.txt', to: 'newdirectory.ext', toType: 'dir' }],
+				expectedAssetKeys: ['newdirectory.ext/file.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a file to a new directory with an extension and forward slash', function(done) {
-			run([{ from: 'file.txt', to: 'newdirectory.ext/' }],
-					['newdirectory.ext/file.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'file.txt', to: 'newdirectory.ext/' }],
+				expectedAssetKeys: ['newdirectory.ext/file.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a file to a new file with a different name', function(done) {
-			run([{ from: 'file.txt', to: 'newname.txt' }],
-					['newname.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'file.txt', to: 'newname.txt' }],
+				expectedAssetKeys: ['newname.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a file to a new file with no extension', function(done) {
-			run([{ from: 'file.txt', to: 'newname', toType: 'file' }],
-					['newname'],
-					done);
+			runEmit({
+				patterns: [{ from: 'file.txt', to: 'newname', toType: 'file' }],
+				expectedAssetKeys: ['newname']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a nested file to the root directory', function(done) {
-			run([{ from: 'directory/directoryfile.txt' }],
-					['directoryfile.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'directory/directoryfile.txt' }],
+				expectedAssetKeys: ['directoryfile.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a nested file to a new directory', function(done) {
-			run([{ from: 'directory/directoryfile.txt', to: 'newdirectory' }],
-					['newdirectory/directoryfile.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'directory/directoryfile.txt', to: 'newdirectory' }],
+				expectedAssetKeys: ['newdirectory/directoryfile.txt']
+			})
+			.then(done)
+			.catch(done);
+		});
+
+		it('won\'t overwrite a file already in the compilation', function(done) {
+			runForce({
+				patterns: [{ from: 'file.txt' }],
+				existingAsset: 'file.txt',
+				expectedAssetContent: 'existing'
+			})
+			.then(done)
+			.catch(done);
+		});
+
+		it('can force overwrite of a file already in the compilation', function(done) {
+			runForce({
+				patterns: [{ from: 'file.txt', force: true }],
+				existingAsset: 'file.txt',
+				expectedAssetContent: 'new'
+			})
+			.then(done)
+			.catch(done);
 		});
 	});
 
 	describe('with directory in from', function() {
 		it('can move a directory\'s contents to the root directory', function(done) {
-			run([{ from: 'directory' }],
-					['directoryfile.txt', 'nested/nestedfile.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'directory' }],
+				expectedAssetKeys: ['directoryfile.txt', 'nested/nestedfile.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a directory\'s contents to a new directory', function(done) {
-			run([{ from: 'directory', to: 'newdirectory' }],
-					['newdirectory/directoryfile.txt','newdirectory/nested/nestedfile.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'directory', to: 'newdirectory' }],
+				expectedAssetKeys: ['newdirectory/directoryfile.txt','newdirectory/nested/nestedfile.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a nested directory\'s contents to the root directory', function(done) {
-			run([{ from: 'directory/nested' }],
-					['nestedfile.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'directory/nested' }],
+				expectedAssetKeys: ['nestedfile.txt']
+			})
+			.then(done)
+			.catch(done);
 		});
 
 		it('can move a nested directory\'s contents to a new directory', function(done) {
-			run([{ from: 'directory/nested', to: 'newdirectory' }],
-					['newdirectory/nestedfile.txt'],
-					done);
+			runEmit({
+				patterns: [{ from: 'directory/nested', to: 'newdirectory' }],
+				expectedAssetKeys: ['newdirectory/nestedfile.txt']
+			})
+			.then(done)
+			.catch(done);
+		});
+
+		it('won\'t overwrite a file already in the compilation', function(done) {
+			runForce({
+				patterns: [{ from: 'directory' }],
+				existingAsset: 'directoryfile.txt',
+				expectedAssetContent: 'existing'
+			})
+			.then(done)
+			.catch(done);
+		});
+
+		it('can force overwrite of a file already in the compilation', function(done) {
+			runForce({
+				patterns: [{ from: 'directory', force: true }],
+				existingAsset: 'directoryfile.txt',
+				expectedAssetContent: 'new'
+			})
+			.then(done)
+			.catch(done);
 		});
 	});
 });

@@ -66,6 +66,11 @@ module.exports = {
 
         { from: 'path/to/file.txt', to: 'file/without/extension', toType: 'file' }
 
+*   Overwrite existing file. By default, assets that are staged by previous plugins aren't overwritten. Provide `force` to override this behavior.
+
+        { from: 'path/to/file.txt', force: true }
+        { from: 'path/to/directory', force: true }
+
 ### Testing
 
 Run `mocha`
