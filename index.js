@@ -22,10 +22,12 @@ function apply(patterns, compiler) {
         .then(function(stat) {
           if (stat.isDirectory()) {
             contextDependencies.push(absSrc);
-            return writeDirectoryToAssets(compilation,
-                                          absSrc,
-                                          relDest,
-                                          forceWrite);
+            return writeDirectoryToAssets({
+              compilation: compilation,
+              absDirSrc: absSrc,
+              relDirDest: relDest,
+              forceWrite: forceWrite
+            });
           } else {
             fileDependencies.push(absSrc);
             if ((path.extname(relDest) === '' ||  // doesn't have an extension
@@ -36,10 +38,12 @@ function apply(patterns, compiler) {
             } else {
               relDest = relDest || path.basename(relSrc);
             }
-            return writeFileToAssets(compilation,
-                                     absSrc,
-                                     relDest,
-                                     forceWrite);
+            return writeFileToAssets({
+              compilation: compilation,
+              absFileSrc: absSrc,
+              relFileDest: relDest,
+              forceWrite: forceWrite
+            });
           }
         });
       })
@@ -68,24 +72,34 @@ function apply(patterns, compiler) {
   });
 }
 
-function writeFileToAssets(compilation, absFileSrc, relFileDest, forceWrite) {
+function writeFileToAssets(opts) {
+  var compilation = opts.compilation;
+  var relFileDest = opts.relFileDest;
+  var absFileSrc = opts.absFileSrc;
+  var forceWrite = opts.forceWrite;
+
   if (compilation.assets[relFileDest] && !forceWrite) {
-    return Promise();
+    return Promise.resolve();
   }
   return fs.statAsync(absFileSrc)
-    .then(function(stat) {
-      compilation.assets[relFileDest] = {
-        size: function() {
-          return stat.size;
-        },
-        source: function() {
-          return fs.readFileSync(absFileSrc);
-        }
-      };
-    });
+  .then(function(stat) {
+    compilation.assets[relFileDest] = {
+      size: function() {
+        return stat.size;
+      },
+      source: function() {
+        return fs.readFileSync(absFileSrc);
+      }
+    };
+  });
 }
 
-function writeDirectoryToAssets(compilation, absDirSrc, relDirDest, forceWrite) {
+function writeDirectoryToAssets(opts) {
+  var compilation = opts.compilation;
+  var absDirSrc = opts.absDirSrc;
+  var relDirDest = opts.relDirDest;
+  var forceWrite = opts.forceWrite;
+
   return dir.filesAsync(absDirSrc)
   .each(function(absFileSrc) {
     var relFileSrc = absFileSrc.replace(absDirSrc, '');
@@ -96,7 +110,12 @@ function writeDirectoryToAssets(compilation, absDirSrc, relDirDest, forceWrite) 
       relFileDest = relFileDest.substr(1);
     }
 
-    return writeFileToAssets(compilation, absFileSrc, relFileDest, forceWrite);
+    return writeFileToAssets({
+      compilation: compilation,
+      absFileSrc: absFileSrc,
+      relFileDest: relFileDest,
+      forceWrite: forceWrite
+    });
   });
 }
 

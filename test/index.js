@@ -54,6 +54,9 @@ describe('apply function', function() {
 				});
 			})
 			.then(function() {
+				if (compilation.errors.length > 0) {
+					throw compilation.errors[0];
+				}
 				resolve(compilation);
 			})
 			.catch(reject);
@@ -68,7 +71,6 @@ describe('apply function', function() {
 			} else {
 				expect(compilation.assets).to.be.empty;
 			}
-			expect(compilation.errors).to.be.empty;
 		});
 	}
 
