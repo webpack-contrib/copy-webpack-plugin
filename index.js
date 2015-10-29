@@ -8,6 +8,8 @@ var dir = Promise.promisifyAll(require('node-dir'));
 function apply(patterns, compiler) {
 
   var baseDir = compiler.options.context;
+  var fileDependencies = [];
+  var contextDependencies = [];
 
   compiler.plugin('emit', function(compilation, cb) {
     Promise.each(patterns, function(pattern) {
@@ -19,11 +21,13 @@ function apply(patterns, compiler) {
         return fs.statAsync(absSrc)
         .then(function(stat) {
           if (stat.isDirectory()) {
+            contextDependencies.push(absSrc);
             return writeDirectoryToAssets(compilation,
                                           absSrc,
                                           relDest,
                                           forceWrite);
           } else {
+            fileDependencies.push(absSrc);
             if ((path.extname(relDest) === '' ||  // doesn't have an extension
                 _.last(relDest) === '/' ||        // doesn't end in a slash
                 pattern.toType === 'dir') &&      // is explicitly a dir
@@ -43,6 +47,24 @@ function apply(patterns, compiler) {
         compilation.errors.push(err);
       })
       .finally(cb);
+  });
+
+  compiler.plugin("after-emit", function(compilation, cb) {
+    var trackedFiles = compilation.fileDependencies;
+    _.each(fileDependencies, function(file) {
+      if (!_.contains(trackedFiles, file)) {
+        trackedFiles.push(file);
+      }
+    });
+
+    var trackedDirs = compilation.contextDependencies;
+    _.each(contextDependencies, function(context) {
+      if (!_.contains(trackedDirs, context)) {
+        trackedDirs.push(context);
+      }
+    });
+
+    cb();
   });
 }
 

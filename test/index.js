@@ -4,14 +4,23 @@ var path = require('path');
 var _ = require('lodash');
 var Promise = require('bluebird');
 
+var HELPER_DIR = path.join(__dirname, 'helpers');
+
 function MockCompiler() {
 	this.options = {
-		context: path.join(__dirname, 'helpers')
+		context: HELPER_DIR
 	};
 }
 
 MockCompiler.prototype.plugin = function(type, fn) {
-	this.emitFn = fn;
+	switch(type) {
+		case 'emit':
+			this.emitFn = fn;
+			break;
+		case 'after-emit':
+			this.afterEmitFn = fn;
+			break;
+	}
 };
 
 describe('apply function', function() {
@@ -28,17 +37,26 @@ describe('apply function', function() {
 			// Call the registered function with a mock compilation and callback
 			var defaultCompilation = {
 				errors: [],
-				assets: {}
+				assets: {},
+				fileDependencies: [],
+				contextDependencies: []
 			};
 			var compilation = _.extend(defaultCompilation, opts.compilation);
 
-			try {
-				compiler.emitFn(compilation, function() {
-					resolve(compilation);
+			// Execute the functions in series
+			Promise.each([compiler.emitFn, compiler.afterEmitFn], function(fn) {
+				return new Promise(function(res, rej) {
+					try {
+						fn(compilation, res);
+					} catch(e) {
+						rej(e);
+					}
 				});
-			} catch(e) {
-				reject(e);
-			}
+			})
+			.then(function() {
+				resolve(compilation);
+			})
+			.catch(reject);
 		});
 	}
 
@@ -96,7 +114,6 @@ describe('apply function', function() {
 	});
 
 	describe('with file in from', function() {
-
 		it('can move a file to the root directory', function(done) {
 			runEmit({
 				patterns: [{ from: 'file.txt' }],
@@ -197,6 +214,18 @@ describe('apply function', function() {
 			.then(done)
 			.catch(done);
 		});
+
+		it('adds the file to the watch list', function(done) {
+			run({
+				patterns: [{ from: 'file.txt' }]
+			})
+			.then(function(compilation) {
+				var absFrom = path.join(HELPER_DIR, 'file.txt');
+				expect(compilation.fileDependencies).to.have.members([absFrom]);
+			})
+			.then(done)
+			.catch(done);
+		});
 	});
 
 	describe('with directory in from', function() {
@@ -251,6 +280,18 @@ describe('apply function', function() {
 				patterns: [{ from: 'directory', force: true }],
 				existingAsset: 'directoryfile.txt',
 				expectedAssetContent: 'new'
+			})
+			.then(done)
+			.catch(done);
+		});
+
+		it('adds the directory to the watch list', function(done) {
+			run({
+				patterns: [{ from: 'directory' }]
+			})
+			.then(function(compilation) {
+				var absFrom = path.join(HELPER_DIR, 'directory');
+				expect(compilation.contextDependencies).to.have.members([absFrom]);
 			})
 			.then(done)
 			.catch(done);
