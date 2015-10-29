@@ -1,4 +1,4 @@
-## 0.2.0 (Unreleased)
+## 0.2.0 (Oct 28, 2015)
 
 * Added `force` option in patterns to overwrite prestaged assets
 * Files and directories are now added to webpack's rebuild watchlist
