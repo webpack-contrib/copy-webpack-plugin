@@ -3,6 +3,8 @@ var CopyWebpackPlugin = require('../index');
 var path = require('path');
 var _ = require('lodash');
 var Promise = require('bluebird');
+var fs = Promise.promisifyAll(require('fs'));
+
 
 var HELPER_DIR = path.join(__dirname, 'helpers');
 
@@ -31,17 +33,16 @@ describe('apply function', function() {
 			var plugin = new CopyWebpackPlugin(opts.patterns);
 
 			// Get a mock compiler to pass to plugin.apply
-			var compiler = new MockCompiler();
+			var compiler = opts.compiler || new MockCompiler();
 			plugin.apply(compiler);
 
 			// Call the registered function with a mock compilation and callback
-			var defaultCompilation = {
+			var compilation = _.extend({
 				errors: [],
 				assets: {},
 				fileDependencies: [],
 				contextDependencies: []
-			};
-			var compilation = _.extend(defaultCompilation, opts.compilation);
+			}, opts.compilation);
 
 			// Execute the functions in series
 			Promise.each([compiler.emitFn, compiler.afterEmitFn], function(fn) {
@@ -87,6 +88,44 @@ describe('apply function', function() {
 		.then(function(compilation) {
 			var assetContent = compilation.assets[opts.existingAsset].source().toString();
 			expect(assetContent).to.equal(opts.expectedAssetContent);
+		});
+	}
+
+	function runChange(opts) {
+		// Create two test files
+		fs.writeFileSync(opts.newFileLoc1);
+		fs.writeFileSync(opts.newFileLoc2);
+
+		// Create a reference to the compiler
+		var compiler = new MockCompiler();
+		var compilation = {
+			errors: [],
+			assets: {},
+			fileDependencies: [],
+			contextDependencies: []
+		};
+		return run({
+			compiler: compiler,
+			patterns: opts.patterns
+		})
+		// mtime is only measured in whole seconds
+		.delay(1000)
+		.then(function() {
+
+			// Change a file
+			fs.appendFileSync(opts.newFileLoc1, 'extra');
+
+			// Trigger another compile
+			return new Promise(function(res, rej) {
+				compiler.emitFn(compilation, res);
+			});
+		})
+		.then(function() {
+			return compilation;
+		})
+		.finally(function() {
+			fs.unlinkSync(opts.newFileLoc1);
+			fs.unlinkSync(opts.newFileLoc2);
 		});
 	}
 
@@ -228,6 +267,20 @@ describe('apply function', function() {
 			.then(done)
 			.catch(done);
 		});
+
+		it('only include files that have changed', function(done) {
+			runChange({
+				patterns: [{ from: 'tempfile1.txt' }, { from: 'tempfile2.txt' }],
+				newFileLoc1: path.join(HELPER_DIR, 'tempfile1.txt'),
+				newFileLoc2: path.join(HELPER_DIR, 'tempfile2.txt')
+			})
+			.then(function(compilation) {
+				expect(compilation.assets).to.have.key('tempfile1.txt');
+				expect(compilation.assets).not.to.have.key('tempfile2.txt');
+			})
+			.then(done)
+			.catch(done);
+		});
 	});
 
 	describe('with directory in from', function() {
@@ -294,6 +347,20 @@ describe('apply function', function() {
 			.then(function(compilation) {
 				var absFrom = path.join(HELPER_DIR, 'directory');
 				expect(compilation.contextDependencies).to.have.members([absFrom]);
+			})
+			.then(done)
+			.catch(done);
+		});
+
+		it('only include files that have changed', function(done) {
+			runChange({
+				patterns: [{ from: 'directory' }],
+				newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
+				newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt')
+			})
+			.then(function(compilation) {
+				expect(compilation.assets).to.have.key('tempfile1.txt');
+				expect(compilation.assets).not.to.have.key('tempfile2.txt');
 			})
 			.then(done)
 			.catch(done);
