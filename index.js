@@ -112,7 +112,7 @@ function writeDirectoryToAssets(opts) {
 
   return dir.filesAsync(absDirSrc)
   .each(function(absFileSrc) {
-    var relFileSrc = absFileSrc.replace(absDirSrc, '');
+    var relFileSrc = path.relative(absDirSrc, absFileSrc);
     var relFileDest = path.join(relDirDest, relFileSrc);
 
     // Make sure it doesn't start with the separator
