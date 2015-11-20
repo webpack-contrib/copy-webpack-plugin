@@ -116,8 +116,8 @@ function writeDirectoryToAssets(opts) {
     var relFileDest = path.join(relDirDest, relFileSrc);
 
     // Make sure it doesn't start with the separator
-    if (_.first(relFileDest) === '/') {
-      relFileDest = relFileDest.substr(1);
+    if (_.first(relFileDest) === path.sep) {
+      relFileDest = relFileDest.slice(1);
     }
 
     return writeFileToAssets({
