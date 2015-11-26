@@ -73,7 +73,7 @@ module.exports = {
 
 ### Testing
 
-Run `mocha`
+Run `npm test`
 
 ### License
 

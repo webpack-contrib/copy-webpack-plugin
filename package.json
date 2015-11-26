@@ -23,9 +23,10 @@
     "node-dir": "^0.1.10"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "devDependencies": {
-    "chai": "^3.4.0"
+    "chai": "^3.4.0",
+    "mocha": "^2.3.4"
   }
 }
