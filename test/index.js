@@ -164,6 +164,16 @@ describe('apply function', function() {
       .catch(done);
     });
 
+    it('can use an absolute path to move a file to the root directory', function(done) {
+      var absolutePath = path.resolve(HELPER_DIR, 'file.txt');
+      runEmit({
+        patterns: [{ from: absolutePath }],
+        expectedAssetKeys: ['file.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
     it('can move a file to a new directory without a forward slash', function(done) {
       runEmit({
         patterns: [{ from: 'file.txt', to: 'newdirectory' }],
@@ -227,9 +237,29 @@ describe('apply function', function() {
       .catch(done);
     });
 
+    it('can use an absolute path to move a nested file to the root directory', function(done) {
+      var absolutePath = path.resolve(HELPER_DIR, 'directory', 'directoryfile.txt');
+      runEmit({
+        patterns: [{ from: absolutePath }],
+        expectedAssetKeys: ['directoryfile.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
     it('can move a nested file to a new directory', function(done) {
       runEmit({
         patterns: [{ from: 'directory/directoryfile.txt', to: 'newdirectory' }],
+        expectedAssetKeys: ['newdirectory/directoryfile.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
+    it('can use an absolute path to move a nested file to a new directory', function(done) {
+      var absolutePath = path.resolve(HELPER_DIR, 'directory', 'directoryfile.txt');
+      runEmit({
+        patterns: [{ from: absolutePath, to: 'newdirectory' }],
         expectedAssetKeys: ['newdirectory/directoryfile.txt']
       })
       .then(done)
@@ -293,6 +323,16 @@ describe('apply function', function() {
       .catch(done);
     });
 
+    it('can use an absolute path to move a directory\'s contents to the root directory', function(done) {
+      var absolutePath = path.resolve(HELPER_DIR, 'directory');
+      runEmit({
+        patterns: [{ from: absolutePath }],
+        expectedAssetKeys: ['directoryfile.txt', 'nested/nestedfile.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
     it('can move a directory\'s contents to a new directory', function(done) {
       runEmit({
         patterns: [{ from: 'directory', to: 'newdirectory' }],
@@ -314,6 +354,16 @@ describe('apply function', function() {
     it('can move a nested directory\'s contents to a new directory', function(done) {
       runEmit({
         patterns: [{ from: 'directory/nested', to: 'newdirectory' }],
+        expectedAssetKeys: ['newdirectory/nestedfile.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
+    it('can use an absolute path to move a nested directory\'s contents to a new directory', function(done) {
+      var absolutePath = path.resolve(HELPER_DIR, 'directory', 'nested');
+      runEmit({
+        patterns: [{ from: absolutePath, to: 'newdirectory' }],
         expectedAssetKeys: ['newdirectory/nestedfile.txt']
       })
       .then(done)

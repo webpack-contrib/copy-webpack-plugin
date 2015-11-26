@@ -33,7 +33,8 @@ function apply(patterns, compiler) {
         } else {
           fileDependencies.push(absSrc);
           if ((path.extname(relDest) === '' ||  // doesn't have an extension
-              _.last(relDest) === '/' ||        // doesn't end in a slash
+              _.last(relDest) === path.sep ||   // ends in a path separator
+              _.last(relDest) === '/' ||        // ends in a slash (kept for compatibility)
               pattern.toType === 'dir') &&      // is explicitly a dir
               pattern.toType !== 'file') {      // is not explicitly a file
             relDest = path.join(relDest, path.basename(relSrc));

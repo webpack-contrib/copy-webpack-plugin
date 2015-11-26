@@ -12,6 +12,33 @@ npm install --save-dev copy-webpack-plugin
 
 ### Usage
 
+`new CopyWebpackPlugin([patterns])`
+
+A pattern looks like:
+`{ from: 'source', to: 'dest' }`
+
+Pattern params:
+* `from`
+    - is required
+    - can be an absolute path
+    - can be a relative path
+    - can be a file
+    - can be a directory
+* `to`
+    - is optional
+    - is relative to the context root
+    - defaults to `'/'`
+* `toType`
+    - is optional
+    - defaults to `'file'` if `to` has an extension
+    - defaults to `'dir'` if `to` doesn't have an extension
+* `force`
+    - is optional
+    - defaults to `false`
+    - forces the plugin to overwrite files staged by previous plugins
+
+### Examples
+
 ```javascript
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 
@@ -19,57 +46,30 @@ module.exports = {
     context: path.join(__dirname, 'app'),
     plugins: [
         new CopyWebpackPlugin([
-            // File examples
+            // {context}/file.txt
             { from: 'path/to/file.txt' },
+            
+            // {context}/path/to/build/file.txt
             { from: 'path/to/file.txt', to: 'path/to/build/file.txt' },
+            
+            // {context}/path/to/build/directory/file.txt
             { from: 'path/to/file.txt', to: 'path/to/build/directory' },
+            
+            // {context}/file/without/extension
             { from: 'path/to/file.txt', to: 'file/without/extension', toType: 'file' },
+            
+            // {context}/directory/with/extension.ext/file.txt
             { from: 'path/to/file.txt', to: 'directory/with/extension.ext', toType: 'dir' },
 
-            // Directory examples
+            // Copy directory contents to {context}/
             { from: 'path/to/directory' },
+            
+            // Copy directory contents to {context}/path/to/build/directory
             { from: 'path/to/directory', to: 'path/to/build/directory' }
         ])
     ]
 };
 ```
-
-### Common patterns
-
-*   Copy from file to file. The destination file can be renamed.
-
-        { from: 'path/to/file.txt', to: 'path/to/build/file.txt' }
-
-*   Copy from file to directory
-
-        { from: 'path/to/file.txt', to: 'path/to/build/directory' }
-
-*   Copy from directory to directory. The destination directory can be renamed.
-
-        { from: 'path/to/directory', to: 'path/to/build/directory' }
-
-### Special cases
-
-*   Copy from file to root
-
-        { from: 'path/to/file.txt' }
-
-*   Copy from directory to root
-
-        { from: 'path/to/directory' }
-
-*   Copy from file to directory that has an extension. If the `to` parameter has an extension, the plugin assumes the target is a file. Provide `toType` to override this behavior.
-
-        { from: 'path/to/file.txt', to: 'directory/with/extension.ext', toType: 'dir' }
-
-*   Copy from file to file without an extension. If the `to` parameter doesn't have an extension, the plugin assumes the target is a directory. Provide `toType` to override this behavior.
-
-        { from: 'path/to/file.txt', to: 'file/without/extension', toType: 'file' }
-
-*   Overwrite existing file. By default, assets that are staged by previous plugins aren't overwritten. Provide `force` to override this behavior.
-
-        { from: 'path/to/file.txt', force: true }
-        { from: 'path/to/directory', force: true }
 
 ### Testing
 
