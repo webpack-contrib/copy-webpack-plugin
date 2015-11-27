@@ -12,15 +12,15 @@ npm install --save-dev copy-webpack-plugin
 
 ### Usage
 
-`new CopyWebpackPlugin([patterns])`
+`new CopyWebpackPlugin([patterns], options)`
 
 A pattern looks like:
 `{ from: 'source', to: 'dest' }`
 
-Pattern params:
+Pattern properties:
 * `from`
     - is required
-    - can be an absolute or relative path
+    - can be an absolute or path relative to the context
     - can be a file or directory
 * `to`
     - is optional
@@ -36,6 +36,12 @@ Pattern params:
     - is optional
     - defaults to `false`
     - forces the plugin to overwrite files staged by previous plugins
+
+Available options:
+* `ignore`
+    - an array of files and directories to ignore
+    - accepts globs
+    - globs are evaluated on the `from` path, relative to the context
 
 ### Examples
 
@@ -74,7 +80,12 @@ module.exports = {
                 to: 'directory/with/extension.ext',
                 toType: 'dir'
             }
-        ])
+        ], {
+            ignore: [
+                // Doesn't copy any files with a txt extension    
+                '*.txt'
+            ]
+        })
     ]
 };
 ```

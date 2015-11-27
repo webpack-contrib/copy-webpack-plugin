@@ -20,6 +20,7 @@
   "dependencies": {
     "bluebird": "^2.10.2",
     "lodash": "^3.10.1",
+    "minimatch": "^3.0.0",
     "node-dir": "^0.1.10"
   },
   "scripts": {

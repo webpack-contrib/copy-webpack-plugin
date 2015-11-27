@@ -30,7 +30,7 @@ describe('apply function', function() {
   // Ideally we pass in patterns and confirm the resulting assets
   function run(opts) {
     return new Promise(function(resolve, reject) {
-      var plugin = new CopyWebpackPlugin(opts.patterns);
+      var plugin = new CopyWebpackPlugin(opts.patterns, opts.options);
 
       // Get a mock compiler to pass to plugin.apply
       var compiler = opts.compiler || new MockCompiler();
@@ -414,6 +414,53 @@ describe('apply function', function() {
       })
       .then(done)
       .catch(done);
+    });
+  });
+  
+  describe('options', function() {
+    describe('ignore', function() {
+      it('ignores files when from is a file', function(done) {
+        runEmit({
+          patterns: [
+            { from: 'file.txt' },
+            { from: 'directory/directoryfile.txt' }
+          ],
+          options: {
+            ignore: [
+              'file.*'
+            ]
+          },
+          expectedAssetKeys: ['directoryfile.txt']
+        })
+        .then(done)
+        .catch(done);
+      });
+      it('ignores files when from is a directory', function(done) {
+        runEmit({
+          patterns: [{ from: 'directory' }],
+          options: {
+            ignore: [
+              '*/nestedfile.*'
+            ]
+          },
+          expectedAssetKeys: ['directoryfile.txt']
+        })
+        .then(done)
+        .catch(done);
+      });
+      it('ignores files with a certain extension', function(done) {
+        runEmit({
+          patterns: [{ from: 'directory' }],
+          options: {
+            ignore: [
+              '*.txt'
+            ]
+          },
+          expectedAssetKeys: []
+        })
+        .then(done)
+        .catch(done);
+      });
     });
   });
 });

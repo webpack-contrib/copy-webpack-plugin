@@ -3,14 +3,21 @@ var Promise = require('bluebird');
 var path = require('path');
 var fs = Promise.promisifyAll(require('fs'));
 var dir = Promise.promisifyAll(require('node-dir'));
+var minimatch = require('minimatch');
 
 
-function apply(patterns, compiler) {
+function apply(patterns, opts, compiler) {
 
   var baseDir = compiler.options.context;
   var fileDependencies = [];
   var contextDependencies = [];
   var lastGlobalUpdate = 0;
+  
+  if (!opts) {
+    opts = {};
+  }
+  
+  var ignoreList = opts.ignore;
 
   compiler.plugin('emit', function(compilation, cb) {
     Promise.each(patterns, function(pattern) {
@@ -28,9 +35,15 @@ function apply(patterns, compiler) {
             absDirSrc: absSrc,
             relDirDest: relDest,
             forceWrite: forceWrite,
-            lastGlobalUpdate: lastGlobalUpdate
+            lastGlobalUpdate: lastGlobalUpdate,
+            ignoreList: ignoreList
           });
         } else {
+          // Skip if it matches any of our ignore list
+          if (shouldIgnore(relSrc, ignoreList)) {
+            return;
+          }
+          
           fileDependencies.push(absSrc);
           if ((path.extname(relDest) === '' ||  // doesn't have an extension
               _.last(relDest) === path.sep ||   // ends in a path separator
@@ -110,11 +123,17 @@ function writeDirectoryToAssets(opts) {
   var relDirDest = opts.relDirDest;
   var forceWrite = opts.forceWrite;
   var lastGlobalUpdate = opts.lastGlobalUpdate;
+  var ignoreList = opts.ignoreList;
 
   return dir.filesAsync(absDirSrc)
   .each(function(absFileSrc) {
     var relFileSrc = path.relative(absDirSrc, absFileSrc);
     var relFileDest = path.join(relDirDest, relFileSrc);
+    
+    // Skip if it matches any of our ignore list
+    if (shouldIgnore(relFileSrc, ignoreList)) {
+      return;
+    }
 
     // Make sure it doesn't start with the separator
     if (_.first(relFileDest) === path.sep) {
@@ -131,7 +150,20 @@ function writeDirectoryToAssets(opts) {
   });
 }
 
-module.exports = function(patterns) {
+function shouldIgnore(pathName, ignoreList) {
+  var matched = _.find(ignoreList, function(glob) {
+    return minimatch(pathName, glob, {
+      matchBase: true
+    });
+  });
+  if (matched) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+module.exports = function(patterns, options) {
   if (_.isUndefined(patterns)) {
     patterns = [];
   }
@@ -141,6 +173,6 @@ module.exports = function(patterns) {
   }
 
   return {
-    apply: apply.bind(this, patterns)
+    apply: apply.bind(this, patterns, options)
   };
 };
