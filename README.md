@@ -20,16 +20,16 @@ A pattern looks like:
 Pattern params:
 * `from`
     - is required
-    - can be an absolute path
-    - can be a relative path
-    - can be a file
-    - can be a directory
+    - can be an absolute or relative path
+    - can be a file or directory
 * `to`
     - is optional
     - is relative to the context root
     - defaults to `'/'`
+    - must be a directory if `from` is a directory
 * `toType`
     - is optional
+    - is ignored if `from` is a directory
     - defaults to `'file'` if `to` has an extension
     - defaults to `'dir'` if `to` doesn't have an extension
 * `force`
@@ -54,24 +54,34 @@ module.exports = {
             
             // {context}/path/to/build/directory/file.txt
             { from: 'path/to/file.txt', to: 'path/to/build/directory' },
-            
-            // {context}/file/without/extension
-            { from: 'path/to/file.txt', to: 'file/without/extension', toType: 'file' },
-            
-            // {context}/directory/with/extension.ext/file.txt
-            { from: 'path/to/file.txt', to: 'directory/with/extension.ext', toType: 'dir' },
 
             // Copy directory contents to {context}/
             { from: 'path/to/directory' },
             
             // Copy directory contents to {context}/path/to/build/directory
-            { from: 'path/to/directory', to: 'path/to/build/directory' }
+            { from: 'path/to/directory', to: 'path/to/build/directory' },
+            
+            // {context}/file/without/extension
+            {
+                from: 'path/to/file.txt',
+                to: 'file/without/extension',
+                toType: 'file'
+            },
+            
+            // {context}/directory/with/extension.ext/file.txt
+            {
+                from: 'path/to/file.txt',
+                to: 'directory/with/extension.ext',
+                toType: 'dir'
+            }
         ])
     ]
 };
 ```
 
 ### Testing
+
+[![Build Status](https://drone.io/github.com/kevlened/copy-webpack-plugin/status.png)](https://drone.io/github.com/kevlened/copy-webpack-plugin/latest)
 
 Run `npm test`
 
