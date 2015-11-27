@@ -68,7 +68,9 @@ describe('apply function', function() {
     return run(opts)
     .then(function(compilation) {
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-        expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
+        // Replace all paths with platform-specific paths
+        var expectedAssetKeys = _.map(opts.expectedAssetKeys, path.normalize);
+        expect(compilation.assets).to.have.all.keys(expectedAssetKeys);
       } else {
         expect(compilation.assets).to.be.empty;
       }

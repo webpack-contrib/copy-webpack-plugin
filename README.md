@@ -47,6 +47,7 @@ Available options:
 
 ```javascript
 var CopyWebpackPlugin = require('copy-webpack-plugin');
+var path = require('path');
 
 module.exports = {
     context: path.join(__dirname, 'app'),
