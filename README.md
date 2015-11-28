@@ -17,7 +17,7 @@ npm install --save-dev copy-webpack-plugin
 A pattern looks like:
 `{ from: 'source', to: 'dest' }`
 
-Pattern properties:
+#### Pattern properties:
 * `from`
     - is required
     - can be an absolute or path relative to the context
@@ -37,7 +37,7 @@ Pattern properties:
     - defaults to `false`
     - forces the plugin to overwrite files staged by previous plugins
 
-Available options:
+#### Available options:
 * `ignore`
     - an array of files and directories to ignore
     - accepts globs
@@ -53,29 +53,29 @@ module.exports = {
     context: path.join(__dirname, 'app'),
     plugins: [
         new CopyWebpackPlugin([
-            // {context}/file.txt
+            // {output}/file.txt
             { from: 'path/to/file.txt' },
             
-            // {context}/path/to/build/file.txt
+            // {output}/path/to/build/file.txt
             { from: 'path/to/file.txt', to: 'path/to/build/file.txt' },
             
-            // {context}/path/to/build/directory/file.txt
+            // {output}/path/to/build/directory/file.txt
             { from: 'path/to/file.txt', to: 'path/to/build/directory' },
 
-            // Copy directory contents to {context}/
+            // Copy directory contents to {output}/
             { from: 'path/to/directory' },
             
-            // Copy directory contents to {context}/path/to/build/directory
+            // Copy directory contents to {output}/path/to/build/directory/
             { from: 'path/to/directory', to: 'path/to/build/directory' },
             
-            // {context}/file/without/extension
+            // {output}/file/without/extension
             {
                 from: 'path/to/file.txt',
                 to: 'file/without/extension',
                 toType: 'file'
             },
             
-            // {context}/directory/with/extension.ext/file.txt
+            // {output}/directory/with/extension.ext/file.txt
             {
                 from: 'path/to/file.txt',
                 to: 'directory/with/extension.ext',
