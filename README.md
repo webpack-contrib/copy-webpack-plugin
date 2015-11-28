@@ -24,7 +24,7 @@ A pattern looks like:
     - can be a file or directory
 * `to`
     - is optional
-    - is relative to the context root
+    - is relative to the build root (webpack defaults to `dist`)
     - defaults to `'/'`
     - must be a directory if `from` is a directory
 * `toType`
