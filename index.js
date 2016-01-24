@@ -5,7 +5,6 @@ var globAsync = Promise.promisify(require('glob'));
 var fs = Promise.promisifyAll(require('fs-extra'));
 var dir = Promise.promisifyAll(require('node-dir'));
 var minimatch = require('minimatch');
-var os = require('os');
 
 function toLooksLikeDirectory(pattern) {
   var filename = pattern.to;
