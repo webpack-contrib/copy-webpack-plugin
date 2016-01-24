@@ -22,10 +22,10 @@ A pattern looks like:
     - is required
     - can be an absolute or path relative to the context
     - can be a file or directory
+    - can be a glob
 * `to`
     - is optional
-    - is relative to the build root (webpack defaults to `dist`)
-    - defaults to `'/'`
+    - if not absolute, it's relative to the build root
     - must be a directory if `from` is a directory
 * `toType`
     - is optional
@@ -54,19 +54,22 @@ module.exports = {
     plugins: [
         new CopyWebpackPlugin([
             // {output}/file.txt
-            { from: 'path/to/file.txt' },
+            { from: 'from/file.txt' },
             
-            // {output}/path/to/build/file.txt
-            { from: 'path/to/file.txt', to: 'path/to/build/file.txt' },
+            // {output}/to/file.txt
+            { from: 'from/file.txt', to: 'to/file.txt' },
             
-            // {output}/path/to/build/directory/file.txt
-            { from: 'path/to/file.txt', to: 'path/to/build/directory' },
+            // {output}/to/directory/file.txt
+            { from: 'from/file.txt', to: 'to/directory' },
 
             // Copy directory contents to {output}/
-            { from: 'path/to/directory' },
+            { from: 'from/directory' },
             
-            // Copy directory contents to {output}/path/to/build/directory/
-            { from: 'path/to/directory', to: 'path/to/build/directory' },
+            // Copy directory contents to {output}/to/directory/
+            { from: 'from/directory', to: 'to/directory' },
+            
+            // Copy glob results to /absolute/path/
+            { from: 'from/directory/**/*', to: '/absolute/path' },
             
             // {output}/file/without/extension
             {
