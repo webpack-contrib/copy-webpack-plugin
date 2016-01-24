@@ -176,6 +176,24 @@ describe('apply function', function() {
       .catch(done);
     });
 
+    it('can use an glob to move a file to the root directory', function(done) {
+      runEmit({
+        patterns: [{ from: path.join(HELPER_DIR, '*.txt') }],
+        expectedAssetKeys: ['file.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
+    it('can use an glob to move multiple files to the root directory', function(done) {
+      runEmit({
+        patterns: [{ from: path.join(HELPER_DIR, '**/*.txt') }],
+        expectedAssetKeys: ['file.txt', 'directory/directoryfile.txt', 'directory/nested/nestedfile.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
     it('can move a file to a new directory without a forward slash', function(done) {
       runEmit({
         patterns: [{ from: 'file.txt', to: 'newdirectory' }],
@@ -418,7 +436,7 @@ describe('apply function', function() {
       .catch(done);
     });
   });
-  
+
   describe('options', function() {
     describe('ignore', function() {
       it('ignores files when from is a file', function(done) {

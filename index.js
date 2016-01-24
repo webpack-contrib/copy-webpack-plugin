@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var Promise = require('bluebird');
 var path = require('path');
+var globAsync = Promise.promisify(require('glob'));
 var fs = Promise.promisifyAll(require('fs'));
 var dir = Promise.promisifyAll(require('node-dir'));
 var minimatch = require('minimatch');
@@ -12,11 +13,11 @@ function apply(patterns, opts, compiler) {
   var fileDependencies = [];
   var contextDependencies = [];
   var lastGlobalUpdate = 0;
-  
+
   if (!opts) {
     opts = {};
   }
-  
+
   var ignoreList = opts.ignore;
 
   compiler.plugin('emit', function(compilation, cb) {
@@ -27,8 +28,11 @@ function apply(patterns, opts, compiler) {
       var forceWrite = !!pattern.force;
 
       return fs.statAsync(absSrc)
+      .catch(function(err) {
+        return null;
+      })
       .then(function(stat) {
-        if (stat.isDirectory()) {
+        if (stat && stat.isDirectory()) {
           contextDependencies.push(absSrc);
           return writeDirectoryToAssets({
             compilation: compilation,
@@ -39,28 +43,42 @@ function apply(patterns, opts, compiler) {
             ignoreList: ignoreList
           });
         } else {
-          // Skip if it matches any of our ignore list
-          if (shouldIgnore(relSrc, ignoreList)) {
-            return;
-          }
-          
-          fileDependencies.push(absSrc);
-          if ((path.extname(relDest) === '' ||  // doesn't have an extension
-              _.last(relDest) === path.sep ||   // ends in a path separator
-              _.last(relDest) === '/' ||        // ends in a slash (kept for compatibility)
-              pattern.toType === 'dir') &&      // is explicitly a dir
-              pattern.toType !== 'file') {      // is not explicitly a file
-            relDest = path.join(relDest, path.basename(relSrc));
-          } else {
-            relDest = relDest || path.basename(relSrc);
-          }
-          return writeFileToAssets({
-            compilation: compilation,
-            absFileSrc: absSrc,
-            relFileDest: relDest,
-            forceWrite: forceWrite,
-            lastGlobalUpdate: lastGlobalUpdate
+
+          return globAsync(relSrc, {cwd: baseDir})
+          .each(function(relFileSrc) {
+
+            // Skip if it matches any of our ignore list
+            if (shouldIgnore(relFileSrc, ignoreList)) {
+              return;
+            }
+
+            var absFileSrc = path.resolve(baseDir, relFileSrc);
+            var relFileDest = pattern.to || '';
+            var relFileDirname = path.dirname(relFileSrc);
+
+            fileDependencies.push(absFileSrc);
+            if (!stat && relFileDirname !== baseDir) {
+              // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
+              relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
+            } else if ((path.extname(relFileDest) === '' ||  // doesn't have an extension
+                _.last(relFileDest) === path.sep ||   // ends in a path separator
+                _.last(relFileDest) === '/' ||        // ends in a slash (kept for compatibility)
+                pattern.toType === 'dir') &&      // is explicitly a dir
+                pattern.toType !== 'file') {      // is not explicitly a file
+              relFileDest = path.join(relFileDest, path.basename(relFileSrc));
+            } else {
+              relFileDest = relFileDest || path.basename(relFileSrc);
+            }
+
+            return writeFileToAssets({
+              compilation: compilation,
+              absFileSrc: absFileSrc,
+              relFileDest: relFileDest,
+              forceWrite: forceWrite,
+              lastGlobalUpdate: lastGlobalUpdate
+            });
           });
+
         }
       });
     })
@@ -102,6 +120,7 @@ function writeFileToAssets(opts) {
   if (compilation.assets[relFileDest] && !forceWrite) {
     return Promise.resolve();
   }
+
   return fs.statAsync(absFileSrc)
   .then(function(stat) {
     if (stat.mtime.getTime() > lastGlobalUpdate) {
@@ -129,7 +148,7 @@ function writeDirectoryToAssets(opts) {
   .each(function(absFileSrc) {
     var relFileSrc = path.relative(absDirSrc, absFileSrc);
     var relFileDest = path.join(relDirDest, relFileSrc);
-    
+
     // Skip if it matches any of our ignore list
     if (shouldIgnore(relFileSrc, ignoreList)) {
       return;
