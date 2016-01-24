@@ -19,6 +19,7 @@
   "homepage": "https://github.com/kevlened/copy-webpack-plugin",
   "dependencies": {
     "bluebird": "^2.10.2",
+    "fs-extra": "^0.26.4",
     "glob": "^6.0.4",
     "lodash": "^3.10.1",
     "minimatch": "^3.0.0",

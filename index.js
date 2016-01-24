@@ -2,10 +2,21 @@ var _ = require('lodash');
 var Promise = require('bluebird');
 var path = require('path');
 var globAsync = Promise.promisify(require('glob'));
-var fs = Promise.promisifyAll(require('fs'));
+var fs = Promise.promisifyAll(require('fs-extra'));
 var dir = Promise.promisifyAll(require('node-dir'));
 var minimatch = require('minimatch');
+var os = require('os');
 
+function toLooksLikeDirectory(pattern) {
+  var filename = pattern.to;
+  if ((path.extname(filename) === '' || // doesn't have an extension
+    _.last(filename) === path.sep ||    // ends in a path separator
+    _.last(filename) === '/' ||         // ends in a slash (kept for compatibility)
+    pattern.toType === 'dir') &&        // is explicitly a dir
+    pattern.toType !== 'file') {        // is not explicitly a file
+    return true;
+  }
+}
 
 function apply(patterns, opts, compiler) {
 
@@ -25,6 +36,20 @@ function apply(patterns, opts, compiler) {
       var relSrc = pattern.from;
       var absSrc = path.resolve(baseDir, relSrc);
       var relDest = pattern.to || '';
+      
+      // Determine if this is an absolute to
+      var absDest;
+      if (os.platform() === 'win32') {
+        var winRootMatcher = /^[A-z]:\\\\/;
+        if (winRootMatcher.test(relDest)) {
+          absDest = relDest;
+        }
+      } else {
+        if (relDest[0] === '/') {
+          absDest = relDest;
+        }
+      }
+      
       var forceWrite = !!pattern.force;
 
       return fs.statAsync(absSrc)
@@ -34,6 +59,11 @@ function apply(patterns, opts, compiler) {
       .then(function(stat) {
         if (stat && stat.isDirectory()) {
           contextDependencies.push(absSrc);
+          
+          if (absDest && toLooksLikeDirectory(pattern)) {
+            return fs.copyAsync(absSrc, absDest);
+          }
+          
           return writeDirectoryToAssets({
             compilation: compilation,
             absDirSrc: absSrc,
@@ -57,14 +87,20 @@ function apply(patterns, opts, compiler) {
             var relFileDirname = path.dirname(relFileSrc);
 
             fileDependencies.push(absFileSrc);
+            
+            // If it's an absolute destination, write directly
+            if (absDest) {
+              var dest = absDest;
+              if (toLooksLikeDirectory(pattern)) {
+                dest = path.join(absDest, path.basename(absFileSrc));
+              }
+              return fs.copyAsync(absFileSrc, dest);
+            }
+            
             if (!stat && relFileDirname !== baseDir) {
               // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
               relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
-            } else if ((path.extname(relFileDest) === '' || // doesn't have an extension
-                _.last(relFileDest) === path.sep ||         // ends in a path separator
-                _.last(relFileDest) === '/' ||              // ends in a slash (kept for compatibility)
-                pattern.toType === 'dir') &&                // is explicitly a dir
-                pattern.toType !== 'file') {                // is not explicitly a file
+            } else if (toLooksLikeDirectory(pattern)) {
               relFileDest = path.join(relFileDest, path.basename(relFileSrc));
             } else {
               relFileDest = relFileDest || path.basename(relFileSrc);
@@ -78,7 +114,6 @@ function apply(patterns, opts, compiler) {
               lastGlobalUpdate: lastGlobalUpdate
             });
           });
-
         }
       });
     })

@@ -1,13 +1,14 @@
-/* globals describe, it, __dirname */
+/* globals describe, it, afterEach, __dirname */
 var expect = require('chai').expect;
 var CopyWebpackPlugin = require('../index');
 var path = require('path');
 var _ = require('lodash');
 var Promise = require('bluebird');
-var fs = Promise.promisifyAll(require('fs'));
+var fs = Promise.promisifyAll(require('fs-extra'));
 
 
 var HELPER_DIR = path.join(__dirname, 'helpers');
+var TEMP_DIR = path.join(__dirname, 'tempdir');
 
 function MockCompiler() {
   this.options = {
@@ -27,6 +28,11 @@ MockCompiler.prototype.plugin = function(type, fn) {
 };
 
 describe('apply function', function() {
+  
+  afterEach(function() {
+    // Make sure the temp directory is removed
+    fs.removeSync(TEMP_DIR);
+  });
 
   // Ideally we pass in patterns and confirm the resulting assets
   function run(opts) {
@@ -74,6 +80,16 @@ describe('apply function', function() {
         expect(compilation.assets).to.have.all.keys(expectedAssetKeys);
       } else {
         expect(compilation.assets).to.be.empty;
+      }
+      
+      if (opts.expectedFilesWritten) {
+        _.each(opts.expectedFilesWritten, function(file) {
+          var stat = fs.statSync(file);
+          expect(stat).to.exist;
+          if (stat) {
+            fs.unlinkSync(file);
+          }
+        });
       }
     });
   }
@@ -201,6 +217,33 @@ describe('apply function', function() {
       runEmit({
         patterns: [{ from: 'file.txt', to: 'newdirectory' }],
         expectedAssetKeys: ['newdirectory/file.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+    
+    it('can move a file to a new directory using an absolute to', function(done) {
+      runEmit({
+        patterns: [{
+          from: 'file.txt',
+          to: TEMP_DIR
+        }],
+        expectedAssetKeys: [],
+        expectedFilesWritten: [path.join(TEMP_DIR, 'file.txt')]
+      })
+      .then(done)
+      .catch(done);
+    });
+    
+    it('can move a file to a new file using an absolute to', function(done) {
+      var absolutePath = path.resolve(TEMP_DIR, 'newfile.txt');
+      runEmit({
+        patterns: [{
+          from: 'file.txt',
+          to: absolutePath
+        }],
+        expectedAssetKeys: [],
+        expectedFilesWritten: [absolutePath]
       })
       .then(done)
       .catch(done);
@@ -360,6 +403,19 @@ describe('apply function', function() {
       runEmit({
         patterns: [{ from: 'directory', to: 'newdirectory' }],
         expectedAssetKeys: ['newdirectory/directoryfile.txt','newdirectory/nested/nestedfile.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+    
+    it('can move a directory\'s contents to a new directory using an absolute to', function(done) {
+      runEmit({
+        patterns: [{ from: 'directory', to: TEMP_DIR }],
+        expectedAssetKeys: [],
+        expectedFilesWritten: [
+          path.join(TEMP_DIR, 'directoryfile.txt'),
+          path.join(TEMP_DIR, 'nested/nestedfile.txt')
+        ]
       })
       .then(done)
       .catch(done);
