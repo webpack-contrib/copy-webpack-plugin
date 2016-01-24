@@ -60,11 +60,11 @@ function apply(patterns, opts, compiler) {
             if (!stat && relFileDirname !== baseDir) {
               // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
               relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
-            } else if ((path.extname(relFileDest) === '' ||  // doesn't have an extension
-                _.last(relFileDest) === path.sep ||   // ends in a path separator
-                _.last(relFileDest) === '/' ||        // ends in a slash (kept for compatibility)
-                pattern.toType === 'dir') &&      // is explicitly a dir
-                pattern.toType !== 'file') {      // is not explicitly a file
+            } else if ((path.extname(relFileDest) === '' || // doesn't have an extension
+                _.last(relFileDest) === path.sep ||         // ends in a path separator
+                _.last(relFileDest) === '/' ||              // ends in a slash (kept for compatibility)
+                pattern.toType === 'dir') &&                // is explicitly a dir
+                pattern.toType !== 'file') {                // is not explicitly a file
               relFileDest = path.join(relFileDest, path.basename(relFileSrc));
             } else {
               relFileDest = relFileDest || path.basename(relFileSrc);
@@ -172,7 +172,8 @@ function writeDirectoryToAssets(opts) {
 function shouldIgnore(pathName, ignoreList) {
   var matched = _.find(ignoreList, function(glob) {
     return minimatch(pathName, glob, {
-      matchBase: true
+      matchBase: true,
+      dot: true
     });
   });
   if (matched) {

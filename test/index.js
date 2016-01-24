@@ -1,3 +1,4 @@
+/* globals describe, it, __dirname */
 var expect = require('chai').expect;
 var CopyWebpackPlugin = require('../index');
 var path = require('path');
@@ -131,6 +132,8 @@ describe('apply function', function() {
     });
   }
 
+  // Use then and catch explicitly, so errors 
+  // aren't seen as unhandled exceptions
   describe('error handling', function() {
     it('doesn\'t throw an error if no patterns are passed', function(done) {
       runEmit({
@@ -176,7 +179,7 @@ describe('apply function', function() {
       .catch(done);
     });
 
-    it('can use an glob to move a file to the root directory', function(done) {
+    it('can use a glob to move a file to the root directory', function(done) {
       runEmit({
         patterns: [{ from: path.join(HELPER_DIR, '*.txt') }],
         expectedAssetKeys: ['file.txt']
@@ -185,7 +188,7 @@ describe('apply function', function() {
       .catch(done);
     });
 
-    it('can use an glob to move multiple files to the root directory', function(done) {
+    it('can use a glob to move multiple files to the root directory', function(done) {
       runEmit({
         patterns: [{ from: path.join(HELPER_DIR, '**/*.txt') }],
         expectedAssetKeys: ['file.txt', 'directory/directoryfile.txt', 'directory/nested/nestedfile.txt']
@@ -455,6 +458,7 @@ describe('apply function', function() {
         .then(done)
         .catch(done);
       });
+      
       it('ignores files when from is a directory', function(done) {
         runEmit({
           patterns: [{ from: 'directory' }],
@@ -468,12 +472,45 @@ describe('apply function', function() {
         .then(done)
         .catch(done);
       });
+      
       it('ignores files with a certain extension', function(done) {
         runEmit({
           patterns: [{ from: 'directory' }],
           options: {
             ignore: [
               '*.txt'
+            ]
+          },
+          expectedAssetKeys: []
+        })
+        .then(done)
+        .catch(done);
+      });
+      
+      it('ignores files that start with a dot', function(done) {
+        runEmit({
+          patterns: [{ from: '.' }],
+          options: {
+            ignore: [
+              '.dotted_file'
+            ]
+          },
+          expectedAssetKeys: [
+            'file.txt',
+            'directory/directoryfile.txt', 
+            'directory/nested/nestedfile.txt'
+          ]
+        })
+        .then(done)
+        .catch(done);
+      });
+      
+      it('ignores all files', function(done) {
+        runEmit({
+          patterns: [{ from: '.' }],
+          options: {
+            ignore: [
+              '**/*'
             ]
           },
           expectedAssetKeys: []
