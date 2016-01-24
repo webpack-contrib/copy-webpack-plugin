@@ -39,15 +39,8 @@ function apply(patterns, opts, compiler) {
       
       // Determine if this is an absolute to
       var absDest;
-      if (os.platform() === 'win32') {
-        var winRootMatcher = /^[A-z]:\\\\/;
-        if (winRootMatcher.test(relDest)) {
-          absDest = relDest;
-        }
-      } else {
-        if (relDest[0] === '/') {
-          absDest = relDest;
-        }
+      if (path.isAbsolute(relDest)) {
+        absDest = relDest;
       }
       
       var forceWrite = !!pattern.force;
@@ -76,7 +69,7 @@ function apply(patterns, opts, compiler) {
 
           return globAsync(relSrc, {cwd: baseDir})
           .each(function(relFileSrc) {
-
+                 
             // Skip if it matches any of our ignore list
             if (shouldIgnore(relFileSrc, ignoreList)) {
               return;
@@ -98,8 +91,12 @@ function apply(patterns, opts, compiler) {
             }
             
             if (!stat && relFileDirname !== baseDir) {
-              // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
-              relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
+              if (path.isAbsolute(relFileSrc)) {
+                // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
+                relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
+              } else {
+                relFileDest = relFileSrc;
+              }
             } else if (toLooksLikeDirectory(pattern)) {
               relFileDest = path.join(relFileDest, path.basename(relFileSrc));
             } else {

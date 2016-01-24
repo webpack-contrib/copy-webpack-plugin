@@ -194,8 +194,26 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-
+    
     it('can use a glob to move a file to the root directory', function(done) {
+      runEmit({
+        patterns: [{ from: '*.txt' }],
+        expectedAssetKeys: ['file.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
+    it('can use a glob to move multiple files to the root directory', function(done) {
+      runEmit({
+        patterns: [{ from: '**/*.txt' }],
+        expectedAssetKeys: ['file.txt', 'directory/directoryfile.txt', 'directory/nested/nestedfile.txt']
+      })
+      .then(done)
+      .catch(done);
+    });
+
+    it('can use a glob with a full path to move a file to the root directory', function(done) {
       runEmit({
         patterns: [{ from: path.join(HELPER_DIR, '*.txt') }],
         expectedAssetKeys: ['file.txt']
@@ -204,7 +222,7 @@ describe('apply function', function() {
       .catch(done);
     });
 
-    it('can use a glob to move multiple files to the root directory', function(done) {
+    it('can use a glob with a full path to move multiple files to the root directory', function(done) {
       runEmit({
         patterns: [{ from: path.join(HELPER_DIR, '**/*.txt') }],
         expectedAssetKeys: ['file.txt', 'directory/directoryfile.txt', 'directory/nested/nestedfile.txt']
