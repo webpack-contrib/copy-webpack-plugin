@@ -36,12 +36,6 @@ function apply(patterns, opts, compiler) {
       var absSrc = path.resolve(baseDir, relSrc);
       var relDest = pattern.to || '';
       
-      // Determine if this is an absolute to
-      var absDest;
-      if (path.isAbsolute(relDest)) {
-        absDest = relDest;
-      }
-      
       var forceWrite = !!pattern.force;
 
       return fs.statAsync(absSrc)
@@ -52,8 +46,9 @@ function apply(patterns, opts, compiler) {
         if (stat && stat.isDirectory()) {
           contextDependencies.push(absSrc);
           
-          if (absDest && toLooksLikeDirectory(pattern)) {
-            return fs.copyAsync(absSrc, absDest);
+          // Make the relative destination actually relative
+          if (path.isAbsolute(relDest)) {
+            relDest = path.relative(baseDir, relDest);
           }
           
           return writeDirectoryToAssets({
@@ -80,15 +75,6 @@ function apply(patterns, opts, compiler) {
 
             fileDependencies.push(absFileSrc);
             
-            // If it's an absolute destination, write directly
-            if (absDest) {
-              var dest = absDest;
-              if (toLooksLikeDirectory(pattern)) {
-                dest = path.join(absDest, path.basename(absFileSrc));
-              }
-              return fs.copyAsync(absFileSrc, dest);
-            }
-            
             if (!stat && relFileDirname !== baseDir) {
               if (path.isAbsolute(relFileSrc)) {
                 // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
@@ -100,6 +86,11 @@ function apply(patterns, opts, compiler) {
               relFileDest = path.join(relFileDest, path.basename(relFileSrc));
             } else {
               relFileDest = relFileDest || path.basename(relFileSrc);
+            }
+            
+            // Make the relative destination actually relative
+            if (path.isAbsolute(relFileDest)) {
+              relFileDest = path.relative(baseDir, relFileDest);
             }
 
             return writeFileToAssets({
