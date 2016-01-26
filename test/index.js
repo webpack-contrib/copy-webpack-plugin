@@ -573,12 +573,26 @@ describe('apply function', function() {
         .catch(done);
       });
       
-      it('ignores all files', function(done) {
+      it('ignores all files except those with dots', function(done) {
         runEmit({
           patterns: [{ from: '.' }],
           options: {
             ignore: [
               '**/*'
+            ]
+          },
+          expectedAssetKeys: ['.dotted_file']
+        })
+        .then(done)
+        .catch(done);
+      });
+      
+      it('ignores all files even if they start with a dot', function(done) {
+        runEmit({
+          patterns: [{ from: '.' }],
+          options: {
+            ignore: [
+              { glob: '**/*', dot: true }
             ]
           },
           expectedAssetKeys: []

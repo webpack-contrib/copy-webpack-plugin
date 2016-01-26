@@ -192,11 +192,24 @@ function writeDirectoryToAssets(opts) {
 }
 
 function shouldIgnore(pathName, ignoreList) {
-  var matched = _.find(ignoreList, function(glob) {
-    return minimatch(pathName, glob, {
-      matchBase: true,
-      dot: true
-    });
+  var matched = _.find(ignoreList, function(g) {
+    // Default minimatch params
+    var params = {
+      matchBase: true
+    };
+    
+    var glob;
+    if (_.isString(g)) {
+      glob = g;
+    } else if(_.isObject(g)){
+      glob = g.glob || '';
+      // Overwrite minimatch defaults
+      params = _.assign(params, _.omit(g, ['glob']));
+    } else {
+      glob = '';
+    }
+    
+    return minimatch(pathName, glob, params);
   });
   if (matched) {
     return true;

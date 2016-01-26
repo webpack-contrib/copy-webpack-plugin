@@ -87,7 +87,10 @@ module.exports = {
         ], {
             ignore: [
                 // Doesn't copy any files with a txt extension    
-                '*.txt'
+                '*.txt',
+                
+                // Doesn't copy any file, even if they start with a dot
+                { glob: '**/*', dot: true }
             ]
         })
     ]
