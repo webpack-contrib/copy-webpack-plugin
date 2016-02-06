@@ -133,7 +133,7 @@ describe('apply function', function() {
     });
   }
 
-  // Use then and catch explicitly, so errors 
+  // Use then and catch explicitly, so errors
   // aren't seen as unhandled exceptions
   describe('error handling', function() {
     it('doesn\'t throw an error if no patterns are passed', function(done) {
@@ -179,7 +179,7 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-    
+
     it('can use a glob to move a file to the root directory', function(done) {
       runEmit({
         patterns: [{ from: '*.txt' }],
@@ -224,7 +224,7 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-    
+
     it('can move a file to the root directory using an absolute to', function(done) {
       runEmit({
         patterns: [{
@@ -236,7 +236,7 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-    
+
     it('can move a file to a new directory using an absolute to', function(done) {
       runEmit({
         patterns: [{
@@ -248,7 +248,7 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-    
+
     it('can move a file to a new file using an absolute to', function(done) {
       var absolutePath = path.resolve(TEMP_DIR, 'newfile.txt');
       runEmit({
@@ -376,20 +376,6 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-
-    it('only include files that have changed', function(done) {
-      runChange({
-        patterns: [{ from: 'tempfile1.txt' }, { from: 'tempfile2.txt' }],
-        newFileLoc1: path.join(HELPER_DIR, 'tempfile1.txt'),
-        newFileLoc2: path.join(HELPER_DIR, 'tempfile2.txt')
-      })
-      .then(function(compilation) {
-        expect(compilation.assets).to.have.key('tempfile1.txt');
-        expect(compilation.assets).not.to.have.key('tempfile2.txt');
-      })
-      .then(done)
-      .catch(done);
-    });
   });
 
   describe('with directory in from', function() {
@@ -420,7 +406,7 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-    
+
     it('can move a directory\'s contents to a new directory using an absolute to', function(done) {
       runEmit({
         patterns: [{ from: 'directory', to: TEMP_DIR }],
@@ -492,20 +478,6 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-
-    it('only include files that have changed', function(done) {
-      runChange({
-        patterns: [{ from: 'directory' }],
-        newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
-        newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt')
-      })
-      .then(function(compilation) {
-        expect(compilation.assets).to.have.key('tempfile1.txt');
-        expect(compilation.assets).not.to.have.key('tempfile2.txt');
-      })
-      .then(done)
-      .catch(done);
-    });
   });
 
   describe('options', function() {
@@ -526,7 +498,7 @@ describe('apply function', function() {
         .then(done)
         .catch(done);
       });
-      
+
       it('ignores files when from is a directory', function(done) {
         runEmit({
           patterns: [{ from: 'directory' }],
@@ -540,7 +512,7 @@ describe('apply function', function() {
         .then(done)
         .catch(done);
       });
-      
+
       it('ignores files with a certain extension', function(done) {
         runEmit({
           patterns: [{ from: 'directory' }],
@@ -554,7 +526,7 @@ describe('apply function', function() {
         .then(done)
         .catch(done);
       });
-      
+
       it('ignores files that start with a dot', function(done) {
         runEmit({
           patterns: [{ from: '.' }],
@@ -565,14 +537,14 @@ describe('apply function', function() {
           },
           expectedAssetKeys: [
             'file.txt',
-            'directory/directoryfile.txt', 
+            'directory/directoryfile.txt',
             'directory/nested/nestedfile.txt'
           ]
         })
         .then(done)
         .catch(done);
       });
-      
+
       it('ignores all files except those with dots', function(done) {
         runEmit({
           patterns: [{ from: '.' }],
@@ -586,7 +558,7 @@ describe('apply function', function() {
         .then(done)
         .catch(done);
       });
-      
+
       it('ignores all files even if they start with a dot', function(done) {
         runEmit({
           patterns: [{ from: '.' }],
