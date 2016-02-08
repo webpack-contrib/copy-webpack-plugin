@@ -35,7 +35,7 @@ function apply(patterns, opts, compiler) {
       var relSrc = pattern.from;
       var absSrc = path.resolve(baseDir, relSrc);
       var relDest = pattern.to || '';
-      
+
       var forceWrite = !!pattern.force;
 
       return fs.statAsync(absSrc)
@@ -45,12 +45,12 @@ function apply(patterns, opts, compiler) {
       .then(function(stat) {
         if (stat && stat.isDirectory()) {
           contextDependencies.push(absSrc);
-          
+
           // Make the relative destination actually relative
           if (path.isAbsolute(relDest)) {
             relDest = path.relative(baseDir, relDest);
           }
-          
+
           return writeDirectoryToAssets({
             compilation: compilation,
             absDirSrc: absSrc,
@@ -63,7 +63,7 @@ function apply(patterns, opts, compiler) {
 
           return globAsync(relSrc, {cwd: baseDir})
           .each(function(relFileSrc) {
-                 
+
             // Skip if it matches any of our ignore list
             if (shouldIgnore(relFileSrc, ignoreList)) {
               return;
@@ -74,7 +74,7 @@ function apply(patterns, opts, compiler) {
             var relFileDirname = path.dirname(relFileSrc);
 
             fileDependencies.push(absFileSrc);
-            
+
             if (!stat && relFileDirname !== baseDir) {
               if (path.isAbsolute(relFileSrc)) {
                 // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
@@ -87,7 +87,7 @@ function apply(patterns, opts, compiler) {
             } else {
               relFileDest = relFileDest || path.basename(relFileSrc);
             }
-            
+
             // Make the relative destination actually relative
             if (path.isAbsolute(relFileDest)) {
               relFileDest = path.relative(baseDir, relFileDest);
@@ -143,19 +143,26 @@ function writeFileToAssets(opts) {
     return Promise.resolve();
   }
 
-  return fs.statAsync(absFileSrc)
-  .then(function(stat) {
-    if (stat.mtime.getTime() > lastGlobalUpdate) {
-      compilation.assets[relFileDest] = {
-        size: function() {
-          return stat.size;
-        },
-        source: function() {
-          return fs.readFileSync(absFileSrc);
-        }
-      };
-    }
+  var currentAssets = _.keys(compilation.assets);
+  var inProduction = _.find(currentAssets, function(name) {
+    return _.endsWith(absFileSrc, name);
   });
+
+  return fs.statAsync(absFileSrc)
+    .then(function(stat) {
+      if (compilation.assets[inProduction]) {
+        compilation.assets[relFileDest] = compilation.assets[inProduction];
+      } else if (stat.mtime.getTime() > lastGlobalUpdate) {
+        compilation.assets[relFileDest] = {
+          size: function() {
+            return stat.size;
+          },
+          source: function() {
+            return fs.readFileSync(absFileSrc);
+          }
+        };
+      }
+    });
 }
 
 function writeDirectoryToAssets(opts) {
@@ -197,7 +204,7 @@ function shouldIgnore(pathName, ignoreList) {
     var params = {
       matchBase: true
     };
-    
+
     var glob;
     if (_.isString(g)) {
       glob = g;
@@ -208,7 +215,7 @@ function shouldIgnore(pathName, ignoreList) {
     } else {
       glob = '';
     }
-    
+
     return minimatch(pathName, glob, params);
   });
   if (matched) {
