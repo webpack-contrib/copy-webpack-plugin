@@ -19,7 +19,7 @@ function toLooksLikeDirectory(pattern) {
 
 function apply(patterns, opts, compiler) {
 
-  var baseDir = compiler.options.context;
+  var globalBaseDir = compiler.options.context;
   var fileDependencies = [];
   var contextDependencies = [];
   var lastGlobalUpdate = 0;
@@ -33,6 +33,7 @@ function apply(patterns, opts, compiler) {
   compiler.plugin('emit', function(compilation, cb) {
     Promise.each(patterns, function(pattern) {
       var relSrc = pattern.from;
+      var baseDir = pattern.context || globalBaseDir;
       var absSrc = path.resolve(baseDir, relSrc);
       var relDest = pattern.to || '';
       
