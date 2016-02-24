@@ -36,6 +36,10 @@ A pattern looks like:
     - is optional
     - defaults to `false`
     - forces the plugin to overwrite files staged by previous plugins
+* `context`
+    - is optional
+    - is a pattern specific context
+    - overrides the base context
 
 #### Available options:
 * `ignore`
