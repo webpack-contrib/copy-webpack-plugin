@@ -22,7 +22,6 @@ function apply(patterns, opts, compiler) {
   var baseDir = compiler.options.output.path;
   var fileDependencies = [];
   var contextDependencies = [];
-  var lastGlobalUpdate = 0;
 
   if (!opts) {
     opts = {};
@@ -56,7 +55,6 @@ function apply(patterns, opts, compiler) {
             absDirSrc: absSrc,
             relDirDest: relDest,
             forceWrite: forceWrite,
-            lastGlobalUpdate: lastGlobalUpdate,
             ignoreList: ignoreList
           });
         } else {
@@ -97,15 +95,11 @@ function apply(patterns, opts, compiler) {
               compilation: compilation,
               absFileSrc: absFileSrc,
               relFileDest: relFileDest,
-              forceWrite: forceWrite,
-              lastGlobalUpdate: lastGlobalUpdate
+              forceWrite: forceWrite
             });
           });
         }
       });
-    })
-    .then(function() {
-      lastGlobalUpdate = _.now();
     })
     .catch(function(err) {
       compilation.errors.push(err);
@@ -137,7 +131,6 @@ function writeFileToAssets(opts) {
   var relFileDest = opts.relFileDest;
   var absFileSrc = opts.absFileSrc;
   var forceWrite = opts.forceWrite;
-  var lastGlobalUpdate = opts.lastGlobalUpdate;
 
   if (compilation.assets[relFileDest] && !forceWrite) {
     return Promise.resolve();
@@ -145,16 +138,14 @@ function writeFileToAssets(opts) {
 
   return fs.statAsync(absFileSrc)
   .then(function(stat) {
-    if (stat.mtime.getTime() > lastGlobalUpdate) {
-      compilation.assets[relFileDest] = {
-        size: function() {
-          return stat.size;
-        },
-        source: function() {
-          return fs.readFileSync(absFileSrc);
-        }
-      };
-    }
+    compilation.assets[relFileDest] = {
+      size: function() {
+        return stat.size;
+      },
+      source: function() {
+        return fs.readFileSync(absFileSrc);
+      }
+    };
   });
 }
 
@@ -163,7 +154,6 @@ function writeDirectoryToAssets(opts) {
   var absDirSrc = opts.absDirSrc;
   var relDirDest = opts.relDirDest;
   var forceWrite = opts.forceWrite;
-  var lastGlobalUpdate = opts.lastGlobalUpdate;
   var ignoreList = opts.ignoreList;
 
   return dir.filesAsync(absDirSrc)
@@ -185,8 +175,7 @@ function writeDirectoryToAssets(opts) {
       compilation: compilation,
       absFileSrc: absFileSrc,
       relFileDest: relFileDest,
-      forceWrite: forceWrite,
-      lastGlobalUpdate: lastGlobalUpdate
+      forceWrite: forceWrite
     });
   });
 }

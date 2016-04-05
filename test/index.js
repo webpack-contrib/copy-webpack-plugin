@@ -378,20 +378,6 @@ describe('apply function', function() {
       .then(done)
       .catch(done);
     });
-
-    it('only include files that have changed', function(done) {
-      runChange({
-        patterns: [{ from: 'tempfile1.txt' }, { from: 'tempfile2.txt' }],
-        newFileLoc1: path.join(HELPER_DIR, 'tempfile1.txt'),
-        newFileLoc2: path.join(HELPER_DIR, 'tempfile2.txt')
-      })
-      .then(function(compilation) {
-        expect(compilation.assets).to.have.key('tempfile1.txt');
-        expect(compilation.assets).not.to.have.key('tempfile2.txt');
-      })
-      .then(done)
-      .catch(done);
-    });
   });
 
   describe('with directory in from', function() {
@@ -490,20 +476,6 @@ describe('apply function', function() {
       .then(function(compilation) {
         var absFrom = path.join(HELPER_DIR, 'directory');
         expect(compilation.contextDependencies).to.have.members([absFrom]);
-      })
-      .then(done)
-      .catch(done);
-    });
-
-    it('only include files that have changed', function(done) {
-      runChange({
-        patterns: [{ from: 'directory' }],
-        newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
-        newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt')
-      })
-      .then(function(compilation) {
-        expect(compilation.assets).to.have.key('tempfile1.txt');
-        expect(compilation.assets).not.to.have.key('tempfile2.txt');
       })
       .then(done)
       .catch(done);
