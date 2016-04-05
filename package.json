@@ -26,10 +26,15 @@
     "node-dir": "^0.1.10"
   },
   "scripts": {
-    "test": "mocha"
+    "lint": "pragmatist lint",
+    "watch-lint": "pragmatist watch-lint",
+    "test": "pragmatist --type-assertions test",
+    "watch-test": "pragmatist --type-assertions test",
+    "build": "pragmatist --es5 build",
+    "watch-build": "pragmatist --es5 watch-build"
   },
   "devDependencies": {
     "chai": "^3.4.0",
-    "mocha": "^2.3.4"
+    "pragmatist": "^3.0.21"
   }
 }
