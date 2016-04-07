@@ -71,7 +71,11 @@ describe('apply function', function() {
     .then(function(compilation) {
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
         // Replace all paths with platform-specific paths
-        var expectedAssetKeys = _.map(opts.expectedAssetKeys, path.normalize);
+        // Replace all paths with platform-specific paths
+        // due to #29 we can't do that, as webpack compilation assets expects
+        // the keys with fwd slashes only --
+        //var expectedAssetKeys = _.map(opts.expectedAssetKeys, path.normalize);
+        var expectedAssetKeys = opts.expectedAssetKeys;
         expect(compilation.assets).to.have.all.keys(expectedAssetKeys);
       } else {
         expect(compilation.assets).to.be.empty;

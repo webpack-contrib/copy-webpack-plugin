@@ -138,6 +138,8 @@ function writeFileToAssets(opts) {
   var absFileSrc = opts.absFileSrc;
   var forceWrite = opts.forceWrite;
   var lastGlobalUpdate = opts.lastGlobalUpdate;
+  //make sure that asset keys use fwd slashes
+  var relFileDest = relFileDest.replace(/\\/g, "/");
 
   if (compilation.assets[relFileDest] && !forceWrite) {
     return Promise.resolve();
