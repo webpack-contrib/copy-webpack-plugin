@@ -200,6 +200,24 @@ describe('apply function', () => {
         .catch(done);
       });
 
+      it('can use a glob to move multiple files to a non-root directory', (done) => {
+        runEmit({
+          expectedAssetKeys: [
+            'nested/file.txt',
+            'nested/directory/directoryfile.txt',
+            'nested/directory/nested/nestedfile.txt'
+          ],
+          patterns: [
+            {
+              from: '**/*.txt',
+              to: 'nested'
+            }
+          ]
+        })
+        .then(done)
+        .catch(done);
+      });
+
       it('can use a glob with a full path to move a file to the root directory', (done) => {
         runEmit({
           expectedAssetKeys: [

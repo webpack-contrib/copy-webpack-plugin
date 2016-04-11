@@ -26,6 +26,16 @@ export default (patterns = [], options = {}) => {
       Promise.each(patterns, (pattern) => {
         let relDest;
 
+        let globOpts = {
+          cwd: baseDir
+        };
+
+        // From can be an object
+        if (pattern.from.glob) {
+          globOpts = _.extend(globOpts, _.omit(pattern.from, 'glob'));
+          pattern.from = pattern.from.glob;
+        }
+        
         const relSrc = pattern.from;
         const absSrc = path.resolve(baseDir, relSrc);
 
@@ -56,8 +66,9 @@ export default (patterns = [], options = {}) => {
             });
           }
 
-          return globAsync(relSrc, {cwd: baseDir})
+          return globAsync(relSrc, globOpts)
           .each((relFileSrc) => {
+
             let relFileDest;
 
             // Skip if it matches any of our ignore list
@@ -73,20 +84,31 @@ export default (patterns = [], options = {}) => {
 
             fileDependencies.push(absFileSrc);
 
-            if (!stat && relFileDirname !== baseDir) {
+            // If the pattern is a blob
+            if (!stat) {
+              // If the source is absolute
               if (path.isAbsolute(relFileSrc)) {
-                  // If the file is in a subdirectory (from globbing), we should correctly map the dest folder
-                  relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
-                } else {
-                  relFileDest = relFileSrc;
-                }
-              } else if (toLooksLikeDirectory(pattern)) {
-                relFileDest = path.join(relFileDest, path.basename(relFileSrc));
-              } else {
-                relFileDest = relFileDest || path.basename(relFileSrc);
-              }
+                // Make the destination relative
+                relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
 
-            // Make the relative destination actually relative
+              // If the source is relative
+              } else {
+                relFileDest = path.join(relFileDest, relFileSrc);
+              }
+            
+            // If it's not a blob
+            } else {
+              // If it looks like a directory
+              if (toLooksLikeDirectory(pattern)) {
+                // Make the path relative to the source
+                relFileDest = path.join(relFileDest, path.basename(relFileSrc));
+              }
+            }
+
+            // If there's still no relFileDest
+            relFileDest = relFileDest || path.basename(relFileSrc);
+
+            // Make sure the relative destination is actually relative
             if (path.isAbsolute(relFileDest)) {
               relFileDest = path.relative(baseDir, relFileDest);
             }
