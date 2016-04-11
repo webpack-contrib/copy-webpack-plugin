@@ -6,7 +6,8 @@ const fs = Promise.promisifyAll(require('fs-extra'));
 
 export default (opts) => {
   const compilation = opts.compilation;
-  const relFileDest = opts.relFileDest;
+  // ensure forward slashes
+  const relFileDest = opts.relFileDest.replace(/\\/g, '/');
   const absFileSrc = opts.absFileSrc;
   const forceWrite = opts.forceWrite;
 

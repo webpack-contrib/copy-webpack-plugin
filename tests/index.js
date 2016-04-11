@@ -76,10 +76,7 @@ describe('apply function', () => {
       return run(opts)
       .then((compilation) => {
         if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-          // Replace all paths with platform-specific paths
-          const expectedAssetKeys = _.map(opts.expectedAssetKeys, path.normalize);
-
-          expect(compilation.assets).to.have.all.keys(expectedAssetKeys);
+          expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
         } else {
           expect(compilation.assets).to.deep.equal({});
         }
