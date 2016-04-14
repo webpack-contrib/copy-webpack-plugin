@@ -26,5 +26,7 @@ export default (opts) => {
         return fs.readFileSync(absFileSrc);
       }
     };
+
+    return relFileDest;
   });
 };

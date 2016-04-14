@@ -16,7 +16,7 @@ export default (opts) => {
   const ignoreList = opts.ignoreList;
 
   return dir.filesAsync(absDirSrc)
-  .each((absFileSrc) => {
+  .map((absFileSrc) => {
     let relFileDest;
 
     const relFileSrc = path.relative(absDirSrc, absFileSrc);

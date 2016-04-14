@@ -11,18 +11,42 @@ const globAsync = Promise.promisify(require('glob'));
 const fs = Promise.promisifyAll(require('fs-extra'));
 /* eslint-enable */
 
+const union = (set1, set2) => {
+  return new Set([...set1, ...set2]);
+}
+
+const isDevServer = (compiler) => {
+  return compiler.outputFileSystem.constructor.name === 'MemoryFileSystem';
+};
+
+const getOutputDir = (compiler) => {
+  if (compiler.options.output.path && compiler.options.output.path !== '/') {
+    return compiler.options.output.path;
+  }
+
+  let outputPath = compiler.options.devServer.outputPath;
+  if (!outputPath || outputPath === '/') {
+    throw new Error('CopyWebpackPlugin: to use webpack-dev-server, devServer.outputPath must be defined in the webpack config');
+  }
+
+  return outputPath;
+};
+
 export default (patterns = [], options = {}) => {
   if (!_.isArray(patterns)) {
     throw new Error('CopyWebpackPlugin: patterns must be an array');
   }
 
   const apply = (compiler) => {
-    const baseDir = compiler.options.output.path;
+    const baseDir = compiler.options.context;
     const fileDependencies = [];
     const contextDependencies = [];
     const ignoreList = options.ignore;
+    let writtenAssets;
 
     compiler.plugin('emit', (compilation, cb) => {
+      writtenAssets = new Set();
+
       Promise.each(patterns, (pattern) => {
         let relDest;
 
@@ -63,6 +87,9 @@ export default (patterns = [], options = {}) => {
               forceWrite,
               ignoreList,
               relDirDest: relDest
+            })
+            .then((assets) => {
+              writtenAssets = union(writtenAssets, assets);
             });
           }
 
@@ -118,7 +145,10 @@ export default (patterns = [], options = {}) => {
               compilation,
               forceWrite,
               relFileDest
-            });
+            })
+            .then((asset) => {
+              writtenAssets.add(asset);
+            });;
           });
         });
       })
@@ -145,7 +175,35 @@ export default (patterns = [], options = {}) => {
         }
       });
 
-      callback();
+      // Write files to file system if webpack-dev-server
+
+      if (!isDevServer(compiler)) {
+        return;
+      }
+
+      const outputPath = getOutputDir(compiler);
+
+      var writeFilePromises = [];
+      _.forEach(compilation.assets, (asset, assetPath) => {
+
+        // If this is not our asset, ignore it
+        if (!writtenAssets.has(assetPath)) {
+          return;
+        }
+
+        const outputFilePath = path.join(outputPath, assetPath);
+        const absOutputPath = path.resolve(process.cwd(), outputFilePath);
+        const promise = fs.mkdirsAsync(path.dirname(absOutputPath))
+        .then(() => {
+          return fs.writeFileAsync(absOutputPath, asset.source());
+        });
+        writeFilePromises.push(promise);
+      });
+
+      Promise.all(writeFilePromises)
+      .then(() => {
+        callback();
+      });
     });
   };
 
