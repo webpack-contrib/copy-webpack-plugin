@@ -70,6 +70,15 @@ module.exports = {
             
             // Copy glob results to /absolute/path/
             { from: 'from/directory/**/*', to: '/absolute/path' },
+
+            // Copy glob results (with dot files) to /absolute/path/
+            {
+                from: {
+                    glob:'from/directory/**/*',
+                    dot: true
+                },
+                to: '/absolute/path'
+            },
             
             // {output}/file/without/extension
             {
@@ -91,7 +100,12 @@ module.exports = {
                 
                 // Doesn't copy any file, even if they start with a dot
                 { glob: '**/*', dot: true }
-            ]
+            ],
+
+            // By default, we only copy modified files during
+            // a watch or webpack-dev-server build. Setting this
+            // to `true` copies all files.
+            copyUnmodified: true // defaults to false
         })
     ]
 };

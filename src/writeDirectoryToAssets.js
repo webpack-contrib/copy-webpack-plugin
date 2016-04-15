@@ -14,6 +14,8 @@ export default (opts) => {
     const relDirDest = opts.relDirDest;
     const forceWrite = opts.forceWrite;
     const ignoreList = opts.ignoreList;
+    const copyUnmodified = opts.copyUnmodified;
+    const lastGlobalUpdate = opts.lastGlobalUpdate;
 
     return dir.filesAsync(absDirSrc)
         .map((absFileSrc) => {
@@ -36,7 +38,9 @@ export default (opts) => {
             return writeFileToAssets({
                 absFileSrc,
                 compilation,
+                copyUnmodified,
                 forceWrite,
+                lastGlobalUpdate,
                 relFileDest
             });
         });

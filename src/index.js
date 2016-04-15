@@ -43,7 +43,11 @@ export default (patterns = [], options = {}) => {
         const fileDependencies = [];
         const contextDependencies = [];
         const ignoreList = options.ignore;
+        const copyUnmodified = options.copyUnmodified;
         let writtenAssets;
+        let lastGlobalUpdate;
+
+        lastGlobalUpdate = 0;
 
         compiler.plugin('emit', (compilation, cb) => {
             writtenAssets = new Set();
@@ -86,8 +90,10 @@ export default (patterns = [], options = {}) => {
                             return writeDirectoryToAssets({
                                 absDirSrc: absSrc,
                                 compilation,
+                                copyUnmodified,
                                 forceWrite,
                                 ignoreList,
+                                lastGlobalUpdate,
                                 relDirDest: relDest
                             })
                             .then((assets) => {
@@ -141,7 +147,9 @@ export default (patterns = [], options = {}) => {
                                 return writeFileToAssets({
                                     absFileSrc,
                                     compilation,
+                                    copyUnmodified,
                                     forceWrite,
+                                    lastGlobalUpdate,
                                     relFileDest
                                 })
                                 .then((asset) => {
@@ -149,6 +157,9 @@ export default (patterns = [], options = {}) => {
                                 });
                             });
                     });
+            })
+            .then(() => {
+                lastGlobalUpdate = _.now();
             })
             .catch((err) => {
                 compilation.errors.push(err);
@@ -177,6 +188,7 @@ export default (patterns = [], options = {}) => {
 
             if (!isDevServer(compiler)) {
                 callback();
+
                 return;
             }
 

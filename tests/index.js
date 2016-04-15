@@ -3,6 +3,7 @@ import {
     expect
 } from 'chai';
 import CopyWebpackPlugin from './../src';
+import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 import Promise from 'bluebird';
@@ -103,6 +104,49 @@ describe('apply function', () => {
 
                 expect(assetContent).to.equal(opts.expectedAssetContent);
             });
+    };
+
+    const runChange = (opts) => {
+        // Create two test files
+        fs.writeFileSync(opts.newFileLoc1, 'file1contents');
+        fs.writeFileSync(opts.newFileLoc2, 'file2contents');
+
+        // Create a reference to the compiler
+        const compiler = new MockCompiler();
+        const compilation = {
+            assets: {},
+            contextDependencies: [],
+            errors: [],
+            fileDependencies: []
+        };
+
+        return run({
+            compiler,
+            options: opts.options,
+            patterns: opts.patterns
+        })
+        // mtime is only measured in whole seconds
+        .delay(1000)
+        .then(() => {
+            // Change a file
+            fs.appendFileSync(opts.newFileLoc1, 'extra');
+
+            // Trigger another compile
+            return new Promise((res) => {
+                compiler.emitFn(compilation, res);
+            });
+        })
+        .then(() => {
+            if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
+                expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
+            } else {
+                expect(compilation.assets).to.deep.equal({});
+            }
+        })
+        .finally(() => {
+            fs.unlinkSync(opts.newFileLoc1);
+            fs.unlinkSync(opts.newFileLoc2);
+        });
     };
 
     // Use then and catch explicitly, so errors
@@ -464,6 +508,23 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('only include files that have changed', (done) => {
+            runChange({
+                expectedAssetKeys: [
+                    'tempfile1.txt'
+                ],
+                newFileLoc1: path.join(HELPER_DIR, 'tempfile1.txt'),
+                newFileLoc2: path.join(HELPER_DIR, 'tempfile2.txt'),
+                patterns: [{
+                    from: 'tempfile1.txt'
+                }, {
+                    from: 'tempfile2.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with directory in from', () => {
@@ -605,6 +666,42 @@ describe('apply function', () => {
                 const absFrom = path.join(HELPER_DIR, 'directory');
 
                 expect(compilation.contextDependencies).to.have.members([absFrom]);
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('only include files that have changed', (done) => {
+            runChange({
+                expectedAssetKeys: [
+                    'tempfile1.txt'
+                ],
+                newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
+                newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt'),
+                patterns: [{
+                    from: 'directory'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('include all files if copyUnmodified is true', (done) => {
+            runChange({
+                expectedAssetKeys: [
+                    'directoryfile.txt',
+                    'nested/nestedfile.txt',
+                    'tempfile1.txt',
+                    'tempfile2.txt'
+                ],
+                newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
+                newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt'),
+                options: {
+                    copyUnmodified: true
+                },
+                patterns: [{
+                    from: 'directory'
+                }]
             })
             .then(done)
             .catch(done);
