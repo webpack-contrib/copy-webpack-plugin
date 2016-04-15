@@ -51,6 +51,11 @@ var path = require('path');
 
 module.exports = {
     context: path.join(__dirname, 'app'),
+    devServer: {
+        // This is required for webpack-dev-server. The path should 
+        // be an absolute path to your build destination.
+        outputPath: path.join(__dirname, 'build')
+    },
     plugins: [
         new CopyWebpackPlugin([
             // {output}/file.txt
