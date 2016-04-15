@@ -12,202 +12,199 @@ const fs = Promise.promisifyAll(require('fs-extra'));
 /* eslint-enable */
 
 const union = (set1, set2) => {
-  return new Set([...set1, ...set2]);
-}
+    return new Set([...set1, ...set2]);
+};
 
 const isDevServer = (compiler) => {
-  return compiler.outputFileSystem.constructor.name === 'MemoryFileSystem';
+    return compiler.outputFileSystem.constructor.name === 'MemoryFileSystem';
 };
 
 const getOutputDir = (compiler) => {
-  if (compiler.options.output.path && compiler.options.output.path !== '/') {
-    return compiler.options.output.path;
-  }
+    if (compiler.options.output.path && compiler.options.output.path !== '/') {
+        return compiler.options.output.path;
+    }
 
-  let outputPath = compiler.options.devServer.outputPath;
-  if (!outputPath || outputPath === '/') {
-    throw new Error('CopyWebpackPlugin: to use webpack-dev-server, devServer.outputPath must be defined in the webpack config');
-  }
+    const outputPath = compiler.options.devServer.outputPath;
 
-  return outputPath;
+    if (!outputPath || outputPath === '/') {
+        throw new Error('CopyWebpackPlugin: to use webpack-dev-server, devServer.outputPath must be defined in the webpack config');
+    }
+
+    return outputPath;
 };
 
 export default (patterns = [], options = {}) => {
-  if (!_.isArray(patterns)) {
-    throw new Error('CopyWebpackPlugin: patterns must be an array');
-  }
+    if (!_.isArray(patterns)) {
+        throw new Error('CopyWebpackPlugin: patterns must be an array');
+    }
 
-  const apply = (compiler) => {
-    const baseDir = compiler.options.context;
-    const fileDependencies = [];
-    const contextDependencies = [];
-    const ignoreList = options.ignore;
-    let writtenAssets;
+    const apply = (compiler) => {
+        const baseDir = compiler.options.context;
+        const fileDependencies = [];
+        const contextDependencies = [];
+        const ignoreList = options.ignore;
+        let writtenAssets;
 
-    compiler.plugin('emit', (compilation, cb) => {
-      writtenAssets = new Set();
+        compiler.plugin('emit', (compilation, cb) => {
+            writtenAssets = new Set();
 
-      Promise.each(patterns, (pattern) => {
-        let relDest;
+            Promise.each(patterns, (pattern) => {
+                let relDest;
+                let globOpts;
 
-        let globOpts = {
-          cwd: baseDir
-        };
+                globOpts = {
+                    cwd: baseDir
+                };
 
-        // From can be an object
-        if (pattern.from.glob) {
-          globOpts = _.extend(globOpts, _.omit(pattern.from, 'glob'));
-          pattern.from = pattern.from.glob;
-        }
-        
-        const relSrc = pattern.from;
-        const absSrc = path.resolve(baseDir, relSrc);
+                // From can be an object
+                if (pattern.from.glob) {
+                    globOpts = _.assignIn(globOpts, _.omit(pattern.from, 'glob'));
+                    pattern.from = pattern.from.glob;
+                }
 
-        relDest = pattern.to || '';
+                const relSrc = pattern.from;
+                const absSrc = path.resolve(baseDir, relSrc);
 
-        const forceWrite = Boolean(pattern.force);
+                relDest = pattern.to || '';
 
-        return fs
-        .statAsync(absSrc)
-        .catch(() => {
-          return null;
-        })
-        .then((stat) => {
-          if (stat && stat.isDirectory()) {
-            contextDependencies.push(absSrc);
+                const forceWrite = Boolean(pattern.force);
 
-            // Make the relative destination actually relative
-            if (path.isAbsolute(relDest)) {
-              relDest = path.relative(baseDir, relDest);
-            }
+                return fs
+                    .statAsync(absSrc)
+                    .catch(() => {
+                        return null;
+                    })
+                    .then((stat) => {
+                        if (stat && stat.isDirectory()) {
+                            contextDependencies.push(absSrc);
 
-            return writeDirectoryToAssets({
-              absDirSrc: absSrc,
-              compilation,
-              forceWrite,
-              ignoreList,
-              relDirDest: relDest
+                            // Make the relative destination actually relative
+                            if (path.isAbsolute(relDest)) {
+                                relDest = path.relative(baseDir, relDest);
+                            }
+
+                            return writeDirectoryToAssets({
+                                absDirSrc: absSrc,
+                                compilation,
+                                forceWrite,
+                                ignoreList,
+                                relDirDest: relDest
+                            })
+                            .then((assets) => {
+                                writtenAssets = union(writtenAssets, assets);
+                            });
+                        }
+
+                        return globAsync(relSrc, globOpts)
+                            .each((relFileSrc) => {
+                                let relFileDest;
+
+                                // Skip if it matches any of our ignore list
+                                if (shouldIgnore(relFileSrc, ignoreList)) {
+                                    return false;
+                                }
+
+                                const absFileSrc = path.resolve(baseDir, relFileSrc);
+
+                                relFileDest = pattern.to || '';
+
+                                const relFileDirname = path.dirname(relFileSrc);
+
+                                fileDependencies.push(absFileSrc);
+
+                                // If the pattern is a blob
+                                if (!stat) {
+                                    // If the source is absolute
+                                    if (path.isAbsolute(relFileSrc)) {
+                                        // Make the destination relative
+                                        relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
+
+                                        // If the source is relative
+                                    } else {
+                                        relFileDest = path.join(relFileDest, relFileSrc);
+                                    }
+
+                                // If it looks like a directory
+                                } else if (toLooksLikeDirectory(pattern)) {
+                                    // Make the path relative to the source
+                                    relFileDest = path.join(relFileDest, path.basename(relFileSrc));
+                                }
+
+                                // If there's still no relFileDest
+                                relFileDest = relFileDest || path.basename(relFileSrc);
+
+                                // Make sure the relative destination is actually relative
+                                if (path.isAbsolute(relFileDest)) {
+                                    relFileDest = path.relative(baseDir, relFileDest);
+                                }
+
+                                return writeFileToAssets({
+                                    absFileSrc,
+                                    compilation,
+                                    forceWrite,
+                                    relFileDest
+                                })
+                                .then((asset) => {
+                                    writtenAssets.add(asset);
+                                });
+                            });
+                    });
             })
-            .then((assets) => {
-              writtenAssets = union(writtenAssets, assets);
+            .catch((err) => {
+                compilation.errors.push(err);
+            })
+            .finally(cb);
+        });
+
+        compiler.plugin('after-emit', (compilation, callback) => {
+            const trackedFiles = compilation.fileDependencies;
+
+            _.forEach(fileDependencies, (file) => {
+                if (!_.includes(trackedFiles, file)) {
+                    trackedFiles.push(file);
+                }
             });
-          }
 
-          return globAsync(relSrc, globOpts)
-          .each((relFileSrc) => {
+            const trackedDirs = compilation.contextDependencies;
 
-            let relFileDest;
+            _.forEach(contextDependencies, (context) => {
+                if (!_.includes(trackedDirs, context)) {
+                    trackedDirs.push(context);
+                }
+            });
 
-            // Skip if it matches any of our ignore list
-            if (shouldIgnore(relFileSrc, ignoreList)) {
-              return;
+            // Write files to file system if webpack-dev-server
+
+            if (!isDevServer(compiler)) {
+                return;
             }
 
-            const absFileSrc = path.resolve(baseDir, relFileSrc);
+            const outputPath = getOutputDir(compiler);
+            const writeFilePromises = [];
 
-            relFileDest = pattern.to || '';
+            _.forEach(compilation.assets, (asset, assetPath) => {
+                // If this is not our asset, ignore it
+                if (!writtenAssets.has(assetPath)) {
+                    return;
+                }
 
-            const relFileDirname = path.dirname(relFileSrc);
+                const outputFilePath = path.join(outputPath, assetPath);
+                const absOutputPath = path.resolve(process.cwd(), outputFilePath);
 
-            fileDependencies.push(absFileSrc);
+                writeFilePromises.push(fs.mkdirsAsync(path.dirname(absOutputPath))
+                    .then(() => {
+                        return fs.writeFileAsync(absOutputPath, asset.source());
+                    }));
+            });
 
-            // If the pattern is a blob
-            if (!stat) {
-              // If the source is absolute
-              if (path.isAbsolute(relFileSrc)) {
-                // Make the destination relative
-                relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
-
-              // If the source is relative
-              } else {
-                relFileDest = path.join(relFileDest, relFileSrc);
-              }
-            
-            // If it's not a blob
-            } else {
-              // If it looks like a directory
-              if (toLooksLikeDirectory(pattern)) {
-                // Make the path relative to the source
-                relFileDest = path.join(relFileDest, path.basename(relFileSrc));
-              }
-            }
-
-            // If there's still no relFileDest
-            relFileDest = relFileDest || path.basename(relFileSrc);
-
-            // Make sure the relative destination is actually relative
-            if (path.isAbsolute(relFileDest)) {
-              relFileDest = path.relative(baseDir, relFileDest);
-            }
-
-            return writeFileToAssets({
-              absFileSrc,
-              compilation,
-              forceWrite,
-              relFileDest
-            })
-            .then((asset) => {
-              writtenAssets.add(asset);
-            });;
-          });
+            Promise.all(writeFilePromises)
+                .then(() => {
+                    callback();
+                });
         });
-      })
-      .catch((err) => {
-        compilation.errors.push(err);
-      })
-      .finally(cb);
-    });
+    };
 
-    compiler.plugin('after-emit', (compilation, callback) => {
-      const trackedFiles = compilation.fileDependencies;
-
-      _.forEach(fileDependencies, (file) => {
-        if (!_.includes(trackedFiles, file)) {
-          trackedFiles.push(file);
-        }
-      });
-
-      const trackedDirs = compilation.contextDependencies;
-
-      _.forEach(contextDependencies, (context) => {
-        if (!_.includes(trackedDirs, context)) {
-          trackedDirs.push(context);
-        }
-      });
-
-      // Write files to file system if webpack-dev-server
-
-      if (!isDevServer(compiler)) {
-        return;
-      }
-
-      const outputPath = getOutputDir(compiler);
-
-      var writeFilePromises = [];
-      _.forEach(compilation.assets, (asset, assetPath) => {
-
-        // If this is not our asset, ignore it
-        if (!writtenAssets.has(assetPath)) {
-          return;
-        }
-
-        const outputFilePath = path.join(outputPath, assetPath);
-        const absOutputPath = path.resolve(process.cwd(), outputFilePath);
-        const promise = fs.mkdirsAsync(path.dirname(absOutputPath))
-        .then(() => {
-          return fs.writeFileAsync(absOutputPath, asset.source());
-        });
-        writeFilePromises.push(promise);
-      });
-
-      Promise.all(writeFilePromises)
-      .then(() => {
-        callback();
-      });
-    });
-  };
-
-  return {
-    apply
-  };
+    return {
+        apply
+    };
 };
