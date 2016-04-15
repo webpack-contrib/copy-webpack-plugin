@@ -113,7 +113,7 @@ module.exports = {
 
 ### Testing
 
-[![Build Status](https://drone.io/github.com/kevlened/copy-webpack-plugin/status.png)](https://drone.io/github.com/kevlened/copy-webpack-plugin/latest)
+[![Build Status](https://travis-ci.org/kevlened/copy-webpack-plugin.svg?branch=master)](https://travis-ci.org/kevlened/copy-webpack-plugin)
 
 Run `npm test`
 
