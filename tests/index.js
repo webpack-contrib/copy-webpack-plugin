@@ -8,13 +8,17 @@ import path from 'path';
 import _ from 'lodash';
 import Promise from 'bluebird';
 
+const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
 const TEMP_DIR = path.join(__dirname, 'tempdir');
 
 class MockCompiler {
     constructor () {
         this.options = {
-            context: HELPER_DIR
+            context: HELPER_DIR,
+            output: {
+                path: BUILD_DIR
+            }
         };
 
         this.outputFileSystem = {
@@ -302,7 +306,7 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: 'file.txt',
-                    to: HELPER_DIR
+                    to: BUILD_DIR
                 }]
             })
             .then(done)

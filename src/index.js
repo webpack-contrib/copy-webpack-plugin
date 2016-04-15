@@ -40,6 +40,7 @@ export default (patterns = [], options = {}) => {
 
     const apply = (compiler) => {
         const baseDir = compiler.options.context;
+        const outputPath = getOutputDir(compiler);
         const fileDependencies = [];
         const contextDependencies = [];
         const ignoreList = options.ignore;
@@ -84,7 +85,7 @@ export default (patterns = [], options = {}) => {
 
                             // Make the relative destination actually relative
                             if (path.isAbsolute(relDest)) {
-                                relDest = path.relative(baseDir, relDest);
+                                relDest = path.relative(outputPath, relDest);
                             }
 
                             return writeDirectoryToAssets({
@@ -125,7 +126,7 @@ export default (patterns = [], options = {}) => {
                                         // Make the destination relative
                                         relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
 
-                                        // If the source is relative
+                                    // If the source is relative
                                     } else {
                                         relFileDest = path.join(relFileDest, relFileSrc);
                                     }
@@ -141,7 +142,7 @@ export default (patterns = [], options = {}) => {
 
                                 // Make sure the relative destination is actually relative
                                 if (path.isAbsolute(relFileDest)) {
-                                    relFileDest = path.relative(baseDir, relFileDest);
+                                    relFileDest = path.relative(outputPath, relFileDest);
                                 }
 
                                 return writeFileToAssets({
@@ -192,7 +193,6 @@ export default (patterns = [], options = {}) => {
                 return;
             }
 
-            const outputPath = getOutputDir(compiler);
             const writeFilePromises = [];
 
             _.forEach(compilation.assets, (asset, assetPath) => {
