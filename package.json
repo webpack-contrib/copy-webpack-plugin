@@ -28,24 +28,17 @@
   "scripts": {
     "lint": "pragmatist lint",
     "watch-lint": "pragmatist watch-lint",
-    "test": "pragmatist --type-assertions test",
-    "watch-test": "pragmatist --type-assertions test",
+    "test": "pragmatist --es5 --type-assertions test",
+    "watch-test": "pragmatist --es5 --type-assertions watch-test",
     "build": "pragmatist --es5 build",
     "watch-build": "pragmatist --es5 watch-build"
   },
   "devDependencies": {
     "chai": "^3.4.0",
     "eslint": "^2.7.0",
-    "eslint-plugin-babel": "^3.2.0",
-    "eslint-plugin-flowtype": "^2.2.6",
-    "eslint-plugin-import": "^1.4.0",
     "eslint-plugin-jsdoc": "^2.3.1",
     "eslint-plugin-lodash": "^1.6.5",
-    "eslint-plugin-mocha": "^2.2.0",
-    "eslint-plugin-no-use-extend-native": "^0.3.4",
-    "eslint-plugin-objects": "^1.1.1",
     "eslint-plugin-react": "^4.3.0",
-    "eslint-plugin-sorting": "0.0.1",
     "pragmatist": "^3.0.21"
   }
 }

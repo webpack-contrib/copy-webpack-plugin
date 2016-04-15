@@ -176,6 +176,7 @@ export default (patterns = [], options = {}) => {
             // Write files to file system if webpack-dev-server
 
             if (!isDevServer(compiler)) {
+                callback();
                 return;
             }
 

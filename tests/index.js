@@ -13,8 +13,12 @@ const TEMP_DIR = path.join(__dirname, 'tempdir');
 class MockCompiler {
     constructor () {
         this.options = {
-            output: {
-                path: HELPER_DIR
+            context: HELPER_DIR
+        };
+
+        this.outputFileSystem = {
+            constructor: {
+                name: 'NotMemoryFileSystem'
             }
         };
     }
@@ -109,7 +113,7 @@ describe('apply function', () => {
                 expectedAssetKeys: [],
                 /* eslint-disable no-undefined */
                 patterns: undefined
-                    /* eslint-enable */
+                /* eslint-enable */
             })
             .then(done)
             .catch(done);
