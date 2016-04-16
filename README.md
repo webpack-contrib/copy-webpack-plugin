@@ -38,7 +38,13 @@ A pattern looks like:
     - forces the plugin to overwrite files staged by previous plugins
 * `context`
     - is optional
-    - defaults to the context of your webpack config
+    - defaults to the base context
+    - is a pattern specific context
+* `flatten`
+    - is optional
+    - defaults to `false`
+    - removes all directory references and only copies file names
+    - if files have the same name, the result is non-deterministic
 
 #### Available options:
 * `ignore`

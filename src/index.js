@@ -99,6 +99,7 @@ export default (patterns = [], options = {}) => {
                                 absDirSrc: absSrc,
                                 compilation,
                                 copyUnmodified,
+                                flatten: pattern.flatten,
                                 forceWrite,
                                 ignoreList,
                                 lastGlobalUpdate,
@@ -121,6 +122,11 @@ export default (patterns = [], options = {}) => {
                                 const absFileSrc = path.resolve(context, relFileSrc);
 
                                 relFileDest = pattern.to || '';
+
+                                // Remove any directory references if flattening
+                                if (pattern.flatten) {
+                                    relFileSrc = path.basename(relFileSrc);
+                                }
 
                                 const relFileDirname = path.dirname(relFileSrc);
 

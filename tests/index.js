@@ -273,6 +273,23 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can use a glob to flatten multiple files in a relative context to a non-root directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'nested/directoryfile.txt',
+                    'nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    context: 'directory',
+                    from: '**/*.txt',
+                    to: 'nested',
+                    flatten: true
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('can use a glob to move multiple files in a different absolute context to a non-root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
@@ -603,6 +620,37 @@ describe('apply function', () => {
                 patterns: [{
                     from: 'directory',
                     to: 'newdirectory'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can move a directory\'s contents to a new directory using a pattern context', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'newdirectory/nestedfile.txt'
+                ],
+                patterns: [{
+                    context: 'directory',
+                    from: 'nested',
+                    to: 'newdirectory'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can flatten a directory\'s contents to a new directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'newdirectory/directoryfile.txt',
+                    'newdirectory/nestedfile.txt'
+                ],
+                patterns: [{
+                    from: 'directory',
+                    to: 'newdirectory',
+                    flatten: true
                 }]
             })
             .then(done)

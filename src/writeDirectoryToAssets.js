@@ -12,6 +12,7 @@ export default (opts) => {
     const compilation = opts.compilation;
     const absDirSrc = opts.absDirSrc;
     const relDirDest = opts.relDirDest;
+    const flatten = opts.flatten;
     const forceWrite = opts.forceWrite;
     const ignoreList = opts.ignoreList;
     const copyUnmodified = opts.copyUnmodified;
@@ -24,6 +25,11 @@ export default (opts) => {
             const relFileSrc = path.relative(absDirSrc, absFileSrc);
 
             relFileDest = path.join(relDirDest, relFileSrc);
+
+            // Remove any directory reference if flattening
+            if (flatten) {
+                relFileDest = path.join(relDirDest, path.basename(relFileDest));
+            }
 
             // Skip if it matches any of our ignore list
             if (shouldIgnore(relFileSrc, ignoreList)) {
