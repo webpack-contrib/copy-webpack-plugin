@@ -45,6 +45,8 @@ A pattern looks like:
     - defaults to `false`
     - removes all directory references and only copies file names
     - if files have the same name, the result is non-deterministic
+* `ignore`
+    - additional globs to ignore for this pattern
 
 #### Available options:
 * `ignore`

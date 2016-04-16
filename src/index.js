@@ -43,7 +43,7 @@ export default (patterns = [], options = {}) => {
         const outputPath = getOutputDir(compiler);
         const fileDependencies = [];
         const contextDependencies = [];
-        const ignoreList = options.ignore;
+        const webpackIgnore = options.ignore || [];
         const copyUnmodified = options.copyUnmodified;
         let writtenAssets;
         let lastGlobalUpdate;
@@ -57,6 +57,7 @@ export default (patterns = [], options = {}) => {
                 let relDest;
                 let globOpts;
                 let context;
+                const ignoreList = webpackIgnore.concat(pattern.ignore || []);
 
                 if (pattern.context && !path.isAbsolute(pattern.context)) {
                     pattern.context = path.resolve(webpackContext, pattern.context);

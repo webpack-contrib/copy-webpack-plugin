@@ -578,6 +578,23 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('ignores files in pattern', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directory/directoryfile.txt',
+                    'directory/nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    from: '**/*.txt',
+                    ignore: [
+                        'file.*'
+                    ]
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with directory in from', () => {
