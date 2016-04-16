@@ -39,7 +39,7 @@ export default (patterns = [], options = {}) => {
     }
 
     const apply = (compiler) => {
-        const baseDir = compiler.options.context;
+        const webpackContext = compiler.options.context;
         const outputPath = getOutputDir(compiler);
         const fileDependencies = [];
         const contextDependencies = [];
@@ -56,9 +56,16 @@ export default (patterns = [], options = {}) => {
             Promise.each(patterns, (pattern) => {
                 let relDest;
                 let globOpts;
+                let context;
+
+                if (pattern.context && !path.isAbsolute(pattern.context)) {
+                    pattern.context = path.resolve(webpackContext, pattern.context);
+                }
+                
+                context = pattern.context || webpackContext;
 
                 globOpts = {
-                    cwd: baseDir
+                    cwd: context
                 };
 
                 // From can be an object
@@ -68,7 +75,7 @@ export default (patterns = [], options = {}) => {
                 }
 
                 const relSrc = pattern.from;
-                const absSrc = path.resolve(baseDir, relSrc);
+                const absSrc = path.resolve(context, relSrc);
 
                 relDest = pattern.to || '';
 
@@ -111,7 +118,7 @@ export default (patterns = [], options = {}) => {
                                     return false;
                                 }
 
-                                const absFileSrc = path.resolve(baseDir, relFileSrc);
+                                const absFileSrc = path.resolve(context, relFileSrc);
 
                                 relFileDest = pattern.to || '';
 
@@ -124,7 +131,7 @@ export default (patterns = [], options = {}) => {
                                     // If the source is absolute
                                     if (path.isAbsolute(relFileSrc)) {
                                         // Make the destination relative
-                                        relFileDest = path.join(path.relative(baseDir, relFileDirname), path.basename(relFileSrc));
+                                        relFileDest = path.join(path.relative(context, relFileDirname), path.basename(relFileSrc));
 
                                     // If the source is relative
                                     } else {

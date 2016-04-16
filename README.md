@@ -36,6 +36,9 @@ A pattern looks like:
     - is optional
     - defaults to `false`
     - forces the plugin to overwrite files staged by previous plugins
+* `context`
+    - is optional
+    - defaults to the context of your webpack config
 
 #### Available options:
 * `ignore`
@@ -82,6 +85,13 @@ module.exports = {
                     glob:'from/directory/**/*',
                     dot: true
                 },
+                to: '/absolute/path'
+            },
+
+            // Copy glob results, relative to context
+            {
+                context: 'from/directory',
+                from: '**/*',
                 to: '/absolute/path'
             },
             

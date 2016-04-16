@@ -257,6 +257,38 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can use a glob to move multiple files in a different relative context to a non-root directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'nested/directoryfile.txt',
+                    'nested/nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    context: 'directory',
+                    from: '**/*.txt',
+                    to: 'nested'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use a glob to move multiple files in a different absolute context to a non-root directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'nested/directoryfile.txt',
+                    'nested/nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    context: path.join(HELPER_DIR, 'directory'),
+                    from: '**/*.txt',
+                    to: 'nested'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('can use a glob with a full path to move a file to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
