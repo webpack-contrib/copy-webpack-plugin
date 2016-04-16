@@ -53,6 +53,10 @@ A pattern looks like:
     - an array of files and directories to ignore
     - accepts globs
     - globs are evaluated on the `from` path, relative to the context
+* `copyUnmodified`
+    - is optional
+    - defaults to `false` (only copies modified files)
+    - `true` copies all files while using watch or webpack-dev-server
 
 ### Examples
 
@@ -128,7 +132,7 @@ module.exports = {
             // By default, we only copy modified files during
             // a watch or webpack-dev-server build. Setting this
             // to `true` copies all files.
-            copyUnmodified: true // defaults to false
+            copyUnmodified: true
         })
     ]
 };

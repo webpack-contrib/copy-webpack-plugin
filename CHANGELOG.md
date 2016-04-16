@@ -1,3 +1,10 @@
+## 2.1.0 (April 16, 2016)
+
+* Added pattern-level context
+* Added pattern-level ignore
+* Added flattening
+
+
 ## 2.0.0 (Apr 14, 2016)
 
 * Several bug fixes
