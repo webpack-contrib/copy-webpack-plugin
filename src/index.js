@@ -56,14 +56,13 @@ export default (patterns = [], options = {}) => {
             Promise.each(patterns, (pattern) => {
                 let relDest;
                 let globOpts;
-                let context;
-                const ignoreList = webpackIgnore.concat(pattern.ignore || []);
 
                 if (pattern.context && !path.isAbsolute(pattern.context)) {
                     pattern.context = path.resolve(webpackContext, pattern.context);
                 }
-                
-                context = pattern.context || webpackContext;
+
+                const context = pattern.context || webpackContext;
+                const ignoreList = webpackIgnore.concat(pattern.ignore || []);
 
                 globOpts = {
                     cwd: context
@@ -112,8 +111,11 @@ export default (patterns = [], options = {}) => {
                         }
 
                         return globAsync(relSrc, globOpts)
-                            .each((relFileSrc) => {
+                            .each((relFileSrcParam) => {
                                 let relFileDest;
+                                let relFileSrc;
+
+                                relFileSrc = relFileSrcParam;
 
                                 // Skip if it matches any of our ignore list
                                 if (shouldIgnore(relFileSrc, ignoreList)) {

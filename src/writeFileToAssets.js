@@ -20,7 +20,7 @@ export default (opts) => {
     return fs
     .statAsync(absFileSrc)
     .then((stat) => {
-        if (!copyUnmodified && stat.mtime.getTime() < lastGlobalUpdate) {
+        if (stat.isDirectory() || !copyUnmodified && stat.mtime.getTime() < lastGlobalUpdate) {
             return null;
         }
 

@@ -281,9 +281,9 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     context: 'directory',
+                    flatten: true,
                     from: '**/*.txt',
-                    to: 'nested',
-                    flatten: true
+                    to: 'nested'
                 }]
             })
             .then(done)
@@ -665,9 +665,9 @@ describe('apply function', () => {
                     'newdirectory/nestedfile.txt'
                 ],
                 patterns: [{
+                    flatten: true,
                     from: 'directory',
-                    to: 'newdirectory',
-                    flatten: true
+                    to: 'newdirectory'
                 }]
             })
             .then(done)
