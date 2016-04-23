@@ -24,13 +24,13 @@ const getOutputDir = (compiler) => {
         return compiler.options.output.path;
     }
 
-    const outputPath = compiler.options.devServer.outputPath;
+    const devServer = compiler.options.devServer;
 
-    if (!outputPath || outputPath === '/') {
+    if (!devServer || !devServer.outputPath || devServer.outputPath === '/') {
         throw new Error('CopyWebpackPlugin: to use webpack-dev-server, devServer.outputPath must be defined in the webpack config');
     }
 
-    return outputPath;
+    return devServer.outputPath;
 };
 
 export default (patterns = [], options = {}) => {
