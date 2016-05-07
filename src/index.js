@@ -15,10 +15,6 @@ const union = (set1, set2) => {
     return new Set([...set1, ...set2]);
 };
 
-const isDevServer = (compiler) => {
-    return compiler.outputFileSystem.constructor.name === 'MemoryFileSystem';
-};
-
 const getOutputDir = (compiler) => {
     if (compiler.options.output.path && compiler.options.output.path !== '/') {
         return compiler.options.output.path;
@@ -201,35 +197,8 @@ export default (patterns = [], options = {}) => {
                 }
             });
 
-            // Write files to file system if webpack-dev-server
-
-            if (!isDevServer(compiler)) {
-                callback();
-
-                return;
-            }
-
-            const writeFilePromises = [];
-
-            _.forEach(compilation.assets, (asset, assetPath) => {
-                // If this is not our asset, ignore it
-                if (!writtenAssets.has(assetPath)) {
-                    return;
-                }
-
-                const outputFilePath = path.join(outputPath, assetPath);
-                const absOutputPath = path.resolve(process.cwd(), outputFilePath);
-
-                writeFilePromises.push(fs.mkdirsAsync(path.dirname(absOutputPath))
-                    .then(() => {
-                        return fs.writeFileAsync(absOutputPath, asset.source());
-                    }));
-            });
-
-            Promise.all(writeFilePromises)
-                .then(() => {
-                    callback();
-                });
+            callback();
+            return;
         });
     };
 
