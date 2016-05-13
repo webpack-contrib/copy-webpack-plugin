@@ -1,5 +1,6 @@
 src
 tests
+compiled_tests
 coverage
 .*
 *.log
