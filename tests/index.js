@@ -1,4 +1,4 @@
-/* globals describe, it, __dirname */
+/* globals describe, it, afterEach, __dirname */
 import {
     expect
 } from 'chai';
