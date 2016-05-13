@@ -7,3 +7,4 @@ dist
 !.npmignore
 !.babelrc
 !.travis.yml
+compiled_tests
