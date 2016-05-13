@@ -33,7 +33,7 @@ const getOutputDir = (compiler) => {
     return devServer.outputPath;
 };
 
-export default (patterns = [], options = {}) => {
+export function CopyWebpackPlugin (patterns = [], options = {}) {
     if (!_.isArray(patterns)) {
         throw new Error('CopyWebpackPlugin: patterns must be an array');
     }
@@ -237,3 +237,5 @@ export default (patterns = [], options = {}) => {
         apply
     };
 };
+
+export default CopyWebpackPlugin;
