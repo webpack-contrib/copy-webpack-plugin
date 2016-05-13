@@ -1,8 +1,8 @@
-/* globals describe, it, __dirname */
+/* globals describe, it, afterEach, __dirname */
 import {
     expect
 } from 'chai';
-import CopyWebpackPlugin from './../dist';
+import CopyWebpackPlugin from './../src';
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
