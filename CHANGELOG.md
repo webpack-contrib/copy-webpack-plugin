@@ -1,3 +1,10 @@
+## 3.0.0 (May 14, 2016)
+
+BREAKING CHANGE
+
+* No longer writing to filesystem when webpack-dev-server is running
+  Use the [write-file-webpack-plugin](https://www.npmjs.com/package/write-file-webpack-plugin) to force writing files to the filesystem
+
 ## 2.1.6 (May 14, 2016)
 
 * Readded Node v6.0.0 compatibility after finding root cause

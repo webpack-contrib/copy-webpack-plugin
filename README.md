@@ -67,8 +67,8 @@ var path = require('path');
 module.exports = {
     context: path.join(__dirname, 'app'),
     devServer: {
-        // This is required for webpack-dev-server. The path should 
-        // be an absolute path to your build destination.
+        // This is required for webpack-dev-server if using a version <3.0.0.
+        // The path should be an absolute path to your build destination.
         outputPath: path.join(__dirname, 'build')
     },
     plugins: [
