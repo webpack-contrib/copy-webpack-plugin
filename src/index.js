@@ -11,28 +11,6 @@ const globAsync = Promise.promisify(require('glob'));
 const fs = Promise.promisifyAll(require('fs-extra'));
 /* eslint-enable */
 
-const union = (set1, set2) => {
-    return new Set([...set1, ...set2]);
-};
-
-const isDevServer = (compiler) => {
-    return compiler.outputFileSystem.constructor.name === 'MemoryFileSystem';
-};
-
-const getOutputDir = (compiler) => {
-    if (compiler.options.output.path && compiler.options.output.path !== '/') {
-        return compiler.options.output.path;
-    }
-
-    const devServer = compiler.options.devServer;
-
-    if (!devServer || !devServer.outputPath || devServer.outputPath === '/') {
-        throw new Error('CopyWebpackPlugin: to use webpack-dev-server, devServer.outputPath must be defined in the webpack config');
-    }
-
-    return devServer.outputPath;
-};
-
 function CopyWebpackPlugin(patterns = [], options = {}) {
     if (!_.isArray(patterns)) {
         throw new Error('CopyWebpackPlugin: patterns must be an array');
@@ -40,18 +18,14 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
 
     const apply = (compiler) => {
         const webpackContext = compiler.options.context;
-        const outputPath = getOutputDir(compiler);
+        const outputPath = compiler.options.output.path;
         const fileDependencies = [];
         const contextDependencies = [];
         const webpackIgnore = options.ignore || [];
         const copyUnmodified = options.copyUnmodified;
-        let writtenAssets;
-        let lastGlobalUpdate;
-
-        lastGlobalUpdate = 0;
+        const writtenAssetHashes = {};
 
         compiler.plugin('emit', (compilation, cb) => {
-            writtenAssets = new Set();
 
             Promise.each(patterns, (pattern) => {
                 let relDest;
@@ -102,11 +76,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                                 flatten: pattern.flatten,
                                 forceWrite,
                                 ignoreList,
-                                lastGlobalUpdate,
-                                relDirDest: relDest
-                            })
-                            .then((assets) => {
-                                writtenAssets = union(writtenAssets, assets);
+                                relDirDest: relDest,
+                                writtenAssetHashes
                             });
                         }
 
@@ -166,17 +137,11 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                                     compilation,
                                     copyUnmodified,
                                     forceWrite,
-                                    lastGlobalUpdate,
-                                    relFileDest
-                                })
-                                .then((asset) => {
-                                    writtenAssets.add(asset);
+                                    relFileDest,
+                                    writtenAssetHashes
                                 });
                             });
                     });
-            })
-            .then(() => {
-                lastGlobalUpdate = _.now();
             })
             .catch((err) => {
                 compilation.errors.push(err);
@@ -201,35 +166,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 }
             });
 
-            // Write files to file system if webpack-dev-server
-
-            if (!isDevServer(compiler)) {
-                callback();
-
-                return;
-            }
-
-            const writeFilePromises = [];
-
-            _.forEach(compilation.assets, (asset, assetPath) => {
-                // If this is not our asset, ignore it
-                if (!writtenAssets.has(assetPath)) {
-                    return;
-                }
-
-                const outputFilePath = path.join(outputPath, assetPath);
-                const absOutputPath = path.resolve(process.cwd(), outputFilePath);
-
-                writeFilePromises.push(fs.mkdirsAsync(path.dirname(absOutputPath))
-                    .then(() => {
-                        return fs.writeFileAsync(absOutputPath, asset.source());
-                    }));
-            });
-
-            Promise.all(writeFilePromises)
-                .then(() => {
-                    callback();
-                });
+            callback();
         });
     };
 
