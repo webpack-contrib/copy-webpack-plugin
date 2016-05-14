@@ -1,3 +1,30 @@
+## 2.1.6 (May 14, 2016)
+
+* Readded Node v6.0.0 compatibility after finding root cause
+
+
+## 2.1.5 (May 13, 2016)
+
+* Reverted Node v6.0.0 compatibility due to import errors
+
+
+## 2.1.4 (May 12, 2016)
+
+* Fix Node v6.0.0 compatibility
+* Fix tests running in Node v6.0.0
+* Fix ERROR in Path must be a string. Received undefined. (undefined `to` when writing directory)
+
+
+## 2.1.3 (April 23, 2016)
+
+* Fix TypeError when working with webpack-dev-server
+
+
+## 2.1.1 (April 16, 2016)
+
+* Fixed nested directories in blobs
+
+
 ## 2.1.0 (April 16, 2016)
 
 * Added pattern-level context
