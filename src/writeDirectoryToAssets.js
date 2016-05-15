@@ -16,7 +16,7 @@ export default (opts) => {
     const forceWrite = opts.forceWrite;
     const ignoreList = opts.ignoreList;
     const copyUnmodified = opts.copyUnmodified;
-    const lastGlobalUpdate = opts.lastGlobalUpdate;
+    const writtenAssetHashes = opts.writtenAssetHashes;
 
     return dir.filesAsync(absDirSrc)
         .map((absFileSrc) => {
@@ -46,8 +46,8 @@ export default (opts) => {
                 compilation,
                 copyUnmodified,
                 forceWrite,
-                lastGlobalUpdate,
-                relFileDest
+                relFileDest,
+                writtenAssetHashes
             });
         });
 };

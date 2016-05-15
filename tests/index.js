@@ -132,8 +132,6 @@ describe('apply function', () => {
             options: opts.options,
             patterns: opts.patterns
         })
-        // mtime is only measured in whole seconds
-        .delay(1000)
         .then(() => {
             // Change a file
             fs.appendFileSync(opts.newFileLoc1, 'extra');

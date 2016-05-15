@@ -1,6 +1,6 @@
 {
   "name": "copy-webpack-plugin",
-  "version": "2.1.6",
+  "version": "3.0.0",
   "description": "Copy files and directories in webpack",
   "main": "dist/index.js",
   "repository": {
