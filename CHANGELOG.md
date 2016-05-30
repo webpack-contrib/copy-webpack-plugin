@@ -1,3 +1,7 @@
+## 3.0.1 (May 29, 2016)
+
+* Fix error thrown when subdirectories are in glob results
+
 ## 3.0.0 (May 14, 2016)
 
 BREAKING CHANGE

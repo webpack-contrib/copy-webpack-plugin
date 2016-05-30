@@ -25,6 +25,11 @@ export default (opts) => {
     .statAsync(absFileSrc)
     .then((stat) => {
 
+        // We don't write empty directories
+        if (stat.isDirectory()) {
+            return;
+        }
+
         function addToAssets() {
             compilation.assets[relFileDest] = {
                 size () {
