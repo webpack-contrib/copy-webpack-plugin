@@ -235,7 +235,7 @@ describe('apply function', () => {
                     'directory/nested/nestedfile.txt'
                 ],
                 patterns: [{
-                    from: '**/*.txt'
+                    from: '**/*'
                 }]
             })
             .then(done)
@@ -250,7 +250,7 @@ describe('apply function', () => {
                     'nested/directory/nested/nestedfile.txt'
                 ],
                 patterns: [{
-                    from: '**/*.txt',
+                    from: '**/*',
                     to: 'nested'
                 }]
             })
@@ -266,7 +266,7 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     context: 'directory',
-                    from: '**/*.txt',
+                    from: '**/*',
                     to: 'nested'
                 }]
             })
@@ -283,7 +283,7 @@ describe('apply function', () => {
                 patterns: [{
                     context: 'directory',
                     flatten: true,
-                    from: '**/*.txt',
+                    from: '**/*',
                     to: 'nested'
                 }]
             })
@@ -299,7 +299,7 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     context: path.join(HELPER_DIR, 'directory'),
-                    from: '**/*.txt',
+                    from: '**/*',
                     to: 'nested'
                 }]
             })
@@ -587,7 +587,7 @@ describe('apply function', () => {
                     'directory/nested/nestedfile.txt'
                 ],
                 patterns: [{
-                    from: '**/*.txt',
+                    from: '**/*',
                     ignore: [
                         'file.*'
                     ]
