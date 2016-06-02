@@ -602,6 +602,7 @@ describe('apply function', () => {
         it('can move a directory\'s contents to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    '.dottedfile',
                     'directoryfile.txt',
                     'nested/nestedfile.txt'
                 ],
@@ -618,6 +619,7 @@ describe('apply function', () => {
 
             runEmit({
                 expectedAssetKeys: [
+                    '.dottedfile',
                     'directoryfile.txt',
                     'nested/nestedfile.txt'
                 ],
@@ -632,6 +634,7 @@ describe('apply function', () => {
         it('can move a directory\'s contents to a new directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    'newdirectory/.dottedfile',
                     'newdirectory/directoryfile.txt',
                     'newdirectory/nested/nestedfile.txt'
                 ],
@@ -662,6 +665,7 @@ describe('apply function', () => {
         it('can flatten a directory\'s contents to a new directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    'newdirectory/.dottedfile',
                     'newdirectory/directoryfile.txt',
                     'newdirectory/nestedfile.txt'
                 ],
@@ -678,6 +682,7 @@ describe('apply function', () => {
         it('can move a directory\'s contents to a new directory using an absolute to', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    '../tempdir/.dottedfile',
                     '../tempdir/directoryfile.txt',
                     '../tempdir/nested/nestedfile.txt'
                 ],
@@ -791,6 +796,7 @@ describe('apply function', () => {
         it('include all files if copyUnmodified is true', (done) => {
             runChange({
                 expectedAssetKeys: [
+                    '.dottedfile',
                     'directoryfile.txt',
                     'nested/nestedfile.txt',
                     'tempfile1.txt',
@@ -835,6 +841,7 @@ describe('apply function', () => {
             it('ignores files when from is a directory', (done) => {
                 runEmit({
                     expectedAssetKeys: [
+                        '.dottedfile',
                         'directoryfile.txt'
                     ],
                     options: {
@@ -852,7 +859,9 @@ describe('apply function', () => {
 
             it('ignores files with a certain extension', (done) => {
                 runEmit({
-                    expectedAssetKeys: [],
+                    expectedAssetKeys: [
+                        '.dottedfile'
+                    ],
                     options: {
                         ignore: [
                             '*.txt'
@@ -875,7 +884,7 @@ describe('apply function', () => {
                     ],
                     options: {
                         ignore: [
-                            '.dotted_file'
+                            '.dottedfile'
                         ]
                     },
                     patterns: [{
@@ -886,10 +895,10 @@ describe('apply function', () => {
                 .catch(done);
             });
 
-            it.skip('ignores all files except those with dots', (done) => {
+            it('ignores all files except those with dots', (done) => {
                 runEmit({
                     expectedAssetKeys: [
-                        '.dotted_file'
+                        'directory/.dottedfile'
                     ],
                     options: {
                         ignore: [
@@ -911,6 +920,26 @@ describe('apply function', () => {
                         ignore: [{
                             dot: true,
                             glob: '**/*'
+                        }]
+                    },
+                    patterns: [{
+                        from: '.'
+                    }]
+
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('ignores nested directory', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        'file.txt'
+                    ],
+                    options: {
+                        ignore: [{
+                            dot: true,
+                            glob: 'directory/**/*'
                         }]
                     },
                     patterns: [{
