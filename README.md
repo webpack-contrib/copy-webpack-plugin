@@ -144,6 +144,22 @@ module.exports = {
 
 Run `npm test`
 
+### FAQ
+
+#### "EMFILE: too many open files" or "ENFILE: file table overflow"
+
+Globally patch fs with [graceful-fs](https://www.npmjs.com/package/graceful-fs)
+
+`npm install graceful-fs --save-dev`
+
+At the top of your webpack config, insert this
+
+    var fs = require('fs');
+    var gracefulFs = require('graceful-fs');
+    gracefulFs.gracefulify(fs);
+
+See [this issue](https://github.com/kevlened/copy-webpack-plugin/issues/59#issuecomment-228563990) for more details
+
 ### License
 
 MIT
