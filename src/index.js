@@ -24,6 +24,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
         const webpackIgnore = options.ignore || [];
         const copyUnmodified = options.copyUnmodified;
         const writtenAssetHashes = {};
+        const namePattern = options.namePattern || '';
 
         compiler.plugin('emit', (compilation, cb) => {
 
@@ -77,7 +78,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                                 forceWrite,
                                 ignoreList,
                                 relDirDest: relDest,
-                                writtenAssetHashes
+                                writtenAssetHashes,
+                                namePattern
                             });
                         }
 
@@ -138,7 +140,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                                     copyUnmodified,
                                     forceWrite,
                                     relFileDest,
-                                    writtenAssetHashes
+                                    writtenAssetHashes,
+                                    namePattern
                                 });
                             });
                     });

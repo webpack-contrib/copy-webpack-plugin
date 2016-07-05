@@ -1,4 +1,6 @@
+import path from 'path';
 import Promise from 'bluebird';
+import loaderUtils from 'loader-utils';
 
 /* eslint-disable import/no-commonjs */
 const fs = Promise.promisifyAll(require('fs-extra'));
@@ -8,14 +10,25 @@ import {
     createHash
 } from 'crypto';
 
+function getDestName(relFileDest, namePattern) {
+    if (!namePattern) {
+        return relFileDest;
+    }
+
+    var ext = path.extname(relFileDest);
+    relFileDest = relFileDest.replace(ext, '');
+    return namePattern.replace('[name]', relFileDest);
+}
+
 export default (opts) => {
     const compilation = opts.compilation;
     // ensure forward slashes
-    const relFileDest = opts.relFileDest.replace(/\\/g, '/');
+    var relFileDest = opts.relFileDest.replace(/\\/g, '/');
     const absFileSrc = opts.absFileSrc;
     const forceWrite = opts.forceWrite;
     const copyUnmodified = opts.copyUnmodified;
     const writtenAssetHashes = opts.writtenAssetHashes;
+    const namePattern = opts.namePattern;
 
     if (compilation.assets[relFileDest] && !forceWrite) {
         return Promise.resolve();
@@ -31,6 +44,9 @@ export default (opts) => {
         }
 
         function addToAssets() {
+            relFileDest = getDestName(relFileDest, namePattern).replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function() {
+                return loaderUtils.getHashDigest(fs.readFileSync(absFileSrc), null, null, parseInt(6, 10));
+            });
             compilation.assets[relFileDest] = {
                 size () {
                     return stat.size;
