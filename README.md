@@ -59,7 +59,7 @@ A pattern looks like:
     - `true` copies all files while using watch or webpack-dev-server
 * `namePattern`
     - example: `"[name]-[contenthash:6].js"` or `"[name].[contenthash:6].js"`
-    - you put content hash before name like this "[contenthash:6]-[name].js"
+    - you put content hash before name like this `"[contenthash:6]-[name].js"`
 
 ### Examples
 
