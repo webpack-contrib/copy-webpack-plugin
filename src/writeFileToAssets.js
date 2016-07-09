@@ -44,16 +44,18 @@ export default (opts) => {
         }
 
         function addToAssets() {
-            relFileDest = getDestName(relFileDest, namePattern).replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function() {
+            var relFileDestHash = getDestName(relFileDest, namePattern).replace(/\[(?:(\w+):)?contenthash(?::([a-z]+\d*))?(?::(\d+))?\]/ig, function() {
                 return loaderUtils.getHashDigest(fs.readFileSync(absFileSrc), null, null, parseInt(6, 10));
             });
-            compilation.assets[relFileDest] = {
-                size () {
+
+            compilation.assets[relFileDestHash] = {
+                size: function() {
                     return stat.size;
                 },
-                source () {
+                source: function() {
                     return fs.readFileSync(absFileSrc);
-                }
+                },
+                chunk: relFileDest
             };
 
             return relFileDest;
