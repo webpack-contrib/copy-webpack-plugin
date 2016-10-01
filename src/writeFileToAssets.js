@@ -48,6 +48,8 @@ export default (opts) => {
                 return loaderUtils.getHashDigest(fs.readFileSync(absFileSrc), null, null, parseInt(6, 10));
             });
 
+            var chunkName = relFileDest.substr(0, relFileDest.lastIndexOf('.'));
+
             compilation.assets[relFileDestHash] = {
                 size: function() {
                     return stat.size;
@@ -55,7 +57,7 @@ export default (opts) => {
                 source: function() {
                     return fs.readFileSync(absFileSrc);
                 },
-                chunk: relFileDest
+                chunk: chunkName
             };
 
             return relFileDest;

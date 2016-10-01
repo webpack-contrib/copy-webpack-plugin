@@ -141,6 +141,9 @@ module.exports = {
 };
 ```
 
+### Maybe a temp repo
+This maybe a temporary repository. Once ```copy-webpack-plugin``` merge my pull request, please stick to the origin repo.
+
 ### Testing
 
 [![Build Status](https://travis-ci.org/kevlened/copy-webpack-plugin.svg?branch=master)](https://travis-ci.org/kevlened/copy-webpack-plugin)

@@ -1,11 +1,11 @@
 {
-  "name": "copy-webpack-plugin",
-  "version": "3.0.1",
+  "name": "copy-webpack-plugin-hash",
+  "version": "3.0.2",
   "description": "Copy files and directories in webpack",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kevlened/copy-webpack-plugin.git"
+    "url": "https://github.com/lcxfs1991/copy-webpack-plugin.git"
   },
   "keywords": [
     "webpack",
@@ -16,7 +16,7 @@
   ],
   "author": "Len Boyette",
   "license": "MIT",
-  "homepage": "https://github.com/kevlened/copy-webpack-plugin",
+  "homepage": "https://github.com/lcxfs1991/copy-webpack-plugin",
   "dependencies": {
     "bluebird": "^2.10.2",
     "fs-extra": "^0.26.4",
