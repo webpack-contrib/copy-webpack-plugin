@@ -17,6 +17,7 @@ export default (opts) => {
     const ignoreList = opts.ignoreList;
     const copyUnmodified = opts.copyUnmodified;
     const writtenAssetHashes = opts.writtenAssetHashes;
+    const namePattern = opts.namePattern;
 
     return dir.filesAsync(absDirSrc)
         .map((absFileSrc) => {
@@ -47,7 +48,8 @@ export default (opts) => {
                 copyUnmodified,
                 forceWrite,
                 relFileDest,
-                writtenAssetHashes
+                writtenAssetHashes,
+                namePattern
             });
         });
 };
