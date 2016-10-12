@@ -419,6 +419,50 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+    });
+
+    describe('with file in from', () => {
+        it('can move a file to the root directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when file not found', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}/nonexistent.txt'`
+                ],
+                patterns: [{
+                    from: 'nonexistent.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use an absolute path to move a file to the root directory', (done) => {
+            const absolutePath = path.resolve(HELPER_DIR, 'file.txt');
+
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: absolutePath
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
 
         it('can use a glob to move multiple files to a non-root directory with name, hash and ext', (done) => {
             runEmit({
