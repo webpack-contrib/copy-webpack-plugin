@@ -75,7 +75,9 @@ describe('apply function', () => {
                 });
             })
             .then(() => {
-                if (compilation.errors.length > 0) {
+                if (opts.expectedErrors) {
+                    expect(compilation.errors).to.deep.equal(opts.expectedErrors);
+                } else if (compilation.errors.length > 0) {
                     throw compilation.errors[0];
                 }
                 resolve(compilation);
@@ -160,9 +162,7 @@ describe('apply function', () => {
         it('doesn\'t throw an error if no patterns are passed', (done) => {
             runEmit({
                 expectedAssetKeys: [],
-                /* eslint-disable no-undefined */
-                patterns: undefined
-                /* eslint-enable */
+                patterns: undefined // eslint-disable-line no-undefined
             })
             .then(done)
             .catch(done);
@@ -185,35 +185,7 @@ describe('apply function', () => {
         });
     });
 
-    describe('with file in from', () => {
-        it('can move a file to the root directory', (done) => {
-            runEmit({
-                expectedAssetKeys: [
-                    'file.txt'
-                ],
-                patterns: [{
-                    from: 'file.txt'
-                }]
-            })
-            .then(done)
-            .catch(done);
-        });
-
-        it('can use an absolute path to move a file to the root directory', (done) => {
-            const absolutePath = path.resolve(HELPER_DIR, 'file.txt');
-
-            runEmit({
-                expectedAssetKeys: [
-                    'file.txt'
-                ],
-                patterns: [{
-                    from: absolutePath
-                }]
-            })
-            .then(done)
-            .catch(done);
-        });
-
+    describe('with glob in from', () => {
         it('can use a glob to move a file to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
@@ -329,6 +301,50 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: path.join(HELPER_DIR, '**/*.txt')
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+    });
+
+    describe('with file in from', () => {
+        it('can move a file to the root directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when file not found', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}/nonexistent.txt'`
+                ],
+                patterns: [{
+                    from: 'nonexistent.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use an absolute path to move a file to the root directory', (done) => {
+            const absolutePath = path.resolve(HELPER_DIR, 'file.txt');
+
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: absolutePath
                 }]
             })
             .then(done)
@@ -608,6 +624,20 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: 'directory'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when directory not found', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    `[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}/nonexistent'`
+                ],
+                patterns: [{
+                    from: 'nonexistent'
                 }]
             })
             .then(done)

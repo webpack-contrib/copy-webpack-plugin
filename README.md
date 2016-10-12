@@ -57,6 +57,11 @@ A pattern looks like:
     - is optional
     - defaults to `false` (only copies modified files)
     - `true` copies all files while using watch or webpack-dev-server
+* `debug`
+    - is optional
+    - defaults to `'warning'` (only logs on warning)
+    - `true` is the same as `'info'`
+    - options are `'warning'`, `'info'`, and `'debug'`
 
 ### Examples
 

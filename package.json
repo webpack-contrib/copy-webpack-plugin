@@ -23,12 +23,14 @@
     "glob": "^6.0.4",
     "lodash": "^4.3.0",
     "minimatch": "^3.0.0",
-    "node-dir": "^0.1.10"
+    "node-dir": "^0.1.10",
+    "loader-utils": "^0.2.15"
   },
   "scripts": {
     "lint": "eslint src/ tests/",
     "pretest": "npm run lint && npm run build && npm run build:tests",
     "test": "mocha compiled_tests/",
+    "test:nolint": "npm run build && npm run build:tests && mocha compiled_tests/",
     "build": "babel src/ --out-dir dist/",
     "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers"
   },

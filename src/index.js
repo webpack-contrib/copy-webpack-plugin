@@ -1,175 +1,117 @@
-import _ from 'lodash';
-import path from 'path';
 import Promise from 'bluebird';
-import toLooksLikeDirectory from './toLooksLikeDirectory';
-import writeFileToAssets from './writeFileToAssets';
-import writeDirectoryToAssets from './writeDirectoryToAssets';
-import shouldIgnore from './shouldIgnore';
-
-/* eslint-disable import/no-commonjs */
-const globAsync = Promise.promisify(require('glob'));
-const fs = Promise.promisifyAll(require('fs-extra'));
-/* eslint-enable */
+import _ from 'lodash';
+import preProcessPattern from './preProcessPattern';
+import processPattern from './processPattern';
 
 function CopyWebpackPlugin(patterns = [], options = {}) {
-    if (!_.isArray(patterns)) {
-        throw new Error('CopyWebpackPlugin: patterns must be an array');
+    if (!Array.isArray(patterns)) {
+        throw new Error('[copy-webpack-plugin] patterns must be an array');
+    }
+
+    // Defaults debug level to 'warning'
+    options.debug = options.debug || 'warning';
+
+    // Defaults debugging to info if only true is specified
+    if (options.debug === true) {
+        options.debug = 'info';
+    }
+
+    const debugLevels = ['warning', 'info', 'debug'];
+    const debugLevelIndex = debugLevels.indexOf(options.debug);
+    function log(msg, level) {
+        if (level === 0) {
+            msg = `WARNING - ${msg}`; 
+        } else {
+            level = level || 1;
+        }
+        if (level <= debugLevelIndex) {
+            console.log('[copy-webpack-plugin] ' + msg); // eslint-disable-line no-console
+        }
+    }
+
+    function warning(msg) {
+        log(msg, 0);
+    }
+
+    function info(msg) {
+        log(msg, 1);
+    }
+
+    function debug(msg) {
+        log(msg, 2);
     }
 
     const apply = (compiler) => {
-        const webpackContext = compiler.options.context;
-        const outputPath = compiler.options.output.path;
         const fileDependencies = [];
         const contextDependencies = [];
-        const webpackIgnore = options.ignore || [];
-        const copyUnmodified = options.copyUnmodified;
-        const writtenAssetHashes = {};
+        const written = {};
 
         compiler.plugin('emit', (compilation, cb) => {
+            debug('starting emit');
+            const callback = () => {
+                debug('finishing emit');
+                cb();
+            };
+
+            const globalRef = {
+                info,
+                debug,
+                warning,
+                compilation,
+                written,
+                fileDependencies,
+                contextDependencies,
+                context: compiler.options.context,
+                output: compiler.options.output.path,
+                ignore: options.ignore || [],
+                copyUnmodified: options.copyUnmodified
+            };
 
             Promise.each(patterns, (pattern) => {
-                let relDest;
-                let globOpts;
-
-                if (pattern.context && !path.isAbsolute(pattern.context)) {
-                    pattern.context = path.resolve(webpackContext, pattern.context);
-                }
-
-                const context = pattern.context || webpackContext;
-                const ignoreList = webpackIgnore.concat(pattern.ignore || []);
-
-                globOpts = {
-                    cwd: context
-                };
-
-                // From can be an object
-                if (pattern.from.glob) {
-                    globOpts = _.assignIn(globOpts, _.omit(pattern.from, 'glob'));
-                    pattern.from = pattern.from.glob;
-                }
-
-                const relSrc = pattern.from;
-                const absSrc = path.resolve(context, relSrc);
-
-                relDest = pattern.to || '';
-
-                const forceWrite = Boolean(pattern.force);
-
-                return fs
-                    .statAsync(absSrc)
-                    .catch(() => {
-                        return null;
-                    })
-                    .then((stat) => {
-                        if (stat && stat.isDirectory()) {
-                            contextDependencies.push(absSrc);
-
-                            // Make the relative destination actually relative
-                            if (path.isAbsolute(relDest)) {
-                                relDest = path.relative(outputPath, relDest);
-                            }
-
-                            return writeDirectoryToAssets({
-                                absDirSrc: absSrc,
-                                compilation,
-                                copyUnmodified,
-                                flatten: pattern.flatten,
-                                forceWrite,
-                                ignoreList,
-                                relDirDest: relDest,
-                                writtenAssetHashes
-                            });
-                        }
-
-                        return globAsync(relSrc, globOpts)
-                            .each((relFileSrcParam) => {
-                                let relFileDest;
-                                let relFileSrc;
-
-                                relFileSrc = relFileSrcParam;
-
-                                // Skip if it matches any of our ignore list
-                                if (shouldIgnore(relFileSrc, ignoreList)) {
-                                    return false;
-                                }
-
-                                const absFileSrc = path.resolve(context, relFileSrc);
-
-                                relFileDest = pattern.to || '';
-
-                                // Remove any directory references if flattening
-                                if (pattern.flatten) {
-                                    relFileSrc = path.basename(relFileSrc);
-                                }
-
-                                const relFileDirname = path.dirname(relFileSrc);
-
-                                fileDependencies.push(absFileSrc);
-
-                                // If the pattern is a blob
-                                if (!stat) {
-                                    // If the source is absolute
-                                    if (path.isAbsolute(relFileSrc)) {
-                                        // Make the destination relative
-                                        relFileDest = path.join(path.relative(context, relFileDirname), path.basename(relFileSrc));
-
-                                    // If the source is relative
-                                    } else {
-                                        relFileDest = path.join(relFileDest, relFileSrc);
-                                    }
-
-                                // If it looks like a directory
-                                } else if (toLooksLikeDirectory(pattern)) {
-                                    // Make the path relative to the source
-                                    relFileDest = path.join(relFileDest, path.basename(relFileSrc));
-                                }
-
-                                // If there's still no relFileDest
-                                relFileDest = relFileDest || path.basename(relFileSrc);
-
-                                // Make sure the relative destination is actually relative
-                                if (path.isAbsolute(relFileDest)) {
-                                    relFileDest = path.relative(outputPath, relFileDest);
-                                }
-
-                                return writeFileToAssets({
-                                    absFileSrc,
-                                    compilation,
-                                    copyUnmodified,
-                                    forceWrite,
-                                    relFileDest,
-                                    writtenAssetHashes
-                                });
-                            });
-                    });
+                // Identify absolute source of each pattern and destination type
+                return preProcessPattern(globalRef, pattern)
+                .then((pattern) => {
+                    // Every source (from) is assumed to exist here
+                    return processPattern(globalRef, pattern);
+                });
             })
             .catch((err) => {
                 compilation.errors.push(err);
             })
-            .finally(cb);
+            .finally(callback);
         });
 
-        compiler.plugin('after-emit', (compilation, callback) => {
-            const trackedFiles = compilation.fileDependencies;
+        compiler.plugin('after-emit', (compilation, cb) => {
+            debug('starting after-emit');
+            const callback = () => {
+                debug('finishing after-emit');
+                cb();
+            };
 
+            // Add file dependencies if they're not already tracked
             _.forEach(fileDependencies, (file) => {
-                if (!_.includes(trackedFiles, file)) {
-                    trackedFiles.push(file);
+                if (_.includes(compilation.fileDependencies, file)) {
+                    debug(`not adding ${file} to change tracking, because it's already tracked`);
+                } else {
+                    debug(`adding ${file} to change tracking`);
+                    compilation.fileDependencies.push(file);
                 }
             });
 
-            const trackedDirs = compilation.contextDependencies;
-
+            // Add context dependencies if they're not already tracked
             _.forEach(contextDependencies, (context) => {
-                if (!_.includes(trackedDirs, context)) {
-                    trackedDirs.push(context);
+                if (_.includes(compilation.contextDependencies, context)) {
+                    debug(`not adding ${context} to change tracking, because it's already tracked`);
+                } else {
+                    debug(`adding ${context} to change tracking`);
+                    compilation.contextDependencies.push(context);
                 }
             });
 
             callback();
         });
     };
-
+    
     return {
         apply
     };
