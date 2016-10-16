@@ -419,6 +419,24 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('can use a glob to move multiple files to a non-root directory with name, hash and ext', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'nested/binextension-d41d8c.bin',
+                    'nested/file-22af64.txt',
+                    'nested/directory/directoryfile-22af64.txt',
+                    'nested/directory/nested/nestedfile-d41d8c.txt',
+                    'nested/noextension-d41d8c'
+                ],
+                patterns: [{
+                    from: '**/*',
+                    to: 'nested/[path][name]-[hash:6].[ext]'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with file in from', () => {
