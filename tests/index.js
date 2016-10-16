@@ -202,9 +202,11 @@ describe('apply function', () => {
         it('can use a glob to move multiple files to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    'binextension.bin',
                     'file.txt',
                     'directory/directoryfile.txt',
-                    'directory/nested/nestedfile.txt'
+                    'directory/nested/nestedfile.txt',
+                    'noextension'
                 ],
                 patterns: [{
                     from: '**/*'
@@ -217,9 +219,11 @@ describe('apply function', () => {
         it('can use a glob to move multiple files to a non-root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    'nested/binextension.bin',
                     'nested/file.txt',
                     'nested/directory/directoryfile.txt',
-                    'nested/directory/nested/nestedfile.txt'
+                    'nested/directory/nested/nestedfile.txt',
+                    'nested/noextension'
                 ],
                 patterns: [{
                     from: '**/*',
@@ -301,6 +305,24 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: path.join(HELPER_DIR, '**/*.txt')
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use a glob to move multiple files to a non-root directory with name, hash and ext', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'nested/binextension-d41d8c.bin',
+                    'nested/file-22af64.txt',
+                    'nested/directory/directoryfile-22af64.txt',
+                    'nested/directory/nested/nestedfile-d41d8c.txt',
+                    'nested/noextension-d41d8c'
+                ],
+                patterns: [{
+                    from: '**/*',
+                    to: 'nested/[path][name]-[hash:6].[ext]'
                 }]
             })
             .then(done)
@@ -481,6 +503,34 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can move a file without an extension to a file using a template', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'noextension.newext'
+                ],
+                patterns: [{
+                    from: 'noextension',
+                    to: '[name][ext].newext'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can move a file with a ".bin" extension using a template', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'binextension.bin'
+                ],
+                patterns: [{
+                    from: 'binextension.bin',
+                    to: '[name].[ext]'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('can move a nested file to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
@@ -599,14 +649,30 @@ describe('apply function', () => {
         it('ignores files in pattern', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    'binextension.bin',
                     'directory/directoryfile.txt',
-                    'directory/nested/nestedfile.txt'
+                    'directory/nested/nestedfile.txt',
+                    'noextension'
                 ],
                 patterns: [{
                     from: '**/*',
                     ignore: [
                         'file.*'
                     ]
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('allows pattern to contain name, hash or ext', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directory/directoryfile-22af64.txt'
+                ],
+                patterns: [{
+                    from: 'directory/directoryfile.txt',
+                    to: 'directory/[name]-[hash:6].[ext]'
                 }]
             })
             .then(done)
@@ -844,6 +910,22 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('can move multiple files to a non-root directory with name, hash and ext', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'nested/.dottedfile-79d39f',
+                    'nested/directoryfile-22af64.txt',
+                    'nested/nested/nestedfile-d41d8c.txt'
+                ],
+                patterns: [{
+                    from: 'directory',
+                    to: 'nested/[path][name]-[hash:6].[ext]'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('options', () => {
@@ -908,9 +990,11 @@ describe('apply function', () => {
             it('ignores files that start with a dot', (done) => {
                 runEmit({
                     expectedAssetKeys: [
+                        'binextension.bin',
                         'file.txt',
                         'directory/directoryfile.txt',
-                        'directory/nested/nestedfile.txt'
+                        'directory/nested/nestedfile.txt',
+                        'noextension'
                     ],
                     options: {
                         ignore: [
@@ -964,7 +1048,9 @@ describe('apply function', () => {
             it('ignores nested directory', (done) => {
                 runEmit({
                     expectedAssetKeys: [
-                        'file.txt'
+                        'binextension.bin',
+                        'file.txt',
+                        'noextension'
                     ],
                     options: {
                         ignore: [{
