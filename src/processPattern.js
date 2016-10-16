@@ -7,7 +7,7 @@ import writeFile from './writeFile';
 const globAsync = Promise.promisify(require('glob')); // eslint-disable-line import/no-commonjs
 
 export default function processPattern(globalRef, pattern) {
-    const {info, debug, output} = globalRef;
+    const {info, debug, output, concurrency} = globalRef;
     const globArgs = _.assign({
         cwd: pattern.context
     }, pattern.fromArgs || {});
@@ -18,7 +18,7 @@ export default function processPattern(globalRef, pattern) {
 
     info(`begin globbing '${pattern.absoluteFrom}' with a context of '${pattern.context}'`);
     return globAsync(pattern.absoluteFrom, globArgs)
-    .each((fileFrom) => {
+    .map((fileFrom) => {
         const file = {
             force: pattern.force,
             absoluteFrom: path.resolve(pattern.context, fileFrom)
@@ -66,7 +66,7 @@ export default function processPattern(globalRef, pattern) {
         } else if (pattern.toType === 'file') {
             file.webpackTo = pattern.to || file.relativeFrom;
         } else if (pattern.toType === 'template') {
-            file.webpackToTemplate = pattern.to;
+            file.webpackTo = pattern.to;
         }
 
         if (path.isAbsolute(file.webpackTo)) {
@@ -76,5 +76,5 @@ export default function processPattern(globalRef, pattern) {
         info(`determined that '${fileFrom}' should write to '${file.webpackTo}'`);
 
         return writeFile(globalRef, pattern, file);
-    });
+    }, {concurrency: concurrency || 1000}); // This is less than file read maximums while staying performant
 }
