@@ -64,7 +64,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 context: compiler.options.context,
                 output: compiler.options.output.path,
                 ignore: options.ignore || [],
-                copyUnmodified: options.copyUnmodified
+                copyUnmodified: options.copyUnmodified,
+                concurrency: options.concurrency
             };
 
             Promise.each(patterns, (pattern) => {
