@@ -94,6 +94,17 @@ describe('apply function', () => {
                 } else {
                     expect(compilation.assets).to.deep.equal({});
                 }
+
+                if (opts.expectedAssetContent) {
+                    for (var key in opts.expectedAssetContent) {
+                        expect(compilation.assets[key]).to.exist;
+                        if (compilation.assets[key]) {
+                            let expectedContent = opts.expectedAssetContent[key];
+                            let compiledContent = compilation.assets[key].source().toString();
+                            expect(compiledContent).to.equal(expectedContent);
+                        }
+                    }
+                }
             });
     };
 
@@ -107,12 +118,7 @@ describe('apply function', () => {
             }
         };
 
-        return run(opts)
-            .then((compilation) => {
-                const assetContent = compilation.assets[opts.existingAsset].source().toString();
-
-                expect(assetContent).to.equal(opts.expectedAssetContent);
-            });
+        return run(opts).then(() => {});
     };
 
     const runChange = (opts) => {
@@ -344,6 +350,25 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can transform a file', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                expectedAssetContent: {
+                    'file.txt': 'changed'
+                },
+                patterns: [{
+                    from: 'file.txt',
+                    transform: function() {
+                        return 'changed';
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('warns when file not found', (done) => {
             runEmit({
                 expectedAssetKeys: [],
@@ -352,6 +377,23 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: 'nonexistent.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when tranform failed', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    'a failure happened'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    transform: function() {
+                        throw 'a failure happened';
+                    }
                 }]
             })
             .then(done)
@@ -592,7 +634,9 @@ describe('apply function', () => {
         it('won\'t overwrite a file already in the compilation', (done) => {
             runForce({
                 existingAsset: 'file.txt',
-                expectedAssetContent: 'existing',
+                expectedAssetContent: {
+                    'file.txt': 'existing'
+                },
                 patterns: [{
                     from: 'file.txt'
                 }]
@@ -604,7 +648,9 @@ describe('apply function', () => {
         it('can force overwrite of a file already in the compilation', (done) => {
             runForce({
                 existingAsset: 'file.txt',
-                expectedAssetContent: 'new',
+                expectedAssetContent: {
+                    'file.txt': 'new'
+                },
                 patterns: [{
                     force: true,
                     from: 'file.txt'
@@ -837,7 +883,9 @@ describe('apply function', () => {
         it('won\'t overwrite a file already in the compilation', (done) => {
             runForce({
                 existingAsset: 'directoryfile.txt',
-                expectedAssetContent: 'existing',
+                expectedAssetContent: {
+                    'directoryfile.txt': 'existing'
+                },
                 patterns: [{
                     from: 'directory'
                 }]
@@ -849,7 +897,9 @@ describe('apply function', () => {
         it('can force overwrite of a file already in the compilation', (done) => {
             runForce({
                 existingAsset: 'directoryfile.txt',
-                expectedAssetContent: 'new',
+                expectedAssetContent: {
+                    'directoryfile.txt': 'new'
+                },
                 patterns: [{
                     force: true,
                     from: 'directory'
