@@ -22,6 +22,10 @@ export default function writeFile(globalRef, pattern, file) {
         info(`reading ${file.absoluteFrom} to write to assets`);
         return fs.readFileAsync(file.absoluteFrom)
         .then((content) => {
+            if (pattern.transform) {
+                content = pattern.transform(content);
+            }
+
             var hash = loaderUtils.getHashDigest(content);
 
             if (pattern.toType === 'template') {
