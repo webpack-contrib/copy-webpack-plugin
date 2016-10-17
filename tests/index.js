@@ -453,6 +453,25 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can transform a file', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                expectedAssetContent: {
+                    'file.txt': 'changed'
+                },
+                patterns: [{
+                    from: 'file.txt',
+                    transform: function() {
+                        return 'changed';
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('warns when file not found', (done) => {
             runEmit({
                 expectedAssetKeys: [],
@@ -461,6 +480,23 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: 'nonexistent.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when tranform failed', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    'a failure happened'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    transform: function() {
+                        throw 'a failure happened';
+                    }
                 }]
             })
             .then(done)
