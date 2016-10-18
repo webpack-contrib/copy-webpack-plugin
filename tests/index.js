@@ -356,12 +356,13 @@ describe('apply function', () => {
                     'file.txt'
                 ],
                 expectedAssetContent: {
-                    'file.txt': 'changed'
+                    'file.txt': 'newchanged'
                 },
                 patterns: [{
                     from: 'file.txt',
-                    transform: function() {
-                        return 'changed';
+                    transform: function(content, absoluteFrom) {
+                        expect(absoluteFrom).to.equal(path.join(HELPER_DIR, 'file.txt'));
+                        return content + 'changed';
                     }
                 }]
             })
