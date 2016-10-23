@@ -107,7 +107,10 @@ module.exports = {
                 '*.txt',
                 
                 // Doesn't copy any file, even if they start with a dot
-                { glob: '**/*', dot: true }
+                '**/*',
+
+                // Doesn't copy any file, except if they start with a dot
+                { glob: '**/*', dot: false }
             ],
 
             // By default, we only copy modified files during
