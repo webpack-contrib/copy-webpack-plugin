@@ -16,13 +16,17 @@ const HELPER_DIR = path.join(__dirname, 'helpers');
 const TEMP_DIR = path.join(__dirname, 'tempdir');
 
 class MockCompiler {
-    constructor () {
+    constructor (options = {}) {
         this.options = {
             context: HELPER_DIR,
             output: {
-                path: BUILD_DIR
+                path: options.outputPath || BUILD_DIR
             }
         };
+
+        if (options.devServer && options.devServer.outputPath) {
+            _.set(this.options, 'devServer.outputPath', options.devServer.outputPath);
+        }
 
         this.outputFileSystem = {
             constructor: {
@@ -434,6 +438,45 @@ describe('apply function', () => {
             runEmit({
                 expectedAssetKeys: [
                     'file.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    to: BUILD_DIR
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('allows absolute to if outpath is defined with webpack-dev-server', (done) => {
+            runEmit({
+                compiler: new MockCompiler({
+                    outputPath: '/',
+                    devServer: {
+                        outputPath: BUILD_DIR
+                    }
+                }),
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    to: BUILD_DIR
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('throws an error when output path isn\'t defined with webpack-dev-server', (done) => {
+            runEmit({
+                compiler: new MockCompiler({
+                    outputPath: '/'
+                }),
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be ' +
+                    'defined to write to absolute paths'
                 ],
                 patterns: [{
                     from: 'file.txt',

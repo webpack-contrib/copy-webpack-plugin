@@ -71,7 +71,7 @@ export default function processPattern(globalRef, pattern) {
 
         if (path.isAbsolute(file.webpackTo)) {
             if (output === '/') {
-                throw '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be defined to copy absolute files';
+                throw '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths';
             }
 
             file.webpackTo = path.relative(output, file.webpackTo);
