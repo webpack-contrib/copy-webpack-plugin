@@ -81,5 +81,5 @@ export default function processPattern(globalRef, pattern) {
         info(`determined that '${fileFrom}' should write to '${file.webpackTo}'`);
 
         return writeFile(globalRef, pattern, file);
-    }, {concurrency: concurrency || 1000}); // This is less than file read maximums while staying performant
+    }, {concurrency: concurrency || 100}); // This is usually less than file read maximums while staying performant
 }
