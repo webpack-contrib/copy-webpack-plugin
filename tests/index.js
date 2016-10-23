@@ -1109,9 +1109,10 @@ describe('apply function', () => {
                         'directory/.dottedfile'
                     ],
                     options: {
-                        ignore: [
-                            '**/*'
-                        ]
+                        ignore: [{
+                            dot: false,
+                            glob: '**/*'
+                        }]
                     },
                     patterns: [{
                         from: '.'
@@ -1125,10 +1126,7 @@ describe('apply function', () => {
                 runEmit({
                     expectedAssetKeys: [],
                     options: {
-                        ignore: [{
-                            dot: true,
-                            glob: '**/*'
-                        }]
+                        ignore: ['**/*']
                     },
                     patterns: [{
                         from: '.'
@@ -1147,10 +1145,7 @@ describe('apply function', () => {
                         'noextension'
                     ],
                     options: {
-                        ignore: [{
-                            dot: true,
-                            glob: 'directory/**/*'
-                        }]
+                        ignore: ['directory/**/*']
                     },
                     patterns: [{
                         from: '.'
