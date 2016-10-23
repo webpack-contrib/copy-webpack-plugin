@@ -23,7 +23,7 @@ export default function writeFile(globalRef, pattern, file) {
         return fs.readFileAsync(file.absoluteFrom)
         .then((content) => {
             if (pattern.transform) {
-                content = pattern.transform(content);
+                content = pattern.transform(content, file.absoluteFrom);
             }
 
             var hash = loaderUtils.getHashDigest(content);

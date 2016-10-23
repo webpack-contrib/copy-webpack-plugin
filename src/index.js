@@ -68,6 +68,12 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 concurrency: options.concurrency
             };
 
+            if (globalRef.output === '/' &&
+                compiler.options.devServer &&
+                compiler.options.devServer.outputPath) {
+                globalRef.output = compiler.options.devServer.outputPath;
+            }
+
             Promise.each(patterns, (pattern) => {
                 // Identify absolute source of each pattern and destination type
                 return preProcessPattern(globalRef, pattern)
