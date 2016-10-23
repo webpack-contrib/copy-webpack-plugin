@@ -37,6 +37,7 @@ export default function processPattern(globalRef, pattern) {
             const ignoreGlob = pattern.ignore[il];
 
             let globParams = {
+                dot: true,
                 matchBase: true
             };
 

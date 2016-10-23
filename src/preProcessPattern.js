@@ -5,7 +5,8 @@ import _ from 'lodash';
 const fs = Promise.promisifyAll(require('fs')); // eslint-disable-line import/no-commonjs
 
 var isGlobLike = /\*/;
-var isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[(\w+:)?hash(:\w+)?(:\d+)?\])|(\[\d+\])`/;
+// https://www.debuggex.com/r/VH2yS2mvJOitiyr3
+var isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\d+)?\])|(\[(\w+:)?hash(:\w+)?(:\d+)?\])|(\[\d+\])/;
 
 export default function preProcessPattern(globalRef, pattern) {
     const {info, debug, warning, context,
