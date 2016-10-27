@@ -116,14 +116,14 @@ function apply(patterns, opts, compiler) {
   compiler.plugin("after-emit", function(compilation, cb) {
     var trackedFiles = compilation.fileDependencies;
     _.each(fileDependencies, function(file) {
-      if (!_.contains(trackedFiles, file)) {
+      if (!_.includes(trackedFiles, file)) {
         trackedFiles.push(file);
       }
     });
 
     var trackedDirs = compilation.contextDependencies;
     _.each(contextDependencies, function(context) {
-      if (!_.contains(trackedDirs, context)) {
+      if (!_.includes(trackedDirs, context)) {
         trackedDirs.push(context);
       }
     });
@@ -184,7 +184,7 @@ function writeDirectoryToAssets(opts) {
     }
 
     // Make sure it doesn't start with the separator
-    if (_.first(relFileDest) === path.sep) {
+    if (_.head(relFileDest) === path.sep) {
       relFileDest = relFileDest.slice(1);
     }
 
