@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
+import findCacheDir from 'find-cache-dir';
 
 function CopyWebpackPlugin(patterns = [], options = {}) {
     if (!Array.isArray(patterns)) {
@@ -44,7 +45,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
     const apply = (compiler) => {
         let fileDependencies;
         let contextDependencies;
-        const written = {};
+        let written = {};
+        let cachePath = null;
 
         compiler.plugin('emit', (compilation, cb) => {
             debug('starting emit');
@@ -52,6 +54,21 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 debug('finishing emit');
                 cb();
             };
+            
+            if (!options.copyUnmodified && Object.keys(written).length == 0) {
+                const thunk = findCacheDir({
+                    'name': 'copy-webpack-plugin',
+                    'thunk': true,
+                    'create': true
+                });
+                cachePath = thunk('data.json');
+                try {
+                    written = require(cachePath);
+                }
+                catch (e) {
+                    written = {};
+                }
+            }
 
             fileDependencies = [];
             contextDependencies = [];
@@ -62,6 +79,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 warning,
                 compilation,
                 written,
+                cachePath,
                 fileDependencies,
                 contextDependencies,
                 context: compiler.options.context,
