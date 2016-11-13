@@ -57,7 +57,7 @@ export default function preProcessPattern(globalRef, pattern) {
     .statAsync(pattern.absoluteFrom)
     .catch(() => {
         // If from doesn't appear to be a glob, then log a warning
-        if (isGlob(pattern.from)) {
+        if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
             pattern.fromType = 'glob';
         } else {
             const msg = `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`;
