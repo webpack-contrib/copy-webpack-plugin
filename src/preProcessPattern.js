@@ -37,6 +37,14 @@ export default function preProcessPattern(globalRef, pattern) {
 
     debug(`determined '${pattern.to}' is a '${pattern.toType}'`);
 
+    // If we know it's a glob, then bail early
+    if (_.isObject(pattern.from) && pattern.from.glob) {
+        pattern.fromType = 'glob';
+        pattern.fromArgs = _.omit(pattern.from, ['glob']);
+        pattern.absoluteFrom = path.resolve(pattern.context, pattern.from.glob);
+        return Promise.resolve(pattern);
+    }
+
     if (path.isAbsolute(pattern.from)) {
         pattern.absoluteFrom = pattern.from;
     } else {
