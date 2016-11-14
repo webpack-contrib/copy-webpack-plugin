@@ -1,10 +1,10 @@
 import Promise from 'bluebird';
 import path from 'path';
 import _ from 'lodash';
+import isGlob from 'is-glob';
 
 const fs = Promise.promisifyAll(require('fs')); // eslint-disable-line import/no-commonjs
 
-var isGlobLike = /\*/;
 // https://www.debuggex.com/r/VH2yS2mvJOitiyr3
 var isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\d+)?\])|(\[(\w+:)?hash(:\w+)?(:\d+)?\])|(\[\d+\])/;
 
@@ -57,7 +57,7 @@ export default function preProcessPattern(globalRef, pattern) {
     .statAsync(pattern.absoluteFrom)
     .catch(() => {
         // If from doesn't appear to be a glob, then log a warning
-        if (isGlobLike.test(pattern.from)) {
+        if (isGlob(pattern.from)) {
             pattern.fromType = 'glob';
         } else {
             const msg = `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`;
