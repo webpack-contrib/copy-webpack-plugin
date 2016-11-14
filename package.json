@@ -21,10 +21,11 @@
     "bluebird": "^2.10.2",
     "fs-extra": "^0.26.4",
     "glob": "^6.0.4",
+    "is-glob": "^3.1.0",
+    "loader-utils": "^0.2.15",
     "lodash": "^4.3.0",
     "minimatch": "^3.0.0",
-    "node-dir": "^0.1.10",
-    "loader-utils": "^0.2.15"
+    "node-dir": "^0.1.10"
   },
   "scripts": {
     "lint": "eslint src/ tests/",
