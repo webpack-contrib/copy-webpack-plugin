@@ -477,7 +477,7 @@ describe('apply function', () => {
             runEmit({
                 expectedAssetKeys: [],
                 expectedErrors: [
-                    `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}/nonexistent.txt'`
+                    `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`
                 ],
                 patterns: [{
                     from: 'nonexistent.txt'
