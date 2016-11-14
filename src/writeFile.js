@@ -48,8 +48,8 @@ export default function writeFile(globalRef, pattern, file) {
                 // A hack because loaderUtils.interpolateName doesn't
                 // find the right path if no directory is defined
                 // ie. [path] applied to 'file.txt' would return 'file'
-                if (file.relativeFrom.indexOf('/') < 0) {
-                    file.relativeFrom = '/' + file.relativeFrom;
+                if (file.relativeFrom.indexOf(path.sep) < 0) {
+                    file.relativeFrom = path.sep + file.relativeFrom;
                 }
 
                 file.webpackTo = loaderUtils.interpolateName(
@@ -60,7 +60,7 @@ export default function writeFile(globalRef, pattern, file) {
                 // Add back removed dots
                 if (dotRemoved) {
                     let newBasename = path.basename(file.webpackTo);
-                    file.webpackTo = path.join(path.dirname(file.webpackTo), '.' + newBasename);
+                    file.webpackTo = path.dirname(file.webpackTo) + '/.' + newBasename;
                 }
             }
 
