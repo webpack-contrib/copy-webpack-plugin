@@ -209,6 +209,21 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can use a glob object to move a file to the root directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: {
+                        glob: '*.txt'
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('can use a glob to move multiple files to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
