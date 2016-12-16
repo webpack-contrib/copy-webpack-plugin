@@ -405,6 +405,47 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can merge files', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'merged.txt'
+                ],
+                expectedAssetContent: {
+                    'merged.txt': 'new, directory:new'
+                },
+                patterns: [{
+                    from: '**/*.txt',
+                    to: 'merged.txt',
+                    transform: function(content, absoluteFrom, relativePath) {
+                        if (!content.length) {
+                            return content;
+                        }
+                        let segments = relativePath.split('\\');
+                        segments.pop();
+                        while(segments.length) {
+                            let segment = segments.pop();
+                            content = `${segment}:${content}`;
+                        }
+                        return content;
+                    },
+                    merge: function(content1, content2) {
+                        if (!content1.length) {
+                            return content2;
+                        }
+                        if (!content2.length) {
+                            return content1;
+                        }
+                        if (content1.length < content2.length)
+                            return `${content1}, ${content2}`;
+                        else
+                            return `${content2}, ${content1}`;
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('warns when file not found', (done) => {
             runEmit({
                 expectedAssetKeys: [],

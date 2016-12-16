@@ -12,6 +12,10 @@ export default function preProcessPattern(globalRef, pattern) {
     const {info, debug, warning, context,
         fileDependencies, contextDependencies, compilation} = globalRef;
 
+    if (pattern.force && pattern.merge) {
+        throw new Error('[copy-webpack-plugin] patterns cannot have both force and merge defined');
+    }
+
     pattern = _.cloneDeep(pattern);
     pattern.to = pattern.to || '';
     pattern.context = pattern.context || context;
