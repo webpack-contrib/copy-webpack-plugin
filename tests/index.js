@@ -411,7 +411,7 @@ describe('apply function', () => {
                     'merged.txt'
                 ],
                 expectedAssetContent: {
-                    'merged.txt': 'new, directory:new'
+                    'merged.txt': './new, directory/new'
                 },
                 patterns: [{
                     from: '**/*.txt',
@@ -420,13 +420,8 @@ describe('apply function', () => {
                         if (!content.length) {
                             return content;
                         }
-                        let segments = relativePath.split('\\');
-                        segments.pop();
-                        while(segments.length) {
-                            let segment = segments.pop();
-                            content = `${segment}:${content}`;
-                        }
-                        return content;
+                        let segment = path.dirname(relativePath);
+                        return `${segment}/${content}`;
                     },
                     merge: function(content1, content2) {
                         if (!content1.length) {
