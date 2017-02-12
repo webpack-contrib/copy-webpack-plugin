@@ -64,6 +64,10 @@ export default function writeFile(globalRef, pattern, file) {
                 }
             }
 
+            if (typeof pattern.transformPath === 'function') {
+                file.webpackTo = pattern.transformPath(file.webpackTo, file.absoluteFrom);
+            }
+
             if (!copyUnmodified &&
                 written[file.absoluteFrom] && written[file.absoluteFrom][hash]) {
                 info(`skipping '${file.webpackTo}', because it hasn't changed`);
