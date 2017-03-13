@@ -2,6 +2,9 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
+import path from 'path';
+
+const fs = Promise.promisifyAll(require('fs')); // eslint-disable-line import/no-commonjs
 
 function CopyWebpackPlugin(patterns = [], options = {}) {
     if (!Array.isArray(patterns)) {
@@ -118,6 +121,22 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 } else {
                     debug(`adding ${context} to change tracking`);
                     compilation.contextDependencies.push(context);
+                }
+            });
+
+            // Copy permissions for files that requested it
+            let output = compiler.options.output.path;
+            if (output === '/' &&
+                compiler.options.devServer &&
+                compiler.options.devServer.outputPath) {
+                output = compiler.options.devServer.outputPath;
+            }
+
+            _.forEach(written, function (value) {
+                if (value.copyPermissions) {
+                    debug(`restoring permissions to ${value.webpackTo}`);
+                    const mask = fs.constants.S_IRWXU | fs.constants.S_IRWXG | fs.constants.S_IRWXO;
+                    fs.chmodSync(path.join(output, value.webpackTo), value.perms & mask);
                 }
             });
 

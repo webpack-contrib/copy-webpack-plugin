@@ -80,6 +80,19 @@ export default function writeFile(globalRef, pattern, file) {
                 return;
             }
 
+            let perms;
+            if (pattern.copyPermissions) {
+                debug(`saving permissions for '${file.absoluteFrom}'`);
+
+                written[file.absoluteFrom].copyPermissions = pattern.copyPermissions;
+                written[file.absoluteFrom].webpackTo = file.webpackTo;
+
+                perms |= stat.mode & fs.constants.S_IRWXU;
+                perms |= stat.mode & fs.constants.S_IRWXG;
+                perms |= stat.mode & fs.constants.S_IRWXO;
+                written[file.absoluteFrom].perms = perms;
+            }
+
             info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);
             compilation.assets[file.webpackTo] = {
                 size: function() {
