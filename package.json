@@ -1,7 +1,7 @@
 {
-  "name": "copy-webpack-plugin",
-  "version": "4.0.1",
-  "description": "Copy files and directories in webpack",
+  "name": "copy-webpack-plugin-advanced",
+  "version": "1.0.0",
+  "description": "Copy files and directories in webpack with optional transformations",
   "main": "dist/index.js",
   "repository": {
     "type": "git",

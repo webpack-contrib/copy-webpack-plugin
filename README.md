@@ -1,6 +1,9 @@
-## Copy Webpack Plugin
+## Copy Webpack Plugin Advanced
 
 This is a [webpack](http://webpack.github.io/) plugin that copies individual files or entire directories to the build directory.
+
+> This package is fork of the original [copy-webpack-plugin](https://github.com/kevlened/copy-webpack-plugin) with additional functionality.
+Reason for creating this separate npm package due to unresponsiveness of original author to [pull request](https://github.com/kevlened/copy-webpack-plugin/pull/103). 
 
 ### Getting started
 
