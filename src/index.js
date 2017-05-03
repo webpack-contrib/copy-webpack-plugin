@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import _ from 'lodash';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
+import writeManifest from './writeManifest';
 
 function CopyWebpackPlugin(patterns = [], options = {}) {
     if (!Array.isArray(patterns)) {
@@ -16,11 +17,13 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
         options.debug = 'info';
     }
 
+    options.writeManifest = options.writeManifest || false;
+
     const debugLevels = ['warning', 'info', 'debug'];
     const debugLevelIndex = debugLevels.indexOf(options.debug);
     function log(msg, level) {
         if (level === 0) {
-            msg = `WARNING - ${msg}`; 
+            msg = `WARNING - ${msg}`;
         } else {
             level = level || 1;
         }
@@ -61,6 +64,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 written,
                 fileDependencies,
                 contextDependencies,
+                assets: {},
                 context: compiler.options.context,
                 output: compiler.options.output.path,
                 ignore: options.ignore || [],
@@ -85,7 +89,13 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             .catch((err) => {
                 compilation.errors.push(err);
             })
-            .finally(callback);
+            .finally((callback) => {
+                if (!options.writeManifest) {
+                    callback();
+                } else {
+                    writeManifest(compilation, globalRef.assets, callback);
+                }
+            });
         });
 
         compiler.plugin('after-emit', (compilation, cb) => {
@@ -118,7 +128,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             callback();
         });
     };
-    
+
     return {
         apply
     };
