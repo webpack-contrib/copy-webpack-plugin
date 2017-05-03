@@ -89,13 +89,13 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             .catch((err) => {
                 compilation.errors.push(err);
             })
-            .finally(callback) => {
+            .finally((callback) => {
                 if (!options.writeManifest) {
                     callback();
                 } else {
                     writeManifest(compilation, globalRef.assets, callback);
                 }
-            };
+            });
         });
 
         compiler.plugin('after-emit', (compilation, cb) => {
