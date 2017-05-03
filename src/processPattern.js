@@ -7,7 +7,7 @@ import writeFile from './writeFile';
 const globAsync = Promise.promisify(require('glob')); // eslint-disable-line import/no-commonjs
 
 export default function processPattern(globalRef, pattern) {
-    const {info, debug, output, concurrency} = globalRef;
+    const {info, debug, output, concurrency, assets} = globalRef;
     const globArgs = _.assign({
         cwd: pattern.context
     }, pattern.fromArgs || {});
@@ -80,8 +80,11 @@ export default function processPattern(globalRef, pattern) {
 
         // ensure forward slashes
         file.webpackTo = file.webpackTo.replace(/\\/g, '/');
-
         info(`determined that '${fileFrom}' should write to '${file.webpackTo}'`);
+
+        // track file for manifest
+        let from = file.relativeFrom.split(process.env.STATIC_ROOT || 'static/')[1];
+        assets[from] = file.webpackTo;
 
         return writeFile(globalRef, pattern, file);
     }, {concurrency: concurrency || 100}); // This is usually less than file read maximums while staying performant
