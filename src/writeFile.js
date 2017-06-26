@@ -3,6 +3,7 @@ import loaderUtils from 'loader-utils';
 import path from 'path';
 
 const fs = Promise.promisifyAll(require('fs')); // eslint-disable-line import/no-commonjs
+const constants = Promise.promisifyAll(require('constants')); // eslint-disable-line import/no-commonjs
 
 export default function writeFile(globalRef, pattern, file) {
     const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
@@ -87,9 +88,12 @@ export default function writeFile(globalRef, pattern, file) {
                 written[file.absoluteFrom].copyPermissions = pattern.copyPermissions;
                 written[file.absoluteFrom].webpackTo = file.webpackTo;
 
-                perms |= stat.mode & fs.constants.S_IRWXU;
-                perms |= stat.mode & fs.constants.S_IRWXG;
-                perms |= stat.mode & fs.constants.S_IRWXO;
+                let constsfrom = fs.constants || constants;
+
+                perms |= stat.mode & constsfrom.S_IRWXU;
+                perms |= stat.mode & constsfrom.S_IRWXG;
+                perms |= stat.mode & constsfrom.S_IRWXO;
+
                 written[file.absoluteFrom].perms = perms;
             }
 
