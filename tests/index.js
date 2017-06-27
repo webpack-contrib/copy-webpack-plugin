@@ -1039,7 +1039,7 @@ describe('apply function', () => {
         it('can move multiple files to a non-root directory with name, hash and ext', (done) => {
             runEmit({
                 expectedAssetKeys: [
-                    'nested/.dottedfile-79d39f',
+                    'nested/.dottedfile-b6368f',
                     'nested/directoryfile-22af64.txt',
                     'nested/nested/nestedfile-d41d8c.txt'
                 ],
@@ -1182,6 +1182,30 @@ describe('apply function', () => {
                         from: '.'
                     }]
 
+                })
+                .then(done)
+                .catch(done);
+            });
+            it('ignores files in subdirectory when flattened', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        'directoryfile.txt'
+                    ],
+                    options: {
+                        ignore: [{
+                            glob: '**/nested/**/*', 
+                            nocase: true
+                        }]
+                    },
+                    patterns: [{
+                        context: 'directory',
+                        from: '*.txt',
+                        flatten: true
+                    }, {
+                        context: 'directory',
+                        from: 'nested/*.txt',
+                        flatten: true
+                    }]
                 })
                 .then(done)
                 .catch(done);
