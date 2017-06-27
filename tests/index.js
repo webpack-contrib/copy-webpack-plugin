@@ -1039,7 +1039,7 @@ describe('apply function', () => {
         it('can move multiple files to a non-root directory with name, hash and ext', (done) => {
             runEmit({
                 expectedAssetKeys: [
-                    'nested/.dottedfile-b6368f',
+                    'nested/.dottedfile-79d39f',
                     'nested/directoryfile-22af64.txt',
                     'nested/nested/nestedfile-d41d8c.txt'
                 ],
