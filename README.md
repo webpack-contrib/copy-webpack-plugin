@@ -104,6 +104,33 @@ module.exports = {
                 from: 'path/to/file.txt',
                 to: 'directory/with/extension.ext',
                 toType: 'dir'
+            },
+            
+            // Transform file content
+            {
+                from: 'path/to/*.json',
+                to: 'to/directory',
+                transform: function (content, absolutePath, relativePath) {
+                    var data = JSON.parse(content.toString());
+                    // store paths in json object or do some other logic
+                    data.absolutePath = absolutePath;
+                    data.relativePath = relativePath;
+                    return new Buffer(JSON.stringify(data));
+                }
+            },
+            
+            // Merge file content
+            {
+                from: 'path/to/*.json',
+                to: 'to/directory',
+                merge: function (sourceContent, destinationContent) {
+                    // combine multiple json files into single one 
+                    var sourceData = JSON.parse(sourceContent.toString());
+                    var destinationData = JSON.parse(destinationContent.toString());
+                    var result = _.merge(sourceData, destinationData);
+
+                    return new Buffer(JSON.stringify(result));
+                }
             }
         ], {
             ignore: [
