@@ -10,7 +10,7 @@ Reason for creating this separate npm package due to unresponsiveness of origina
 Install the plugin:
 
 ```
-npm install --save-dev copy-webpack-plugin
+npm install --save-dev copy-webpack-plugin-advanced
 ```
 
 ### Usage
