@@ -19,7 +19,8 @@
     "test": "mocha compiled_tests/",
     "test:nolint": "npm run build && npm run build:tests && mocha compiled_tests/",
     "build": "babel src/ --out-dir dist/",
-    "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers"
+    "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers",
+    "prepublish": "npm run build"
   },
   "dependencies": {
     "globby": "^7.1.1",
