@@ -799,6 +799,27 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('allows copying a same file into two different locations', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directory/directoryfile-a.txt',
+                    'directory/directoryfile-b.txt'
+                ],
+                patterns: [
+                    {
+                        from: 'directory/directoryfile.txt',
+                        to: 'directory/directoryfile-a.txt'
+                    },
+                    {
+                        from: 'directory/directoryfile.txt',
+                        to: 'directory/directoryfile-b.txt'
+                    }
+                ]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with directory in from', () => {
