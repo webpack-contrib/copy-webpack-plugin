@@ -1186,6 +1186,30 @@ describe('apply function', () => {
                 .then(done)
                 .catch(done);
             });
+            it('ignores files in subdirectory when flattened', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        'directoryfile.txt'
+                    ],
+                    options: {
+                        ignore: [{
+                            glob: '**/nested/**/*', 
+                            nocase: true
+                        }]
+                    },
+                    patterns: [{
+                        context: 'directory',
+                        from: '*.txt',
+                        flatten: true
+                    }, {
+                        context: 'directory',
+                        from: 'nested/*.txt',
+                        flatten: true
+                    }]
+                })
+                .then(done)
+                .catch(done);
+            });
         });
     });
 });

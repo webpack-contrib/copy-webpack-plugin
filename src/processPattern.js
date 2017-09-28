@@ -24,6 +24,7 @@ export default function processPattern(globalRef, pattern) {
             absoluteFrom: path.resolve(pattern.context, fileFrom)
         };
         file.relativeFrom = path.relative(pattern.context, file.absoluteFrom);
+        file.relativeFromBeforeFlatten = file.relativeFrom;
 
         if (pattern.flatten) {
             file.relativeFrom = path.basename(file.relativeFrom);
@@ -52,12 +53,12 @@ export default function processPattern(globalRef, pattern) {
                 glob = '';
             }
 
-            debug(`testing ${glob} against ${file.relativeFrom}`);
-            if (minimatch(file.relativeFrom, glob, globParams)) {
-                info(`ignoring '${file.relativeFrom}', because it matches the ignore glob '${glob}'`);
+            debug(`testing ${glob} against ${file.relativeFromBeforeFlatten}`);
+            if (minimatch(file.relativeFromBeforeFlatten, glob, globParams)) {
+                info(`ignoring '${file.relativeFromBeforeFlatten}', because it matches the ignore glob '${glob}'`);
                 return;
             } else {
-                debug(`${glob} doesn't match ${file.relativeFrom}`);
+                debug(`${glob} doesn't match ${file.relativeFromBeforeFlatten}`);
             }
         }
 
