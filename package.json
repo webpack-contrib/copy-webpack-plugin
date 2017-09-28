@@ -1,11 +1,11 @@
 {
-  "name": "copy-webpack-plugin",
-  "version": "4.0.1",
-  "description": "Copy files and directories in webpack",
+  "name": "copy-webpack-plugin-advanced",
+  "version": "1.0.3",
+  "description": "Copy files and directories in webpack with optional transformations",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kevlened/copy-webpack-plugin.git"
+    "url": "https://github.com/meeroslav/copy-webpack-plugin.git"
   },
   "keywords": [
     "webpack",
@@ -16,7 +16,7 @@
   ],
   "author": "Len Boyette",
   "license": "MIT",
-  "homepage": "https://github.com/kevlened/copy-webpack-plugin",
+  "homepage": "https://github.com/meeroslav/copy-webpack-plugin",
   "dependencies": {
     "bluebird": "^2.10.2",
     "fs-extra": "^0.26.4",
@@ -33,7 +33,8 @@
     "test": "mocha compiled_tests/",
     "test:nolint": "npm run build && npm run build:tests && mocha compiled_tests/",
     "build": "babel src/ --out-dir dist/",
-    "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers"
+    "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers",
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",

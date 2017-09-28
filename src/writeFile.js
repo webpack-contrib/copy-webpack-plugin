@@ -23,7 +23,7 @@ export default function writeFile(globalRef, pattern, file) {
         return fs.readFileAsync(file.absoluteFrom)
         .then((content) => {
             if (pattern.transform) {
-                content = pattern.transform(content, file.absoluteFrom);
+                content = pattern.transform(content, file.absoluteFrom, file.relativeFrom);
             }
 
             var hash = loaderUtils.getHashDigest(content);
@@ -75,9 +75,20 @@ export default function writeFile(globalRef, pattern, file) {
                 };
             }
 
-            if (compilation.assets[file.webpackTo] && !file.force) {
-                info(`skipping '${file.webpackTo}', because it already exists`);
-                return;
+            if (compilation.assets[file.webpackTo]) {
+                if (pattern.merge) {
+                    info(`merging '${file.absoluteFrom}' to compilation asset '${file.webpackTo}'`);
+                    let totalSize = compilation.assets[file.webpackTo].size() + stat.size;
+                    let mergedContent = pattern.merge(compilation.assets[file.webpackTo].source(), content, file.absoluteFrom, file.webpackTo);
+                    compilation.assets[file.webpackTo] = {
+                        size: function() { return totalSize; },
+                        source: function() { return mergedContent; }
+                    };
+                    return;
+                } else if (!file.force) {
+                    info(`skipping '${file.webpackTo}', because it already exists`);
+                    return;
+                }
             }
 
             info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);
