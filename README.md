@@ -1,7 +1,7 @@
 [![npm][npm]][npm-url]
 [![node][node]][node-url]
 [![deps][deps]][deps-url]
-[![tests][tests]][tests-url]
+[![test][test]][test-url]
 [![coverage][cover]][cover-url]
 [![chat][chat]][chat-url]
 
