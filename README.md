@@ -1,16 +1,26 @@
-## Copy Webpack Plugin
+[![npm][npm]][npm-url]
+[![node][node]][node-url]
+[![deps][deps]][deps-url]
+[![tests][tests]][tests-url]
+[![coverage][cover]][cover-url]
+[![chat][chat]][chat-url]
 
-This is a [webpack](http://webpack.github.io/) plugin that copies individual files or entire directories to the build directory.
+<div align="center">
+  <a href="https://github.com/webpack/webpack">
+    <img width="200" height="200"
+      src="https://webpack.js.org/assets/icon-square-big.svg">
+  </a>
+  <h1>Copy Webpack Plugin</h1>
+  <p>Copies individual files or entire directories to the build directory.</p>
+</div>
 
-### Getting started
-
-Install the plugin:
+<h2 align="center">Install</h2>
 
 ```
 npm install --save-dev copy-webpack-plugin
 ```
 
-### Usage
+<h2 align="center">Usage</h2>
 
 `new CopyWebpackPlugin([patterns], options)`
 
@@ -122,12 +132,6 @@ module.exports = {
 };
 ```
 
-### Testing
-
-[![Build Status](https://travis-ci.org/kevlened/copy-webpack-plugin.svg?branch=master)](https://travis-ci.org/kevlened/copy-webpack-plugin)
-
-Run `npm test`
-
 ### FAQ
 
 #### "EMFILE: too many open files" or "ENFILE: file table overflow"
@@ -152,6 +156,58 @@ Starting in version [3.0.0](https://github.com/kevlened/copy-webpack-plugin/blob
 
 If you must have webpack-dev-server write to your output directory, you can force it with the [write-file-webpack-plugin](https://github.com/gajus/write-file-webpack-plugin).
 
-### License
+<h2 align="center">Maintainers</h2>
 
-MIT
+<table>
+  <tbody>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/bebraw">
+          <img width="150" height="150" src="https://github.com/bebraw.png?v=3&s=150">
+          </br>
+          Juho Vepsäläinen
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/d3viant0ne">
+          <img width="150" height="150" src="https://github.com/d3viant0ne.png?v=3&s=150">
+          </br>
+          Joshua Wiens
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/michael-ciniawsky">
+          <img width="150" height="150" src="https://github.com/michael-ciniawsky.png?v=3&s=150">
+          </br>
+          Michael Ciniawsky
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/evilebottnawi">
+          <img width="150" height="150" src="https://github.com/evilebottnawi.png?v=3&s=150">
+          </br>
+          Alexander Krasnoyarov
+        </a>
+      </td>
+    </tr>
+  <tbody>
+</table>
+
+
+[npm]: https://img.shields.io/npm/v/copy-webpack-plugin.svg
+[npm-url]: https://npmjs.com/package/copy-webpack-plugin
+
+[node]: https://img.shields.io/node/v/copy-webpack-plugin.svg
+[node-url]: https://nodejs.org
+
+[deps]: https://david-dm.org/webpack-contrib/copy-webpack-plugin.svg
+[deps-url]: https://david-dm.org/webpack-contrib/copy-webpack-plugin
+
+[test]: https://secure.travis-ci.org/webpack-contrib/copy-webpack-plugin.svg
+[test-url]: http://travis-ci.org/webpack-contrib/copy-webpack-plugin
+
+[cover]: https://codecov.io/gh/webpack-contrib/copy-webpack-plugin/branch/master/graph/badge.svg
+[cover-url]: https://codecov.io/gh/webpack-contrib/copy-webpack-plugin
+
+[chat]: https://img.shields.io/badge/gitter-webpack%2Fwebpack-brightgreen.svg
+[chat-url]: https://gitter.im/webpack/webpack
