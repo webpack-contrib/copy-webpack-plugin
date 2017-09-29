@@ -7,6 +7,7 @@
   "main": "dist/index.js",
   "scripts": {
     "lint": "eslint src/ tests/",
+    "release": "standard-version",
     "pretest": "npm run lint && npm run build && npm run build:tests",
     "test": "mocha compiled_tests/",
     "test:nolint": "npm run build && npm run build:tests && mocha compiled_tests/",
@@ -29,7 +30,8 @@
     "chai": "^3.4.0",
     "eslint": "^2.9.0",
     "mocha": "^2.4.5",
-    "ncp": "^2.0.0"
+    "ncp": "^2.0.0",
+    "standard-version": "^4.2.0"
   },
   "homepage": "https://github.com/webpack-contrib/copy-webpack-plugin",
   "repository": {
