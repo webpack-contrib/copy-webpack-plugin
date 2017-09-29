@@ -20,7 +20,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
     const debugLevelIndex = debugLevels.indexOf(options.debug);
     function log(msg, level) {
         if (level === 0) {
-            msg = `WARNING - ${msg}`; 
+            msg = `WARNING - ${msg}`;
         } else {
             level = level || 1;
         }
@@ -42,8 +42,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
     }
 
     const apply = (compiler) => {
-        const fileDependencies = [];
-        const contextDependencies = [];
+        let fileDependencies;
+        let contextDependencies;
         const written = {};
 
         compiler.plugin('emit', (compilation, cb) => {
@@ -52,6 +52,9 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 debug('finishing emit');
                 cb();
             };
+
+            fileDependencies = [];
+            contextDependencies = [];
 
             const globalRef = {
                 info,
@@ -95,9 +98,12 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 cb();
             };
 
+            const compilationFileDependencies = new Set(compilation.fileDependencies);
+            const compilationContextDependencies = new Set(compilation.contextDependencies);
+
             // Add file dependencies if they're not already tracked
             _.forEach(fileDependencies, (file) => {
-                if (_.includes(compilation.fileDependencies, file)) {
+                if (compilationFileDependencies.has(file)) {
                     debug(`not adding ${file} to change tracking, because it's already tracked`);
                 } else {
                     debug(`adding ${file} to change tracking`);
@@ -107,7 +113,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
 
             // Add context dependencies if they're not already tracked
             _.forEach(contextDependencies, (context) => {
-                if (_.includes(compilation.contextDependencies, context)) {
+                if (compilationContextDependencies.has(context)) {
                     debug(`not adding ${context} to change tracking, because it's already tracked`);
                 } else {
                     debug(`adding ${context} to change tracking`);
@@ -118,7 +124,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             callback();
         });
     };
-    
+
     return {
         apply
     };
