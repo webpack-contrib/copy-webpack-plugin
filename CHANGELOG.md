@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file. See [standa
 
 * Update dependencies for NSP security advisory ([#151](https://github.com/webpack-contrib/copy-webpack-plugin/issues/151)) ([6d4346e](https://github.com/webpack-contrib/copy-webpack-plugin/commit/6d4346e))
 
+  - Reference issue: https://nodesecurity.io/advisories/minimatch_regular-expression-denial-of-service
+
 
 
 <a name="4.1.0"></a>
