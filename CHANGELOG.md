@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file. See [standa
 ## [4.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.1.0...v4.1.1) (2017-10-05)
 
 
+### Chore
+
+* Update dependencies for NSP security advisory ([#151](https://github.com/webpack-contrib/copy-webpack-plugin/issues/151)) ([6d4346e](https://github.com/webpack-contrib/copy-webpack-plugin/commit/6d4346e))
+
+
 
 <a name="4.1.0"></a>
 # [4.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v2.1.3...v4.1.0) (2017-09-29)
