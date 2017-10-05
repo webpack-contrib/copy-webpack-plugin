@@ -1227,5 +1227,59 @@ describe('apply function', () => {
                 .catch(done);
             });
         });
+
+        describe('context', () => {
+            it('overrides webpack config context with absolute path', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        'newdirectory/nestedfile.txt'
+                    ],
+                    options: {
+                        context: path.resolve(HELPER_DIR, 'directory')
+                    },
+                    patterns: [{
+                        from: 'nested',
+                        to: 'newdirectory'
+                    }]
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('overrides webpack config context with relative path', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        'newdirectory/nestedfile.txt'
+                    ],
+                    options: {
+                        context: 'directory'
+                    },
+                    patterns: [{
+                        from: 'nested',
+                        to: 'newdirectory'
+                    }]
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('is overridden by pattern context', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        'newdirectory/nestedfile.txt'
+                    ],
+                    options: {
+                        context: 'directory'
+                    },
+                    patterns: [{
+                        context: 'nested',
+                        from: '.',
+                        to: 'newdirectory'
+                    }]
+                })
+                .then(done)
+                .catch(done);
+            });
+        });
     });
 });
