@@ -67,37 +67,20 @@ export default function writeFile(globalRef, pattern, file) {
             if (pattern.toType === 'template') {
                 info(`interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`);
 
-                // A hack so .dotted files don't get parsed as extensions
-                let basename = path.basename(file.relativeFrom);
-                let dotRemoved = false;
-                if (basename[0] === '.') {
-                    dotRemoved = true;
-                    file.relativeFrom = path.join(path.dirname(file.relativeFrom), basename.slice(1));
-                }
-
                 // If it doesn't have an extension, remove it from the pattern
                 // ie. [name].[ext] or [name][ext] both become [name]
                 if (!path.extname(file.relativeFrom)) {
                     file.webpackTo = file.webpackTo.replace(/\.?\[ext\]/g, '');
                 }
 
-                // A hack because loaderUtils.interpolateName doesn't
-                // find the right path if no directory is defined
-                // ie. [path] applied to 'file.txt' would return 'file'
-                if (file.relativeFrom.indexOf(path.sep) < 0) {
-                    file.relativeFrom = path.sep + file.relativeFrom;
-                }
-
                 file.webpackTo = loaderUtils.interpolateName(
-                    {resourcePath: file.relativeFrom},
+                    {resourcePath: file.absoluteFrom},
                     file.webpackTo,
-                    {content});
-
-                // Add back removed dots
-                if (dotRemoved) {
-                    let newBasename = path.basename(file.webpackTo);
-                    file.webpackTo = path.dirname(file.webpackTo) + '/.' + newBasename;
-                }
+                    {
+                        content,
+                        context: pattern.context
+                    }
+                );
             }
 
             if (!copyUnmodified &&
