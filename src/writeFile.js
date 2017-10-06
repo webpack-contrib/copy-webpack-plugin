@@ -5,7 +5,7 @@ import path from 'path';
 const fs = Promise.promisifyAll(require('fs')); // eslint-disable-line import/no-commonjs
 
 export default function writeFile(globalRef, pattern, file) {
-    const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
+    const {info, debug, compilation, fileDependencies, written, cachePath, copyUnmodified} = globalRef;
 
     return fs.statAsync(file.absoluteFrom)
     .then((stat) => {
@@ -73,6 +73,9 @@ export default function writeFile(globalRef, pattern, file) {
                 written[file.absoluteFrom] = {
                     [hash]: true
                 };
+                if (!copyUnmodified) {
+                    fs.writeFileSync(cachePath, JSON.stringify(written));
+                }
             }
 
             if (compilation.assets[file.webpackTo] && !file.force) {

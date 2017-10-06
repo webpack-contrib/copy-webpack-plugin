@@ -5,6 +5,18 @@
   "author": "Len Boyette",
   "license": "MIT",
   "main": "dist/index.js",
+  "dependencies": {
+    "bluebird": "^3.5.1",
+    "find-cache-dir": "^1.0.0",
+    "fs-extra": "^4.0.2",
+    "glob": "^7.1.2",
+    "is-glob": "^4.0.0",
+    "loader-utils": "^0.2.15",
+    "lodash": "^4.3.0",
+    "minimatch": "^3.0.4",
+    "node-dir": "^0.1.10"
+  },
+  "homepage": "https://github.com/webpack-contrib/copy-webpack-plugin",
   "scripts": {
     "lint": "eslint src/ tests/",
     "release": "standard-version",
@@ -13,16 +25,6 @@
     "test:nolint": "npm run build && npm run build:tests && mocha compiled_tests/",
     "build": "babel src/ --out-dir dist/",
     "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers"
-  },
-  "dependencies": {
-    "bluebird": "^3.5.1",
-    "fs-extra": "^4.0.2",
-    "glob": "^7.1.2",
-    "is-glob": "^4.0.0",
-    "loader-utils": "^0.2.15",
-    "lodash": "^4.3.0",
-    "minimatch": "^3.0.4",
-    "node-dir": "^0.1.10"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
@@ -33,7 +35,6 @@
     "ncp": "^2.0.0",
     "standard-version": "^4.2.0"
   },
-  "homepage": "https://github.com/webpack-contrib/copy-webpack-plugin",
   "repository": {
     "type": "git",
     "url": "https://github.com/webpack-contrib/copy-webpack-plugin.git"
