@@ -12,7 +12,9 @@ export default function preProcessPattern(globalRef, pattern) {
     const {info, debug, warning, context,
         fileDependencies, contextDependencies, compilation} = globalRef;
 
-    pattern = _.cloneDeep(pattern);
+    pattern = typeof pattern === 'string' ? {
+        from: pattern
+    } : _.cloneDeep(pattern);
     pattern.to = pattern.to || '';
     pattern.context = pattern.context || context;
     if (!path.isAbsolute(pattern.context)) {

@@ -1053,6 +1053,25 @@ describe('apply function', () => {
         });
     });
 
+    describe('with simple string patterns', () => {
+        it('can move multiple files', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'binextension.bin',
+                    'file.txt',
+                    'noextension'
+                ],
+                patterns: [
+                    'binextension.bin',
+                    'file.txt',
+                    'noextension'
+                ]
+            })
+            .then(done)
+            .catch(done);
+        });
+    });
+
     describe('options', () => {
         describe('ignore', () => {
             it('ignores files when from is a file', (done) => {
