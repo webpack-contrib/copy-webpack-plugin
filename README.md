@@ -27,6 +27,9 @@ npm install --save-dev copy-webpack-plugin
 A pattern looks like:
 `{ from: 'source', to: 'dest' }`
 
+Or, in the simple case of just a `from` with the default destination, you can use a string primitive instead of an object:
+`'source'`
+
 #### Pattern properties:
 
 | Name | Required | Default     | Details                                                 |
@@ -67,6 +70,9 @@ module.exports = {
             // {output}/file.txt
             { from: 'from/file.txt' },
             
+            // equivalent
+            'from/file.txt',
+
             // {output}/to/file.txt
             { from: 'from/file.txt', to: 'to/file.txt' },
             
