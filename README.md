@@ -37,7 +37,7 @@ Or, in the simple case of just a `from` with the default destination, you can us
 | `from` | Y        |             | _examples:_<br>'relative/file.txt'<br>'/absolute/file.txt'<br>'relative/dir'<br>'/absolute/dir'<br>'\*\*/\*'<br>{glob:'\*\*/\*', dot: true}<br><br>Globs accept [minimatch options](https://github.com/isaacs/minimatch) |
 | `to`   | N        | output root if `from` is file or dir<br><br>resolved glob path if `from` is glob | _examples:_<br>'relative/file.txt'<br>'/absolute/file.txt'<br>'relative/dir'<br>'/absolute/dir'<br>'relative/[name].[ext]'<br>'/absolute/[name].[ext]'<br><br>Templates are [file-loader patterns](https://github.com/webpack/file-loader) |
 | `toType` | N | **'file'** if `to` has extension or `from` is file<br><br>**'dir'** if `from` is directory, `to` has no extension or ends in '/'<br><br>**'template'** if `to` contains [a template pattern](https://github.com/webpack/file-loader) | |
-| `context` | N | compiler.options.context | A path that determines how to interpret the `from` path |
+| `context` | N | options.context \|\| compiler.options.context | A path that determines how to interpret the `from` path |
 | `flatten` | N | false | Removes all directory references and only copies file names<br><br>If files have the same name, the result is non-deterministic |
 | `ignore` | N | [] | Additional globs to ignore for this pattern |
 | `transform` | N | function(content, path) {<br>&nbsp;&nbsp;return content;<br>} | Function that modifies file contents before writing to webpack |
@@ -47,6 +47,7 @@ Or, in the simple case of just a `from` with the default destination, you can us
 
 | Name | Default | Details |
 | ---- | ------- | ------- |
+| `context` | compiler.options.context | A path that determines how to interpret the `from` path, shared for all patterns |
 | `ignore` | [] | Array of globs to ignore (applied to `from`) |
 | `copyUnmodified` | false | Copies files, regardless of modification when using watch or webpack-dev-server. All files are copied on first build, regardless of this option. |
 | `debug` | **'warning'** | _options:_<br>**'warning'** - only warnings<br>**'info'** or true - file location and read info<br>**'debug'** - very detailed debugging info

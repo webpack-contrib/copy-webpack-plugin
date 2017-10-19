@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import path from 'path';
 import _ from 'lodash';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
@@ -46,6 +47,16 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
         let contextDependencies;
         const written = {};
 
+        let context;
+
+        if (!options.context) {
+            context = compiler.options.context;
+        } else if (!path.isAbsolute(options.context)) {
+            context = path.join(compiler.options.context, options.context);
+        } else {
+            context = options.context;
+        }
+
         compiler.plugin('emit', (compilation, cb) => {
             debug('starting emit');
             const callback = () => {
@@ -64,7 +75,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 written,
                 fileDependencies,
                 contextDependencies,
-                context: compiler.options.context,
+                context,
                 output: compiler.options.output.path,
                 ignore: options.ignore || [],
                 copyUnmodified: options.copyUnmodified,
