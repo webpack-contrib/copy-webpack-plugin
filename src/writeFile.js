@@ -26,6 +26,8 @@ export default function writeFile(globalRef, pattern, file) {
                 content = pattern.transform(content, file.absoluteFrom);
             }
 
+            return content;
+        }).then((content) => {
             var hash = loaderUtils.getHashDigest(content);
 
             if (pattern.toType === 'template') {

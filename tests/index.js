@@ -799,6 +799,27 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('transform with promise', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                expectedAssetContent: {
+                    'file.txt': 'newchanged!'
+                },
+                patterns: [{
+                    from: 'file.txt',
+                    transform: function(content) {
+                        return new Promise((resolve) => {
+                            resolve(content + 'changed!');
+                        });
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with directory in from', () => {
