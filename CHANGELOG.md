@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.0"></a>
+# [4.2.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.1.1...v4.2.0) (2017-10-19)
+
+
+### Features
+
+* add `context` option (`options.context`) ([#149](https://github.com/webpack-contrib/copy-webpack-plugin/issues/149)) ([10cd1a2](https://github.com/webpack-contrib/copy-webpack-plugin/commit/10cd1a2))
+* allow async transforms ([#111](https://github.com/webpack-contrib/copy-webpack-plugin/issues/111)) ([8794e5f](https://github.com/webpack-contrib/copy-webpack-plugin/commit/8794e5f))
+* Plugin context option ([5c54e92](https://github.com/webpack-contrib/copy-webpack-plugin/commit/5c54e92)), closes [#148](https://github.com/webpack-contrib/copy-webpack-plugin/issues/148)
+* support `{String}` patterns ([#155](https://github.com/webpack-contrib/copy-webpack-plugin/issues/155)) ([b6c2e66](https://github.com/webpack-contrib/copy-webpack-plugin/commit/b6c2e66))
+* Support simple string patterns ([056a60b](https://github.com/webpack-contrib/copy-webpack-plugin/commit/056a60b)), closes [#150](https://github.com/webpack-contrib/copy-webpack-plugin/issues/150)
+
+
+
 <a name="4.1.1"></a>
 ## [4.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.1.0...v4.1.1) (2017-10-05)
 
