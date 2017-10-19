@@ -799,6 +799,38 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('allows copying a same file into two different locations', (done) => {
+            const transform = (content, absoluteFrom) => {
+                expect(absoluteFrom).to.equal(path.join(HELPER_DIR, 'directory/directoryfile.txt'));
+                return content + 'new';
+            };
+
+            runEmit({
+                expectedAssetKeys: [
+                    'directory/directoryfile-a.txt',
+                    'directory/directoryfile-b.txt'
+                ],
+                expectedAssetContent: {
+                    'directory/directoryfile-a.txt': 'newnew',
+                    'directory/directoryfile-b.txt': 'newnew'
+                },
+                patterns: [
+                    {
+                        from: 'directory/directoryfile.txt',
+                        to: 'directory/directoryfile-a.txt',
+                        transform
+                    },
+                    {
+                        from: 'directory/directoryfile.txt',
+                        to: 'directory/directoryfile-b.txt',
+                        transform
+                    }
+                ]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with directory in from', () => {
