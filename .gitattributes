@@ -1,0 +1,4 @@
+* text=auto
+
+package-lock.json -diff
+bin/* eol=lf
