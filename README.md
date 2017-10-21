@@ -42,6 +42,7 @@ Or, in the simple case of just a `from` with the default destination, you can us
 | `ignore` | N | [] | Additional globs to ignore for this pattern |
 | `transform` | N | function(content, path) {<br>&nbsp;&nbsp;return content;<br>} | Function that modifies file contents before writing to webpack |
 | `force` | N | false | Overwrites files already in compilation.assets (usually added by other plugins) |
+|  copyPermissions | N | false | Applies source file permissions to destination files |
 
 #### Available options:
 

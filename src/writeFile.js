@@ -3,6 +3,7 @@ import loaderUtils from 'loader-utils';
 import path from 'path';
 
 const fs = Promise.promisifyAll(require('fs')); // eslint-disable-line import/no-commonjs
+const constants = Promise.promisifyAll(require('constants')); // eslint-disable-line import/no-commonjs
 
 export default function writeFile(globalRef, pattern, file) {
     const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
@@ -80,6 +81,22 @@ export default function writeFile(globalRef, pattern, file) {
             if (compilation.assets[file.webpackTo] && !file.force) {
                 info(`skipping '${file.webpackTo}', because it already exists`);
                 return;
+            }
+
+            let perms;
+            if (pattern.copyPermissions) {
+                debug(`saving permissions for '${file.absoluteFrom}'`);
+
+                written[file.absoluteFrom].copyPermissions = pattern.copyPermissions;
+                written[file.absoluteFrom].webpackTo = file.webpackTo;
+
+                let constsfrom = fs.constants || constants;
+
+                perms |= stat.mode & constsfrom.S_IRWXU;
+                perms |= stat.mode & constsfrom.S_IRWXG;
+                perms |= stat.mode & constsfrom.S_IRWXO;
+
+                written[file.absoluteFrom].perms = perms;
             }
 
             info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);
