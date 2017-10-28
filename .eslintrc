@@ -1,3 +1,9 @@
 {
-  "extends": "webpack"
+  "extends": "webpack",
+  "rules": {
+    "consistent-return": 1,
+    "no-param-reassign": 1,
+    "no-underscore-dangle": 1,
+    "no-multi-assign": 1
+  }
 }
