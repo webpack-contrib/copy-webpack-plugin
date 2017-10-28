@@ -5,22 +5,22 @@
   "author": "Len Boyette",
   "license": "MIT",
   "main": "dist/cjs.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "lint": "eslint --cache src test",
-    "release": "standard-version",
-    "pretest": "npm run lint && npm run build && npm run build:tests",
-    "test": "jest",
-    "test:nolint": "npm run build && npm run build:tests && mocha compiled_tests/",
-    "build": "cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js'",
-    "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers",
     "webpack-defaults": "webpack-defaults",
     "start": "npm run build -- -w",
     "appveyor:test": "npm run test",
+    "build": "cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js'",
     "clean": "del-cli dist",
+    "lint": "eslint --cache src test",
     "lint-staged": "lint-staged",
     "prebuild": "npm run clean",
     "prepublish": "npm run build",
+    "release": "standard-version",
     "security": "nsp check",
+    "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --collectCoverageFrom='src/**/*.js' --coverage",
     "travis:lint": "npm run lint && npm run security",
@@ -28,13 +28,13 @@
     "travis:coverage": "npm run test:coverage -- --runInBand"
   },
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "fs-extra": "^4.0.2",
-    "glob": "^7.1.2",
-    "is-glob": "^4.0.0",
-    "loader-utils": "^0.2.15",
+    "bluebird": "^2.10.2",
+    "fs-extra": "^0.26.4",
+    "glob": "^6.0.4",
+    "is-glob": "^3.1.0",
+    "loader-utils": "^1.1.0",
     "lodash": "^4.3.0",
-    "minimatch": "^3.0.4",
+    "minimatch": "^3.0.0",
     "node-dir": "^0.1.10"
   },
   "devDependencies": {
@@ -42,19 +42,25 @@
     "babel-jest": "^21.2.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.0",
-    "cross-env": "^5.0.5",
+    "babel-preset-env": "^1.6.1",
+    "cross-env": "^5.1.1",
     "del-cli": "^1.1.0",
-    "eslint": "^4.8.0",
+    "eslint": "^4.10.0",
     "eslint-config-webpack": "^1.2.5",
-    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-import": "^2.8.0",
     "jest": "^21.2.1",
-    "lint-staged": "^4.2.3",
+    "lint-staged": "^4.3.0",
     "nsp": "^2.8.1",
     "pre-commit": "^1.2.2",
     "standard-version": "^4.2.0",
-    "webpack": "^3.6.0",
-    "webpack-defaults": "^1.5.0"
+    "webpack": "^3.8.1",
+    "webpack-defaults": "^1.6.0"
+  },
+  "engines": {
+    "node": ">= 4.8 < 5.0.0 || >= 5.10"
+  },
+  "peerDependencies": {
+    "webpack": "^2.0.0 || ^3.0.0"
   },
   "homepage": "https://github.com/webpack-contrib/copy-webpack-plugin",
   "repository": {
@@ -68,15 +74,6 @@
     "move",
     "copy"
   ],
-  "files": [
-    "dist"
-  ],
-  "engines": {
-    "node": ">= 4.3 < 5.0.0 || >= 5.10"
-  },
-  "peerDependencies": {
-    "webpack": "^2.0.0 || ^3.0.0"
-  },
   "pre-commit": "lint-staged",
   "lint-staged": {
     "*.js": [
