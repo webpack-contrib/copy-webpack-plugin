@@ -1,13 +1,12 @@
 /* globals describe, it, __dirname */
-const CopyWebpackPlugin = require('./../dist/index');
-
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
 import Promise from 'bluebird';
+import CopyWebpackPlugin from '../src/index';
 
 const BUILD_DIR = path.join(__dirname, 'build');
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const HELPER_DIR = path.join(__dirname, 'fixtures');
 const TEMP_DIR = path.join(__dirname, 'tempdir');
 
 class MockCompiler {
@@ -43,46 +42,51 @@ class MockCompiler {
 
 describe('apply function', () => {
   // Ideally we pass in patterns and confirm the resulting assets
-  const run = opts => new Promise((resolve, reject) => {
-    const plugin = CopyWebpackPlugin(opts.patterns, opts.options);
+  const run = opts =>
+    new Promise((resolve, reject) => {
+      const plugin = CopyWebpackPlugin(opts.patterns, opts.options);
 
-    // Get a mock compiler to pass to plugin.apply
-    const compiler = opts.compiler || new MockCompiler();
+      // Get a mock compiler to pass to plugin.apply
+      const compiler = opts.compiler || new MockCompiler();
 
-    plugin.apply(compiler);
+      plugin.apply(compiler);
 
-    // Call the registered function with a mock compilation and callback
-    const compilation = _.assignIn({
-      assets: {},
-      contextDependencies: [],
-      errors: [],
-      fileDependencies: [],
-    }, opts.compilation);
+      // Call the registered function with a mock compilation and callback
+      const compilation = _.assignIn(
+        {
+          assets: {},
+          contextDependencies: [],
+          errors: [],
+          fileDependencies: [],
+        },
+        opts.compilation,
+      );
 
-    // Execute the functions in series
-    Promise.each([
-      compiler.emitFn,
-      compiler.afterEmitFn,
-    ], fn => new Promise((res, rej) => {
-      try {
-        fn(compilation, res);
-      } catch (error) {
-        rej(error);
-      }
-    }))
-      .then(() => {
-        if (opts.expectedErrors) {
-          expect(compilation.errors).toEqual(opts.expectedErrors);
-        } else if (compilation.errors.length > 0) {
-          throw compilation.errors[0];
-        }
-        resolve(compilation);
-      })
-      .catch(reject);
-  });
+      // Execute the functions in series
+      Promise.each(
+        [compiler.emitFn, compiler.afterEmitFn],
+        fn =>
+          new Promise((res, rej) => {
+            try {
+              fn(compilation, res);
+            } catch (error) {
+              rej(error);
+            }
+          }),
+      )
+        .then(() => {
+          if (opts.expectedErrors) {
+            expect(compilation.errors).toEqual(opts.expectedErrors);
+          } else if (compilation.errors.length > 0) {
+            throw compilation.errors[0];
+          }
+          resolve(compilation);
+        })
+        .catch(reject);
+    });
 
-  const runEmit = opts => run(opts)
-    .then((compilation) => {
+  const runEmit = opts =>
+    run(opts).then((compilation) => {
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
         expect(compilation.assets).toEqual(expect.arrayContaining(opts.expectedAssetKeys));
       } else {
@@ -155,10 +159,10 @@ describe('apply function', () => {
       });
   };
 
-    // Use then and catch explicitly, so errors
-    // aren't seen as unhandled exceptions
+  // Use then and catch explicitly, so errors
+  // aren't seen as unhandled exceptions
   describe('error handling', () => {
-    it('doesn\'t throw an error if no patterns are passed', (done) => {
+    it("doesn't throw an error if no patterns are passed", (done) => {
       runEmit({
         expectedAssetKeys: [],
         patterns: undefined, // eslint-disable-line no-undefined
@@ -187,12 +191,12 @@ describe('apply function', () => {
   describe('with glob in from', () => {
     it('can use a glob to move a file to the root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: '*.txt',
+          },
         ],
-        patterns: [{
-          from: '*.txt',
-        }],
       })
         .then(done)
         .catch(done);
@@ -200,15 +204,12 @@ describe('apply function', () => {
 
     it('can use a bracketed glob to move a file to the root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'directory/directoryfile.txt',
-          'directory/nested/nestedfile.txt',
-          'file.txt',
-          'noextension',
+        expectedAssetKeys: ['directory/directoryfile.txt', 'directory/nested/nestedfile.txt', 'file.txt', 'noextension'],
+        patterns: [
+          {
+            from: '{file.txt,noextension,directory/**/*}',
+          },
         ],
-        patterns: [{
-          from: '{file.txt,noextension,directory/**/*}',
-        }],
       })
         .then(done)
         .catch(done);
@@ -216,14 +217,14 @@ describe('apply function', () => {
 
     it('can use a glob object to move a file to the root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
-        ],
-        patterns: [{
-          from: {
-            glob: '*.txt',
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: {
+              glob: '*.txt',
+            },
           },
-        }],
+        ],
       })
         .then(done)
         .catch(done);
@@ -238,9 +239,11 @@ describe('apply function', () => {
           'directory/nested/nestedfile.txt',
           'noextension',
         ],
-        patterns: [{
-          from: '**/*',
-        }],
+        patterns: [
+          {
+            from: '**/*',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -255,10 +258,12 @@ describe('apply function', () => {
           'nested/directory/nested/nestedfile.txt',
           'nested/noextension',
         ],
-        patterns: [{
-          from: '**/*',
-          to: 'nested',
-        }],
+        patterns: [
+          {
+            from: '**/*',
+            to: 'nested',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -266,15 +271,14 @@ describe('apply function', () => {
 
     it('can use a glob to move multiple files in a different relative context to a non-root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'nested/directoryfile.txt',
-          'nested/nested/nestedfile.txt',
+        expectedAssetKeys: ['nested/directoryfile.txt', 'nested/nested/nestedfile.txt'],
+        patterns: [
+          {
+            context: 'directory',
+            from: '**/*',
+            to: 'nested',
+          },
         ],
-        patterns: [{
-          context: 'directory',
-          from: '**/*',
-          to: 'nested',
-        }],
       })
         .then(done)
         .catch(done);
@@ -282,16 +286,15 @@ describe('apply function', () => {
 
     it('can use a glob to flatten multiple files in a relative context to a non-root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'nested/directoryfile.txt',
-          'nested/nestedfile.txt',
+        expectedAssetKeys: ['nested/directoryfile.txt', 'nested/nestedfile.txt'],
+        patterns: [
+          {
+            context: 'directory',
+            flatten: true,
+            from: '**/*',
+            to: 'nested',
+          },
         ],
-        patterns: [{
-          context: 'directory',
-          flatten: true,
-          from: '**/*',
-          to: 'nested',
-        }],
       })
         .then(done)
         .catch(done);
@@ -299,15 +302,14 @@ describe('apply function', () => {
 
     it('can use a glob to move multiple files in a different absolute context to a non-root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'nested/directoryfile.txt',
-          'nested/nested/nestedfile.txt',
+        expectedAssetKeys: ['nested/directoryfile.txt', 'nested/nested/nestedfile.txt'],
+        patterns: [
+          {
+            context: path.join(HELPER_DIR, 'directory'),
+            from: '**/*',
+            to: 'nested',
+          },
         ],
-        patterns: [{
-          context: path.join(HELPER_DIR, 'directory'),
-          from: '**/*',
-          to: 'nested',
-        }],
       })
         .then(done)
         .catch(done);
@@ -315,12 +317,12 @@ describe('apply function', () => {
 
     it('can use a glob with a full path to move a file to the root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: path.join(HELPER_DIR, '*.txt'),
+          },
         ],
-        patterns: [{
-          from: path.join(HELPER_DIR, '*.txt'),
-        }],
       })
         .then(done)
         .catch(done);
@@ -328,14 +330,12 @@ describe('apply function', () => {
 
     it('can use a glob with a full path to move multiple files to the root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
-          'directory/directoryfile.txt',
-          'directory/nested/nestedfile.txt',
+        expectedAssetKeys: ['file.txt', 'directory/directoryfile.txt', 'directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: path.join(HELPER_DIR, '**/*.txt'),
+          },
         ],
-        patterns: [{
-          from: path.join(HELPER_DIR, '**/*.txt'),
-        }],
       })
         .then(done)
         .catch(done);
@@ -350,10 +350,12 @@ describe('apply function', () => {
           'nested/directory/nested/nestedfile-d41d8c.txt',
           'nested/noextension-d41d8c',
         ],
-        patterns: [{
-          from: '**/*',
-          to: 'nested/[path][name]-[hash:6].[ext]',
-        }],
+        patterns: [
+          {
+            from: '**/*',
+            to: 'nested/[path][name]-[hash:6].[ext]',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -363,12 +365,12 @@ describe('apply function', () => {
   describe('with file in from', () => {
     it('can move a file to the root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-        }],
       })
         .then(done)
         .catch(done);
@@ -376,19 +378,19 @@ describe('apply function', () => {
 
     it('can transform a file', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
-        ],
+        expectedAssetKeys: ['file.txt'],
         expectedAssetContent: {
           'file.txt': 'newchanged',
         },
-        patterns: [{
-          from: 'file.txt',
-          transform(content, absoluteFrom) {
-            expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
-            return `${content}changed`;
+        patterns: [
+          {
+            from: 'file.txt',
+            transform(content, absoluteFrom) {
+              expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
+              return `${content}changed`;
+            },
           },
-        }],
+        ],
       })
         .then(done)
         .catch(done);
@@ -397,12 +399,12 @@ describe('apply function', () => {
     it('warns when file not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`,
+        expectedErrors: [`[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`],
+        patterns: [
+          {
+            from: 'nonexistent.txt',
+          },
         ],
-        patterns: [{
-          from: 'nonexistent.txt',
-        }],
       })
         .then(done)
         .catch(done);
@@ -411,15 +413,15 @@ describe('apply function', () => {
     it('warns when tranform failed', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedErrors: [
-          'a failure happened',
-        ],
-        patterns: [{
-          from: 'file.txt',
-          transform() {
-            throw 'a failure happened';
+        expectedErrors: ['a failure happened'],
+        patterns: [
+          {
+            from: 'file.txt',
+            transform() {
+              throw 'a failure happened';
+            },
           },
-        }],
+        ],
       })
         .then(done)
         .catch(done);
@@ -429,12 +431,12 @@ describe('apply function', () => {
       const absolutePath = path.resolve(HELPER_DIR, 'file.txt');
 
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: absolutePath,
+          },
         ],
-        patterns: [{
-          from: absolutePath,
-        }],
       })
         .then(done)
         .catch(done);
@@ -442,13 +444,13 @@ describe('apply function', () => {
 
     it('can move a file to a new directory without a forward slash', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/file.txt',
+        expectedAssetKeys: ['newdirectory/file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
@@ -456,13 +458,13 @@ describe('apply function', () => {
 
     it('can move a file to the root directory using an absolute to', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: BUILD_DIR,
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: BUILD_DIR,
-        }],
       })
         .then(done)
         .catch(done);
@@ -476,19 +478,19 @@ describe('apply function', () => {
             outputPath: BUILD_DIR,
           },
         }),
-        expectedAssetKeys: [
-          'file.txt',
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: BUILD_DIR,
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: BUILD_DIR,
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('throws an error when output path isn\'t defined with webpack-dev-server', (done) => {
+    it("throws an error when output path isn't defined with webpack-dev-server", (done) => {
       runEmit({
         compiler: new MockCompiler({
           outputPath: '/',
@@ -496,12 +498,14 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be ' +
-                    'defined to write to absolute paths',
+            'defined to write to absolute paths',
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: BUILD_DIR,
-        }],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: BUILD_DIR,
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -509,13 +513,13 @@ describe('apply function', () => {
 
     it('can move a file to a new directory using an absolute to', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          '../tempdir/file.txt',
+        expectedAssetKeys: ['../tempdir/file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: TEMP_DIR,
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: TEMP_DIR,
-        }],
       })
         .then(done)
         .catch(done);
@@ -525,13 +529,13 @@ describe('apply function', () => {
       const absolutePath = path.resolve(TEMP_DIR, 'newfile.txt');
 
       runEmit({
-        expectedAssetKeys: [
-          '../tempdir/newfile.txt',
+        expectedAssetKeys: ['../tempdir/newfile.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: absolutePath,
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: absolutePath,
-        }],
       })
         .then(done)
         .catch(done);
@@ -539,13 +543,13 @@ describe('apply function', () => {
 
     it('can move a file to a new directory with a forward slash', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/file.txt',
+        expectedAssetKeys: ['newdirectory/file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newdirectory/',
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: 'newdirectory/',
-        }],
       })
         .then(done)
         .catch(done);
@@ -553,14 +557,14 @@ describe('apply function', () => {
 
     it('can move a file to a new directory with an extension', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory.ext/file.txt',
+        expectedAssetKeys: ['newdirectory.ext/file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newdirectory.ext',
+            toType: 'dir',
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: 'newdirectory.ext',
-          toType: 'dir',
-        }],
       })
         .then(done)
         .catch(done);
@@ -568,13 +572,13 @@ describe('apply function', () => {
 
     it('can move a file to a new directory with an extension and forward slash', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory.ext/file.txt',
+        expectedAssetKeys: ['newdirectory.ext/file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newdirectory.ext/',
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: 'newdirectory.ext/',
-        }],
       })
         .then(done)
         .catch(done);
@@ -582,13 +586,13 @@ describe('apply function', () => {
 
     it('can move a file to a new file with a different name', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newname.txt',
+        expectedAssetKeys: ['newname.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newname.txt',
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: 'newname.txt',
-        }],
       })
         .then(done)
         .catch(done);
@@ -596,14 +600,14 @@ describe('apply function', () => {
 
     it('can move a file to a new file with no extension', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newname',
+        expectedAssetKeys: ['newname'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newname',
+            toType: 'file',
+          },
         ],
-        patterns: [{
-          from: 'file.txt',
-          to: 'newname',
-          toType: 'file',
-        }],
       })
         .then(done)
         .catch(done);
@@ -611,13 +615,13 @@ describe('apply function', () => {
 
     it('can move a file without an extension to a file using a template', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'noextension.newext',
+        expectedAssetKeys: ['noextension.newext'],
+        patterns: [
+          {
+            from: 'noextension',
+            to: '[name][ext].newext',
+          },
         ],
-        patterns: [{
-          from: 'noextension',
-          to: '[name][ext].newext',
-        }],
       })
         .then(done)
         .catch(done);
@@ -625,13 +629,13 @@ describe('apply function', () => {
 
     it('can move a file with a ".bin" extension using a template', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'binextension.bin',
+        expectedAssetKeys: ['binextension.bin'],
+        patterns: [
+          {
+            from: 'binextension.bin',
+            to: '[name].[ext]',
+          },
         ],
-        patterns: [{
-          from: 'binextension.bin',
-          to: '[name].[ext]',
-        }],
       })
         .then(done)
         .catch(done);
@@ -639,12 +643,12 @@ describe('apply function', () => {
 
     it('can move a nested file to the root directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'directoryfile.txt',
+        expectedAssetKeys: ['directoryfile.txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+          },
         ],
-        patterns: [{
-          from: 'directory/directoryfile.txt',
-        }],
       })
         .then(done)
         .catch(done);
@@ -654,12 +658,12 @@ describe('apply function', () => {
       const absolutePath = path.resolve(HELPER_DIR, 'directory', 'directoryfile.txt');
 
       runEmit({
-        expectedAssetKeys: [
-          'directoryfile.txt',
+        expectedAssetKeys: ['directoryfile.txt'],
+        patterns: [
+          {
+            from: absolutePath,
+          },
         ],
-        patterns: [{
-          from: absolutePath,
-        }],
       })
         .then(done)
         .catch(done);
@@ -667,13 +671,13 @@ describe('apply function', () => {
 
     it('can move a nested file to a new directory', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/directoryfile.txt',
+        expectedAssetKeys: ['newdirectory/directoryfile.txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          from: 'directory/directoryfile.txt',
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
@@ -683,27 +687,29 @@ describe('apply function', () => {
       const absolutePath = path.resolve(HELPER_DIR, 'directory', 'directoryfile.txt');
 
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/directoryfile.txt',
+        expectedAssetKeys: ['newdirectory/directoryfile.txt'],
+        patterns: [
+          {
+            from: absolutePath,
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          from: absolutePath,
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('won\'t overwrite a file already in the compilation', (done) => {
+    it("won't overwrite a file already in the compilation", (done) => {
       runForce({
         existingAsset: 'file.txt',
         expectedAssetContent: {
           'file.txt': 'existing',
         },
-        patterns: [{
-          from: 'file.txt',
-        }],
+        patterns: [
+          {
+            from: 'file.txt',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -715,10 +721,12 @@ describe('apply function', () => {
         expectedAssetContent: {
           'file.txt': 'new',
         },
-        patterns: [{
-          force: true,
-          from: 'file.txt',
-        }],
+        patterns: [
+          {
+            force: true,
+            from: 'file.txt',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -726,9 +734,11 @@ describe('apply function', () => {
 
     it('adds the file to the watch list', (done) => {
       run({
-        patterns: [{
-          from: 'file.txt',
-        }],
+        patterns: [
+          {
+            from: 'file.txt',
+          },
+        ],
       })
         .then((compilation) => {
           const absFrom = path.join(HELPER_DIR, 'file.txt');
@@ -741,16 +751,17 @@ describe('apply function', () => {
 
     it('only include files that have changed', (done) => {
       runChange({
-        expectedAssetKeys: [
-          'tempfile1.txt',
-        ],
+        expectedAssetKeys: ['tempfile1.txt'],
         newFileLoc1: path.join(HELPER_DIR, 'tempfile1.txt'),
         newFileLoc2: path.join(HELPER_DIR, 'tempfile2.txt'),
-        patterns: [{
-          from: 'tempfile1.txt',
-        }, {
-          from: 'tempfile2.txt',
-        }],
+        patterns: [
+          {
+            from: 'tempfile1.txt',
+          },
+          {
+            from: 'tempfile2.txt',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -758,18 +769,13 @@ describe('apply function', () => {
 
     it('ignores files in pattern', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'binextension.bin',
-          'directory/directoryfile.txt',
-          'directory/nested/nestedfile.txt',
-          'noextension',
+        expectedAssetKeys: ['binextension.bin', 'directory/directoryfile.txt', 'directory/nested/nestedfile.txt', 'noextension'],
+        patterns: [
+          {
+            from: '**/*',
+            ignore: ['file.*'],
+          },
         ],
-        patterns: [{
-          from: '**/*',
-          ignore: [
-            'file.*',
-          ],
-        }],
       })
         .then(done)
         .catch(done);
@@ -777,13 +783,13 @@ describe('apply function', () => {
 
     it('allows pattern to contain name, hash or ext', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'directory/directoryfile-22af64.txt',
+        expectedAssetKeys: ['directory/directoryfile-22af64.txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+            to: 'directory/[name]-[hash:6].[ext]',
+          },
         ],
-        patterns: [{
-          from: 'directory/directoryfile.txt',
-          to: 'directory/[name]-[hash:6].[ext]',
-        }],
       })
         .then(done)
         .catch(done);
@@ -791,20 +797,20 @@ describe('apply function', () => {
 
     it('transform with promise', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'file.txt',
-        ],
+        expectedAssetKeys: ['file.txt'],
         expectedAssetContent: {
           'file.txt': 'newchanged!',
         },
-        patterns: [{
-          from: 'file.txt',
-          transform(content) {
-            return new Promise((resolve) => {
-              resolve(`${content}changed!`);
-            });
+        patterns: [
+          {
+            from: 'file.txt',
+            transform(content) {
+              return new Promise((resolve) => {
+                resolve(`${content}changed!`);
+              });
+            },
           },
-        }],
+        ],
       })
         .then(done)
         .catch(done);
@@ -812,16 +818,14 @@ describe('apply function', () => {
   });
 
   describe('with directory in from', () => {
-    it('can move a directory\'s contents to the root directory', (done) => {
+    it("can move a directory's contents to the root directory", (done) => {
       runEmit({
-        expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/nestedfile.txt',
+        expectedAssetKeys: ['.dottedfile', 'directoryfile.txt', 'nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory',
+          },
         ],
-        patterns: [{
-          from: 'directory',
-        }],
       })
         .then(done)
         .catch(done);
@@ -830,150 +834,144 @@ describe('apply function', () => {
     it('warns when directory not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}${path.sep}nonexistent'`,
+        expectedErrors: [`[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}${path.sep}nonexistent'`],
+        patterns: [
+          {
+            from: 'nonexistent',
+          },
         ],
-        patterns: [{
-          from: 'nonexistent',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can use an absolute path to move a directory\'s contents to the root directory', (done) => {
+    it("can use an absolute path to move a directory's contents to the root directory", (done) => {
       const absolutePath = path.resolve(HELPER_DIR, 'directory');
 
       runEmit({
-        expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/nestedfile.txt',
+        expectedAssetKeys: ['.dottedfile', 'directoryfile.txt', 'nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: absolutePath,
+          },
         ],
-        patterns: [{
-          from: absolutePath,
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can move a directory\'s contents to a new directory', (done) => {
+    it("can move a directory's contents to a new directory", (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/.dottedfile',
-          'newdirectory/directoryfile.txt',
-          'newdirectory/nested/nestedfile.txt',
+        expectedAssetKeys: ['newdirectory/.dottedfile', 'newdirectory/directoryfile.txt', 'newdirectory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory',
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          from: 'directory',
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can move a directory\'s contents to a new directory using a pattern context', (done) => {
+    it("can move a directory's contents to a new directory using a pattern context", (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/nestedfile.txt',
+        expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+        patterns: [
+          {
+            context: 'directory',
+            from: 'nested',
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          context: 'directory',
-          from: 'nested',
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can flatten a directory\'s contents to a new directory', (done) => {
+    it("can flatten a directory's contents to a new directory", (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/.dottedfile',
-          'newdirectory/directoryfile.txt',
-          'newdirectory/nestedfile.txt',
+        expectedAssetKeys: ['newdirectory/.dottedfile', 'newdirectory/directoryfile.txt', 'newdirectory/nestedfile.txt'],
+        patterns: [
+          {
+            flatten: true,
+            from: 'directory',
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          flatten: true,
-          from: 'directory',
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can move a directory\'s contents to a new directory using an absolute to', (done) => {
+    it("can move a directory's contents to a new directory using an absolute to", (done) => {
       runEmit({
-        expectedAssetKeys: [
-          '../tempdir/.dottedfile',
-          '../tempdir/directoryfile.txt',
-          '../tempdir/nested/nestedfile.txt',
+        expectedAssetKeys: ['../tempdir/.dottedfile', '../tempdir/directoryfile.txt', '../tempdir/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory',
+            to: TEMP_DIR,
+          },
         ],
-        patterns: [{
-          from: 'directory',
-          to: TEMP_DIR,
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can move a nested directory\'s contents to the root directory', (done) => {
+    it("can move a nested directory's contents to the root directory", (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'nestedfile.txt',
+        expectedAssetKeys: ['nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory/nested',
+          },
         ],
-        patterns: [{
-          from: 'directory/nested',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can move a nested directory\'s contents to a new directory', (done) => {
+    it("can move a nested directory's contents to a new directory", (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/nestedfile.txt',
+        expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory/nested',
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          from: 'directory/nested',
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('can use an absolute path to move a nested directory\'s contents to a new directory', (done) => {
+    it("can use an absolute path to move a nested directory's contents to a new directory", (done) => {
       const absolutePath = path.resolve(HELPER_DIR, 'directory', 'nested');
 
       runEmit({
-        expectedAssetKeys: [
-          'newdirectory/nestedfile.txt',
+        expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+        patterns: [
+          {
+            from: absolutePath,
+            to: 'newdirectory',
+          },
         ],
-        patterns: [{
-          from: absolutePath,
-          to: 'newdirectory',
-        }],
       })
         .then(done)
         .catch(done);
     });
 
-    it('won\'t overwrite a file already in the compilation', (done) => {
+    it("won't overwrite a file already in the compilation", (done) => {
       runForce({
         existingAsset: 'directoryfile.txt',
         expectedAssetContent: {
           'directoryfile.txt': 'existing',
         },
-        patterns: [{
-          from: 'directory',
-        }],
+        patterns: [
+          {
+            from: 'directory',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -985,10 +983,12 @@ describe('apply function', () => {
         expectedAssetContent: {
           'directoryfile.txt': 'new',
         },
-        patterns: [{
-          force: true,
-          from: 'directory',
-        }],
+        patterns: [
+          {
+            force: true,
+            from: 'directory',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -996,9 +996,11 @@ describe('apply function', () => {
 
     it('adds the directory to the watch list', (done) => {
       run({
-        patterns: [{
-          from: 'directory',
-        }],
+        patterns: [
+          {
+            from: 'directory',
+          },
+        ],
       })
         .then((compilation) => {
           const absFrom = path.join(HELPER_DIR, 'directory');
@@ -1011,14 +1013,14 @@ describe('apply function', () => {
 
     it('only include files that have changed', (done) => {
       runChange({
-        expectedAssetKeys: [
-          'tempfile1.txt',
-        ],
+        expectedAssetKeys: ['tempfile1.txt'],
         newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
         newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt'),
-        patterns: [{
-          from: 'directory',
-        }],
+        patterns: [
+          {
+            from: 'directory',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -1026,21 +1028,17 @@ describe('apply function', () => {
 
     it('include all files if copyUnmodified is true', (done) => {
       runChange({
-        expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/nestedfile.txt',
-          'tempfile1.txt',
-          'tempfile2.txt',
-        ],
+        expectedAssetKeys: ['.dottedfile', 'directoryfile.txt', 'nested/nestedfile.txt', 'tempfile1.txt', 'tempfile2.txt'],
         newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
         newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt'),
         options: {
           copyUnmodified: true,
         },
-        patterns: [{
-          from: 'directory',
-        }],
+        patterns: [
+          {
+            from: 'directory',
+          },
+        ],
       })
         .then(done)
         .catch(done);
@@ -1048,15 +1046,13 @@ describe('apply function', () => {
 
     it('can move multiple files to a non-root directory with name, hash and ext', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'nested/.dottedfile-79d39f',
-          'nested/directoryfile-22af64.txt',
-          'nested/nested/nestedfile-d41d8c.txt',
+        expectedAssetKeys: ['nested/.dottedfile-79d39f', 'nested/directoryfile-22af64.txt', 'nested/nested/nestedfile-d41d8c.txt'],
+        patterns: [
+          {
+            from: 'directory',
+            to: 'nested/[path][name]-[hash:6].[ext]',
+          },
         ],
-        patterns: [{
-          from: 'directory',
-          to: 'nested/[path][name]-[hash:6].[ext]',
-        }],
       })
         .then(done)
         .catch(done);
@@ -1066,16 +1062,8 @@ describe('apply function', () => {
   describe('with simple string patterns', () => {
     it('can move multiple files', (done) => {
       runEmit({
-        expectedAssetKeys: [
-          'binextension.bin',
-          'file.txt',
-          'noextension',
-        ],
-        patterns: [
-          'binextension.bin',
-          'file.txt',
-          'noextension',
-        ],
+        expectedAssetKeys: ['binextension.bin', 'file.txt', 'noextension'],
+        patterns: ['binextension.bin', 'file.txt', 'noextension'],
       })
         .then(done)
         .catch(done);
@@ -1086,19 +1074,18 @@ describe('apply function', () => {
     describe('ignore', () => {
       it('ignores files when from is a file', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            'directoryfile.txt',
-          ],
+          expectedAssetKeys: ['directoryfile.txt'],
           options: {
-            ignore: [
-              'file.*',
-            ],
+            ignore: ['file.*'],
           },
-          patterns: [{
-            from: 'file.txt',
-          }, {
-            from: 'directory/directoryfile.txt',
-          }],
+          patterns: [
+            {
+              from: 'file.txt',
+            },
+            {
+              from: 'directory/directoryfile.txt',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1106,18 +1093,15 @@ describe('apply function', () => {
 
       it('ignores files when from is a directory', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            '.dottedfile',
-            'directoryfile.txt',
-          ],
+          expectedAssetKeys: ['.dottedfile', 'directoryfile.txt'],
           options: {
-            ignore: [
-              '*/nestedfile.*',
-            ],
+            ignore: ['*/nestedfile.*'],
           },
-          patterns: [{
-            from: 'directory',
-          }],
+          patterns: [
+            {
+              from: 'directory',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1125,17 +1109,15 @@ describe('apply function', () => {
 
       it('ignores files with a certain extension', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            '.dottedfile',
-          ],
+          expectedAssetKeys: ['.dottedfile'],
           options: {
-            ignore: [
-              '*.txt',
-            ],
+            ignore: ['*.txt'],
           },
-          patterns: [{
-            from: 'directory',
-          }],
+          patterns: [
+            {
+              from: 'directory',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1151,13 +1133,13 @@ describe('apply function', () => {
             'noextension',
           ],
           options: {
-            ignore: [
-              '.dottedfile',
-            ],
+            ignore: ['.dottedfile'],
           },
-          patterns: [{
-            from: '.',
-          }],
+          patterns: [
+            {
+              from: '.',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1165,18 +1147,20 @@ describe('apply function', () => {
 
       it('ignores all files except those with dots', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            'directory/.dottedfile',
-          ],
+          expectedAssetKeys: ['directory/.dottedfile'],
           options: {
-            ignore: [{
-              dot: false,
-              glob: '**/*',
-            }],
+            ignore: [
+              {
+                dot: false,
+                glob: '**/*',
+              },
+            ],
           },
-          patterns: [{
-            from: '.',
-          }],
+          patterns: [
+            {
+              from: '.',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1188,10 +1172,11 @@ describe('apply function', () => {
           options: {
             ignore: ['**/*'],
           },
-          patterns: [{
-            from: '.',
-          }],
-
+          patterns: [
+            {
+              from: '.',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1199,18 +1184,15 @@ describe('apply function', () => {
 
       it('ignores nested directory', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            'binextension.bin',
-            'file.txt',
-            'noextension',
-          ],
+          expectedAssetKeys: ['binextension.bin', 'file.txt', 'noextension'],
           options: {
             ignore: ['directory/**/*'],
           },
-          patterns: [{
-            from: '.',
-          }],
-
+          patterns: [
+            {
+              from: '.',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1220,16 +1202,16 @@ describe('apply function', () => {
     describe('context', () => {
       it('overrides webpack config context with absolute path', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            'newdirectory/nestedfile.txt',
-          ],
+          expectedAssetKeys: ['newdirectory/nestedfile.txt'],
           options: {
             context: path.resolve(HELPER_DIR, 'directory'),
           },
-          patterns: [{
-            from: 'nested',
-            to: 'newdirectory',
-          }],
+          patterns: [
+            {
+              from: 'nested',
+              to: 'newdirectory',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1237,16 +1219,16 @@ describe('apply function', () => {
 
       it('overrides webpack config context with relative path', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            'newdirectory/nestedfile.txt',
-          ],
+          expectedAssetKeys: ['newdirectory/nestedfile.txt'],
           options: {
             context: 'directory',
           },
-          patterns: [{
-            from: 'nested',
-            to: 'newdirectory',
-          }],
+          patterns: [
+            {
+              from: 'nested',
+              to: 'newdirectory',
+            },
+          ],
         })
           .then(done)
           .catch(done);
@@ -1254,17 +1236,17 @@ describe('apply function', () => {
 
       it('is overridden by pattern context', (done) => {
         runEmit({
-          expectedAssetKeys: [
-            'newdirectory/nestedfile.txt',
-          ],
+          expectedAssetKeys: ['newdirectory/nestedfile.txt'],
           options: {
             context: 'directory',
           },
-          patterns: [{
-            context: 'nested',
-            from: '.',
-            to: 'newdirectory',
-          }],
+          patterns: [
+            {
+              context: 'nested',
+              from: '.',
+              to: 'newdirectory',
+            },
+          ],
         })
           .then(done)
           .catch(done);

@@ -44,6 +44,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "cross-env": "^5.1.1",
+    "del": "^3.0.0",
     "del-cli": "^1.1.0",
     "eslint": "^4.10.0",
     "eslint-config-webpack": "^1.2.5",
