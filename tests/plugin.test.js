@@ -1,9 +1,4 @@
 /* globals describe, it, __dirname */
-import {
-    expect
-} from 'chai';
-
-// ensure we don't mess up classic imports
 const CopyWebpackPlugin = require('./../dist/index');
 
 import fs from 'fs';
@@ -80,7 +75,7 @@ describe('apply function', () => {
             })
             .then(() => {
                 if (opts.expectedErrors) {
-                    expect(compilation.errors).to.deep.equal(opts.expectedErrors);
+                    expect(compilation.errors).toEqual(opts.expectedErrors);
                 } else if (compilation.errors.length > 0) {
                     throw compilation.errors[0];
                 }
@@ -94,18 +89,18 @@ describe('apply function', () => {
         return run(opts)
             .then((compilation) => {
                 if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-                    expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
+                    expect(compilation.assets).toEqual(expect.arrayContaining(opts.expectedAssetKeys));
                 } else {
-                    expect(compilation.assets).to.deep.equal({});
+                    expect(compilation.assets).toEqual({});
                 }
 
                 if (opts.expectedAssetContent) {
                     for (var key in opts.expectedAssetContent) {
-                        expect(compilation.assets[key]).to.exist;
+                        expect(compilation.assets[key]).toBeDefined();
                         if (compilation.assets[key]) {
                             let expectedContent = opts.expectedAssetContent[key];
                             let compiledContent = compilation.assets[key].source().toString();
-                            expect(compiledContent).to.equal(expectedContent);
+                            expect(compiledContent).toBe(expectedContent);
                         }
                     }
                 }
@@ -155,9 +150,9 @@ describe('apply function', () => {
         })
         .then(() => {
             if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-                expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
+                expect(compilation.assets).toEqual(expect.arrayContaining(opts.expectedAssetKeys));
             } else {
-                expect(compilation.assets).to.deep.equal({});
+                expect(compilation.assets).toEqual({});
             }
         })
         .finally(() => {
@@ -183,7 +178,7 @@ describe('apply function', () => {
                 CopyWebpackPlugin({});
             };
 
-            expect(createPluginWithObject).to.throw(Error);
+            expect(createPluginWithObject).toThrowError(Error);
         });
 
         it('throws an error if the patterns are null', () => {
@@ -191,7 +186,7 @@ describe('apply function', () => {
                 CopyWebpackPlugin(null);
             };
 
-            expect(createPluginWithNull).to.throw(Error);
+            expect(createPluginWithNull).toThrowError(Error);
         });
     });
 
@@ -396,7 +391,7 @@ describe('apply function', () => {
                 patterns: [{
                     from: 'file.txt',
                     transform: function(content, absoluteFrom) {
-                        expect(absoluteFrom).to.equal(path.join(HELPER_DIR, 'file.txt'));
+                        expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
                         return content + 'changed';
                     }
                 }]
@@ -744,7 +739,7 @@ describe('apply function', () => {
             .then((compilation) => {
                 const absFrom = path.join(HELPER_DIR, 'file.txt');
 
-                expect(compilation.fileDependencies).to.have.members([absFrom]);
+                expect(compilation.fileDependencies).toEqual(expect.arrayContaining([absFrom]));
             })
             .then(done)
             .catch(done);
@@ -1014,7 +1009,7 @@ describe('apply function', () => {
             .then((compilation) => {
                 const absFrom = path.join(HELPER_DIR, 'directory');
 
-                expect(compilation.contextDependencies).to.have.members([absFrom]);
+                expect(compilation.contextDependencies).toEqual(expect.arrayContaining([absFrom]));
             })
             .then(done)
             .catch(done);
