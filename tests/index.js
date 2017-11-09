@@ -46,6 +46,10 @@ class MockCompiler {
     }
 }
 
+const statsMock = {
+    toJson: () => ({})
+};
+
 describe('apply function', () => {
     // Ideally we pass in patterns and confirm the resulting assets
     const run = (opts) => {
@@ -62,7 +66,8 @@ describe('apply function', () => {
                 assets: {},
                 contextDependencies: [],
                 errors: [],
-                fileDependencies: []
+                fileDependencies: [],
+                getStats: () => statsMock
             }, opts.compilation);
 
             // Execute the functions in series
@@ -136,7 +141,8 @@ describe('apply function', () => {
             assets: {},
             contextDependencies: [],
             errors: [],
-            fileDependencies: []
+            fileDependencies: [],
+            getStats: () => statsMock
         };
 
         return run({

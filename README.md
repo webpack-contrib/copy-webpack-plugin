@@ -40,7 +40,7 @@ Or, in the simple case of just a `from` with the default destination, you can us
 | `context` | N | options.context \|\| compiler.options.context | A path that determines how to interpret the `from` path |
 | `flatten` | N | false | Removes all directory references and only copies file names<br><br>If files have the same name, the result is non-deterministic |
 | `ignore` | N | [] | Additional globs to ignore for this pattern |
-| `transform` | N | function(content, path) {<br>&nbsp;&nbsp;return content;<br>} | Function that modifies file contents before writing to webpack |
+| `transform` | N | function(content, path, stats) {<br>&nbsp;&nbsp;return content;<br>} | Function that modifies file contents before writing to webpack. Third paramter contains [stats](https://github.com/webpack/docs/wiki/node.js-api#stats) object |
 | `force` | N | false | Overwrites files already in compilation.assets (usually added by other plugins) |
 
 #### Available options:
