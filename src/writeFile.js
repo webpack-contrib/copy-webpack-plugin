@@ -67,13 +67,17 @@ export default function writeFile(globalRef, pattern, file) {
             }
 
             if (!copyUnmodified &&
-                written[file.absoluteFrom] && written[file.absoluteFrom][hash]) {
+                written[file.absoluteFrom] &&
+                written[file.absoluteFrom]['hash'] === hash &&
+                written[file.absoluteFrom]['webpackTo'] === file.webpackTo
+            ) {
                 info(`skipping '${file.webpackTo}', because it hasn't changed`);
                 return;
             } else {
                 debug(`added ${hash} to written tracking for '${file.absoluteFrom}'`);
                 written[file.absoluteFrom] = {
-                    [hash]: true
+                    hash: hash,
+                    webpackTo: file.webpackTo
                 };
             }
 

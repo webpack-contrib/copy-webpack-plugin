@@ -820,6 +820,24 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('same file to multiple targets', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'first/file.txt',
+                    'second/file.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    to: 'first/file.txt'
+                }, {
+                    from: 'file.txt',
+                    to: 'second/file.txt'
+                }]
+            })
+              .then(done)
+              .catch(done);
+        });
     });
 
     describe('with directory in from', () => {
