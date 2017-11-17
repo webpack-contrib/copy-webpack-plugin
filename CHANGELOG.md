@@ -2,8 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-<a name="4.2.1"></a>
 ## [4.2.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.0...v4.2.1) (2017-11-17)
+
+
+### Bug Fixes
+
+* copying same file to multiple targets ([#165](https://github.com/webpack-contrib/copy-webpack-plugin/issues/165)) ([43a9870](https://github.com/webpack-contrib/copy-webpack-plugin/commit/43a9870))
 
 
 
