@@ -28,7 +28,7 @@ export default function writeFile(globalRef, pattern, file) {
 
             return content;
         }).then((content) => {
-            var hash = loaderUtils.getHashDigest(content);
+            const hash = loaderUtils.getHashDigest(content);
 
             if (pattern.toType === 'template') {
                 info(`interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`);
