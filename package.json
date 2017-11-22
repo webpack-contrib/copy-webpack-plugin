@@ -16,13 +16,11 @@
   },
   "dependencies": {
     "bluebird": "^3.5.1",
-    "fs-extra": "^4.0.2",
     "glob": "^7.1.2",
     "is-glob": "^4.0.0",
     "loader-utils": "^0.2.15",
     "lodash": "^4.3.0",
-    "minimatch": "^3.0.4",
-    "node-dir": "^0.1.10"
+    "minimatch": "^3.0.4"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
