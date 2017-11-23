@@ -118,7 +118,11 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                     debug(`not adding ${file} to change tracking, because it's already tracked`);
                 } else {
                     debug(`adding ${file} to change tracking`);
-                    compilation.fileDependencies.push(file);
+                    const { fileDependencies } = compilation;
+
+                    Array.isArray(fileDependencies)
+                        ? fileDependencies.push(file)
+                        : fileDependencies.add(file);
                 }
             });
 
@@ -128,7 +132,11 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                     debug(`not adding ${context} to change tracking, because it's already tracked`);
                 } else {
                     debug(`adding ${context} to change tracking`);
-                    compilation.contextDependencies.push(context);
+                    const { contextDependencies } = compilation;
+
+                    Array.isArray(contextDependencies)
+                        ? contextDependencies.push(context)
+                        : contextDependencies.add(context);
                 }
             });
 
