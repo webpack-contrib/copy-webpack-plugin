@@ -55,8 +55,8 @@ Or, in the simple case of just a `from` with the default destination, you can us
 ### Examples
 
 ```javascript
-var CopyWebpackPlugin = require('copy-webpack-plugin');
-var path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require('path');
 
 module.exports = {
     context: path.join(__dirname, 'app'),
@@ -149,8 +149,8 @@ Globally patch fs with [graceful-fs](https://www.npmjs.com/package/graceful-fs)
 
 At the top of your webpack config, insert this
 
-    var fs = require('fs');
-    var gracefulFs = require('graceful-fs');
+    const fs = require('fs');
+    const gracefulFs = require('graceful-fs');
     gracefulFs.gracefulify(fs);
 
 See [this issue](https://github.com/kevlened/copy-webpack-plugin/issues/59#issuecomment-228563990) for more details
