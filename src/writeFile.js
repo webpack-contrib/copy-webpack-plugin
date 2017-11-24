@@ -2,6 +2,10 @@ import fs from 'fs';
 import pify from 'pify';
 import loaderUtils from 'loader-utils';
 import path from 'path';
+import cacache from 'cacache';
+import serialize from 'serialize-javascript';
+import { name, version } from '../package.json';
+import findCacheDir from 'find-cache-dir';
 
 export default function writeFile(globalRef, pattern, file) {
     const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
@@ -22,7 +26,42 @@ export default function writeFile(globalRef, pattern, file) {
         return pify(fs.readFile)(file.absoluteFrom)
         .then((content) => {
             if (pattern.transform) {
-                content = pattern.transform(content, file.absoluteFrom);
+                const transform = (content, absoluteFrom) => {
+                    return pattern.transform(content, absoluteFrom);
+                };
+
+                if (pattern.cache) {
+                    if (!globalRef.cacheDir) {
+                        globalRef.cacheDir = findCacheDir({ name: 'copy-webpack-plugin' });
+                    }
+
+                    const cacheKey = pattern.cache.key
+                        ? pattern.cache.key
+                        : serialize({
+                            name,
+                            version,
+                            pattern,
+                            content
+                        });
+
+                    return cacache
+                    .get(globalRef.cacheDir, cacheKey)
+                    .then(
+                         (result) => JSON.parse(result.data),
+                          () => {
+                              return Promise
+                              .resolve()
+                              .then(() => transform(content, file.absoluteFrom))
+                              .then((content) => cacache.put(
+                                  globalRef.cacheDir,
+                                  cacheKey,
+                                  JSON.stringify(content)
+                               ).then(() => content));
+                          }
+                     );
+                }
+
+                content = transform(content, file.absoluteFrom);
             }
 
             return content;

@@ -91,11 +91,10 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
 
             patterns.forEach((pattern) => {
                 tasks.push(
-                  preProcessPattern(globalRef, pattern)
-                    .then((pattern) => {
-                      // Every source (from) is assumed to exist here
-                        return processPattern(globalRef, pattern);
-                    })
+                    Promise.resolve()
+                    .then(() => preProcessPattern(globalRef, pattern))
+                    // Every source (from) is assumed to exist here
+                    .then((pattern) => processPattern(globalRef, pattern))
                 );
             });
 
