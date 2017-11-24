@@ -9,7 +9,6 @@ const CopyWebpackPlugin = require('./../dist/index');
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
-import Promise from 'bluebird';
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
@@ -66,27 +65,34 @@ describe('apply function', () => {
             }, opts.compilation);
 
             // Execute the functions in series
-            Promise.each([
-                compiler.emitFn,
-                compiler.afterEmitFn
-            ], (fn) => {
-                return new Promise((res, rej) => {
-                    try {
-                        fn(compilation, res);
-                    } catch (error) {
-                        rej(error);
-                    }
-                });
-            })
-            .then(() => {
-                if (opts.expectedErrors) {
-                    expect(compilation.errors).to.deep.equal(opts.expectedErrors);
-                } else if (compilation.errors.length > 0) {
-                    throw compilation.errors[0];
-                }
-                resolve(compilation);
-            })
-            .catch(reject);
+            return Promise.resolve()
+                .then(() => {
+                    return new Promise((res, rej) => {
+                        try {
+                            compiler.emitFn(compilation, res);
+                        } catch (error) {
+                            rej(error);
+                        }
+                    });
+                })
+                .then(() => {
+                    return new Promise((res, rej) => {
+                        try {
+                            compiler.afterEmitFn(compilation, res);
+                        } catch (error) {
+                            rej(error);
+                        }
+                    });
+                })
+              .then(() => {
+                  if (opts.expectedErrors) {
+                      expect(compilation.errors).to.deep.equal(opts.expectedErrors);
+                  } else if (compilation.errors.length > 0) {
+                      throw compilation.errors[0];
+                  }
+                  resolve(compilation);
+              })
+              .catch(reject);
         });
     };
 
@@ -160,7 +166,7 @@ describe('apply function', () => {
                 expect(compilation.assets).to.deep.equal({});
             }
         })
-        .finally(() => {
+        .then(() => {
             fs.unlinkSync(opts.newFileLoc1);
             fs.unlinkSync(opts.newFileLoc2);
         });

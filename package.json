@@ -15,12 +15,13 @@
     "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers"
   },
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "glob": "^7.1.2",
+    "globby": "^7.1.1",
     "is-glob": "^4.0.0",
     "loader-utils": "^0.2.15",
     "lodash": "^4.3.0",
-    "minimatch": "^3.0.4"
+    "minimatch": "^3.0.4",
+    "pify": "^3.0.0",
+    "p-limit": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
