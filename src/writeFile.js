@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import pify from 'pify';
 import loaderUtils from 'loader-utils';
 import path from 'path';
@@ -94,6 +94,10 @@ export default function writeFile(globalRef, pattern, file) {
                     return content;
                 }
             };
+
+            if (pattern.writeWhenEmit) {
+                return fs.outputFile(path.join(pattern.context, file.webpackTo), content);
+            }
         });
     });
 }
