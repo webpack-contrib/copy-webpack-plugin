@@ -1,4 +1,3 @@
-import Promise from 'bluebird';
 import path from 'path';
 import _ from 'lodash';
 import preProcessPattern from './preProcessPattern';
@@ -88,18 +87,23 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 globalRef.output = compiler.options.devServer.outputPath;
             }
 
-            Promise.each(patterns, (pattern) => {
-                // Identify absolute source of each pattern and destination type
-                return preProcessPattern(globalRef, pattern)
-                .then((pattern) => {
-                    // Every source (from) is assumed to exist here
-                    return processPattern(globalRef, pattern);
-                });
-            })
+            const tasks = [];
+
+            patterns.forEach((pattern) => {
+                tasks.push(
+                  preProcessPattern(globalRef, pattern)
+                    .then((pattern) => {
+                      // Every source (from) is assumed to exist here
+                        return processPattern(globalRef, pattern);
+                    })
+                );
+            });
+
+            Promise.all(tasks)
             .catch((err) => {
                 compilation.errors.push(err);
             })
-            .finally(callback);
+            .then(() => callback());
         });
 
         compiler.plugin('after-emit', (compilation, cb) => {
