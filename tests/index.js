@@ -6,9 +6,13 @@ import {
 // ensure we don't mess up classic imports
 const CopyWebpackPlugin = require('./../dist/index');
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 import _ from 'lodash';
+import chai from 'chai';
+import spies from 'chai-spies';
+
+chai.use(spies);
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
@@ -1300,6 +1304,30 @@ describe('apply function', () => {
                         from: '.',
                         to: 'newdirectory'
                     }]
+                })
+                .then(done)
+                .catch(done);
+            });
+        });
+
+        describe('writeWhenEmit', () => {
+            it('should be write file', (done) => {
+                chai.spy.on(fs, 'outputFile');
+
+                runEmit({
+                    compiler: new MockCompiler({
+                        outputPath: '/'
+                    }),
+                    expectedAssetKeys: [
+                        'file.txt'
+                    ],
+                    patterns: [{
+                        from: 'file.txt',
+                        writeWhenEmit: true
+                    }]
+                })
+                .then(() => {
+                    expect(fs.outputFile).to.have.been.called.once;
                 })
                 .then(done)
                 .catch(done);

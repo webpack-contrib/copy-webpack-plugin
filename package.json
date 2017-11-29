@@ -15,18 +15,20 @@
     "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers"
   },
   "dependencies": {
+    "fs-extra": "^4.0.2",
     "globby": "^7.1.1",
     "is-glob": "^4.0.0",
     "loader-utils": "^0.2.15",
     "lodash": "^4.3.0",
     "minimatch": "^3.0.4",
-    "pify": "^3.0.0",
-    "p-limit": "^1.0.0"
+    "p-limit": "^1.0.0",
+    "pify": "^3.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
     "babel-preset-es2015": "^6.6.0",
     "chai": "^3.4.0",
+    "chai-spies": "^0.7.1",
     "eslint": "^2.9.0",
     "mocha": "^2.4.5",
     "ncp": "^2.0.0",
