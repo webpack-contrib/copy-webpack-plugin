@@ -1250,6 +1250,23 @@ describe('apply function', () => {
                 .then(done)
                 .catch(done);
             });
+
+            it('ignores nested directory (glob)', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        '.dottedfile',
+                        'directoryfile.txt'
+                    ],
+                    options: {
+                        ignore: ['nested/**/*']
+                    },
+                    patterns: [{
+                        from: 'directory'
+                    }]
+                })
+                .then(done)
+                .catch(done);
+            });
         });
 
         describe('context', () => {
