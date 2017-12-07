@@ -117,6 +117,13 @@ module.exports = {
                 from: 'path/to/file.txt',
                 to: 'directory/with/extension.ext',
                 toType: 'dir'
+            },
+            
+            // Ignore some files using glob in nested directory
+            {
+                from: 'from/directory',
+                to: 'to/directory',
+                ignore: ['nested/**/*.extension']
             }
         ], {
             ignore: [
