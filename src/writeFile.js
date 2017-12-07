@@ -4,7 +4,7 @@ import loaderUtils from 'loader-utils';
 import path from 'path';
 
 export default function writeFile(globalRef, pattern, file) {
-    const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
+    const {info, debug, compilation, fileDependencies, written, copyUnmodified, stats} = globalRef;
 
     return pify(fs.stat)(file.absoluteFrom)
     .then((stat) => {
@@ -22,7 +22,7 @@ export default function writeFile(globalRef, pattern, file) {
         return pify(fs.readFile)(file.absoluteFrom)
         .then((content) => {
             if (pattern.transform) {
-                content = pattern.transform(content, file.absoluteFrom);
+                content = pattern.transform(content, file.absoluteFrom, stats);
             }
 
             return content;
