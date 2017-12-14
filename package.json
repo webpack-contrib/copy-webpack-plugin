@@ -16,6 +16,9 @@
   },
   "dependencies": {
     "globby": "^7.1.1",
+    "cacache": "^10.0.1",
+    "find-cache-dir": "^1.0.0",
+    "serialize-javascript": "^1.4.0",
     "is-glob": "^4.0.0",
     "loader-utils": "^0.2.15",
     "lodash": "^4.3.0",

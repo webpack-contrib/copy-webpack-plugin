@@ -9,6 +9,8 @@ const CopyWebpackPlugin = require('./../dist/index');
 import fs from 'fs';
 import path from 'path';
 import _ from 'lodash';
+import findCacheDir from 'find-cache-dir';
+import cacache from 'cacache';
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
@@ -1321,6 +1323,176 @@ describe('apply function', () => {
                 .then(done)
                 .catch(done);
             });
+        });
+
+        describe('cache', () => {
+            const cacheDir = findCacheDir({ name: 'copy-webpack-plugin' });
+
+            beforeEach(() => cacache.rm.all(cacheDir));
+
+            it('file should be cached', (done) => {
+                const newContent = 'newchanged!';
+                const from = 'file.txt';
+
+                runEmit({
+                    expectedAssetKeys: [
+                        'file.txt'
+                    ],
+                    expectedAssetContent: {
+                        'file.txt': newContent
+                    },
+                    patterns: [{
+                        from: from,
+                        cache: true,
+                        transform: function(content) {
+                            return new Promise((resolve) => {
+                                resolve(content + 'changed!');
+                            });
+                        }
+                    }]
+                })
+                .then(() => {
+                    return cacache
+                        .ls(cacheDir)
+                        .then((cacheEntries) => {
+                            const cacheKeys = Object.keys(cacheEntries);
+
+                            expect(cacheKeys).to.have.lengthOf(1);
+
+                            cacheKeys.forEach((cacheKey) => {
+                                const cacheEntry = new Function(`'use strict'\nreturn ${cacheKey}`)();
+
+                                expect(cacheEntry.pattern.from).to.equal(from);
+                            });
+                        });
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('files in directory should be cached', (done) => {
+                const from = 'directory';
+
+                runEmit({
+                    expectedAssetKeys: [
+                        '.dottedfile',
+                        'directoryfile.txt',
+                        'nested/nestedfile.txt'
+                    ],
+                    expectedAssetContent: {
+                        '.dottedfile': 'dottedfile contents\nchanged!',
+                        'directoryfile.txt': 'newchanged!',
+                        'nested/nestedfile.txt': 'changed!'
+                    },
+                    patterns: [{
+                        from: from,
+                        cache: true,
+                        transform: function(content) {
+                            return new Promise((resolve) => {
+                                resolve(content + 'changed!');
+                            });
+                        }
+                    }]
+                })
+                .then(() => {
+                    return cacache
+                        .ls(cacheDir)
+                        .then((cacheEntries) => {
+                            const cacheKeys = Object.keys(cacheEntries);
+
+                            expect(cacheKeys).to.have.lengthOf(3);
+
+                            cacheKeys.forEach((cacheKey) => {
+                                const cacheEntry = new Function(`'use strict'\nreturn ${cacheKey}`)();
+
+                                expect(cacheEntry.pattern.from).to.equal(from);
+                            });
+                        });
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('glob should be cached', (done) => {
+                const from = '*.txt';
+
+                runEmit({
+                    expectedAssetKeys: [
+                        'file.txt'
+                    ],
+                    expectedAssetContent: {
+                        'file.txt': 'newchanged!'
+                    },
+                    patterns: [{
+                        from: from,
+                        cache: true,
+                        transform: function(content) {
+                            return new Promise((resolve) => {
+                                resolve(content + 'changed!');
+                            });
+                        }
+                    }]
+                })
+                .then(() => {
+                    return cacache
+                    .ls(cacheDir)
+                    .then((cacheEntries) => {
+                        const cacheKeys = Object.keys(cacheEntries);
+
+                        expect(cacheKeys).to.have.lengthOf(1);
+
+                        cacheKeys.forEach((cacheKey) => {
+                            const cacheEntry = new Function(`'use strict'\nreturn ${cacheKey}`)();
+
+                            expect(cacheEntry.pattern.from).to.equal(from);
+                        });
+                    });
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('file should be cached with custom cache key', (done) => {
+                const newContent = 'newchanged!';
+                const from = 'file.txt';
+
+                runEmit({
+                    expectedAssetKeys: [
+                        'file.txt'
+                    ],
+                    expectedAssetContent: {
+                        'file.txt': newContent
+                    },
+                    patterns: [{
+                        from: from,
+                        cache: {
+                            key: 'foobar'
+                        },
+                        transform: function(content) {
+                            return new Promise((resolve) => {
+                                resolve(content + 'changed!');
+                            });
+                        }
+                    }]
+                })
+                .then(() => {
+                    return cacache
+                    .ls(cacheDir)
+                    .then((cacheEntries) => {
+                        const cacheKeys = Object.keys(cacheEntries);
+
+                        expect(cacheKeys).to.have.lengthOf(1);
+
+                        cacheKeys.forEach((cacheKey) => {
+                            expect(cacheKey).to.equal('foobar');
+                        });
+                    });
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            after(() => cacache.rm.all(cacheDir));
         });
     });
 });
