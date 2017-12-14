@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file. See [standa
 ## [4.2.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.3...v4.2.4) (2017-12-14)
 
 
+### Refactoring
+
+* refactor: use native `{Promise}` instead of `bluebird` ([#178](https://github.com/webpack-contrib/copy-webpack-plugin/issues/178)) ([a508f14](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a508f14))
+
+
 
 <a name="4.2.3"></a>
 ## [4.2.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.2...v4.2.3) (2017-11-23)
