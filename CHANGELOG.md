@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.3.0"></a>
+# [4.3.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.4...v4.3.0) (2017-12-14)
+
+
+### Features
+
+* add option to cache `pattern.transform` (`pattern.cache`) ([#176](https://github.com/webpack-contrib/copy-webpack-plugin/issues/176)) ([20c143b](https://github.com/webpack-contrib/copy-webpack-plugin/commit/20c143b))
+* option for caching `transform` function ([48c19ff](https://github.com/webpack-contrib/copy-webpack-plugin/commit/48c19ff))
+
+
+
 <a name="4.2.4"></a>
 ## [4.2.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.3...v4.2.4) (2017-12-14)
 
