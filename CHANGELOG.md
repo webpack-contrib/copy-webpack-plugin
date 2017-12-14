@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.2.4"></a>
+## [4.2.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.3...v4.2.4) (2017-12-14)
+
+
+
 <a name="4.2.3"></a>
 ## [4.2.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.2...v4.2.3) (2017-11-23)
 
