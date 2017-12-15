@@ -47,16 +47,13 @@ export default function writeFile(globalRef, pattern, file) {
                     return cacache
                     .get(globalRef.cacheDir, cacheKey)
                     .then(
-                         (result) => JSON.parse(result.data),
+                         (result) => result.data,
                           () => {
                               return Promise
                               .resolve()
                               .then(() => transform(content, file.absoluteFrom))
-                              .then((content) => cacache.put(
-                                  globalRef.cacheDir,
-                                  cacheKey,
-                                  JSON.stringify(content)
-                               ).then(() => content));
+                              .then((content) => cacache.put(globalRef.cacheDir, cacheKey, content.toString())
+                              .then(() => content));
                           }
                      );
                 }
