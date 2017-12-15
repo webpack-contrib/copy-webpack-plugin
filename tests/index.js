@@ -8,7 +8,6 @@ const CopyWebpackPlugin = require('./../dist/index');
 
 import fs from 'fs';
 import path from 'path';
-import _ from 'lodash';
 import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 import isGzip from 'is-gzip';
@@ -28,7 +27,9 @@ class MockCompiler {
         };
 
         if (options.devServer && options.devServer.outputPath) {
-            _.set(this.options, 'devServer.outputPath', options.devServer.outputPath);
+            this.options.devServer = {
+                outputPath: options.devServer.outputPath
+            };
         }
 
         this.outputFileSystem = {
@@ -61,7 +62,7 @@ describe('apply function', () => {
             plugin.apply(compiler);
 
             // Call the registered function with a mock compilation and callback
-            const compilation = _.assignIn({
+            const compilation = Object.assign({
                 assets: {},
                 contextDependencies: [],
                 errors: [],
