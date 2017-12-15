@@ -35,6 +35,7 @@ Or, in the simple case of just a `from` with the default destination, you can us
 | Name | Required | Default     | Details                                                 |
 |------|----------|------------ |---------------------------------------------------------|
 | `from` | Y |  | _examples:_<br>'relative/file.txt'<br>'/absolute/file.txt'<br>'relative/dir'<br>'/absolute/dir'<br>'\*\*/\*'<br>{glob:'\*\*/\*', dot: true}<br><br>Globs accept [minimatch options](https://github.com/isaacs/minimatch) |
+| `fromArgs` | N | `{ cwd: context }` | See the [`node-glob` options](https://github.com/isaacs/node-glob#options) in addition to the ones below. |
 | `to`   | N | output root if `from` is file or dir<br><br>resolved glob path if `from` is glob | _examples:_<br>'relative/file.txt'<br>'/absolute/file.txt'<br>'relative/dir'<br>'/absolute/dir'<br>'relative/[name].[ext]'<br>'/absolute/[name].[ext]'<br><br>Templates are [file-loader patterns](https://github.com/webpack/file-loader) |
 | `toType` | N | **'file'** if `to` has extension or `from` is file<br><br>**'dir'** if `from` is directory, `to` has no extension or ends in '/'<br><br>**'template'** if `to` contains [a template pattern](https://github.com/webpack/file-loader) | |
 | `context` | N | options.context \|\| compiler.options.context | A path that determines how to interpret the `from` path |
