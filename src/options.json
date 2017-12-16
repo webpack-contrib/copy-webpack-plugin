@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "properties": {
+    "boilerplate": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
