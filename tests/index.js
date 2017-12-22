@@ -11,6 +11,8 @@ import path from 'path';
 import _ from 'lodash';
 import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
+import isGzip from 'is-gzip';
+import zlib from 'zlib';
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
@@ -112,8 +114,18 @@ describe('apply function', () => {
                         expect(compilation.assets[key]).to.exist;
                         if (compilation.assets[key]) {
                             let expectedContent = opts.expectedAssetContent[key];
-                            let compiledContent = compilation.assets[key].source().toString();
-                            expect(compiledContent).to.equal(expectedContent);
+
+                            if (!Buffer.isBuffer(expectedContent)) {
+                                expectedContent = new Buffer(expectedContent);
+                            }
+
+                            let compiledContent = compilation.assets[key].source();
+
+                            if (!Buffer.isBuffer(compiledContent)) {
+                                compiledContent = new Buffer(compiledContent);
+                            }
+
+                            expect(Buffer.compare(expectedContent, compiledContent)).to.equal(0);
                         }
                     }
                 }
@@ -253,6 +265,7 @@ describe('apply function', () => {
                 expectedAssetKeys: [
                     'binextension.bin',
                     'file.txt',
+                    'file.txt.gz',
                     'directory/directoryfile.txt',
                     'directory/nested/nestedfile.txt',
                     'noextension'
@@ -270,6 +283,7 @@ describe('apply function', () => {
                 expectedAssetKeys: [
                     'nested/binextension.bin',
                     'nested/file.txt',
+                    'nested/file.txt.gz',
                     'nested/directory/directoryfile.txt',
                     'nested/directory/nested/nestedfile.txt',
                     'nested/noextension'
@@ -365,6 +379,7 @@ describe('apply function', () => {
                 expectedAssetKeys: [
                     'nested/binextension-d41d8c.bin',
                     'nested/file-22af64.txt',
+                    'nested/file.txt-5b311c.gz',
                     'nested/directory/directoryfile-22af64.txt',
                     'nested/directory/nested/nestedfile-d41d8c.txt',
                     'nested/noextension-d41d8c'
@@ -1183,6 +1198,7 @@ describe('apply function', () => {
                     expectedAssetKeys: [
                         'binextension.bin',
                         'file.txt',
+                        'file.txt.gz',
                         'directory/directoryfile.txt',
                         'directory/nested/nestedfile.txt',
                         'noextension'
@@ -1239,6 +1255,7 @@ describe('apply function', () => {
                     expectedAssetKeys: [
                         'binextension.bin',
                         'file.txt',
+                        'file.txt.gz',
                         'noextension'
                     ],
                     options: {
@@ -1485,6 +1502,68 @@ describe('apply function', () => {
 
                         cacheKeys.forEach((cacheKey) => {
                             expect(cacheKey).to.equal('foobar');
+                        });
+                    });
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('binary file should be cached', (done) => {
+                const from = 'file.txt.gz';
+                const content = fs.readFileSync(path.join(HELPER_DIR, from));
+                const expectedNewContent = zlib.gzipSync('newchanged!');
+
+                expect(isGzip(content)).to.equal(true);
+                expect(isGzip(expectedNewContent)).to.equal(true);
+
+                runEmit({
+                    expectedAssetKeys: [
+                        'file.txt.gz'
+                    ],
+                    expectedAssetContent: {
+                        'file.txt.gz': expectedNewContent
+                    },
+                    patterns: [{
+                        from: from,
+                        cache: true,
+                        transform: function(content) {
+                            expect(isGzip(content)).to.equal(true);
+
+                            return new Promise((resolve) => {
+                                zlib.unzip(content, (error, content) => {
+                                    if (error) {
+                                        throw error;
+                                    }
+
+                                    const newContent = new Buffer(content + 'changed!');
+
+                                    zlib.gzip(newContent, (error, compressedData) => {
+                                        if (error) {
+                                            throw error;
+                                        }
+
+                                        expect(isGzip(compressedData)).to.equal(true);
+
+                                        return resolve(compressedData);
+                                    });
+                                });
+                            });
+                        }
+                    }]
+                })
+                .then(() => {
+                    return cacache
+                    .ls(cacheDir)
+                    .then((cacheEntries) => {
+                        const cacheKeys = Object.keys(cacheEntries);
+
+                        expect(cacheKeys).to.have.lengthOf(1);
+
+                        cacheKeys.forEach((cacheKey) => {
+                            const cacheEntry = new Function(`'use strict'\nreturn ${cacheKey}`)();
+
+                            expect(cacheEntry.pattern.from).to.equal(from);
                         });
                     });
                 })
