@@ -33,7 +33,8 @@
     "eslint": "^2.9.0",
     "mocha": "^2.4.5",
     "ncp": "^2.0.0",
-    "standard-version": "^4.2.0"
+    "standard-version": "^4.2.0",
+    "is-gzip": "^2.0.0"
   },
   "homepage": "https://github.com/webpack-contrib/copy-webpack-plugin",
   "repository": {

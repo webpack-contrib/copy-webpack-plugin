@@ -52,7 +52,7 @@ export default function writeFile(globalRef, pattern, file) {
                               return Promise
                               .resolve()
                               .then(() => transform(content, file.absoluteFrom))
-                              .then((content) => cacache.put(globalRef.cacheDir, cacheKey, content.toString())
+                              .then((content) => cacache.put(globalRef.cacheDir, cacheKey, content)
                               .then(() => content));
                           }
                      );
