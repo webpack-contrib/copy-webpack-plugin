@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.3.1"></a>
+## [4.3.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.3.0...v4.3.1) (2017-12-22)
+
+
+### Bug Fixes
+
+* `cache` behaviour ([#196](https://github.com/webpack-contrib/copy-webpack-plugin/issues/196)) ([6beb89e](https://github.com/webpack-contrib/copy-webpack-plugin/commit/6beb89e))
+* `cache` option behaviour ([3b088d0](https://github.com/webpack-contrib/copy-webpack-plugin/commit/3b088d0))
+
+
+
 <a name="4.3.0"></a>
 # [4.3.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.2.4...v4.3.0) (2017-12-14)
 
