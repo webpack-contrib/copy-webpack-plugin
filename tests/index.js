@@ -1576,7 +1576,7 @@ describe('apply function', () => {
 
         describe('manifest', () => {
             it('should accept a manifest object', (done) => {
-                const myManifest = {
+                const manifest = {
                     'source/sauce.txt': 'dist/sauce-a3d2f1.txt'
                 };
                 const expectedManifest = {
@@ -1591,17 +1591,17 @@ describe('apply function', () => {
                         from: 'directory',
                         to: 'dist/[path][name]-[hash:6].[ext]'
                     }],
-                    options: { manifest: myManifest }
+                    options: { manifest }
                 })
                 .then(() => {
-                    expect(myManifest).to.deep.equal(expectedManifest);
+                    expect(manifest).to.deep.equal(expectedManifest);
                 })
                 .then(done)
                 .catch(done);
             });
 
             it('should accept a manifest function', (done) => {
-                const myManifest = {
+                const manifest = {
                     'source/sauce.txt': 'dist/sauce-a3d2f1.txt'
                 };
                 const expectedManifest = {
@@ -1618,12 +1618,12 @@ describe('apply function', () => {
                     }],
                     options: {
                         manifest: (file) => {
-                            myManifest['directory/' + file.relativeFrom] = file.webpackTo;
+                            manifest['directory/' + file.relativeFrom] = file.webpackTo;
                         }
                     }
                 })
                 .then(() => {
-                    expect(myManifest).to.deep.equal(expectedManifest);
+                    expect(manifest).to.deep.equal(expectedManifest);
                 })
                 .then(done)
                 .catch(done);
