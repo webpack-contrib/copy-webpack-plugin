@@ -1573,5 +1573,61 @@ describe('apply function', () => {
 
             after(() => cacache.rm.all(cacheDir));
         });
+
+        describe('manifest', () => {
+            it('should accept a manifest object', (done) => {
+                const myManifest = {
+                    'source/sauce.txt': 'dist/sauce-a3d2f1.txt'
+                };
+                const expectedManifest = {
+                    'source/sauce.txt': 'dist/sauce-a3d2f1.txt',
+                    '.dottedfile': 'dist/.dottedfile-79d39f',
+                    'directoryfile.txt': 'dist/directoryfile-22af64.txt',
+                    'nested/nestedfile.txt': 'dist/nested/nestedfile-d41d8c.txt'
+                };
+                
+                run({
+                    patterns: [{
+                        from: 'directory',
+                        to: 'dist/[path][name]-[hash:6].[ext]'
+                    }],
+                    options: { manifest: myManifest }
+                })
+                .then(() => {
+                    expect(myManifest).to.deep.equal(expectedManifest);
+                })
+                .then(done)
+                .catch(done);
+            });
+
+            it('should accept a manifest function', (done) => {
+                const myManifest = {
+                    'source/sauce.txt': 'dist/sauce-a3d2f1.txt'
+                };
+                const expectedManifest = {
+                    'source/sauce.txt': 'dist/sauce-a3d2f1.txt',
+                    'directory/.dottedfile': 'dist/.dottedfile-79d39f',
+                    'directory/directoryfile.txt': 'dist/directoryfile-22af64.txt',
+                    'directory/nested/nestedfile.txt': 'dist/nested/nestedfile-d41d8c.txt'
+                };
+                
+                run({
+                    patterns: [{
+                        from: 'directory',
+                        to: 'dist/[path][name]-[hash:6].[ext]'
+                    }],
+                    options: {
+                        manifest: (file) => {
+                            myManifest['directory/' + file.relativeFrom] = file.webpackTo;
+                        }
+                    }
+                })
+                .then(() => {
+                    expect(myManifest).to.deep.equal(expectedManifest);
+                })
+                .then(done)
+                .catch(done);
+            });
+        });
     });
 });

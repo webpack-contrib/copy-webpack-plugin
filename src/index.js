@@ -78,7 +78,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 output: compiler.options.output.path,
                 ignore: options.ignore || [],
                 copyUnmodified: options.copyUnmodified,
-                concurrency: options.concurrency
+                concurrency: options.concurrency,
+                manifest: options.manifest || {}
             };
 
             if (globalRef.output === '/' &&

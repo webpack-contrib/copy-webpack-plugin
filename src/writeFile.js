@@ -8,7 +8,7 @@ import { name, version } from '../package.json';
 import findCacheDir from 'find-cache-dir';
 
 export default function writeFile(globalRef, pattern, file) {
-    const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
+    const {info, debug, compilation, fileDependencies, written, copyUnmodified, manifest} = globalRef;
 
     return pify(fs.stat)(file.absoluteFrom)
     .then((stat) => {
@@ -71,6 +71,7 @@ export default function writeFile(globalRef, pattern, file) {
                 // A hack so .dotted files don't get parsed as extensions
                 let basename = path.basename(file.relativeFrom);
                 let dotRemoved = false;
+                let slashAdded = false;
                 if (basename[0] === '.') {
                     dotRemoved = true;
                     file.relativeFrom = path.join(path.dirname(file.relativeFrom), basename.slice(1));
@@ -86,6 +87,7 @@ export default function writeFile(globalRef, pattern, file) {
                 // find the right path if no directory is defined
                 // ie. [path] applied to 'file.txt' would return 'file'
                 if (file.relativeFrom.indexOf(path.sep) < 0) {
+                    slashAdded = true;
                     file.relativeFrom = path.sep + file.relativeFrom;
                 }
 
@@ -98,6 +100,12 @@ export default function writeFile(globalRef, pattern, file) {
                 if (dotRemoved) {
                     let newBasename = path.basename(file.webpackTo);
                     file.webpackTo = path.dirname(file.webpackTo) + '/.' + newBasename;
+                    file.relativeFrom = path.join(path.dirname(file.relativeFrom), basename);
+                }
+
+                // Remove leading slash
+                if (slashAdded) {
+                    file.relativeFrom = file.relativeFrom.slice(1);
                 }
             }
 
@@ -130,6 +138,13 @@ export default function writeFile(globalRef, pattern, file) {
                     return content;
                 }
             };
+
+            
+            if (typeof manifest === 'function') {
+                manifest(file);
+            } else {
+                manifest[file.relativeFrom] = file.webpackTo;
+            }
         });
     });
 }

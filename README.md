@@ -52,6 +52,7 @@ Or, in the simple case of just a `from` with the default destination, you can us
 | `context` | compiler.options.context | A path that determines how to interpret the `from` path, shared for all patterns |
 | `ignore` | [] | Array of globs to ignore (applied to `from`) |
 | `copyUnmodified` | false | Copies files, regardless of modification when using watch or webpack-dev-server. All files are copied on first build, regardless of this option. |
+| `manifest` | {} | Either a manifest object or a function for writing one's own manifest.<br> Signature: `function(file)` where `file` is a file object |
 | `debug` | **'warning'** | _options:_<br>**'warning'** - only warnings<br>**'info'** or true - file location and read info<br>**'debug'** - very detailed debugging info
 
 ### Examples
