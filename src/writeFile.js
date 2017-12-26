@@ -71,7 +71,6 @@ export default function writeFile(globalRef, pattern, file) {
                 // A hack so .dotted files don't get parsed as extensions
                 let basename = path.basename(file.relativeFrom);
                 let dotRemoved = false;
-                let slashAdded = false;
                 if (basename[0] === '.') {
                     dotRemoved = true;
                     file.relativeFrom = path.join(path.dirname(file.relativeFrom), basename.slice(1));
@@ -86,6 +85,7 @@ export default function writeFile(globalRef, pattern, file) {
                 // A hack because loaderUtils.interpolateName doesn't
                 // find the right path if no directory is defined
                 // ie. [path] applied to 'file.txt' would return 'file'
+                let slashAdded = false;
                 if (file.relativeFrom.indexOf(path.sep) < 0) {
                     slashAdded = true;
                     file.relativeFrom = path.sep + file.relativeFrom;
