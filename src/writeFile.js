@@ -7,6 +7,23 @@ import serialize from 'serialize-javascript';
 import { name, version } from '../package.json';
 import findCacheDir from 'find-cache-dir';
 
+function getChunkName(resourcePath, fileWepackTo) {
+    var i;
+
+    for (i = fileWepackTo.length - 1; i >= 0; i--) {
+        if (fileWepackTo[i] === '/' || fileWepackTo[i] === '\\') {
+            break;
+        }
+    }
+
+    var pattern = fileWepackTo.substr(0, i + 1) + '[name].[ext]'; 
+    return loaderUtils.interpolateName({
+        resourcePath: resourcePath
+    },pattern, {
+        
+    });
+}
+
 export default function writeFile(globalRef, pattern, file) {
     const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
 
@@ -94,6 +111,8 @@ export default function writeFile(globalRef, pattern, file) {
                     file.webpackTo,
                     {content});
 
+                file.chunkName = getChunkName(file.relativeFrom, file.webpackTo);
+
                 // Add back removed dots
                 if (dotRemoved) {
                     let newBasename = path.basename(file.webpackTo);
@@ -128,7 +147,8 @@ export default function writeFile(globalRef, pattern, file) {
                 },
                 source: function() {
                     return content;
-                }
+                },
+                chunk: file.chunkName
             };
         });
     });
