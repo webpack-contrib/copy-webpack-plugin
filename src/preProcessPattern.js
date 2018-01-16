@@ -1,4 +1,3 @@
-import fs from 'fs';
 import pify from 'pify';
 import path from 'path';
 import isGlob from 'is-glob';
@@ -9,7 +8,7 @@ import isObject from './utils/isObject';
 const isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\d+)?\])|(\[(\w+:)?hash(:\w+)?(:\d+)?\])|(\[\d+\])/;
 
 export default function preProcessPattern(globalRef, pattern) {
-    const {info, debug, warning, context,
+    const {info, debug, warning, context, inputFileSystem,
         fileDependencies, contextDependencies, compilation} = globalRef;
 
     pattern = typeof pattern === 'string' ? {
@@ -59,7 +58,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
     debug(`determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`);
 
-    return pify(fs.stat)(pattern.absoluteFrom)
+    return pify(inputFileSystem).stat(pattern.absoluteFrom)
     .catch(() => {
         // If from doesn't appear to be a glob, then log a warning
         if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {

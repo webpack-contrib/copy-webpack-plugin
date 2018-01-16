@@ -74,6 +74,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 fileDependencies,
                 contextDependencies,
                 context,
+                inputFileSystem: compiler.inputFileSystem,
                 output: compiler.options.output.path,
                 ignore: options.ignore || [],
                 copyUnmodified: options.copyUnmodified,
