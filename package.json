@@ -5,6 +5,7 @@
   "author": "Len Boyette",
   "license": "MIT",
   "main": "dist/index.js",
+  "files": ["dist"],
   "scripts": {
     "lint": "eslint src/ tests/",
     "release": "standard-version",
