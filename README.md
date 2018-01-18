@@ -42,6 +42,7 @@ Or, in the simple case of just a `from` with the default destination, you can us
 | `flatten` | N | false | Removes all directory references and only copies file names<br><br>If files have the same name, the result is non-deterministic |
 | `ignore` | N | [] | Additional globs to ignore for this pattern |
 | `transform` | N | function(content, path) {<br>&nbsp;&nbsp;return content;<br>} | Function that modifies file contents before writing to webpack |
+| `transformPath` | N | function(targetPath, sourcePath) {<br>&nbsp;&nbsp;return targetPath;<br>} | Function that modifies target file path before writing to webpack |
 | `force` | N | false | Overwrites files already in compilation.assets (usually added by other plugins) |
 | `cache` | N | false | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key'} }` to invalidate cache. |
 
