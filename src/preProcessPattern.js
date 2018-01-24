@@ -2,6 +2,7 @@ import fs from 'fs';
 import pify from 'pify';
 import path from 'path';
 import isGlob from 'is-glob';
+import escape from './utils/escape';
 import isObject from './utils/isObject';
 
 // https://www.debuggex.com/r/VH2yS2mvJOitiyr3
@@ -46,7 +47,7 @@ export default function preProcessPattern(globalRef, pattern) {
         delete fromArgs.glob;
 
         pattern.fromArgs = fromArgs;
-        pattern.absoluteFrom = path.resolve(pattern.context, pattern.from.glob);
+        pattern.absoluteFrom = escape(pattern.context, pattern.from.glob);
         return Promise.resolve(pattern);
     }
 
@@ -63,6 +64,7 @@ export default function preProcessPattern(globalRef, pattern) {
         // If from doesn't appear to be a glob, then log a warning
         if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
             pattern.fromType = 'glob';
+            pattern.absoluteFrom = escape(pattern.context, pattern.from);
         } else {
             const msg = `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`;
             warning(msg);
@@ -79,13 +81,14 @@ export default function preProcessPattern(globalRef, pattern) {
             pattern.fromType = 'dir';
             pattern.context = pattern.absoluteFrom;
             contextDependencies.push(pattern.absoluteFrom);
-            pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
+            pattern.absoluteFrom = escape(pattern.absoluteFrom, '**/*');
             pattern.fromArgs = {
                 dot: true
             };
         } else if(stat.isFile()) {
             pattern.fromType = 'file';
             pattern.context = path.dirname(pattern.absoluteFrom);
+            pattern.absoluteFrom = escape(pattern.absoluteFrom);
             pattern.fromArgs = {
                 dot: true
             };
