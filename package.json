@@ -1,10 +1,13 @@
 {
   "name": "copy-webpack-plugin",
   "version": "4.3.1",
-  "description": "Copy files and directories in webpack",
+  "description": "Copy files && directories with webpack",
   "author": "Len Boyette",
   "license": "MIT",
   "main": "dist/index.js",
+  "engines": {
+    "node": ">= 4"
+  },
   "files": [
     "dist"
   ],
