@@ -1,4 +1,3 @@
-import fs from 'fs';
 import pify from 'pify';
 import loaderUtils from 'loader-utils';
 import path from 'path';
@@ -8,9 +7,9 @@ import { name, version } from '../package.json';
 import findCacheDir from 'find-cache-dir';
 
 export default function writeFile(globalRef, pattern, file) {
-    const {info, debug, compilation, fileDependencies, written, copyUnmodified} = globalRef;
+    const {info, debug, compilation, fileDependencies, written, inputFileSystem, copyUnmodified} = globalRef;
 
-    return pify(fs.stat)(file.absoluteFrom)
+    return pify(inputFileSystem).stat(file.absoluteFrom)
     .then((stat) => {
         // We don't write empty directories
         if (stat.isDirectory()) {
@@ -23,7 +22,7 @@ export default function writeFile(globalRef, pattern, file) {
         }
 
         info(`reading ${file.absoluteFrom} to write to assets`);
-        return pify(fs.readFile)(file.absoluteFrom)
+        return pify(inputFileSystem).readFile(file.absoluteFrom)
         .then((content) => {
             if (pattern.transform) {
                 const transform = (content, absoluteFrom) => {
