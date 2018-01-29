@@ -5,9 +5,12 @@
   "author": "Len Boyette",
   "license": "MIT",
   "main": "dist/index.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "lint": "eslint src/ tests/",
+    "prepare": "npm run build",
     "release": "standard-version",
     "pretest": "npm run lint && npm run build && npm run build:tests",
     "test": "mocha compiled_tests/",
