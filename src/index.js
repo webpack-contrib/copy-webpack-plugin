@@ -111,28 +111,45 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 cb();
             };
 
-            const compilationFileDependencies = new Set(compilation.fileDependencies);
-            const compilationContextDependencies = new Set(compilation.contextDependencies);
+            let compilationFileDependencies;
+            let addFileDependency;
+            if (Array.isArray(compilation.fileDependencies)) {
+                compilationFileDependencies = new Set(compilation.fileDependencies);
+                addFileDependency = (file) => compilation.fileDependencies.push(file);
+            } else {
+                compilationFileDependencies = compilation.fileDependencies;
+                addFileDependency = (file) => compilation.fileDependencies.add(file);
+            }
+
+            let compilationContextDependencies;
+            let addContextDependency;
+            if (Array.isArray(compilation.contextDependencies)) {
+                compilationContextDependencies = new Set(compilation.contextDependencies);
+                addContextDependency = (file) => compilation.contextDependencies.push(file);
+            } else {
+                compilationContextDependencies = compilation.contextDependencies;
+                addContextDependency = (file) => compilation.contextDependencies.add(file);
+            }
 
             // Add file dependencies if they're not already tracked
-            fileDependencies.forEach((file) => {
+            for (const file of fileDependencies) {
                 if (compilationFileDependencies.has(file)) {
                     debug(`not adding ${file} to change tracking, because it's already tracked`);
                 } else {
                     debug(`adding ${file} to change tracking`);
-                    compilation.fileDependencies.push(file);
+                    addFileDependency(file);
                 }
-            });
+            }
 
             // Add context dependencies if they're not already tracked
-            contextDependencies.forEach((context) => {
+            for (const context of contextDependencies) {
                 if (compilationContextDependencies.has(context)) {
                     debug(`not adding ${context} to change tracking, because it's already tracked`);
                 } else {
                     debug(`adding ${context} to change tracking`);
-                    compilation.contextDependencies.push(context);
+                    addContextDependency(context);
                 }
-            });
+            }
 
             callback();
         });
