@@ -1,13 +1,13 @@
 import globby from 'globby';
 import pLimit from 'p-limit';
 import path from 'path';
-import _ from 'lodash';
 import minimatch from 'minimatch';
 import writeFile from './writeFile';
+import isObject from './utils/isObject';
 
 export default function processPattern(globalRef, pattern) {
     const {info, debug, output, concurrency} = globalRef;
-    const globArgs = _.assign({
+    const globArgs = Object.assign({
         cwd: pattern.context
     }, pattern.fromArgs || {});
 
@@ -43,12 +43,15 @@ export default function processPattern(globalRef, pattern) {
                 };
 
                 let glob;
-                if (_.isString(ignoreGlob)) {
+                if (typeof ignoreGlob === 'string') {
                     glob = ignoreGlob;
-                } else if (_.isObject(ignoreGlob)) {
+                } else if (isObject(ignoreGlob)) {
                     glob = ignoreGlob.glob || '';
+                    const ignoreGlobParams = Object.assign({}, ignoreGlob);
+                    delete ignoreGlobParams.glob;
+
                     // Overwrite minimatch defaults
-                    globParams = _.assign(globParams, _.omit(ignoreGlob, ['glob']));
+                    globParams = Object.assign(globParams, ignoreGlobParams);
                 } else {
                     glob = '';
                 }

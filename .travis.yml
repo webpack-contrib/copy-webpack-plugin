@@ -1,4 +1,10 @@
 language: node_js
+
 node_js:
-  - "4"
-  - "6"
+  - stable
+  - lts/*
+  - 6
+  - 4
+
+notifications:
+  email: false

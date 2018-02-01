@@ -2,13 +2,14 @@
 import {
     expect
 } from 'chai';
+import NodeJsInputFileSystem from 'enhanced-resolve/lib/NodeJsInputFileSystem';
+import CachedInputFileSystem from 'enhanced-resolve/lib/CachedInputFileSystem';
 
 // ensure we don't mess up classic imports
 const CopyWebpackPlugin = require('./../dist/index');
 
 import fs from 'fs';
 import path from 'path';
-import _ from 'lodash';
 import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 import isGzip from 'is-gzip';
@@ -28,8 +29,12 @@ class MockCompiler {
         };
 
         if (options.devServer && options.devServer.outputPath) {
-            _.set(this.options, 'devServer.outputPath', options.devServer.outputPath);
+            this.options.devServer = {
+                outputPath: options.devServer.outputPath
+            };
         }
+
+        this.inputFileSystem = new CachedInputFileSystem(new NodeJsInputFileSystem(), 0);
 
         this.outputFileSystem = {
             constructor: {
@@ -61,7 +66,7 @@ describe('apply function', () => {
             plugin.apply(compiler);
 
             // Call the registered function with a mock compilation and callback
-            const compilation = _.assignIn({
+            const compilation = Object.assign({
                 assets: {},
                 contextDependencies: [],
                 errors: [],
@@ -268,6 +273,9 @@ describe('apply function', () => {
                     'file.txt.gz',
                     'directory/directoryfile.txt',
                     'directory/nested/nestedfile.txt',
+                    '[special?directory]/directoryfile.txt',
+                    '[special?directory]/(special-*file).txt',
+                    '[special?directory]/nested/nestedfile.txt',
                     'noextension'
                 ],
                 patterns: [{
@@ -286,6 +294,9 @@ describe('apply function', () => {
                     'nested/file.txt.gz',
                     'nested/directory/directoryfile.txt',
                     'nested/directory/nested/nestedfile.txt',
+                    'nested/[special?directory]/directoryfile.txt',
+                    'nested/[special?directory]/(special-*file).txt',
+                    'nested/[special?directory]/nested/nestedfile.txt',
                     'nested/noextension'
                 ],
                 patterns: [{
@@ -307,6 +318,38 @@ describe('apply function', () => {
                     context: 'directory',
                     from: '**/*',
                     to: 'nested'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use a direct glob to move multiple files in a different relative context with special characters', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directoryfile.txt',
+                    '(special-*file).txt',
+                    'nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    context: '[special?directory]',
+                    from: { glob: '**/*' }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use a glob to move multiple files in a different relative context with special characters', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directoryfile.txt',
+                    '(special-*file).txt',
+                    'nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    context: '[special?directory]',
+                    from: '**/*'
                 }]
             })
             .then(done)
@@ -364,7 +407,10 @@ describe('apply function', () => {
                 expectedAssetKeys: [
                     'file.txt',
                     'directory/directoryfile.txt',
-                    'directory/nested/nestedfile.txt'
+                    'directory/nested/nestedfile.txt',
+                    '[special?directory]/directoryfile.txt',
+                    '[special?directory]/(special-*file).txt',
+                    '[special?directory]/nested/nestedfile.txt'
                 ],
                 patterns: [{
                     from: path.join(HELPER_DIR, '**/*.txt')
@@ -382,6 +428,9 @@ describe('apply function', () => {
                     'nested/file.txt-5b311c.gz',
                     'nested/directory/directoryfile-22af64.txt',
                     'nested/directory/nested/nestedfile-d41d8c.txt',
+                    'nested/[special?directory]/(special-*file)-0bd650.txt',
+                    'nested/[special?directory]/directoryfile-22af64.txt',
+                    'nested/[special?directory]/nested/nestedfile-d41d8c.txt',
                     'nested/noextension-d41d8c'
                 ],
                 patterns: [{
@@ -579,6 +628,34 @@ describe('apply function', () => {
                 patterns: [{
                     from: 'file.txt',
                     to: 'newdirectory/'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can move a file with a context containing special characters', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directoryfile.txt'
+                ],
+                patterns: [{
+                    from: 'directoryfile.txt',
+                    context: '[special?directory]'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can move a file with special characters with a context containing special characters', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    '(special-*file).txt'
+                ],
+                patterns: [{
+                    from: '(special-*file).txt',
+                    context: '[special?directory]'
                 }]
             })
             .then(done)
@@ -796,6 +873,9 @@ describe('apply function', () => {
                     'binextension.bin',
                     'directory/directoryfile.txt',
                     'directory/nested/nestedfile.txt',
+                    '[special?directory]/directoryfile.txt',
+                    '[special?directory]/(special-*file).txt',
+                    '[special?directory]/nested/nestedfile.txt',
                     'noextension'
                 ],
                 patterns: [{
@@ -873,6 +953,37 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: 'directory'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can move a directory\'s contents to the root directory using from with special characters', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directoryfile.txt',
+                    '(special-*file).txt',
+                    'nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    from: '[special?directory]'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can move a directory\'s contents to the root directory using context with special characters', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'directoryfile.txt',
+                    '(special-*file).txt',
+                    'nested/nestedfile.txt'
+                ],
+                patterns: [{
+                    from: '.',
+                    context: '[special?directory]'
                 }]
             })
             .then(done)
@@ -1201,6 +1312,9 @@ describe('apply function', () => {
                         'file.txt.gz',
                         'directory/directoryfile.txt',
                         'directory/nested/nestedfile.txt',
+                        '[special?directory]/directoryfile.txt',
+                        '[special?directory]/(special-*file).txt',
+                        '[special?directory]/nested/nestedfile.txt',
                         'noextension'
                     ],
                     options: {
@@ -1259,7 +1373,7 @@ describe('apply function', () => {
                         'noextension'
                     ],
                     options: {
-                        ignore: ['directory/**/*']
+                        ignore: ['directory/**/*', '\\[special\\?directory\\]/**/*']
                     },
                     patterns: [{
                         from: '.'

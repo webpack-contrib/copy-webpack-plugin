@@ -1,5 +1,4 @@
 import path from 'path';
-import _ from 'lodash';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 
@@ -75,6 +74,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 fileDependencies,
                 contextDependencies,
                 context,
+                inputFileSystem: compiler.inputFileSystem,
                 output: compiler.options.output.path,
                 ignore: options.ignore || [],
                 copyUnmodified: options.copyUnmodified,
@@ -117,7 +117,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             const compilationContextDependencies = new Set(compilation.contextDependencies);
 
             // Add file dependencies if they're not already tracked
-            _.forEach(fileDependencies, (file) => {
+            fileDependencies.forEach((file) => {
                 if (compilationFileDependencies.has(file)) {
                     debug(`not adding ${file} to change tracking, because it's already tracked`);
                 } else {
@@ -127,7 +127,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             });
 
             // Add context dependencies if they're not already tracked
-            _.forEach(contextDependencies, (context) => {
+            contextDependencies.forEach((context) => {
                 if (compilationContextDependencies.has(context)) {
                     debug(`not adding ${context} to change tracking, because it's already tracked`);
                 } else {
