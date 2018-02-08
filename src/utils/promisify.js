@@ -7,7 +7,7 @@ export const stat = (inputFileSystem, path) => {
             resolve(stats);
         });
     });
-}
+};
 
 export const readFile = (inputFileSystem, path) => {
     return new Promise((resolve, reject) => {
@@ -18,4 +18,4 @@ export const readFile = (inputFileSystem, path) => {
             resolve(stats);
         });
     });
-}
+};
