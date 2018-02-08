@@ -58,20 +58,24 @@ export default function preProcessPattern(globalRef, pattern) {
 
     debug(`determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`);
 
-    return pify(inputFileSystem).stat(pattern.absoluteFrom)
-    .catch(() => {
-        // If from doesn't appear to be a glob, then log a warning
-        if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
-            pattern.fromType = 'glob';
-            pattern.absoluteFrom = escape(pattern.context, pattern.from);
-        } else {
-            const msg = `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`;
-            warning(msg);
-            compilation.errors.push(`[copy-webpack-plugin] ${msg}`);
-            pattern.fromType = 'nonexistent';
+
+
+    return pify(inputFileSystem).stat(pattern.absoluteFrom, (err, stat) => {
+        if (err) {
+            // If from doesn't appear to be a glob, then log a warning
+            if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
+                pattern.fromType = 'glob';
+                pattern.absoluteFrom = escape(pattern.context, pattern.from);
+            } else {
+                const msg = `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`;
+                warning(msg);
+                compilation.errors.push(`[copy-webpack-plugin] ${msg}`);
+                pattern.fromType = 'nonexistent';
+            }
+
+            return;
         }
-    })
-    .then((stat) => {
+
         if (!stat) {
             return pattern;
         }
@@ -95,6 +99,7 @@ export default function preProcessPattern(globalRef, pattern) {
         } else if(!pattern.fromType) {
             info(`Unrecognized file type for ${pattern.from}`);
         }
+
         return pattern;
-    });
+    })
 }

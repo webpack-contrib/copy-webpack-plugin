@@ -9,8 +9,7 @@ import findCacheDir from 'find-cache-dir';
 export default function writeFile(globalRef, pattern, file) {
     const {info, debug, compilation, fileDependencies, written, inputFileSystem, copyUnmodified} = globalRef;
 
-    return pify(inputFileSystem).stat(file.absoluteFrom)
-    .then((stat) => {
+    return pify(inputFileSystem).stat(file.absoluteFrom, (err, stat) => {
         // We don't write empty directories
         if (stat.isDirectory()) {
             return;
@@ -22,8 +21,8 @@ export default function writeFile(globalRef, pattern, file) {
         }
 
         info(`reading ${file.absoluteFrom} to write to assets`);
-        return pify(inputFileSystem).readFile(file.absoluteFrom)
-        .then((content) => {
+        
+        return pify(inputFileSystem).readFile(file.absoluteFrom, (err, content) => {
             if (pattern.transform) {
                 const transform = (content, absoluteFrom) => {
                     return pattern.transform(content, absoluteFrom);
@@ -46,22 +45,20 @@ export default function writeFile(globalRef, pattern, file) {
                     return cacache
                     .get(globalRef.cacheDir, cacheKey)
                     .then(
-                         (result) => result.data,
-                          () => {
-                              return Promise
-                              .resolve()
-                              .then(() => transform(content, file.absoluteFrom))
-                              .then((content) => cacache.put(globalRef.cacheDir, cacheKey, content)
-                              .then(() => content));
-                          }
-                     );
+                        (result) => result.data,
+                        () => {
+                            return Promise
+                            .resolve()
+                            .then(() => transform(content, file.absoluteFrom))
+                            .then((content) => cacache.put(globalRef.cacheDir, cacheKey, content)
+                            .then(() => content));
+                        }
+                    );
                 }
 
                 content = transform(content, file.absoluteFrom);
             }
 
-            return content;
-        }).then((content) => {
             const hash = loaderUtils.getHashDigest(content);
 
             if (pattern.toType === 'template') {
