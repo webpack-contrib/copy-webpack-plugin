@@ -171,7 +171,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 ```js
 [
   new CopyWebpackPlugin([
-    { from: 'src/**/*' to: 'dest/', flatten: true }
+    { from: 'src/**/*', to: 'dest/', flatten: true }
   ], options)
 ]
 ```
@@ -217,7 +217,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 ```js
 [
   new CopyWebpackPlugin([
-    { from: 'src/*.txt' to: 'dest/', context: 'app/' }
+    { from: 'src/*.txt', to: 'dest/', context: 'app/' }
   ], options)
 ]
 ```
