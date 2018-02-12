@@ -1,6 +1,6 @@
 {
   "name": "copy-webpack-plugin",
-  "version": "4.3.1",
+  "version": "4.4.1",
   "description": "Copy files && directories with webpack",
   "author": "Len Boyette",
   "license": "MIT",
@@ -28,7 +28,6 @@
     "is-glob": "^4.0.0",
     "loader-utils": "^0.2.15",
     "minimatch": "^3.0.4",
-    "pify": "^3.0.0",
     "p-limit": "^1.0.0"
   },
   "devDependencies": {

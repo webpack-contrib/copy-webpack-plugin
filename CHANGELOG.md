@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.4.1"></a>
+## [4.4.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.4.0...v4.4.1) (2018-02-08)
+
+
+### Bug Fixes
+
+* replace `pify` with simpler promise helpers ([#221](https://github.com/webpack-contrib/copy-webpack-plugin/issues/221)) ([dadac24](https://github.com/webpack-contrib/copy-webpack-plugin/commit/dadac24))
+
+
+
+<a name="4.4.0"></a>
+# [4.4.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.3.1...v4.4.0) (2018-02-08)
+
+
+### Bug Fixes
+
+* **package:** add `prepare` script ([9bf0d99](https://github.com/webpack-contrib/copy-webpack-plugin/commit/9bf0d99))
+* **preProcessPatterns:** support glob context paths with special characters ([#208](https://github.com/webpack-contrib/copy-webpack-plugin/issues/208)) ([ea0c05f](https://github.com/webpack-contrib/copy-webpack-plugin/commit/ea0c05f))
+* support `webpack >= v4.0.0` ([6a16b3c](https://github.com/webpack-contrib/copy-webpack-plugin/commit/6a16b3c))
+
+
+### Features
+
+* use `compiler.inputFileSystem` instead `fs` ([#205](https://github.com/webpack-contrib/copy-webpack-plugin/issues/205)) ([158f821](https://github.com/webpack-contrib/copy-webpack-plugin/commit/158f821))
+
+
+
 <a name="4.3.1"></a>
 ## [4.3.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.3.0...v4.3.1) (2017-12-22)
 

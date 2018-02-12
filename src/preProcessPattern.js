@@ -1,8 +1,8 @@
-import pify from 'pify';
 import path from 'path';
 import isGlob from 'is-glob';
 import escape from './utils/escape';
 import isObject from './utils/isObject';
+import { stat } from './utils/promisify';
 
 // https://www.debuggex.com/r/VH2yS2mvJOitiyr3
 const isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\d+)?\])|(\[(\w+:)?hash(:\w+)?(:\d+)?\])|(\[\d+\])/;
@@ -58,7 +58,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
     debug(`determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`);
 
-    return pify(inputFileSystem).stat(pattern.absoluteFrom)
+    return stat(inputFileSystem, pattern.absoluteFrom)
     .catch(() => {
         // If from doesn't appear to be a glob, then log a warning
         if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
