@@ -28,6 +28,7 @@
     "is-glob": "^4.0.0",
     "loader-utils": "^0.2.15",
     "minimatch": "^3.0.4",
+    "pify": "^3.0.0",
     "p-limit": "^1.0.0"
   },
   "devDependencies": {

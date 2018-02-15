@@ -1,15 +1,17 @@
+import pify from 'pify';
 import loaderUtils from 'loader-utils';
 import path from 'path';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import { name, version } from '../package.json';
 import findCacheDir from 'find-cache-dir';
-import { stat, readFile } from './utils/promisify';
 
 export default function writeFile(globalRef, pattern, file) {
     const {info, debug, compilation, fileDependencies, written, inputFileSystem, copyUnmodified} = globalRef;
 
-    return stat(inputFileSystem, file.absoluteFrom)
+    // `inputFileSystem` can be a ES6 class, so use `pify` over methods instead of over the whole object.
+    // See https://github.com/sindresorhus/pify/issues/57
+    return pify(inputFileSystem.stat)(file.absoluteFrom)
     .then((stat) => {
         // We don't write empty directories
         if (stat.isDirectory()) {
@@ -22,7 +24,7 @@ export default function writeFile(globalRef, pattern, file) {
         }
 
         info(`reading ${file.absoluteFrom} to write to assets`);
-        return readFile(inputFileSystem, file.absoluteFrom)
+        return pify(inputFileSystem.readFile)(file.absoluteFrom)
         .then((content) => {
             if (pattern.transform) {
                 const transform = (content, absoluteFrom) => {
