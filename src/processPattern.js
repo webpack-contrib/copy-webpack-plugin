@@ -17,8 +17,8 @@ export default function processPattern(globalRef, pattern) {
 
     const limit = pLimit(concurrency || 100);
 
-    info(`begin globbing '${pattern.absoluteFrom}' with a context of '${pattern.context}'`);
-    return globby(pattern.absoluteFrom, globArgs)
+    info(`begin globbing '${pattern.glob}' with a context of '${pattern.context}'`);
+    return globby(pattern.glob, globArgs)
         .then((paths) => Promise.all(paths.map((from) => limit(() => {
             const file = {
                 force: pattern.force,
