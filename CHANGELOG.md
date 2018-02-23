@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.4.2"></a>
+## [4.4.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.4.1...v4.4.2) (2018-02-23)
+
+
+### Bug Fixes
+
+* **src/:** don't escape non-glob patterns ([#230](https://github.com/webpack-contrib/copy-webpack-plugin/issues/230)) ([0eb2cd5](https://github.com/webpack-contrib/copy-webpack-plugin/commit/0eb2cd5))
+
+
+
 <a name="4.4.1"></a>
 ## [4.4.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.4.0...v4.4.1) (2018-02-08)
 
