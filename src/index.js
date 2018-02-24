@@ -3,7 +3,7 @@ import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 
 function CopyWebpackPlugin(patterns = [], options = {}) {
-    this.options = options;
+
     if (!Array.isArray(patterns)) {
         throw new Error('[copy-webpack-plugin] patterns must be an array');
     }
@@ -41,8 +41,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
         log(msg, 2);
     }
 
-    const written = this.written = {};
-    this.apply = (compiler) => {
+    const written = {};
+    const apply = (compiler) => {
         let fileDependencies;
         let contextDependencies;
 
@@ -155,6 +155,12 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
 
             callback();
         });
+    };
+
+    return {
+        options,
+        written,
+        apply
     };
 }
 
