@@ -42,7 +42,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
     }
 
     const written = this.written = {};
-    const apply = this.apply = (compiler) => {
+    this.apply = (compiler) => {
         let fileDependencies;
         let contextDependencies;
 
