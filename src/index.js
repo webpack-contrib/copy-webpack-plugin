@@ -55,7 +55,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             context = options.context;
         }
 
-        compiler.plugin('emit', (compilation, cb) => {
+        const emit = (compilation, cb) => {
             debug('starting emit');
             const callback = () => {
                 debug('finishing emit');
@@ -103,9 +103,9 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 compilation.errors.push(err);
             })
             .then(() => callback());
-        });
+        };
 
-        compiler.plugin('after-emit', (compilation, cb) => {
+        const afterEmit = (compilation, cb) => {
             debug('starting after-emit');
             const callback = () => {
                 debug('finishing after-emit');
@@ -153,7 +153,17 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             }
 
             callback();
-        });
+        };
+
+        if (compiler.hooks) {
+            const plugin = { name: 'CopyPlugin' };
+
+            compiler.hooks.emit.tapAsync(plugin, emit);
+            compiler.hooks.afterEmit.tapAsync(plugin, afterEmit);
+        } else {
+            compiler.plugin('emit', emit);
+            compiler.plugin('after-emit', afterEmit);
+        }
     };
 
     return {
