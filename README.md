@@ -55,6 +55,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`fromArgs`](#fromArgs)|`{Object}`|`{ cwd: context }`|See the [`node-glob` options](https://github.com/isaacs/node-glob#options) in addition to the ones below|
 |[`to`](#to)|`{String\|Object}`|`undefined`|Output root if `from` is file or dir, resolved glob path if `from` is glob|
 |[`toType`](#toType)|`{String}`|``|[toType Options](#toType)|
+|[`test`](#test)|`{RegExp}`|``|Pattern for extracting elements to be used in `to` templates|
 |[`force`](#force)|`{Boolean}`|`false`|Overwrites files already in `compilation.assets` (usually added by other plugins/loaders)|
 |[`ignore`](#ignore)|`{Array}`|`[]`|Globs to ignore for this pattern|
 |`flatten`|`{Boolean}`|`false`|Removes all directory references and only copies file names.⚠️ If files have the same name, the result is non-deterministic|
@@ -138,6 +139,27 @@ Or, in case of just a `from` with the default destination, you can also use a `{
       from: 'src/'
       to: 'dest/[name].[hash].[ext]',
       toType: 'template'
+    }
+  ], options)
+]
+```
+
+### `test`
+
+Defines a `{RegExp}` to match some parts of the file path.
+These capture groups can be reused in the name property using `[N]` placeholder.
+Note that `[0]` will be replaced by the entire path of the file,
+whereas `[1]` will contain the first capturing parenthesis of your `{RegExp}`
+and so on...
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    {
+      from: '*/*',
+      to: '[1]-[2].[hash].[ext]',
+      test: /([^/]+)\/(.+)\.png$/
     }
   ], options)
 ]
