@@ -72,6 +72,7 @@ export default function processPattern(globalRef, pattern) {
                 file.webpackTo = pattern.to || file.relativeFrom;
             } else if (pattern.toType === 'template') {
                 file.webpackTo = pattern.to;
+                file.webpackToRegExp = pattern.test;
             }
 
             if (path.isAbsolute(file.webpackTo)) {

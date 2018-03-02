@@ -441,6 +441,23 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('can flatten or normalize glob matches', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    '[special?directory]-(special-*file).txt',
+                    '[special?directory]-directoryfile.txt',
+                    'directory-directoryfile.txt'
+                ],
+                patterns: [{
+                    from: '*/*.*',
+                    test: /([^\/]+)\/([^\/]+)\.\w+$/,
+                    to: '[1]-[2].[ext]'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with file in from', () => {

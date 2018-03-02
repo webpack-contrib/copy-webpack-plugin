@@ -78,6 +78,7 @@ export default function writeFile(globalRef, pattern, file) {
                     file.webpackTo,
                     {
                         content,
+                        regExp: file.webpackToRegExp,
                         context: pattern.context
                     }
                 );
