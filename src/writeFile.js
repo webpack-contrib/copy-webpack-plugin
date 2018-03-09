@@ -5,6 +5,7 @@ import serialize from 'serialize-javascript';
 import { name, version } from '../package.json';
 import findCacheDir from 'find-cache-dir';
 import { stat, readFile } from './utils/promisify';
+import crypto from 'crypto';
 
 export default function writeFile(globalRef, pattern, file) {
     const {info, debug, compilation, fileDependencies, written, inputFileSystem, copyUnmodified} = globalRef;
@@ -40,7 +41,7 @@ export default function writeFile(globalRef, pattern, file) {
                             name,
                             version,
                             pattern,
-                            content
+                            hash: crypto.createHash('md4').update(content).digest('hex')
                         });
 
                     return cacache
