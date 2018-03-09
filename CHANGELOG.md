@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.5.1"></a>
+## [4.5.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.5.0...v4.5.1) (2018-03-09)
+
+
+### Bug Fixes
+
+* **package:** update `cacache` v10.0.1...10.0.4 (`dependencies`) ([#238](https://github.com/webpack-contrib/copy-webpack-plugin/issues/238)) ([0b288f9](https://github.com/webpack-contrib/copy-webpack-plugin/commit/0b288f9))
+
+
+### Performance Improvements
+
+* **index:** switch to `md4` for content hashing ([#239](https://github.com/webpack-contrib/copy-webpack-plugin/issues/239)) ([2be8191](https://github.com/webpack-contrib/copy-webpack-plugin/commit/2be8191))
+
+
+
 <a name="4.5.0"></a>
 # [4.5.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.4.3...v4.5.0) (2018-03-02)
 
