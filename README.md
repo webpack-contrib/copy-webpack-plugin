@@ -54,7 +54,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`from`](#from)|`{String\|Object}`|`undefined`|Globs accept [minimatch options](https://github.com/isaacs/minimatch)|
 |[`fromArgs`](#fromArgs)|`{Object}`|`{ cwd: context }`|See the [`node-glob` options](https://github.com/isaacs/node-glob#options) in addition to the ones below|
 |[`to`](#to)|`{String\|Object}`|`undefined`|Output root if `from` is file or dir, resolved glob path if `from` is glob|
-|[`toType`](#toType)|`{String}`|``|[toType Options](#toType)|
+|[`toType`](#toType)|`{String}`|``|[toType Options](#totype)|
 |[`test`](#test)|`{RegExp}`|``|Pattern for extracting elements to be used in `to` templates|
 |[`force`](#force)|`{Boolean}`|`false`|Overwrites files already in `compilation.assets` (usually added by other plugins/loaders)|
 |[`ignore`](#ignore)|`{Array}`|`[]`|Globs to ignore for this pattern|
