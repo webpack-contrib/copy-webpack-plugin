@@ -59,7 +59,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`force`](#force)|`{Boolean}`|`false`|Overwrites files already in `compilation.assets` (usually added by other plugins/loaders)|
 |[`ignore`](#ignore)|`{Array}`|`[]`|Globs to ignore for this pattern|
 |`flatten`|`{Boolean}`|`false`|Removes all directory references and only copies file names.⚠️ If files have the same name, the result is non-deterministic|
-|[`transform`](#transform)|`{Function}`|`(content, path) => content`|Function that modifies file contents before copying|
+|[`transform`](#transform)|`{Function}`|`(content, path) => content`|Function that modifies file contents before copying. This function may return a Promise too.|
 |[`cache`](#cache)|`{Boolean\|Object}`|`false`|Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache|
 |[`context`](#context)|`{String}`|`options.context \|\| compiler.options.context`|A path that determines how to interpret the `from` path|
 
