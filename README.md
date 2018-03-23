@@ -60,6 +60,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`ignore`](#ignore)|`{Array}`|`[]`|Globs to ignore for this pattern|
 |`flatten`|`{Boolean}`|`false`|Removes all directory references and only copies file names.⚠️ If files have the same name, the result is non-deterministic|
 |[`transform`](#transform)|`{Function\|Promise}`|`(content, path) => content`|Function or Promise that modifies file contents before copying|
+|[`merge`](#merge)|`{Function}`|`(existingContent, content, path) => content`|Function that merges content to the content already in compilation. Cannot be used with `force`.|
 |[`cache`](#cache)|`{Boolean\|Object}`|`false`|Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache|
 |[`context`](#context)|`{String}`|`options.context \|\| compiler.options.context`|A path that determines how to interpret the `from` path|
 
@@ -230,6 +231,23 @@ and so on...
         return Promise.resolve(optimize(content))
       }
   }
+  ], options)
+]
+```
+
+### `merge`
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    {
+      from: 'src/*.png',
+      to: 'dest/',
+      merge (existingContent, content, path) {
+        return merge(existingContent, content)
+      }
+    }
   ], options)
 ]
 ```

@@ -100,9 +100,20 @@ export default function writeFile(globalRef, pattern, file) {
                 };
             }
 
-            if (compilation.assets[file.webpackTo] && !file.force) {
-                info(`skipping '${file.webpackTo}', because it already exists`);
-                return;
+            if (compilation.assets[file.webpackTo]) {
+                if (pattern.merge) {
+                    info(`merging '${file.absoluteFrom}' to compilation asset '${file.webpackTo}'`);
+                    let totalSize = compilation.assets[file.webpackTo].size() + stat.size;
+                    let mergedContent = pattern.merge(compilation.assets[file.webpackTo].source(), content, file.absoluteFrom);
+                    compilation.assets[file.webpackTo] = {
+                        size: function() { return totalSize; },
+                        source: function() { return mergedContent; }
+                    };
+                    return;
+                } else if (!file.force) {
+                    info(`skipping '${file.webpackTo}', because it already exists`);
+                    return;
+                }
             }
 
             info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);

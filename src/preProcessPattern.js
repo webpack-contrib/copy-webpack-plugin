@@ -14,6 +14,9 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern = typeof pattern === 'string' ? {
         from: pattern
     } : Object.assign({}, pattern);
+    if (pattern.force && pattern.merge) {
+        throw new Error('[copy-webpack-plugin] patterns cannot have both force and merge defined');
+    }
     pattern.to = pattern.to || '';
     pattern.context = pattern.context || context;
     if (!path.isAbsolute(pattern.context)) {
