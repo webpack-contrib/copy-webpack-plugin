@@ -425,6 +425,141 @@ describe('apply function', () => {
                 expectedAssetKeys: [
                     'nested/binextension-d41d8c.bin',
                     'nested/file-22af64.txt',
+                    'nested/directory/directoryfile-22af64.txt',
+                    'nested/directory/nested/nestedfile-d41d8c.txt',
+                    'nested/noextension-d41d8c'
+                ],
+                patterns: [{
+                    from: '**/*',
+                    to: 'nested/[path][name]-[hash:6].[ext]'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+    });
+
+    describe('with file in from', () => {
+        it('can move a file to the root directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can transform a file', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                expectedAssetContent: {
+                    'file.txt': 'newchanged'
+                },
+                patterns: [{
+                    from: 'file.txt',
+                    transform: function(content, absoluteFrom) {
+                        expect(absoluteFrom).to.equal(path.join(HELPER_DIR, 'file.txt'));
+                        return content + 'changed';
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can merge files', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'merged.txt'
+                ],
+                expectedAssetContent: {
+                    'merged.txt': './new, directory/new'
+                },
+                patterns: [{
+                    from: '**/*.txt',
+                    to: 'merged.txt',
+                    transform: function(content, absoluteFrom, relativePath) {
+                        if (!content.length) {
+                            return content;
+                        }
+                        let segment = path.dirname(relativePath);
+                        return `${segment}/${content}`;
+                    },
+                    merge: function(content1, content2) {
+                        if (!content1.length) {
+                            return content2;
+                        }
+                        if (!content2.length) {
+                            return content1;
+                        }
+                        if (content1.length < content2.length)
+                            return `${content1}, ${content2}`;
+                        else
+                            return `${content2}, ${content1}`;
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when file not found', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`
+                ],
+                patterns: [{
+                    from: 'nonexistent.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when tranform failed', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    'a failure happened'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    transform: function() {
+                        throw 'a failure happened';
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use an absolute path to move a file to the root directory', (done) => {
+            const absolutePath = path.resolve(HELPER_DIR, 'file.txt');
+
+            runEmit({
+                expectedAssetKeys: [
+                    'file.txt'
+                ],
+                patterns: [{
+                    from: absolutePath
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can use a glob to move multiple files to a non-root directory with name, hash and ext', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'nested/binextension-d41d8c.bin',
+                    'nested/file-22af64.txt',
                     'nested/file.txt-5b311c.gz',
                     'nested/directory/directoryfile-22af64.txt',
                     'nested/directory/nested/nestedfile-d41d8c.txt',
