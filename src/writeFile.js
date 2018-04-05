@@ -85,35 +85,73 @@ export default function writeFile(globalRef, pattern, file) {
                 );
             }
 
-            if (!copyUnmodified &&
-                written[file.absoluteFrom] &&
-                written[file.absoluteFrom]['hash'] === hash &&
-                written[file.absoluteFrom]['webpackTo'] === file.webpackTo
-            ) {
-                info(`skipping '${file.webpackTo}', because it hasn't changed`);
-                return;
+            if (copyUnmodified == 'never') {
+
+                if (written[file.absoluteFrom]) {
+
+                    proceedWithWrite();
+                } else {
+
+                    if (!compilation.compiler || typeof compilation.compiler.outputPath == 'undefined') {
+                        let msg = 'copyUnmodified:"never" setting does not work with the current version of webpack. Please change the option value to proceed. '; 
+                        msg += 'The plugin must be updated to work with current version of webpack. Last worked with webpack 3 and 4.';
+                        throw new Error(`[copy-webpack-plugin] ${msg}`);
+                    }
+
+                    return readFile(inputFileSystem, path.resolve(compilation.compiler.outputPath, file.webpackTo))
+                    .then((previousContent) => {
+                        const previousHash = loaderUtils.getHashDigest(previousContent);
+
+                        proceedWithWrite(previousHash);
+                    }).catch(error => {
+                        proceedWithWrite();
+                    });
+                }
             } else {
-                debug(`added ${hash} to written tracking for '${file.absoluteFrom}'`);
-                written[file.absoluteFrom] = {
-                    hash: hash,
-                    webpackTo: file.webpackTo
+                proceedWithWrite();
+            }
+            
+
+            function proceedWithWrite(previousHash) {
+
+                if ((!copyUnmodified || copyUnmodified == 'never') &&
+                    written[file.absoluteFrom] &&
+                    written[file.absoluteFrom]['hash'] === hash &&
+                    written[file.absoluteFrom]['webpackTo'] === file.webpackTo
+                ) { 
+                    info(`skipping '${file.webpackTo}', because it hasn't changed`);
+                    return;
+                } else if (copyUnmodified == 'never' && previousHash != null && previousHash == hash) { 
+                    info(`skipping '${file.webpackTo}', because it hasn't changed`);
+                    written[file.absoluteFrom] = {
+                        hash: hash,
+                        webpackTo: file.webpackTo
+                    };
+                    return;
+                } else {
+                    debug(`added ${hash} to written tracking for '${file.absoluteFrom}'`);
+                    written[file.absoluteFrom] = {
+                        hash: hash,
+                        webpackTo: file.webpackTo
+                    };
+                }   
+                    
+                if (compilation.assets[file.webpackTo] && !file.force) {
+                    info(`skipping '${file.webpackTo}', because it already exists`);
+                    return;
+                } 
+
+                info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);
+                compilation.assets[file.webpackTo] = {
+                    size: function() {
+                        return stat.size;
+                    },
+                    source: function() {
+                        return content;
+                    }
                 };
             }
-
-            if (compilation.assets[file.webpackTo] && !file.force) {
-                info(`skipping '${file.webpackTo}', because it already exists`);
-                return;
-            }
-
-            info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);
-            compilation.assets[file.webpackTo] = {
-                size: function() {
-                    return stat.size;
-                },
-                source: function() {
-                    return content;
-                }
-            };
         });
     });
 }
+
