@@ -97,7 +97,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |:--:|:--:|:-----:|:----------|
 |**`'dir'`**|`{String}`|`undefined`|If `from` is directory, `to` has no extension or ends in `'/'`|
 |**`'file'`**|`{String}`|`undefined`|If `to` has extension or `from` is file|
-|**`'template'`**|`{String}`|`undefined`|If `to` contains [a template pattern](https://github.com/webpack/file-loader#placeholders)|
+|**`'template'`**|`{String}`|`undefined`|If `to` contains [a template pattern](https://github.com/webpack-contrib/file-loader#placeholders)|
 
 #### `'dir'`
 
