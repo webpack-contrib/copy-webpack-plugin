@@ -85,7 +85,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 ```js
 [
   new CopyWebpackPlugin([
-    { from: '**/*', to: 'relative/path/to/dest/' }
+    { from: '**/*', to: 'relative/path/to/dest/' },
     { from: '**/*', to: '/absolute/path/to/dest/' }
   ], options)
 ]
