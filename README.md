@@ -69,11 +69,11 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 ```js
 [
   new CopyWebpackPlugin([
-    'relative/path/to/file.ext'
-    '/absolute/path/to/file.ext'
-    'relative/path/to/dir'
-    '/absolute/path/to/dir'
-    '**/*'
+    'relative/path/to/file.ext',
+    '/absolute/path/to/file.ext',
+    'relative/path/to/dir',
+    '/absolute/path/to/dir',
+    '**/*',
     { glob: '\*\*/\*', dot: true }
   ], options)
 ]
@@ -136,7 +136,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 [
   new CopyWebpackPlugin([
     {
-      from: 'src/'
+      from: 'src/',
       to: 'dest/[name].[hash].[ext]',
       toType: 'template'
     }
@@ -171,7 +171,7 @@ and so on...
 ```js
 [
   new CopyWebpackPlugin([
-    { from: 'src/**/*' to: 'dest/', force: true }
+    { from: 'src/**/*', to: 'dest/', force: true }
   ], options)
 ]
 ```
@@ -182,7 +182,7 @@ and so on...
 ```js
 [
   new CopyWebpackPlugin([
-    { from: 'src/**/*' to: 'dest/', ignore: [ '*.js' ] }
+    { from: 'src/**/*', to: 'dest/', ignore: [ '*.js' ] }
   ], options)
 ]
 ```
