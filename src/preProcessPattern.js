@@ -60,7 +60,7 @@ export default function preProcessPattern(globalRef, pattern) {
     debug(`determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`);
 
     return stat(inputFileSystem, pattern.absoluteFrom)
-    .catch(() => {
+    .catch((err) => {
         if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
             // If it is a glob, then no worries if it does not exist in the file system
             pattern.fromType = 'glob';
@@ -69,10 +69,12 @@ export default function preProcessPattern(globalRef, pattern) {
             // Try the node module resolution algorithm to find the module
             pattern.absoluteFrom = require.resolve(pattern.from);
             return stat(inputFileSystem, pattern.absoluteFrom);
+        } else {
+            throw err;
         }
     })
     .catch(() => {
-        // If from doesn't appear to be a glob, then log a warning
+        // Log a warning if the file cannot be located
         const msg = `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`;
         warning(msg);
         compilation.errors.push(`[copy-webpack-plugin] ${msg}`);
