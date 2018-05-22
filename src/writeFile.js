@@ -84,6 +84,15 @@ export default function writeFile(globalRef, pattern, file) {
                     }
                 );
             }
+            
+            const asset = {
+                size: function() {
+                    return stat.size;
+                },
+                source: function() {
+                    return content;
+                }
+            };
 
             if (!copyUnmodified &&
                 written[file.absoluteFrom] &&
@@ -91,12 +100,14 @@ export default function writeFile(globalRef, pattern, file) {
                 written[file.absoluteFrom]['webpackTo'] === file.webpackTo
             ) {
                 info(`skipping '${file.webpackTo}', because it hasn't changed`);
+                compilation.assets[file.webpackTo] = written[file.absoluteFrom].asset;
                 return;
             } else {
                 debug(`added ${hash} to written tracking for '${file.absoluteFrom}'`);
                 written[file.absoluteFrom] = {
                     hash: hash,
-                    webpackTo: file.webpackTo
+                    webpackTo: file.webpackTo,
+                    asset
                 };
             }
 
@@ -106,14 +117,7 @@ export default function writeFile(globalRef, pattern, file) {
             }
 
             info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);
-            compilation.assets[file.webpackTo] = {
-                size: function() {
-                    return stat.size;
-                },
-                source: function() {
-                    return content;
-                }
-            };
+            compilation.assets[file.webpackTo] = asset;
         });
     });
 }
