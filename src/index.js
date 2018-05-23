@@ -136,6 +136,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             for (const file of fileDependencies) {
                 if (compilationFileDependencies.has(file)) {
                     debug(`not adding ${file} to change tracking, because it's already tracked`);
+                } else if (options.track === false) {
+                    debug(`not adding ${file} to change tracking, because track option is false`);
                 } else {
                     debug(`adding ${file} to change tracking`);
                     addFileDependency(file);

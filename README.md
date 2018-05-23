@@ -271,6 +271,7 @@ and so on...
 |[`ignore`](#ignore)|`{Array}`|`[]`|Array of globs to ignore (applied to `from`)|
 |[`context`](#context)|`{String}`|`compiler.options.context`|A path that determines how to interpret the `from` path, shared for all patterns|
 |[`copyUnmodified`](#copyUnmodified)|`{Boolean}`|`false`|Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option|
+|[`track`](#track)|`{Boolean}`|`true`|Whether the files being copied should be tracked and trigger compilations on changes.|
 
 ### `debug`
 
