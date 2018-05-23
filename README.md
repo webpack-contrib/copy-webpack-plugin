@@ -33,7 +33,7 @@ const config = {
 }
 ```
 
-> ℹ️ If you must have `webpack-dev-server` write files to output directory during development, you can force it with the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
+> ℹ️ If you want `webpack-dev-server` to write files to the output directory during development, you can force it with the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
 
 ### `Patterns`
 
