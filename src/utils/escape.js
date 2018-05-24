@@ -9,7 +9,7 @@ export default function escape(context, from) {
         const absoluteContext = path.resolve(context)
             .replace(/\\/, '/')
             .replace(/[\*|\?|\!|\(|\)|\{|\}]/g, (substring) => `\\${substring}`)
-            .replace(/[\[\]]/g, substring => (substring === '[' ? '[[]' : '[]]'));
+            .replace(/\[/g, '[[]');
 
         if (!from) {
             return absoluteContext;
