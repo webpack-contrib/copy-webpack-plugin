@@ -474,6 +474,19 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can resolve modules using the Node module resolution algorithm', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'package.json'
+                ],
+                patterns: [{
+                    from: 'globby/package.json'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('can transform a file', (done) => {
             runEmit({
                 expectedAssetKeys: [
