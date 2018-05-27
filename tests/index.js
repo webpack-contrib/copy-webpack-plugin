@@ -15,6 +15,8 @@ import cacache from 'cacache';
 import isGzip from 'is-gzip';
 import zlib from 'zlib';
 
+import removeIllegalCharacterForWindows from '../scripts/removeIllegalCharacterForWindows';
+
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
 const TEMP_DIR = path.join(__dirname, 'tempdir');
@@ -58,6 +60,13 @@ describe('apply function', () => {
     // Ideally we pass in patterns and confirm the resulting assets
     const run = (opts) => {
         return new Promise((resolve, reject) => {
+            if (Array.isArray(opts.patterns)) {
+                opts.patterns.forEach(function (pattern) {
+                    if (pattern.context) {
+                        pattern.context = removeIllegalCharacterForWindows(pattern.context);
+                    }
+                });
+            }
             const plugin = CopyWebpackPlugin(opts.patterns, opts.options);
 
             // Get a mock compiler to pass to plugin.apply
@@ -109,7 +118,7 @@ describe('apply function', () => {
         return run(opts)
             .then((compilation) => {
                 if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-                    expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
+                    expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys.map(removeIllegalCharacterForWindows));
                 } else {
                     expect(compilation.assets).to.deep.equal({});
                 }
@@ -451,7 +460,7 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: '*/*.*',
-                    test: /([^\/]+)\/([^\/]+)\.\w+$/,
+                    test: `([^\\${path.sep}]+)\\${path.sep}([^\\${path.sep}]+)\\.\\w+$`,
                     to: '[1]-[2].[ext]'
                 }]
             })
@@ -984,7 +993,7 @@ describe('apply function', () => {
                     'nested/nestedfile.txt'
                 ],
                 patterns: [{
-                    from: '[special?directory]'
+                    from: (path.sep === '/' ? '[special?directory]' : '[specialdirectory]')
                 }]
             })
             .then(done)
@@ -1390,7 +1399,7 @@ describe('apply function', () => {
                         'noextension'
                     ],
                     options: {
-                        ignore: ['directory/**/*', '\\[special\\?directory\\]/**/*']
+                        ignore: ['directory/**/*', (path.sep === '/' ? '\\[special\\?directory\\]/**/*' : '[[]specialdirectory]/**/*')]
                     },
                     patterns: [{
                         from: '.'
