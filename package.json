@@ -18,7 +18,7 @@
     "pretest": "npm run lint && npm run build && npm run build:tests",
     "test": "mocha compiled_tests/",
     "build": "babel src/ --out-dir dist/",
-    "build:tests": "babel tests/ --out-dir compiled_tests/ && ncp tests/helpers compiled_tests/helpers && node scripts/createSpecialDirectory.js"
+    "build:tests": "babel tests/ --out-dir compiled_tests/ && rimraf compiled_tests/helpers && ncp tests/helpers compiled_tests/helpers && node scripts/createSpecialDirectory.js"
   },
   "dependencies": {
     "globby": "^7.1.1",
@@ -40,6 +40,7 @@
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
     "ncp": "^2.0.0",
+    "rimraf": "^2.6.2",
     "standard-version": "^4.2.0"
   },
   "homepage": "https://github.com/webpack-contrib/copy-webpack-plugin",
