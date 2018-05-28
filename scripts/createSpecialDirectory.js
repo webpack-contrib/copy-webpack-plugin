@@ -17,3 +17,4 @@ Object.keys(specialFiles).forEach(function (originFile) {
     mkdirp.sync(path.join(baseDir, dir));
     fs.writeFileSync(path.join(baseDir, file), specialFiles[originFile]);
 });
+
