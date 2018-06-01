@@ -1,7 +1,7 @@
 const mkdirp = require('mkdirp');
 const path = require('path');
 const fs = require('fs');
-const removeIllegalCharacterForWindows = require('./removeIllegalCharacterForWindows');
+const removeIllegalCharacterForWindows = require('../tests/utils/removeIllegalCharacterForWindows');
 
 const baseDir = 'compiled_tests/helpers';
 

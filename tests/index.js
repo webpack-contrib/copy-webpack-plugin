@@ -15,7 +15,7 @@ import cacache from 'cacache';
 import isGzip from 'is-gzip';
 import zlib from 'zlib';
 
-import removeIllegalCharacterForWindows from '../scripts/removeIllegalCharacterForWindows';
+import removeIllegalCharacterForWindows from './utils/removeIllegalCharacterForWindows';
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
@@ -277,6 +277,7 @@ describe('apply function', () => {
         it('can use a glob to move multiple files to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    '[!]/hello.txt',
                     'binextension.bin',
                     'file.txt',
                     'file.txt.gz',
@@ -298,6 +299,7 @@ describe('apply function', () => {
         it('can use a glob to move multiple files to a non-root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    'nested/[!]/hello.txt',
                     'nested/binextension.bin',
                     'nested/file.txt',
                     'nested/file.txt.gz',
@@ -414,6 +416,7 @@ describe('apply function', () => {
         it('can use a glob with a full path to move multiple files to the root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    '[!]/hello.txt',
                     'file.txt',
                     'directory/directoryfile.txt',
                     'directory/nested/nestedfile.txt',
@@ -432,6 +435,7 @@ describe('apply function', () => {
         it('can use a glob to move multiple files to a non-root directory with name, hash and ext', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    'nested/[!]/hello-d41d8c.txt',
                     'nested/binextension-d41d8c.bin',
                     'nested/file-22af64.txt',
                     'nested/file.txt-5b311c.gz',
@@ -454,6 +458,7 @@ describe('apply function', () => {
         it('can flatten or normalize glob matches', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    '[!]-hello.txt',
                     '[special?directory]-(special-*file).txt',
                     '[special?directory]-directoryfile.txt',
                     'directory-directoryfile.txt'
@@ -896,6 +901,7 @@ describe('apply function', () => {
         it('ignores files in pattern', (done) => {
             runEmit({
                 expectedAssetKeys: [
+                    '[!]/hello.txt',
                     'binextension.bin',
                     'directory/directoryfile.txt',
                     'directory/nested/nestedfile.txt',
@@ -1333,6 +1339,7 @@ describe('apply function', () => {
             it('ignores files that start with a dot', (done) => {
                 runEmit({
                     expectedAssetKeys: [
+                        '[!]/hello.txt',
                         'binextension.bin',
                         'file.txt',
                         'file.txt.gz',
@@ -1393,13 +1400,14 @@ describe('apply function', () => {
             it('ignores nested directory', (done) => {
                 runEmit({
                     expectedAssetKeys: [
+                        '[!]/hello.txt',
                         'binextension.bin',
                         'file.txt',
                         'file.txt.gz',
                         'noextension'
                     ],
                     options: {
-                        ignore: ['directory/**/*', (path.sep === '/' ? '\\[special\\?directory\\]/**/*' : '[[]specialdirectory]/**/*')]
+                        ignore: ['directory/**/*', `[[]special${process.platform === 'win32' ? '' : '[?]'}directory]/**/*`]
                     },
                     patterns: [{
                         from: '.'
@@ -1409,6 +1417,29 @@ describe('apply function', () => {
                 .then(done)
                 .catch(done);
             });
+
+            if (path.sep === '/') {
+                it('ignores nested directory(can use "\\" to escape if path.sep is "/")', (done) => {
+                    runEmit({
+                        expectedAssetKeys: [
+                            '[!]/hello.txt',
+                            'binextension.bin',
+                            'file.txt',
+                            'file.txt.gz',
+                            'noextension'
+                        ],
+                        options: {
+                            ignore: ['directory/**/*', '\\[special\\?directory\\]/**/*']
+                        },
+                        patterns: [{
+                            from: '.'
+                        }]
+    
+                    })
+                    .then(done)
+                    .catch(done);
+                });
+            }
 
             it('ignores nested directory (glob)', (done) => {
                 runEmit({
