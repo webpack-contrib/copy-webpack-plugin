@@ -319,6 +319,57 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can transform target path of every file in glob', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    '/some/path/(special-*file).txt.tst',
+                    '/some/path/binextension.bin.tst',
+                    '/some/path/file.txt.tst',
+                    '/some/path/file.txt.gz.tst',
+                    '/some/path/directoryfile.txt.tst',
+                    '/some/path/nestedfile.txt.tst',
+                    '/some/path/noextension.tst',
+                    '/some/path/hello.txt.tst'
+                ],
+                patterns: [{
+                    from: '**/*',
+                    transformPath: function(targetPath, absoluteFrom) {
+                        expect(absoluteFrom).to.have.string(HELPER_DIR);
+                        return '/some/path/' + path.basename(targetPath) + '.tst';
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can transform target path of every file in glob after applying template', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'transformed/[!]/hello-d41d8c.txt',
+                    'transformed/[special?directory]/directoryfile-22af64.txt',
+                    'transformed/[special?directory]/(special-*file)-0bd650.txt',
+                    'transformed/[special?directory]/nested/nestedfile-d41d8c.txt',
+                    'transformed/binextension-d41d8c.bin',
+                    'transformed/file-22af64.txt',
+                    'transformed/file.txt-5b311c.gz',
+                    'transformed/directory/directoryfile-22af64.txt',
+                    'transformed/directory/nested/nestedfile-d41d8c.txt',
+                    'transformed/noextension-d41d8c'
+                ],
+                patterns: [{
+                    from: '**/*',
+                    to: 'nested/[path][name]-[hash:6].[ext]',
+                    transformPath: function(targetPath, absoluteFrom) {
+                        expect(absoluteFrom).to.have.string(HELPER_DIR);
+                        return targetPath.replace('nested/', 'transformed/');
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('can use a glob to move multiple files in a different relative context to a non-root directory', (done) => {
             runEmit({
                 expectedAssetKeys: [
@@ -539,6 +590,23 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('can transform target path', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    'subdir/test.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    transformPath: function(targetPath, absoluteFrom) {
+                        expect(absoluteFrom).to.equal(path.join(HELPER_DIR, 'file.txt'));
+                        return targetPath.replace('file.txt', 'subdir/test.txt');
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('warns when file not found', (done) => {
             runEmit({
                 expectedAssetKeys: [],
@@ -562,6 +630,23 @@ describe('apply function', () => {
                 patterns: [{
                     from: 'file.txt',
                     transform: function() {
+                        throw 'a failure happened';
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when tranformPath failed', (done) => {
+            runEmit({
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    'a failure happened'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    transformPath: function() {
                         throw 'a failure happened';
                     }
                 }]
@@ -987,6 +1072,26 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('transformPath with promise', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    '/some/path/file.txt'
+                ],
+                patterns: [{
+                    from: 'file.txt',
+                    transformPath: function(targetPath, absoluteFrom) {
+                        expect(absoluteFrom).to.have.string(HELPER_DIR);
+
+                        return new Promise((resolve) => {
+                            resolve('/some/path/' + path.basename(targetPath));
+                        });
+                    }
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
         it('same file to multiple targets', (done) => {
             runEmit({
                 expectedAssetKeys: [
@@ -1016,6 +1121,25 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: 'directory'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('can transform target path of every file in directory', (done) => {
+            runEmit({
+                expectedAssetKeys: [
+                    '/some/path/.dottedfile',
+                    '/some/path/directoryfile.txt',
+                    '/some/path/nestedfile.txt'
+                ],
+                patterns: [{
+                    from: 'directory',
+                    transformPath: function(targetPath, absoluteFrom) {
+                        expect(absoluteFrom).to.have.string(path.join(HELPER_DIR, 'directory'));
+                        return '/some/path/' + path.basename(targetPath);
+                    }
                 }]
             })
             .then(done)

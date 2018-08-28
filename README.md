@@ -60,6 +60,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`ignore`](#ignore)|`{Array}`|`[]`|Globs to ignore for this pattern|
 |`flatten`|`{Boolean}`|`false`|Removes all directory references and only copies file names.⚠️ If files have the same name, the result is non-deterministic|
 |[`transform`](#transform)|`{Function\|Promise}`|`(content, path) => content`|Function or Promise that modifies file contents before copying|
+|[`transformPath`](#transformPath)|`{Function\|Promise}`|`(targetPath, sourcePath) => path`|Function or Promise that modifies file writing path|
 |[`cache`](#cache)|`{Boolean\|Object}`|`false`|Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache|
 |[`context`](#context)|`{String}`|`options.context \|\| compiler.options.context`|A path that determines how to interpret the `from` path|
 
@@ -233,6 +234,43 @@ and so on...
   ], options)
 ]
 ```
+
+### `transformPath`
+
+#### `{Function}`
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    {
+      from: 'src/*.png',
+      to: 'dest/',
+      transformPath (targetPath, absolutePath) {
+        return 'newPath';
+      }
+    }
+  ], options)
+]
+```
+
+#### `{Promise}`
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    {
+      from: 'src/*.png',
+      to: 'dest/',
+      transform (targePath, absolutePath) {
+        return Promise.resolve('newPath')
+      }
+  }
+  ], options)
+]
+```
+
 
 ### `cache`
 
