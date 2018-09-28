@@ -472,6 +472,22 @@ describe('apply function', () => {
             .then(done)
             .catch(done);
         });
+
+        it('adds the directory to the watch list when using glob', (done) => {
+            run({
+                patterns: [{
+                    from: 'directory/**/*'
+                }]
+            })
+            .then((compilation) => {
+                const absFrom = path.resolve(HELPER_DIR, 'directory');
+                const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
+                expect(compilation.contextDependencies).to.have.members([absFrom, absFromNested]);
+            })
+            .then(done)
+            .catch(done);
+        });
+
     });
 
     describe('with file in from', () => {
@@ -1196,9 +1212,9 @@ describe('apply function', () => {
                 }]
             })
             .then((compilation) => {
-                const absFrom = path.join(HELPER_DIR, 'directory');
-
-                expect(compilation.contextDependencies).to.have.members([absFrom]);
+                const absFrom = path.resolve(HELPER_DIR, 'directory');
+                const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
+                expect(compilation.contextDependencies).to.have.members([absFrom, absFromNested]);
             })
             .then(done)
             .catch(done);
