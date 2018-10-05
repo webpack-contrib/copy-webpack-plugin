@@ -72,6 +72,19 @@ export default function processPattern(globalRef, pattern) {
                 }
             }
 
+            // Run ignore functions
+            for (let i = 0; i < pattern._ignoreFunctions.length; i++) {
+                debug(`running ignore function against ${file.relativeFrom}`);
+                if (
+                    pattern._ignoreFunctions[i]({
+                        absolutePath: file.absoluteFrom,
+                        relativePath: file.relativeFrom
+                    })
+                ) {
+                    return Promise.resolve();
+                }
+            }
+
             // Change the to path to be relative for webpack
             if (pattern.toType === 'dir') {
                 file.webpackTo = path.join(pattern.to, file.relativeFrom);

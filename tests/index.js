@@ -1475,6 +1475,116 @@ describe('apply function', () => {
             });
         });
 
+        describe('ignoreFn', () => {
+            it('runs global ignore function, if specified', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        '[!]/hello.txt',
+                        'binextension.bin',
+                        'file.txt',
+                        'file.txt.gz',
+                        'directory/nested/nestedfile.txt',
+                        '[special?directory]/directoryfile.txt',
+                        '[special?directory]/(special-*file).txt',
+                        '[special?directory]/nested/nestedfile.txt'
+                    ],
+                    options: {
+                        ignoreFn({ relativePath }) {
+                            var filesToIgnore = ['noextension', 'directory/directoryfile.txt'];
+
+                            for (var i = 0; i < filesToIgnore.length; i++) {
+                                if (filesToIgnore[i] === relativePath) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                    },
+                    patterns: [{
+                        from: '**/*'
+                    }]
+                })
+                    .then(done)
+                    .catch(done);
+            });
+
+            it('runs local ignore function, if specified', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        '[!]/hello.txt',
+                        'binextension.bin',
+                        'file.txt',
+                        'file.txt.gz',
+                        'directory/nested/nestedfile.txt',
+                        '[special?directory]/directoryfile.txt',
+                        '[special?directory]/(special-*file).txt',
+                        '[special?directory]/nested/nestedfile.txt'
+                    ],
+                    patterns: [{
+                        from: '**/*',
+                        ignoreFn({ relativePath }) {
+                            var filesToIgnore = ['noextension', 'directory/directoryfile.txt'];
+
+                            for (var i = 0; i < filesToIgnore.length; i++) {
+                                if (filesToIgnore[i] === relativePath) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                    }]
+                })
+                    .then(done)
+                    .catch(done);
+            });
+
+            it('runs local and global ignore functions, if specified', (done) => {
+                runEmit({
+                    expectedAssetKeys: [
+                        '[!]/hello.txt',
+                        'binextension.bin',
+                        'file.txt',
+                        'directory/nested/nestedfile.txt',
+                        '[special?directory]/directoryfile.txt',
+                        '[special?directory]/(special-*file).txt',
+                        '[special?directory]/nested/nestedfile.txt',
+                        'noextension'
+                    ],
+                    options: {
+                        ignoreFn({ relativePath }) {
+                            var filesToIgnore = ['file.txt.gz'];
+
+                            for (var i = 0; i < filesToIgnore.length; i++) {
+                                if (filesToIgnore[i] === relativePath) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                    },
+                    patterns: [{
+                        from: '**/*',
+                        ignoreFn({ relativePath }) {
+                            var filesToIgnore = ['directory/directoryfile.txt'];
+
+                            for (var i = 0; i < filesToIgnore.length; i++) {
+                                if (filesToIgnore[i] === relativePath) {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                    }]
+                })
+                    .then(done)
+                    .catch(done);
+            });
+        });
+
         describe('context', () => {
             it('overrides webpack config context with absolute path', (done) => {
                 runEmit({

@@ -58,6 +58,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`test`](#test)|`{RegExp}`|``|Pattern for extracting elements to be used in `to` templates|
 |[`force`](#force)|`{Boolean}`|`false`|Overwrites files already in `compilation.assets` (usually added by other plugins/loaders)|
 |[`ignore`](#ignore)|`{Array}`|`[]`|Globs to ignore for this pattern|
+|[`ignoreFn`](#ignoreFn)|`{Function}`|`null`|Function which will be executed for each file which matches the current pattern to allow single file exclusions|
 |`flatten`|`{Boolean}`|`false`|Removes all directory references and only copies file names.⚠️ If files have the same name, the result is non-deterministic|
 |[`transform`](#transform)|`{Function\|Promise}`|`(content, path) => content`|Function or Promise that modifies file contents before copying|
 |[`cache`](#cache)|`{Boolean\|Object}`|`false`|Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache|
@@ -187,6 +188,25 @@ and so on...
 ]
 ```
 
+### `ignoreFn`
+
+Accepts a callback function, which receives as first argument an object containing the relative and absolute paths for the each file to copy: `{ absolutePath, relativePath }`.
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    {
+      from: 'src/**/*',
+      to: 'dest/',
+      ignoreFn({ absolutePath, relativePath }) {
+        return ['my-file.js', 'directory/some-file.html'].includes(relativePath)
+      }
+    }
+  ], options)
+]
+```
+
 ### `flatten`
 
 **webpack.config.js**
@@ -269,6 +289,7 @@ and so on...
 |:--:|:--:|:-----:|:----------|
 |[`debug`](#debug)|`{String}`|**`'warning'`**|[Debug Options](#debug)|
 |[`ignore`](#ignore)|`{Array}`|`[]`|Array of globs to ignore (applied to `from`)|
+|[`ignoreFn`](#ignoreFn)|`{Function}`|`null`|Function which will be executed for each file to allow single file exclusions|
 |[`context`](#context)|`{String}`|`compiler.options.context`|A path that determines how to interpret the `from` path, shared for all patterns|
 |[`copyUnmodified`](#copyUnmodified)|`{Boolean}`|`false`|Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option|
 
@@ -324,6 +345,24 @@ and so on...
   new CopyWebpackPlugin(
     [ ...patterns ],
     { ignore: [ '*.js', '*.css' ] }
+  )
+]
+```
+
+### `ignoreFn`
+
+Accepts a callback function, which receives as first argument an object containing the relative and absolute paths for the each file to copy: `{ absolutePath, relativePath }`.
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin(
+    [ ...patterns ],
+    {
+      ignoreFn({ absolutePath, relativePath }) {
+        return ['my-file.js', 'directory/some-file.html'].includes(relativePath)
+      }
+    }
   )
 ]
 ```
