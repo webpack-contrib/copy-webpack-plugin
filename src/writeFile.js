@@ -63,8 +63,6 @@ export default function writeFile(globalRef, pattern, file) {
 
             return content;
         }).then((content) => {
-            const hash = loaderUtils.getHashDigest(content);
-
             if (pattern.toType === 'template') {
                 info(`interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`);
 
@@ -84,6 +82,20 @@ export default function writeFile(globalRef, pattern, file) {
                     }
                 );
             }
+            
+            return content;
+        }).then((content) => {
+            if (pattern.transformPath) {
+                return Promise.resolve(
+                    pattern.transformPath(file.webpackTo, file.absoluteFrom)
+                ).then((newPath) => {
+                    file.webpackTo = newPath;
+                }).then(() => content);
+            }
+            
+            return content;
+        }).then((content) => {
+            const hash = loaderUtils.getHashDigest(content);
 
             if (!copyUnmodified &&
                 written[file.absoluteFrom] &&
