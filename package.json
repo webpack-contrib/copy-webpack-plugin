@@ -10,7 +10,7 @@
   },
   "files": [
     "dist"
-  ],package-lock.json
+  ],
   "scripts": {
     "lint": "eslint src/ tests/",
     "prepare": "npm run build",
