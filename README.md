@@ -1,3 +1,6 @@
+######Forked from webpack-contrib/copy-webpack-plugin and include some PR not yet merged.
+
+
 [![npm][npm]][npm-url]
 [![node][node]][node-url]
 [![deps][deps]][deps-url]
@@ -447,3 +450,6 @@ and so on...
 
 [chat]: https://img.shields.io/badge/gitter-webpack%2Fwebpack-brightgreen.svg
 [chat-url]: https://gitter.im/webpack/webpack
+
+
+

@@ -539,6 +539,21 @@ describe('apply function', () => {
             .catch(done);
         });
 
+        it('does not add the directory to the watch list when glob is a file', (done) => {
+            run({
+                patterns: [{
+                    from: {
+                        glob: 'directory/directoryfile.txt'
+                    }
+                }]
+            })
+            .then((compilation) => {
+                const absFrom = path.resolve(HELPER_DIR, 'directory');
+                expect(compilation.contextDependencies).to.not.have.members([absFrom]);
+            })
+            .then(done)
+            .catch(done);
+        });
     });
 
     describe('with file in from', () => {
