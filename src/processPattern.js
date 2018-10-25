@@ -1,5 +1,6 @@
 import globby from 'globby';
 import pLimit from 'p-limit';
+import isGlob from 'is-glob';
 import path from 'path';
 import minimatch from 'minimatch';
 import writeFile from './writeFile';
@@ -33,7 +34,7 @@ export default function processPattern(globalRef, pattern) {
             // This is so webpack is able to watch the directory and when
             // a new file is added it triggeres a rebuild
             const contextPath = path.dirname(path.resolve(from));
-            if (contextDependencies.indexOf(contextPath) === -1) {
+            if (contextDependencies.indexOf(contextPath) === -1 && isGlob(pattern.glob)) {
                 contextDependencies.push(contextPath);
             }
 

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.5.4"></a>
+## [4.5.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.5.3...v4.5.4) (2018-10-18)
+
+
+### Bug Fixes
+
+* **processPattern:** don't add `'glob'` as directory when it is a file (`contextDependencies`) ([#296](https://github.com/webpack-contrib/copy-webpack-plugin/issues/296)) ([5670926](https://github.com/webpack-contrib/copy-webpack-plugin/commit/5670926))
+
+
+
 <a name="4.5.3"></a>
 ## [4.5.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.5.2...v4.5.3) (2018-10-10)
 
