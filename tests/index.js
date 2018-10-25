@@ -56,6 +56,15 @@ class MockCompiler {
     }
 }
 
+
+class MockCompilerNoStat extends MockCompiler {
+    constructor (options = {}) {
+        super(options);
+
+        this.inputFileSystem.stat = (file, cb) => cb(undefined, undefined);
+    }
+}
+
 describe('apply function', () => {
     // Ideally we pass in patterns and confirm the resulting assets
     const run = (opts) => {
@@ -547,6 +556,23 @@ describe('apply function', () => {
                 ],
                 patterns: [{
                     from: 'nonexistent.txt'
+                }]
+            })
+            .then(done)
+            .catch(done);
+        });
+
+        it('warns when file not found and stats is undefined', (done) => {
+            runEmit({
+                compiler: new MockCompilerNoStat(),
+                expectedAssetKeys: [],
+                expectedErrors: [
+                    `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`
+                ],
+                patterns: [{
+                    from: 'nonexistent.txt',
+                    to: '.',
+                    toType: 'dir'
                 }]
             })
             .then(done)
