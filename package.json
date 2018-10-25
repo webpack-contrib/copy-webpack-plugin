@@ -1,6 +1,6 @@
 {
   "name": "copy-webpack-plugin",
-  "version": "4.6.2",
+  "version": "4.6.3",
   "description": "Copy files && directories with webpack",
   "author": "Len Boyette",
   "license": "MIT",
