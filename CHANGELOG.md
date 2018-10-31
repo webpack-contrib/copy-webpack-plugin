@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="4.6.0"></a>
+# [4.6.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.5.4...v4.6.0) (2018-10-31)
+
+
+### Bug Fixes
+
+* handle undefined and null as stats value ([#302](https://github.com/webpack-contrib/copy-webpack-plugin/issues/302)) ([78c5d12](https://github.com/webpack-contrib/copy-webpack-plugin/commit/78c5d12))
+
+
+### Features
+
+* add support for target path transform ([#284](https://github.com/webpack-contrib/copy-webpack-plugin/issues/284)) ([7fe0c06](https://github.com/webpack-contrib/copy-webpack-plugin/commit/7fe0c06))
+
+
+
 <a name="4.5.4"></a>
 ## [4.5.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.5.3...v4.5.4) (2018-10-18)
 
