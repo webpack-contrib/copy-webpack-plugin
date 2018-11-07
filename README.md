@@ -61,6 +61,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`ignoreFn`](#ignoreFn)|`{Function}`|`null`|Function which will be executed for each file which matches the current pattern to allow single file exclusions|
 |`flatten`|`{Boolean}`|`false`|Removes all directory references and only copies file names.⚠️ If files have the same name, the result is non-deterministic|
 |[`transform`](#transform)|`{Function\|Promise}`|`(content, path) => content`|Function or Promise that modifies file contents before copying|
+|[`transformPath`](#transformPath)|`{Function\|Promise}`|`(targetPath, sourcePath) => path`|Function or Promise that modifies file writing path|
 |[`cache`](#cache)|`{Boolean\|Object}`|`false`|Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache|
 |[`context`](#context)|`{String}`|`options.context \|\| compiler.options.context`|A path that determines how to interpret the `from` path|
 
@@ -253,6 +254,43 @@ Accepts a callback function, which receives as first argument an object containi
   ], options)
 ]
 ```
+
+### `transformPath`
+
+#### `{Function}`
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    {
+      from: 'src/*.png',
+      to: 'dest/',
+      transformPath (targetPath, absolutePath) {
+        return 'newPath';
+      }
+    }
+  ], options)
+]
+```
+
+#### `{Promise}`
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    {
+      from: 'src/*.png',
+      to: 'dest/',
+      transform (targePath, absolutePath) {
+        return Promise.resolve('newPath')
+      }
+  }
+  ], options)
+]
+```
+
 
 ### `cache`
 

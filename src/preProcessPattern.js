@@ -64,21 +64,29 @@ export default function preProcessPattern(globalRef, pattern) {
 
     debug(`determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`);
 
-    return stat(inputFileSystem, pattern.absoluteFrom)
-    .catch(() => {
+    const noStatsHandler = () => {
         // If from doesn't appear to be a glob, then log a warning
         if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
             pattern.fromType = 'glob';
             pattern.glob = escape(pattern.context, pattern.from);
         } else {
             const msg = `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`;
-            warning(msg);
-            compilation.errors.push(`[copy-webpack-plugin] ${msg}`);
+            const warningMsg = `[copy-webpack-plugin] ${msg}`;
+            // only display the same message once
+            if (compilation.errors.indexOf(warningMsg) === -1) {
+                warning(msg);
+                compilation.errors.push(warningMsg);
+            }
+
             pattern.fromType = 'nonexistent';
         }
-    })
+    };
+
+    return stat(inputFileSystem, pattern.absoluteFrom)
+    .catch(() => noStatsHandler())
     .then((stat) => {
         if (!stat) {
+            noStatsHandler();
             return pattern;
         }
 
