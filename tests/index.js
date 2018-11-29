@@ -1640,7 +1640,7 @@ describe('apply function', () => {
             });
         });
 
-        describe('ignoreFn', () => {
+        describe('ignoreFiles', () => {
             it('runs global ignore function, if specified', (done) => {
                 runEmit({
                     expectedAssetKeys: [
@@ -1654,7 +1654,7 @@ describe('apply function', () => {
                         '[special?directory]/nested/nestedfile.txt'
                     ],
                     options: {
-                        ignoreFn({ relativePath }) {
+                        ignoreFiles({ relativePath }) {
                             var filesToIgnore = ['noextension', 'directory/directoryfile.txt'];
 
                             for (var i = 0; i < filesToIgnore.length; i++) {
@@ -1688,7 +1688,7 @@ describe('apply function', () => {
                     ],
                     patterns: [{
                         from: '**/*',
-                        ignoreFn({ relativePath }) {
+                        ignoreFiles({ relativePath }) {
                             var filesToIgnore = ['noextension', 'directory/directoryfile.txt'];
 
                             for (var i = 0; i < filesToIgnore.length; i++) {
@@ -1718,7 +1718,7 @@ describe('apply function', () => {
                         'noextension'
                     ],
                     options: {
-                        ignoreFn({ relativePath }) {
+                        ignoreFiles({ relativePath }) {
                             var filesToIgnore = ['file.txt.gz'];
 
                             for (var i = 0; i < filesToIgnore.length; i++) {
@@ -1732,7 +1732,7 @@ describe('apply function', () => {
                     },
                     patterns: [{
                         from: '**/*',
-                        ignoreFn({ relativePath }) {
+                        ignoreFiles({ relativePath }) {
                             var filesToIgnore = ['directory/directoryfile.txt'];
 
                             for (var i = 0; i < filesToIgnore.length; i++) {
