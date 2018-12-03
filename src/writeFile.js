@@ -117,6 +117,12 @@ export default function writeFile(globalRef, pattern, file) {
                 return;
             }
 
+            // Used to announce these files as moduleAssets.
+            // This allows the paths to be resolved by things like the manifest plugin
+            compilation.hooks.moduleAsset.call({
+                userRequest: file.relativeFrom
+            }, file.webpackTo);
+
             info(`writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`);
             compilation.assets[file.webpackTo] = {
                 size: function() {
