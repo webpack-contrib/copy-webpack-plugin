@@ -14,6 +14,9 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern = typeof pattern === 'string' ? {
         from: pattern
     } : Object.assign({}, pattern);
+    if (pattern.from === '') {
+        throw new Error('[copy-webpack-plugin] path "from" cannot be empty string');
+    }
     pattern.to = pattern.to || '';
     pattern.context = pattern.context || context;
     if (!path.isAbsolute(pattern.context)) {

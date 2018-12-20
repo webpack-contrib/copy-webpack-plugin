@@ -236,6 +236,16 @@ describe('apply function', () => {
 
             expect(createPluginWithNull).to.throw(Error);
         });
+
+        it('throws an error if the "from" path is an empty string', () => {
+            const createPluginWithNull = () => {
+                CopyWebpackPlugin({
+                    from: ''
+                });
+            };
+
+            expect(createPluginWithNull).to.throw(Error);
+        });
     });
 
     describe('with glob in from', () => {
@@ -1615,7 +1625,7 @@ describe('apply function', () => {
                         patterns: [{
                             from: '.'
                         }]
-    
+
                     })
                     .then(done)
                     .catch(done);
