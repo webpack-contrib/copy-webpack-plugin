@@ -63,12 +63,13 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 |[`transformPath`](#transformPath)|`{Function\|Promise}`|`(targetPath, sourcePath) => path`|Function or Promise that modifies file writing path|
 |[`cache`](#cache)|`{Boolean\|Object}`|`false`|Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache|
 |[`context`](#context)|`{String}`|`options.context \|\| compiler.options.context`|A path that determines how to interpret the `from` path|
+|[`copyPermissions`](#copyPermissions)|`{Boolean}`|`false`|Applies source file permissions to destination files|
 
 ### `from`
 
 **webpack.config.js**
 ```js
-[
+[`
   new CopyWebpackPlugin([
     'relative/path/to/file.ext',
     '/absolute/path/to/file.ext',
@@ -297,6 +298,17 @@ and so on...
 [
   new CopyWebpackPlugin([
     { from: 'src/*.txt', to: 'dest/', context: 'app/' }
+  ], options)
+]
+```
+
+### `copyPermissions`
+
+**webpack.config.js**
+```js
+[
+  new CopyWebpackPlugin([
+    { from: 'src/**/*', to: 'dest/', copyPermissions: true }
   ], options)
 ]
 ```
