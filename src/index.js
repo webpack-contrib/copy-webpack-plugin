@@ -1,10 +1,8 @@
 import path from 'path';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
-import path from 'path';
-
-const fs = Promise.promisifyAll(require('fs')); // eslint-disable-line import/no-commonjs
-const constants = Promise.promisifyAll(require('constants')); // eslint-disable-line import/no-commonjs
+import constants from 'constants';
+import {chmodSync} from 'fs';
 
 function CopyWebpackPlugin(patterns = [], options = {}) {
     if (!Array.isArray(patterns)) {
@@ -171,7 +169,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                     let constsfrom = fs.constants || constants;
 
                     const mask = constsfrom.S_IRWXU | constsfrom.S_IRWXG | constsfrom.S_IRWXO;
-                    fs.chmodSync(path.join(output, value.webpackTo), value.perms & mask);
+                    chmodSync(path.join(output, value.webpackTo), value.perms & mask);
                 }
             });
 
