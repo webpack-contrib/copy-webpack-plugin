@@ -69,7 +69,7 @@ Or, in case of just a `from` with the default destination, you can also use a `{
 
 **webpack.config.js**
 ```js
-[`
+[
   new CopyWebpackPlugin([
     'relative/path/to/file.ext',
     '/absolute/path/to/file.ext',
