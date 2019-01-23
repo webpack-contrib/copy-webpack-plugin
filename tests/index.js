@@ -76,7 +76,7 @@ describe('apply function', () => {
                     }
                 });
             }
-            const plugin = CopyWebpackPlugin(opts.patterns, opts.options);
+            const plugin = new CopyWebpackPlugin(opts.patterns, opts.options);
 
             // Get a mock compiler to pass to plugin.apply
             const compiler = opts.compiler || new MockCompiler();
@@ -223,7 +223,7 @@ describe('apply function', () => {
 
         it('throws an error if the patterns are an object', () => {
             const createPluginWithObject = () => {
-                CopyWebpackPlugin({});
+                new CopyWebpackPlugin({});
             };
 
             expect(createPluginWithObject).to.throw(Error);
@@ -231,7 +231,7 @@ describe('apply function', () => {
 
         it('throws an error if the patterns are null', () => {
             const createPluginWithNull = () => {
-                CopyWebpackPlugin(null);
+                new CopyWebpackPlugin(null);
             };
 
             expect(createPluginWithNull).to.throw(Error);
@@ -239,7 +239,7 @@ describe('apply function', () => {
 
         it('throws an error if the "from" path is an empty string', () => {
             const createPluginWithNull = () => {
-                CopyWebpackPlugin({
+                new CopyWebpackPlugin({
                     from: ''
                 });
             };

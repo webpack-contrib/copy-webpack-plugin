@@ -165,10 +165,8 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
             compiler.plugin('after-emit', afterEmit);
         }
     };
-
-    return {
-        apply
-    };
+    
+    CopyWebpackPlugin.prototype.apply = apply;
 }
 
 CopyWebpackPlugin['default'] = CopyWebpackPlugin;
