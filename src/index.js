@@ -162,16 +162,17 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
                 output = compiler.options.devServer.outputPath;
             }
 
-            _.forEach(written, function (value) {
+            for (const key in written) {
+                let value = written[key];
                 if (value.copyPermissions) {
                     debug(`restoring permissions to ${value.webpackTo}`);
 
-                    let constsfrom = fs.constants || constants;
+                    let constsfrom = compiler.inputFileSystem.constants || constants;
 
                     const mask = constsfrom.S_IRWXU | constsfrom.S_IRWXG | constsfrom.S_IRWXO;
                     chmodSync(path.join(output, value.webpackTo), value.perms & mask);
                 }
-            });
+            }
 
             callback();
         };
