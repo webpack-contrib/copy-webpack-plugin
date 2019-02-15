@@ -27,13 +27,13 @@
   },
   "dependencies": {
     "globby": "^7.1.1",
-    "cacache": "^10.0.4",
-    "find-cache-dir": "^1.0.0",
+    "cacache": "^11.3.1",
+    "find-cache-dir": "^2.0.0",
     "serialize-javascript": "^1.4.0",
     "is-glob": "^4.0.0",
     "loader-utils": "^1.1.0",
     "minimatch": "^3.0.4",
-    "p-limit": "^1.0.0"
+    "p-limit": "^2.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",
