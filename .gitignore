@@ -16,4 +16,3 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 *.iml
-compiled_tests
