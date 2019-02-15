@@ -7,7 +7,7 @@ import isObject from './utils/isObject';
 import { stat } from './utils/promisify';
 
 // https://www.debuggex.com/r/VH2yS2mvJOitiyr3
-const isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\d+)?\])|(\[(\w+:)?hash(:\w+)?(:\d+)?\])|(\[\d+\])/;
+const isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\d+)?\])|(\[(\w+:)?(hash|contenthash)(:\w+)?(:\d+)?\])|(\[\d+\])/;
 
 /* eslint-disable no-param-reassign */
 
