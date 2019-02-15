@@ -3,63 +3,68 @@ import path from 'path';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 
-function CopyWebpackPlugin(patterns = [], options = {}) {
-  if (!Array.isArray(patterns)) {
-    throw new Error('[copy-webpack-plugin] patterns must be an array');
+class CopyPlugin {
+  constructor(patterns = [], options = {}) {
+    if (!Array.isArray(patterns)) {
+      throw new Error('[copy-webpack-plugin] patterns must be an array');
+    }
+
+    this.patterns = patterns;
+    this.options = options;
   }
 
-  // Defaults debug level to 'warning'
-  // eslint-disable-next-line no-param-reassign
-  options.debug = options.debug || 'warning';
-
-  // Defaults debugging to info if only true is specified
-  if (options.debug === true) {
+  apply(compiler) {
+    // Defaults debug level to 'warning'
     // eslint-disable-next-line no-param-reassign
-    options.debug = 'info';
-  }
+    this.options.debug = this.options.debug || 'warning';
 
-  const debugLevels = ['warning', 'info', 'debug'];
-  const debugLevelIndex = debugLevels.indexOf(options.debug);
-
-  function log(msg, level) {
-    if (level === 0) {
+    // Defaults debugging to info if only true is specified
+    if (this.options.debug === true) {
       // eslint-disable-next-line no-param-reassign
-      msg = `WARNING - ${msg}`;
-    } else {
-      // eslint-disable-next-line no-param-reassign
-      level = level || 1;
+      this.options.debug = 'info';
     }
 
-    if (level <= debugLevelIndex) {
-      console.log(`[copy-webpack-plugin] ${msg}`); // eslint-disable-line no-console
+    const debugLevels = ['warning', 'info', 'debug'];
+    const debugLevelIndex = debugLevels.indexOf(this.options.debug);
+
+    function log(msg, level) {
+      if (level === 0) {
+        // eslint-disable-next-line no-param-reassign
+        msg = `WARNING - ${msg}`;
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        level = level || 1;
+      }
+
+      if (level <= debugLevelIndex) {
+        console.log(`[copy-webpack-plugin] ${msg}`); // eslint-disable-line no-console
+      }
     }
-  }
 
-  function warning(msg) {
-    log(msg, 0);
-  }
+    function warning(msg) {
+      log(msg, 0);
+    }
 
-  function info(msg) {
-    log(msg, 1);
-  }
+    function info(msg) {
+      log(msg, 1);
+    }
 
-  function debug(msg) {
-    log(msg, 2);
-  }
+    function debug(msg) {
+      log(msg, 2);
+    }
 
-  const apply = (compiler) => {
     let fileDependencies;
     let contextDependencies;
     const written = {};
 
     let context;
 
-    if (!options.context) {
+    if (!this.options.context) {
       ({ context } = compiler.options);
-    } else if (!path.isAbsolute(options.context)) {
-      context = path.join(compiler.options.context, options.context);
+    } else if (!path.isAbsolute(this.options.context)) {
+      context = path.join(compiler.options.context, this.options.context);
     } else {
-      ({ context } = options);
+      ({ context } = this.options);
     }
 
     const emit = (compilation, cb) => {
@@ -84,9 +89,9 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
         context,
         inputFileSystem: compiler.inputFileSystem,
         output: compiler.options.output.path,
-        ignore: options.ignore || [],
-        copyUnmodified: options.copyUnmodified,
-        concurrency: options.concurrency,
+        ignore: this.options.ignore || [],
+        copyUnmodified: this.options.copyUnmodified,
+        concurrency: this.options.concurrency,
       };
 
       if (
@@ -99,7 +104,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
 
       const tasks = [];
 
-      patterns.forEach((pattern) => {
+      this.patterns.forEach((pattern) => {
         tasks.push(
           Promise.resolve()
             .then(() => preProcessPattern(globalRef, pattern))
@@ -188,12 +193,7 @@ function CopyWebpackPlugin(patterns = [], options = {}) {
       compiler.plugin('emit', emit);
       compiler.plugin('after-emit', afterEmit);
     }
-  };
-
-  return {
-    apply,
-  };
+  }
 }
 
-CopyWebpackPlugin.default = CopyWebpackPlugin;
-module.exports = CopyWebpackPlugin;
+export default CopyPlugin;

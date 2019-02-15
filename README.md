@@ -30,11 +30,11 @@ Then add the loader to your `webpack` config. For example:
 **webpack.config.js**
 
 ```js
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       { from: 'source', to: 'dest' },
       { from: 'other', to: 'public' },
     ]),
@@ -52,7 +52,7 @@ The plugin's signature:
 
 ```js
 module.exports = {
-  plugins: [new CopyWebpackPlugin(patterns, options)],
+  plugins: [new CopyPlugin(patterns, options)],
 };
 ```
 
@@ -80,7 +80,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       'relative/path/to/file.ext',
       '/absolute/path/to/file.ext',
       'relative/path/to/dir',
@@ -99,7 +99,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       { from: '**/*', to: 'relative/path/to/dest/' },
       { from: '**/*', to: '/absolute/path/to/dest/' },
     ]),
@@ -122,7 +122,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'path/to/file.txt',
         to: 'directory/with/extension.ext',
@@ -140,7 +140,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'path/to/file.txt',
         to: 'file/without/extension',
@@ -158,7 +158,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'src/',
         to: 'dest/[name].[hash].[ext]',
@@ -182,7 +182,7 @@ and so on...
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: '*/*',
         to: '[1]-[2].[hash].[ext]',
@@ -200,7 +200,13 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([{ from: 'src/**/*', to: 'dest/', force: true }]),
+    new CopyPlugin([
+      {
+        from: 'src/**/*',
+        to: 'dest/',
+        force: true,
+      },
+    ]),
   ],
 };
 ```
@@ -212,8 +218,12 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
-      { from: 'src/**/*', to: 'dest/', ignore: ['*.js'] },
+    new CopyPlugin([
+      {
+        from: 'src/**/*',
+        to: 'dest/',
+        ignore: ['*.js'],
+      },
     ]),
   ],
 };
@@ -226,7 +236,13 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([{ from: 'src/**/*', to: 'dest/', flatten: true }]),
+    new CopyPlugin([
+      {
+        from: 'src/**/*',
+        to: 'dest/',
+        flatten: true,
+      },
+    ]),
   ],
 };
 ```
@@ -240,7 +256,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'src/*.png',
         to: 'dest/',
@@ -260,7 +276,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'src/*.png',
         to: 'dest/',
@@ -282,7 +298,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'src/*.png',
         to: 'dest/',
@@ -302,7 +318,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'src/*.png',
         to: 'dest/',
@@ -322,7 +338,7 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
+    new CopyPlugin([
       {
         from: 'src/*.png',
         to: 'dest/',
@@ -343,8 +359,12 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyWebpackPlugin([
-      { from: 'src/*.txt', to: 'dest/', context: 'app/' },
+    new CopyPlugin([
+      {
+        from: 'src/*.txt',
+        to: 'dest/',
+        context: 'app/',
+      },
     ]),
   ],
 };
@@ -373,7 +393,7 @@ module.exports = {
 
 ```js
 module.exports = {
-  plugins: [new CopyWebpackPlugin([...patterns], { debug: 'info' })],
+  plugins: [new CopyPlugin([...patterns], { debug: 'info' })],
 };
 ```
 
@@ -383,7 +403,7 @@ module.exports = {
 
 ```js
 module.exports = {
-  plugins: [new CopyWebpackPlugin([...patterns], { debug: 'debug' })],
+  plugins: [new CopyPlugin([...patterns], { debug: 'debug' })],
 };
 ```
 
@@ -393,7 +413,7 @@ module.exports = {
 
 ```js
 module.exports = {
-  plugins: [new CopyWebpackPlugin([...patterns], { debug: true })],
+  plugins: [new CopyPlugin([...patterns], { debug: true })],
 };
 ```
 
@@ -403,9 +423,7 @@ module.exports = {
 
 ```js
 module.exports = {
-  plugins: [
-    new CopyWebpackPlugin([...patterns], { ignore: ['*.js', '*.css'] }),
-  ],
+  plugins: [new CopyPlugin([...patterns], { ignore: ['*.js', '*.css'] })],
 };
 ```
 
@@ -415,7 +433,7 @@ module.exports = {
 
 ```js
 module.exports = {
-  plugins: [new CopyWebpackPlugin([...patterns], { context: '/app' })],
+  plugins: [new CopyPlugin([...patterns], { context: '/app' })],
 };
 ```
 
@@ -427,7 +445,7 @@ module.exports = {
 
 ```js
 module.exports = {
-  plugins: [new CopyWebpackPlugin([...patterns], { copyUnmodified: true })],
+  plugins: [new CopyPlugin([...patterns], { copyUnmodified: true })],
 };
 ```
 

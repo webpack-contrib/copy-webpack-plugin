@@ -11,11 +11,9 @@ import cacache from 'cacache';
 import isGzip from 'is-gzip';
 import mkdirp from 'mkdirp';
 
-import removeIllegalCharacterForWindows from './utils/removeIllegalCharacterForWindows';
+import CopyPlugin from '../src/index';
 
-// ensure we don't mess up classic imports
-// eslint-disable-next-line import/no-unresolved
-const CopyWebpackPlugin = require('../src');
+import removeIllegalCharacterForWindows from './utils/removeIllegalCharacterForWindows';
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
@@ -80,12 +78,11 @@ describe('apply function', () => {
           }
         });
       }
-      const plugin = CopyWebpackPlugin(opts.patterns, opts.options);
 
       // Get a mock compiler to pass to plugin.apply
       const compiler = opts.compiler || new MockCompiler();
 
-      plugin.apply(compiler);
+      new CopyPlugin(opts.patterns, opts.options).apply(compiler);
 
       // Call the registered function with a mock compilation and callback
       const compilation = Object.assign(
@@ -256,7 +253,8 @@ describe('apply function', () => {
 
     it('throws an error if the patterns are an object', () => {
       const createPluginWithObject = () => {
-        CopyWebpackPlugin({});
+        // eslint-disable-next-line no-new
+        new CopyPlugin({});
       };
 
       expect(createPluginWithObject).toThrow(Error);
@@ -264,7 +262,8 @@ describe('apply function', () => {
 
     it('throws an error if the patterns are null', () => {
       const createPluginWithNull = () => {
-        CopyWebpackPlugin(null);
+        // eslint-disable-next-line no-new
+        new CopyPlugin(null);
       };
 
       expect(createPluginWithNull).toThrow(Error);
@@ -272,7 +271,8 @@ describe('apply function', () => {
 
     it('throws an error if the "from" path is an empty string', () => {
       const createPluginWithNull = () => {
-        CopyWebpackPlugin({
+        // eslint-disable-next-line no-new
+        new CopyPlugin({
           from: '',
         });
       };
