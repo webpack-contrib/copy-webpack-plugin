@@ -1832,7 +1832,7 @@ describe('apply function', () => {
             {
               from,
               cache: true,
-              transform(content) {
+              transform: function transform(content) {
                 return new Promise((resolve) => {
                   resolve(`${content}changed!`);
                 });
@@ -1878,7 +1878,7 @@ describe('apply function', () => {
             {
               from,
               cache: true,
-              transform(content) {
+              transform: function transform(content) {
                 return new Promise((resolve) => {
                   resolve(`${content}changed!`);
                 });
@@ -1918,7 +1918,7 @@ describe('apply function', () => {
             {
               from,
               cache: true,
-              transform(content) {
+              transform: function transform(content) {
                 return new Promise((resolve) => {
                   resolve(`${content}changed!`);
                 });
@@ -2002,7 +2002,7 @@ describe('apply function', () => {
               from,
               cache: true,
               // eslint-disable-next-line no-shadow
-              transform(content) {
+              transform: function transform(content) {
                 expect(isGzip(content)).to.equal(true);
 
                 return new Promise((resolve) => {
