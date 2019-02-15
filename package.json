@@ -6,20 +6,23 @@
   "license": "MIT",
   "main": "dist/index.js",
   "engines": {
-    "node": ">= 4"
+    "node": ">= 6.9.0"
   },
   "files": [
     "dist"
   ],
   "scripts": {
+    "start": "npm run build -- -w",
+    "prebuild": "npm run clean",
+    "build": "cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js' --copy-files",
+    "clean": "del-cli dist",
     "lint": "eslint src/ tests/",
-    "prepare": "npm run build",
+    "prepublish": "npm run build",
     "release": "standard-version",
     "test:only": "npm run build && npm run build:tests && mocha compiled_tests/",
     "pretest": "npm run lint",
     "test": "npm run test:only",
-    "build": "babel src/ --out-dir dist/",
-    "build:tests": "babel tests/ --out-dir compiled_tests/ && rimraf compiled_tests/helpers && ncp tests/helpers compiled_tests/helpers && node scripts/createSpecialDirectory.js"
+    "build:tests": "babel tests -d compiled_tests && rimraf compiled_tests/helpers && ncp tests/helpers compiled_tests/helpers && node scripts/createSpecialDirectory.js"
   },
   "dependencies": {
     "globby": "^7.1.1",
@@ -32,9 +35,13 @@
     "p-limit": "^1.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/polyfill": "^7.0.0",
+    "@babel/preset-env": "^7.1.6",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
-    "babel-cli": "^6.8.0",
-    "babel-preset-es2015": "^6.6.0",
+    "cross-env": "^5.1.3",
+    "del-cli": "^1.1.0",
     "chai": "^4.2.0",
     "enhanced-resolve": "^3.4.1",
     "eslint": "^5.13.0",
@@ -57,5 +64,18 @@
     "transfer",
     "move",
     "copy"
-  ]
+  ],
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "6.9.0"
+          },
+          "useBuiltIns": "usage"
+        }
+      ]
+    ]
+  }
 }
