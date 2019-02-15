@@ -1184,6 +1184,20 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('allows pattern to contain contenthash', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/22af64.txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+            to: 'directory/[contenthash:6].txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('transform with promise', (done) => {
       runEmit({
         expectedAssetKeys: ['file.txt'],
