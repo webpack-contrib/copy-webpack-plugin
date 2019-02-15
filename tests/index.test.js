@@ -1,23 +1,21 @@
 /* globals describe, it, __dirname */
 import fs from 'fs';
-
 import path from 'path';
-
 import zlib from 'zlib';
 
-import { expect } from 'chai';
 import NodeJsInputFileSystem from 'enhanced-resolve/lib/NodeJsInputFileSystem';
 import CachedInputFileSystem from 'enhanced-resolve/lib/CachedInputFileSystem';
 
 import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 import isGzip from 'is-gzip';
+import mkdirp from 'mkdirp';
 
 import removeIllegalCharacterForWindows from './utils/removeIllegalCharacterForWindows';
 
 // ensure we don't mess up classic imports
 // eslint-disable-next-line import/no-unresolved
-const CopyWebpackPlugin = require('./../dist/index');
+const CopyWebpackPlugin = require('../src');
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
@@ -124,7 +122,7 @@ describe('apply function', () => {
         )
         .then(() => {
           if (opts.expectedErrors) {
-            expect(compilation.errors).to.deep.equal(opts.expectedErrors);
+            expect(compilation.errors).toEqual(opts.expectedErrors);
           } else if (compilation.errors.length > 0) {
             throw compilation.errors[0];
           }
@@ -136,35 +134,32 @@ describe('apply function', () => {
   const runEmit = (opts) =>
     run(opts).then((compilation) => {
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-        expect(compilation.assets).to.have.all.keys(
-          opts.expectedAssetKeys.map(removeIllegalCharacterForWindows)
+        expect(Object.keys(compilation.assets).sort()).toEqual(
+          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
         );
       } else {
-        expect(compilation.assets).to.deep.equal({});
+        expect(compilation.assets).toEqual({});
       }
 
       if (opts.expectedAssetContent) {
         // eslint-disable-next-line guard-for-in
         for (const key in opts.expectedAssetContent) {
-          // eslint-disable-next-line no-unused-expressions
-          expect(compilation.assets[key]).to.exist;
+          expect(compilation.assets[key]).toBeDefined();
 
           if (compilation.assets[key]) {
             let expectedContent = opts.expectedAssetContent[key];
 
             if (!Buffer.isBuffer(expectedContent)) {
-              expectedContent = new Buffer(expectedContent);
+              expectedContent = Buffer.from(expectedContent);
             }
 
             let compiledContent = compilation.assets[key].source();
 
             if (!Buffer.isBuffer(compiledContent)) {
-              compiledContent = new Buffer(compiledContent);
+              compiledContent = Buffer.from(compiledContent);
             }
 
-            expect(Buffer.compare(expectedContent, compiledContent)).to.equal(
-              0
-            );
+            expect(Buffer.compare(expectedContent, compiledContent)).toBe(0);
           }
         }
       }
@@ -215,9 +210,11 @@ describe('apply function', () => {
       })
       .then(() => {
         if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-          expect(compilation.assets).to.have.all.keys(opts.expectedAssetKeys);
+          expect(Object.keys(compilation.assets).sort()).toEqual(
+            opts.expectedAssetKeys.sort()
+          );
         } else {
-          expect(compilation.assets).to.deep.equal({});
+          expect(compilation.assets).toEqual({});
         }
       })
       .then(() => {
@@ -225,6 +222,25 @@ describe('apply function', () => {
         fs.unlinkSync(opts.newFileLoc2);
       });
   };
+
+  const specialFiles = {
+    '[special?directory]/nested/nestedfile.txt': '',
+    '[special?directory]/(special-*file).txt': 'special',
+    '[special?directory]/directoryfile.txt': 'new',
+  };
+
+  const baseDir = path.join(__dirname, 'helpers');
+
+  beforeAll(() => {
+    Object.keys(specialFiles).forEach((originFile) => {
+      const file = removeIllegalCharacterForWindows(originFile);
+      const dir = path.dirname(file);
+
+      mkdirp.sync(path.join(baseDir, dir));
+
+      fs.writeFileSync(path.join(baseDir, file), specialFiles[originFile]);
+    });
+  });
 
   // Use then and catch explicitly, so errors
   // aren't seen as unhandled exceptions
@@ -243,7 +259,7 @@ describe('apply function', () => {
         CopyWebpackPlugin({});
       };
 
-      expect(createPluginWithObject).to.throw(Error);
+      expect(createPluginWithObject).toThrow(Error);
     });
 
     it('throws an error if the patterns are null', () => {
@@ -251,7 +267,7 @@ describe('apply function', () => {
         CopyWebpackPlugin(null);
       };
 
-      expect(createPluginWithNull).to.throw(Error);
+      expect(createPluginWithNull).toThrow(Error);
     });
 
     it('throws an error if the "from" path is an empty string', () => {
@@ -261,7 +277,7 @@ describe('apply function', () => {
         });
       };
 
-      expect(createPluginWithNull).to.throw(Error);
+      expect(createPluginWithNull).toThrow(Error);
     });
   });
 
@@ -377,7 +393,8 @@ describe('apply function', () => {
           {
             from: '**/*',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom).to.have.string(HELPER_DIR);
+              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+
               return `/some/path/${path.basename(targetPath)}.tst`;
             },
           },
@@ -406,7 +423,8 @@ describe('apply function', () => {
             from: '**/*',
             to: 'nested/[path][name]-[hash:6].[ext]',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom).to.have.string(HELPER_DIR);
+              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+
               return targetPath.replace('nested/', 'transformed/');
             },
           },
@@ -597,10 +615,10 @@ describe('apply function', () => {
         .then((compilation) => {
           const absFrom = path.resolve(HELPER_DIR, 'directory');
           const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
-          expect(compilation.contextDependencies).to.have.members([
-            absFrom,
-            absFromNested,
-          ]);
+
+          expect(compilation.contextDependencies.sort()).toEqual(
+            [absFrom, absFromNested].sort()
+          );
         })
         .then(done)
         .catch(done);
@@ -618,9 +636,7 @@ describe('apply function', () => {
       })
         .then((compilation) => {
           const absFrom = path.resolve(HELPER_DIR, 'directory');
-          expect(compilation.contextDependencies).to.not.have.members([
-            absFrom,
-          ]);
+          expect(compilation.contextDependencies).not.toContain(absFrom);
         })
         .then(done)
         .catch(done);
@@ -651,7 +667,8 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             transform(content, absoluteFrom) {
-              expect(absoluteFrom).to.equal(path.join(HELPER_DIR, 'file.txt'));
+              expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
+
               return `${content}changed`;
             },
           },
@@ -668,7 +685,8 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom).to.equal(path.join(HELPER_DIR, 'file.txt'));
+              expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
+
               return targetPath.replace('file.txt', 'subdir/test.txt');
             },
           },
@@ -1105,7 +1123,7 @@ describe('apply function', () => {
         .then((compilation) => {
           const absFrom = path.join(HELPER_DIR, 'file.txt');
 
-          expect(compilation.fileDependencies).to.have.members([absFrom]);
+          expect(compilation.fileDependencies.sort()).toEqual([absFrom].sort());
         })
         .then(done)
         .catch(done);
@@ -1194,7 +1212,7 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom).to.have.string(HELPER_DIR);
+              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
 
               return new Promise((resolve) => {
                 resolve(`/some/path/${path.basename(targetPath)}`);
@@ -1255,9 +1273,10 @@ describe('apply function', () => {
           {
             from: 'directory',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom).to.have.string(
-                path.join(HELPER_DIR, 'directory')
-              );
+              expect(
+                absoluteFrom.includes(path.join(HELPER_DIR, 'directory'))
+              ).toBe(true);
+
               return `/some/path/${path.basename(targetPath)}`;
             },
           },
@@ -1497,10 +1516,9 @@ describe('apply function', () => {
         .then((compilation) => {
           const absFrom = path.resolve(HELPER_DIR, 'directory');
           const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
-          expect(compilation.contextDependencies).to.have.members([
-            absFrom,
-            absFromNested,
-          ]);
+          expect(compilation.contextDependencies.sort()).toEqual(
+            [absFrom, absFromNested].sort()
+          );
         })
         .then(done)
         .catch(done);
@@ -1844,7 +1862,7 @@ describe('apply function', () => {
             cacache.ls(cacheDir).then((cacheEntries) => {
               const cacheKeys = Object.keys(cacheEntries);
 
-              expect(cacheKeys).to.have.lengthOf(1);
+              expect(cacheKeys).toHaveLength(1);
 
               cacheKeys.forEach((cacheKey) => {
                 // eslint-disable-next-line no-new-func
@@ -1852,7 +1870,7 @@ describe('apply function', () => {
                   `'use strict'\nreturn ${cacheKey}`
                 )();
 
-                expect(cacheEntry.pattern.from).to.equal(from);
+                expect(cacheEntry.pattern.from).toBe(from);
               });
             })
           )
@@ -1890,7 +1908,7 @@ describe('apply function', () => {
             cacache.ls(cacheDir).then((cacheEntries) => {
               const cacheKeys = Object.keys(cacheEntries);
 
-              expect(cacheKeys).to.have.lengthOf(3);
+              expect(cacheKeys).toHaveLength(3);
 
               cacheKeys.forEach((cacheKey) => {
                 // eslint-disable-next-line no-new-func
@@ -1898,7 +1916,7 @@ describe('apply function', () => {
                   `'use strict'\nreturn ${cacheKey}`
                 )();
 
-                expect(cacheEntry.pattern.from).to.equal(from);
+                expect(cacheEntry.pattern.from).toBe(from);
               });
             })
           )
@@ -1930,7 +1948,7 @@ describe('apply function', () => {
             cacache.ls(cacheDir).then((cacheEntries) => {
               const cacheKeys = Object.keys(cacheEntries);
 
-              expect(cacheKeys).to.have.lengthOf(1);
+              expect(cacheKeys).toHaveLength(1);
 
               cacheKeys.forEach((cacheKey) => {
                 // eslint-disable-next-line no-new-func
@@ -1938,7 +1956,7 @@ describe('apply function', () => {
                   `'use strict'\nreturn ${cacheKey}`
                 )();
 
-                expect(cacheEntry.pattern.from).to.equal(from);
+                expect(cacheEntry.pattern.from).toBe(from);
               });
             })
           )
@@ -1973,10 +1991,10 @@ describe('apply function', () => {
             cacache.ls(cacheDir).then((cacheEntries) => {
               const cacheKeys = Object.keys(cacheEntries);
 
-              expect(cacheKeys).to.have.lengthOf(1);
+              expect(cacheKeys).toHaveLength(1);
 
               cacheKeys.forEach((cacheKey) => {
-                expect(cacheKey).to.equal('foobar');
+                expect(cacheKey).toBe('foobar');
               });
             })
           )
@@ -1989,8 +2007,8 @@ describe('apply function', () => {
         const content = fs.readFileSync(path.join(HELPER_DIR, from));
         const expectedNewContent = zlib.gzipSync('newchanged!');
 
-        expect(isGzip(content)).to.equal(true);
-        expect(isGzip(expectedNewContent)).to.equal(true);
+        expect(isGzip(content)).toBe(true);
+        expect(isGzip(expectedNewContent)).toBe(true);
 
         runEmit({
           expectedAssetKeys: ['file.txt.gz'],
@@ -2003,7 +2021,7 @@ describe('apply function', () => {
               cache: true,
               // eslint-disable-next-line no-shadow
               transform: function transform(content) {
-                expect(isGzip(content)).to.equal(true);
+                expect(isGzip(content)).toBe(true);
 
                 return new Promise((resolve) => {
                   // eslint-disable-next-line no-shadow
@@ -2012,7 +2030,7 @@ describe('apply function', () => {
                       throw error;
                     }
 
-                    const newContent = new Buffer(`${content}changed!`);
+                    const newContent = Buffer.from(`${content}changed!`);
 
                     // eslint-disable-next-line no-shadow
                     zlib.gzip(newContent, (error, compressedData) => {
@@ -2020,7 +2038,7 @@ describe('apply function', () => {
                         throw error;
                       }
 
-                      expect(isGzip(compressedData)).to.equal(true);
+                      expect(isGzip(compressedData)).toBe(true);
 
                       return resolve(compressedData);
                     });
@@ -2034,7 +2052,7 @@ describe('apply function', () => {
             cacache.ls(cacheDir).then((cacheEntries) => {
               const cacheKeys = Object.keys(cacheEntries);
 
-              expect(cacheKeys).to.have.lengthOf(1);
+              expect(cacheKeys).toHaveLength(1);
 
               cacheKeys.forEach((cacheKey) => {
                 // eslint-disable-next-line no-new-func
@@ -2042,15 +2060,13 @@ describe('apply function', () => {
                   `'use strict'\nreturn ${cacheKey}`
                 )();
 
-                expect(cacheEntry.pattern.from).to.equal(from);
+                expect(cacheEntry.pattern.from).toBe(from);
               });
             })
           )
           .then(done)
           .catch(done);
       });
-
-      after(() => cacache.rm.all(cacheDir));
     });
   });
 });
