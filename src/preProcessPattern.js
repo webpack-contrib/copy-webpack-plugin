@@ -71,6 +71,7 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.fromArgs = fromArgs;
     pattern.glob = escape(pattern.context, pattern.from.glob);
     pattern.absoluteFrom = path.resolve(pattern.context, pattern.from.glob);
+
     return Promise.resolve(pattern);
   }
 
