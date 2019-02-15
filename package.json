@@ -47,6 +47,8 @@
     "eslint": "^5.13.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^3.0.0",
+    "husky": "^1.2.1",
+    "lint-staged": "^8.1.0",
     "is-gzip": "^2.0.0",
     "mkdirp": "^0.5.1",
     "mocha": "^5.2.0",
@@ -77,5 +79,21 @@
         }
       ]
     ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "arrowParens": "always"
   }
 }
