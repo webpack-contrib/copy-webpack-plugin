@@ -10,4 +10,4 @@ matrix:
 build: off
 shallow_clone: true
 test_script:
-  - npm run test
+  - npm run test:only

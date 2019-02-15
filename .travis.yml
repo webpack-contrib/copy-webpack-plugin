@@ -1,10 +1,30 @@
+sudo: false
+
+git:
+  depth: 10
+
 language: node_js
 
-node_js:
-  - stable
-  - lts/*
-  - 6
-  - 4
+# cache node modules
+cache:
+  directories:
+    - $HOME/.npm
+    - node_modules
 
-notifications:
-  email: false
+matrix:
+  include:
+    - node_js: '11'
+      script: npm run pretest
+      env: CI=pretest
+    - node_js: '11'
+      script: npm run test:only
+      env: CI=tests
+    - node_js: '10'
+      script: npm run test:only
+      env: CI=tests 10
+    - node_js: '6'
+      script: npm run test:only
+      env: CI=tests 6
+    - node_js: '4'
+      script: npm run test:only
+      env: CI=tests 4
