@@ -90,6 +90,10 @@ export default function preProcessPattern(globalRef, pattern) {
     if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
       pattern.fromType = 'glob';
       pattern.glob = escape(pattern.context, pattern.from);
+
+      // We need to add context directory as dependencies to avoid problems when new files added in directories
+      // when we already in watch mode and this directories are not in context dependencies
+      contextDependencies.add(pattern.context);
     } else {
       const msg = `unable to locate '${pattern.from}' at '${
         pattern.absoluteFrom
