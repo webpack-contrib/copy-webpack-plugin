@@ -54,8 +54,8 @@ class CopyPlugin {
       log(msg, 2);
     }
 
-    const fileDependencies = [];
-    const contextDependencies = [];
+    const fileDependencies = new Set();
+    const contextDependencies = new Set();
     const written = {};
 
     let context;

@@ -45,11 +45,8 @@ export default function processPattern(globalRef, pattern) {
           // a new file is added it triggeres a rebuild
           const contextPath = path.dirname(path.resolve(from));
 
-          if (
-            contextDependencies.indexOf(contextPath) === -1 &&
-            isGlob(pattern.glob)
-          ) {
-            contextDependencies.push(contextPath);
+          if (isGlob(pattern.glob)) {
+            contextDependencies.add(contextPath);
           }
 
           debug(`found ${from}`);
