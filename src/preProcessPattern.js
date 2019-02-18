@@ -1,10 +1,10 @@
 import path from 'path';
 
 import isGlob from 'is-glob';
-import normalizePath from 'normalize-path';
 
 import escape from './utils/escape';
 import isObject from './utils/isObject';
+import normalizePatternFrom from './utils/normalizePatternFrom';
 import { stat } from './utils/promisify';
 
 // https://www.debuggex.com/r/VH2yS2mvJOitiyr3
@@ -24,24 +24,7 @@ export default function preProcessPattern(globalRef, pattern) {
     compilation,
   } = globalRef;
 
-  pattern =
-    typeof pattern === 'string'
-      ? {
-          from: pattern,
-        }
-      : Object.assign({}, pattern);
-
-  if (typeof pattern.from === 'string') {
-    pattern.from = normalizePath(pattern.from);
-  } else if (
-    typeof pattern.from === 'object' &&
-    typeof pattern.from.glob === 'string'
-  ) {
-    pattern.from = {
-      ...pattern.from,
-      glob: normalizePath(pattern.from.glob),
-    };
-  }
+  pattern = normalizePatternFrom(pattern);
 
   if (pattern.from === '') {
     throw new Error('[copy-webpack-plugin] path "from" cannot be empty string');
