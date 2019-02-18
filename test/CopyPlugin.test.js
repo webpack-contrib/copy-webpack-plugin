@@ -298,6 +298,19 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('can normalize backslash path', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory\\nested\\*',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('can use a bracketed glob to move a file to the root directory', (done) => {
       runEmit({
         expectedAssetKeys: [

@@ -1,6 +1,7 @@
 import path from 'path';
 
 import isGlob from 'is-glob';
+import normalizePath from 'normalize-path';
 
 import escape from './utils/escape';
 import isObject from './utils/isObject';
@@ -29,6 +30,18 @@ export default function preProcessPattern(globalRef, pattern) {
           from: pattern,
         }
       : Object.assign({}, pattern);
+
+  if (typeof pattern.from === 'string') {
+    pattern.from = normalizePath(pattern.from);
+  } else if (
+    typeof pattern.from === 'object' &&
+    typeof pattern.from.glob === 'string'
+  ) {
+    pattern.from = {
+      ...pattern.from,
+      glob: normalizePath(pattern.from.glob),
+    };
+  }
 
   if (pattern.from === '') {
     throw new Error('[copy-webpack-plugin] path "from" cannot be empty string');
