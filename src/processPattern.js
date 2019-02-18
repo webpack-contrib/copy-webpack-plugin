@@ -2,13 +2,12 @@ import path from 'path';
 
 import globby from 'globby';
 import pLimit from 'p-limit';
-import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 
 import isObject from './utils/isObject';
 
 export default function processPattern(globalRef, pattern) {
-  const { info, debug, output, concurrency, contextDependencies } = globalRef;
+  const { info, debug, output, concurrency } = globalRef;
   const globOptions = Object.assign(
     {
       cwd: pattern.context,
@@ -39,14 +38,6 @@ export default function processPattern(globalRef, pattern) {
 
           if (pattern.flatten) {
             file.relativeFrom = path.basename(file.relativeFrom);
-          }
-
-          // This is so webpack is able to watch the directory and when
-          // a new file is added it triggeres a rebuild
-          const contextPath = path.dirname(path.resolve(from));
-
-          if (isGlob(pattern.glob)) {
-            contextDependencies.add(contextPath);
           }
 
           debug(`found ${from}`);

@@ -623,7 +623,7 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('adds the directory to the watch list when using glob', (done) => {
+    it('adds the context directory to the watch list when using glob', (done) => {
       run({
         patterns: [
           {
@@ -632,11 +632,8 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.resolve(HELPER_DIR, 'directory');
-          const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
-
           expect(Array.from(compilation.contextDependencies).sort()).toEqual(
-            [absFrom, absFromNested].sort()
+            [HELPER_DIR].sort()
           );
         })
         .then(done)
@@ -1540,7 +1537,7 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('adds the directory to the watch list', (done) => {
+    it('adds the context directory to the watch list', (done) => {
       run({
         patterns: [
           {
@@ -1550,9 +1547,8 @@ describe('apply function', () => {
       })
         .then((compilation) => {
           const absFrom = path.resolve(HELPER_DIR, 'directory');
-          const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
           expect(Array.from(compilation.contextDependencies).sort()).toEqual(
-            [absFrom, absFromNested].sort()
+            [absFrom].sort()
           );
         })
         .then(done)
