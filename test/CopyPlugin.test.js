@@ -336,6 +336,21 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('can normalize backslash path in object', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: {
+              glob: 'directory\\nested\\*',
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('can exclude path', (done) => {
       runEmit({
         expectedAssetKeys: [
