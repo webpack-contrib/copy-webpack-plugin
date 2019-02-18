@@ -85,6 +85,22 @@ describe('apply function', () => {
       // Get a mock compiler to pass to plugin.apply
       const compiler = opts.compiler || new MockCompiler();
 
+      const isWin = process.platform === 'win32';
+
+      if (!opts.symlink || isWin) {
+        if (!opts.options) {
+          // eslint-disable-next-line no-param-reassign
+          opts.options = {};
+        }
+
+        if (!opts.options.ignore) {
+          // eslint-disable-next-line no-param-reassign
+          opts.options.ignore = [];
+        }
+
+        opts.options.ignore.push('symlink/**/*', 'file-ln.txt', 'directory-ln');
+      }
+
       new CopyPlugin(opts.patterns, opts.options).apply(compiler);
 
       // Call the registered function with a mock compilation and callback
@@ -92,6 +108,7 @@ describe('apply function', () => {
         {
           assets: {},
           errors: [],
+          warnings: [],
           fileDependencies: new Set(),
           contextDependencies: new Set(),
         },
@@ -126,6 +143,13 @@ describe('apply function', () => {
           } else if (compilation.errors.length > 0) {
             throw compilation.errors[0];
           }
+
+          if (opts.expectedWarnings) {
+            expect(compilation.warnings).toEqual(opts.expectedWarnings);
+          } else if (compilation.warnings.length > 0) {
+            throw compilation.warnings[0];
+          }
+
           resolve(compilation);
         })
         .catch(reject);
@@ -190,6 +214,7 @@ describe('apply function', () => {
     const compilation = {
       assets: {},
       errors: [],
+      warnings: [],
       fileDependencies: new Set(),
       contextDependencies: new Set(),
     };
@@ -670,6 +695,31 @@ describe('apply function', () => {
         .then(done)
         .catch(done);
     });
+
+    it('can use a glob to move a file to the root directory from symbolic link', (done) => {
+      runEmit({
+        // Windows doesn't support symbolic link
+        symlink: true,
+        expectedAssetKeys:
+          process.platform === 'win32'
+            ? []
+            : [
+                'symlink/directory-ln/file.txt',
+                'symlink/directory-ln/nested-directory/file-in-nested-directory.txt',
+                'symlink/directory/file.txt',
+                'symlink/directory/nested-directory/file-in-nested-directory.txt',
+                'symlink/file-ln.txt',
+                'symlink/file.txt',
+              ],
+        patterns: [
+          {
+            from: 'symlink/**/*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
   });
 
   describe('with file in from', () => {
@@ -728,10 +778,12 @@ describe('apply function', () => {
     it('warns when file not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-            path.sep
-          }nonexistent.txt'`,
+        expectedWarnings: [
+          new Error(
+            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent.txt'`
+          ),
         ],
         patterns: [
           {
@@ -747,10 +799,12 @@ describe('apply function', () => {
       runEmit({
         compiler: new MockCompilerNoStat(),
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-            path.sep
-          }nonexistent.txt'`,
+        expectedWarnings: [
+          new Error(
+            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent.txt'`
+          ),
         ],
         patterns: [
           {
@@ -1194,7 +1248,7 @@ describe('apply function', () => {
         patterns: [
           {
             from: '**/*',
-            ignore: ['file.*'],
+            ignore: ['file.*', 'file-in-nested-directory.*'],
           },
         ],
       })
@@ -1288,6 +1342,21 @@ describe('apply function', () => {
         .then(done)
         .catch(done);
     });
+
+    it('can move a file (symbolic link) to the root directory', (done) => {
+      // Windows doesn't support symbolic link
+      runEmit({
+        symlink: true,
+        expectedAssetKeys: process.platform === 'win32' ? [] : ['file-ln.txt'],
+        patterns: [
+          {
+            from: 'symlink/file-ln.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
   });
 
   describe('with directory in from', () => {
@@ -1371,10 +1440,12 @@ describe('apply function', () => {
     it('warns when directory not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}${
-            path.sep
-          }nonexistent'`,
+        expectedWarnings: [
+          new Error(
+            `[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent'`
+          ),
         ],
         patterns: [
           {
@@ -1619,6 +1690,24 @@ describe('apply function', () => {
           {
             from: 'directory',
             to: 'nested/[path][name]-[hash:6].[ext]',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it("can move a directory's contents to the root directory from symbolic link", (done) => {
+      runEmit({
+        // Windows doesn't support symbolic link
+        symlink: true,
+        expectedAssetKeys:
+          process.platform === 'win32'
+            ? []
+            : ['file.txt', 'nested-directory/file-in-nested-directory.txt'],
+        patterns: [
+          {
+            from: 'symlink/directory-ln',
           },
         ],
       })
