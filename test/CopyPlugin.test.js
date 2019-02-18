@@ -108,6 +108,7 @@ describe('apply function', () => {
         {
           assets: {},
           errors: [],
+          warnings: [],
           fileDependencies: new Set(),
           contextDependencies: new Set(),
         },
@@ -142,6 +143,13 @@ describe('apply function', () => {
           } else if (compilation.errors.length > 0) {
             throw compilation.errors[0];
           }
+
+          if (opts.expectedWarnings) {
+            expect(compilation.warnings).toEqual(opts.expectedWarnings);
+          } else if (compilation.warnings.length > 0) {
+            throw compilation.warnings[0];
+          }
+
           resolve(compilation);
         })
         .catch(reject);
@@ -206,6 +214,7 @@ describe('apply function', () => {
     const compilation = {
       assets: {},
       errors: [],
+      warnings: [],
       fileDependencies: new Set(),
       contextDependencies: new Set(),
     };
@@ -756,10 +765,12 @@ describe('apply function', () => {
     it('warns when file not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-            path.sep
-          }nonexistent.txt'`,
+        expectedWarnings: [
+          new Error(
+            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent.txt'`
+          ),
         ],
         patterns: [
           {
@@ -775,10 +786,12 @@ describe('apply function', () => {
       runEmit({
         compiler: new MockCompilerNoStat(),
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-            path.sep
-          }nonexistent.txt'`,
+        expectedWarnings: [
+          new Error(
+            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent.txt'`
+          ),
         ],
         patterns: [
           {
@@ -1414,10 +1427,12 @@ describe('apply function', () => {
     it('warns when directory not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedErrors: [
-          `[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}${
-            path.sep
-          }nonexistent'`,
+        expectedWarnings: [
+          new Error(
+            `[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent'`
+          ),
         ],
         patterns: [
           {
