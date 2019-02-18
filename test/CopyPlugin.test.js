@@ -39,21 +39,24 @@ class MockCompiler {
       0
     );
 
+    this.hooks = {
+      emit: {
+        tapAsync: (plugin, fn) => {
+          this.hooks.emit = fn;
+        },
+      },
+      afterEmit: {
+        tapAsync: (plugin, fn) => {
+          this.hooks.afterEmit = fn;
+        },
+      },
+    };
+
     this.outputFileSystem = {
       constructor: {
         name: 'NotMemoryFileSystem',
       },
     };
-  }
-
-  plugin(type, fn) {
-    if (type === 'emit') {
-      this.emitFn = fn;
-    }
-
-    if (type === 'after-emit') {
-      this.afterEmitFn = fn;
-    }
   }
 }
 
@@ -101,7 +104,7 @@ describe('apply function', () => {
           () =>
             new Promise((res, rej) => {
               try {
-                compiler.emitFn(compilation, res);
+                compiler.hooks.emit(compilation, res);
               } catch (error) {
                 rej(error);
               }
@@ -111,7 +114,7 @@ describe('apply function', () => {
           () =>
             new Promise((res, rej) => {
               try {
-                compiler.afterEmitFn(compilation, res);
+                compiler.hooks.afterEmit(compilation, res);
               } catch (error) {
                 rej(error);
               }
@@ -202,7 +205,7 @@ describe('apply function', () => {
 
         // Trigger another compile
         return new Promise((res) => {
-          compiler.emitFn(compilation, res);
+          compiler.hooks.emit(compilation, res);
         });
       })
       .then(() => {

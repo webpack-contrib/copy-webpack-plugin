@@ -184,15 +184,10 @@ class CopyPlugin {
       callback();
     };
 
-    if (compiler.hooks) {
-      const plugin = { name: 'CopyPlugin' };
+    const plugin = { name: 'CopyPlugin' };
 
-      compiler.hooks.emit.tapAsync(plugin, emit);
-      compiler.hooks.afterEmit.tapAsync(plugin, afterEmit);
-    } else {
-      compiler.plugin('emit', emit);
-      compiler.plugin('after-emit', afterEmit);
-    }
+    compiler.hooks.emit.tapAsync(plugin, emit);
+    compiler.hooks.afterEmit.tapAsync(plugin, afterEmit);
   }
 }
 
