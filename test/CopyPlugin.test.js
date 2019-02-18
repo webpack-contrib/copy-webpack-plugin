@@ -311,6 +311,42 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('can exclude path', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: '!(directory)/**/*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can exclude path with backslash path', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: '!(directory)\\**\\*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('can use a bracketed glob to move a file to the root directory', (done) => {
       runEmit({
         expectedAssetKeys: [
