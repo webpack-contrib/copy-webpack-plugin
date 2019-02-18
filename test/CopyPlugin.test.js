@@ -327,6 +327,7 @@ describe('apply function', () => {
     it('can use a bracketed glob to move a file to the root directory', (done) => {
       runEmit({
         expectedAssetKeys: [
+          'directory/.dottedfile',
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
