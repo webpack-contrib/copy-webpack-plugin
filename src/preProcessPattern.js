@@ -65,11 +65,11 @@ export default function preProcessPattern(globalRef, pattern) {
   if (isObject(pattern.from) && pattern.from.glob) {
     pattern.fromType = 'glob';
 
-    const fromArgs = Object.assign({}, pattern.from);
-    delete fromArgs.glob;
+    const globOptions = Object.assign({}, pattern.from);
+    delete globOptions.glob;
 
-    pattern.fromArgs = fromArgs;
     pattern.glob = escape(pattern.context, pattern.from.glob);
+    pattern.globOptions = globOptions;
     pattern.absoluteFrom = path.resolve(pattern.context, pattern.from.glob);
 
     return Promise.resolve(pattern);
@@ -123,7 +123,7 @@ export default function preProcessPattern(globalRef, pattern) {
         pattern.context = pattern.absoluteFrom;
         pattern.glob = escape(pattern.absoluteFrom, '**/*');
         pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
-        pattern.fromArgs = {
+        pattern.globOptions = {
           dot: true,
         };
       } else if (stats.isFile()) {
@@ -132,7 +132,7 @@ export default function preProcessPattern(globalRef, pattern) {
         pattern.fromType = 'file';
         pattern.context = path.dirname(pattern.absoluteFrom);
         pattern.glob = escape(pattern.absoluteFrom);
-        pattern.fromArgs = {
+        pattern.globOptions = {
           dot: true,
         };
       } else if (!pattern.fromType) {
