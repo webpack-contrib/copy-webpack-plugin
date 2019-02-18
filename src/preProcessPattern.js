@@ -91,16 +91,21 @@ export default function preProcessPattern(globalRef, pattern) {
       // when we already in watch mode and this directories are not in context dependencies
       contextDependencies.add(pattern.context);
     } else {
-      const msg = `unable to locate '${pattern.from}' at '${
-        pattern.absoluteFrom
-      }'`;
-      const warningMsg = `[copy-webpack-plugin] ${msg}`;
+      const newWarning = new Error(
+        `[copy-webpack-plugin] unable to locate '${pattern.from}' at '${
+          pattern.absoluteFrom
+        }'`
+      );
+      const hasWarning = compilation.warnings.some(
+        // eslint-disable-next-line no-shadow
+        (warning) => warning.message === newWarning.message
+      );
 
-      // only display the same message once
-      if (compilation.errors.indexOf(warningMsg) === -1) {
-        warning(msg);
+      // Only display the same message once
+      if (!hasWarning) {
+        warning(newWarning.message);
 
-        compilation.errors.push(warningMsg);
+        compilation.warnings.push(newWarning);
       }
 
       pattern.fromType = 'nonexistent';
