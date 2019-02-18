@@ -85,6 +85,22 @@ describe('apply function', () => {
       // Get a mock compiler to pass to plugin.apply
       const compiler = opts.compiler || new MockCompiler();
 
+      const isWin = process.platform === 'win32';
+
+      if (!opts.symlink || isWin) {
+        if (!opts.options) {
+          // eslint-disable-next-line no-param-reassign
+          opts.options = {};
+        }
+
+        if (!opts.options.ignore) {
+          // eslint-disable-next-line no-param-reassign
+          opts.options.ignore = [];
+        }
+
+        opts.options.ignore.push('symlink/**/*', 'file-ln.txt', 'directory-ln');
+      }
+
       new CopyPlugin(opts.patterns, opts.options).apply(compiler);
 
       // Call the registered function with a mock compilation and callback
@@ -657,6 +673,31 @@ describe('apply function', () => {
         .then(done)
         .catch(done);
     });
+
+    it('can use a glob to move a file to the root directory from symbolic link', (done) => {
+      runEmit({
+        // Windows doesn't support symbolic link
+        symlink: true,
+        expectedAssetKeys:
+          process.platform === 'win32'
+            ? []
+            : [
+                'symlink/directory-ln/file.txt',
+                'symlink/directory-ln/nested-directory/file-in-nested-directory.txt',
+                'symlink/directory/file.txt',
+                'symlink/directory/nested-directory/file-in-nested-directory.txt',
+                'symlink/file-ln.txt',
+                'symlink/file.txt',
+              ],
+        patterns: [
+          {
+            from: 'symlink/**/*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
   });
 
   describe('with file in from', () => {
@@ -1180,7 +1221,7 @@ describe('apply function', () => {
         patterns: [
           {
             from: '**/*',
-            ignore: ['file.*'],
+            ignore: ['file.*', 'file-in-nested-directory.*'],
           },
         ],
       })
@@ -1268,6 +1309,21 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             to: 'second/file.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can move a file (symbolic link) to the root directory', (done) => {
+      // Windows doesn't support symbolic link
+      runEmit({
+        symlink: true,
+        expectedAssetKeys: process.platform === 'win32' ? [] : ['file-ln.txt'],
+        patterns: [
+          {
+            from: 'symlink/file-ln.txt',
           },
         ],
       })
@@ -1605,6 +1661,24 @@ describe('apply function', () => {
           {
             from: 'directory',
             to: 'nested/[path][name]-[hash:6].[ext]',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it("can move a directory's contents to the root directory from symbolic link", (done) => {
+      runEmit({
+        // Windows doesn't support symbolic link
+        symlink: true,
+        expectedAssetKeys:
+          process.platform === 'win32'
+            ? []
+            : ['file.txt', 'nested-directory/file-in-nested-directory.txt'],
+        patterns: [
+          {
+            from: 'symlink/directory-ln',
           },
         ],
       })

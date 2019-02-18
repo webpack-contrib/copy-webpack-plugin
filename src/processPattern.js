@@ -11,6 +11,7 @@ export default function processPattern(globalRef, pattern) {
   const globOptions = Object.assign(
     {
       cwd: pattern.context,
+      follow: true,
     },
     pattern.globOptions || {}
   );
