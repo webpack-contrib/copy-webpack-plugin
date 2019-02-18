@@ -857,8 +857,9 @@ describe('apply function', () => {
         }),
         expectedAssetKeys: [],
         expectedErrors: [
-          '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be ' +
-            'defined to write to absolute paths',
+          new Error(
+            '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths'
+          ),
         ],
         patterns: [
           {
