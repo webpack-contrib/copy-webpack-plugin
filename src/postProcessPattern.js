@@ -32,7 +32,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
 
     // If this came from a glob, add it to the file watchlist
     if (pattern.fromType === 'glob') {
-      fileDependencies.push(file.absoluteFrom);
+      fileDependencies.add(file.absoluteFrom);
     }
 
     info(`reading ${file.absoluteFrom} to write to assets`);

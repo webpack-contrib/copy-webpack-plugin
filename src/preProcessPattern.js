@@ -117,7 +117,7 @@ export default function preProcessPattern(globalRef, pattern) {
       }
 
       if (stats.isDirectory()) {
-        contextDependencies.push(pattern.absoluteFrom);
+        contextDependencies.add(pattern.absoluteFrom);
 
         pattern.fromType = 'dir';
         pattern.context = pattern.absoluteFrom;
@@ -127,7 +127,7 @@ export default function preProcessPattern(globalRef, pattern) {
           dot: true,
         };
       } else if (stats.isFile()) {
-        fileDependencies.push(pattern.absoluteFrom);
+        fileDependencies.add(pattern.absoluteFrom);
 
         pattern.fromType = 'file';
         pattern.context = path.dirname(pattern.absoluteFrom);
