@@ -5,7 +5,6 @@ import pLimit from 'p-limit';
 import isGlob from 'is-glob';
 import minimatch from 'minimatch';
 
-import writeFile from './writeFile';
 import isObject from './utils/isObject';
 
 export default function processPattern(globalRef, pattern) {
@@ -91,6 +90,7 @@ export default function processPattern(globalRef, pattern) {
                   file.relativeFrom
                 }', because it matches the ignore glob '${glob}'`
               );
+
               return Promise.resolve();
             }
 
@@ -121,7 +121,7 @@ export default function processPattern(globalRef, pattern) {
 
           info(`determined that '${from}' should write to '${file.webpackTo}'`);
 
-          return writeFile(globalRef, pattern, file);
+          return file;
         })
       )
     )

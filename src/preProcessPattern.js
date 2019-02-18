@@ -95,9 +95,11 @@ export default function preProcessPattern(globalRef, pattern) {
         pattern.absoluteFrom
       }'`;
       const warningMsg = `[copy-webpack-plugin] ${msg}`;
+
       // only display the same message once
       if (compilation.errors.indexOf(warningMsg) === -1) {
         warning(msg);
+
         compilation.errors.push(warningMsg);
       }
 
@@ -110,29 +112,33 @@ export default function preProcessPattern(globalRef, pattern) {
     .then((stats) => {
       if (!stats) {
         noStatsHandler();
+
         return pattern;
       }
 
       if (stats.isDirectory()) {
+        contextDependencies.push(pattern.absoluteFrom);
+
         pattern.fromType = 'dir';
         pattern.context = pattern.absoluteFrom;
-        contextDependencies.push(pattern.absoluteFrom);
         pattern.glob = escape(pattern.absoluteFrom, '**/*');
         pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
         pattern.fromArgs = {
           dot: true,
         };
       } else if (stats.isFile()) {
+        fileDependencies.push(pattern.absoluteFrom);
+
         pattern.fromType = 'file';
         pattern.context = path.dirname(pattern.absoluteFrom);
         pattern.glob = escape(pattern.absoluteFrom);
         pattern.fromArgs = {
           dot: true,
         };
-        fileDependencies.push(pattern.absoluteFrom);
       } else if (!pattern.fromType) {
         info(`Unrecognized file type for ${pattern.from}`);
       }
+
       return pattern;
     });
 }
