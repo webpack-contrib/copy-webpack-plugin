@@ -2,6 +2,7 @@ import path from 'path';
 
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
+import postProcessPattern from './postProcessPattern';
 
 class CopyPlugin {
   constructor(patterns = [], options = {}) {
@@ -53,8 +54,8 @@ class CopyPlugin {
       log(msg, 2);
     }
 
-    let fileDependencies;
-    let contextDependencies;
+    const fileDependencies = [];
+    const contextDependencies = [];
     const written = {};
 
     let context;
@@ -67,16 +68,10 @@ class CopyPlugin {
       ({ context } = this.options);
     }
 
-    const emit = (compilation, cb) => {
+    const plugin = { name: 'CopyPlugin' };
+
+    compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
       debug('starting emit');
-
-      const callback = () => {
-        debug('finishing emit');
-        cb();
-      };
-
-      fileDependencies = [];
-      contextDependencies = [];
 
       const globalRef = {
         info,
@@ -102,92 +97,71 @@ class CopyPlugin {
         globalRef.output = compiler.options.devServer.outputPath;
       }
 
-      const tasks = [];
+      const { patterns } = this;
 
-      this.patterns.forEach((pattern) => {
-        tasks.push(
+      Promise.all(
+        patterns.map((pattern) =>
           Promise.resolve()
             .then(() => preProcessPattern(globalRef, pattern))
             // Every source (from) is assumed to exist here
             // eslint-disable-next-line no-shadow
-            .then((pattern) => processPattern(globalRef, pattern))
-        );
-      });
+            .then((pattern) =>
+              processPattern(globalRef, pattern).then((files) => {
+                if (!files) {
+                  return Promise.resolve();
+                }
 
-      Promise.all(tasks)
-        .catch((err) => {
-          compilation.errors.push(err);
+                return Promise.all(
+                  files
+                    .filter(Boolean)
+                    .map((file) => postProcessPattern(globalRef, pattern, file))
+                );
+              })
+            )
+        )
+      )
+        .catch((error) => {
+          compilation.errors.push(error);
         })
-        .then(() => callback());
-    };
+        .then(() => {
+          debug('finishing emit');
 
-    const afterEmit = (compilation, cb) => {
+          callback();
+        });
+    });
+    compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
       debug('starting after-emit');
-
-      const callback = () => {
-        debug('finishing after-emit');
-        cb();
-      };
-
-      let compilationFileDependencies;
-      let addFileDependency;
-
-      if (Array.isArray(compilation.fileDependencies)) {
-        compilationFileDependencies = new Set(compilation.fileDependencies);
-        addFileDependency = (file) => compilation.fileDependencies.push(file);
-      } else {
-        compilationFileDependencies = compilation.fileDependencies;
-        addFileDependency = (file) => compilation.fileDependencies.add(file);
-      }
-
-      let compilationContextDependencies;
-      let addContextDependency;
-
-      if (Array.isArray(compilation.contextDependencies)) {
-        compilationContextDependencies = new Set(
-          compilation.contextDependencies
-        );
-        addContextDependency = (file) =>
-          compilation.contextDependencies.push(file);
-      } else {
-        compilationContextDependencies = compilation.contextDependencies;
-        addContextDependency = (file) =>
-          compilation.contextDependencies.add(file);
-      }
 
       // Add file dependencies if they're not already tracked
       for (const fileDependency of fileDependencies) {
-        if (compilationFileDependencies.has(fileDependency)) {
+        if (compilation.fileDependencies.has(fileDependency)) {
           debug(
             `not adding ${fileDependency} to change tracking, because it's already tracked`
           );
         } else {
           debug(`adding ${fileDependency} to change tracking`);
 
-          addFileDependency(fileDependency);
+          compilation.fileDependencies.add(fileDependency);
         }
       }
 
       // Add context dependencies if they're not already tracked
       for (const contextDependency of contextDependencies) {
-        if (compilationContextDependencies.has(contextDependency)) {
+        if (compilation.contextDependencies.has(contextDependency)) {
           debug(
             `not adding ${contextDependency} to change tracking, because it's already tracked`
           );
         } else {
           debug(`adding ${contextDependency} to change tracking`);
 
-          addContextDependency(contextDependency);
+          compilation.contextDependencies.add(contextDependency);
         }
       }
 
+      debug('finishing after-emit');
+
       callback();
-    };
-
-    const plugin = { name: 'CopyPlugin' };
-
-    compiler.hooks.emit.tapAsync(plugin, emit);
-    compiler.hooks.afterEmit.tapAsync(plugin, afterEmit);
+    });
   }
 }
 

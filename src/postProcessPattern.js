@@ -5,7 +5,6 @@ import crypto from 'crypto';
 import loaderUtils from 'loader-utils';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
-
 import findCacheDir from 'find-cache-dir';
 
 import { name, version } from '../package.json';
@@ -14,7 +13,7 @@ import { stat, readFile } from './utils/promisify';
 
 /* eslint-disable no-param-reassign */
 
-export default function writeFile(globalRef, pattern, file) {
+export default function postProcessPattern(globalRef, pattern, file) {
   const {
     info,
     debug,
@@ -133,6 +132,7 @@ export default function writeFile(globalRef, pattern, file) {
           written[file.absoluteFrom].webpackTo === file.webpackTo
         ) {
           info(`skipping '${file.webpackTo}', because it hasn't changed`);
+
           return;
         }
 
@@ -144,6 +144,7 @@ export default function writeFile(globalRef, pattern, file) {
 
         if (compilation.assets[file.webpackTo] && !file.force) {
           info(`skipping '${file.webpackTo}', because it already exists`);
+
           return;
         }
 

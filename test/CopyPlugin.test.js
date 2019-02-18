@@ -91,9 +91,9 @@ describe('apply function', () => {
       const compilation = Object.assign(
         {
           assets: {},
-          contextDependencies: [],
           errors: [],
-          fileDependencies: [],
+          fileDependencies: new Set(),
+          contextDependencies: new Set(),
         },
         opts.compilation
       );
@@ -189,9 +189,9 @@ describe('apply function', () => {
     const compiler = new MockCompiler();
     const compilation = {
       assets: {},
-      contextDependencies: [],
       errors: [],
-      fileDependencies: [],
+      fileDependencies: new Set(),
+      contextDependencies: new Set(),
     };
 
     return run({
@@ -619,7 +619,7 @@ describe('apply function', () => {
           const absFrom = path.resolve(HELPER_DIR, 'directory');
           const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
 
-          expect(compilation.contextDependencies.sort()).toEqual(
+          expect(Array.from(compilation.contextDependencies).sort()).toEqual(
             [absFrom, absFromNested].sort()
           );
         })
@@ -1126,7 +1126,9 @@ describe('apply function', () => {
         .then((compilation) => {
           const absFrom = path.join(HELPER_DIR, 'file.txt');
 
-          expect(compilation.fileDependencies.sort()).toEqual([absFrom].sort());
+          expect(Array.from(compilation.fileDependencies).sort()).toEqual(
+            [absFrom].sort()
+          );
         })
         .then(done)
         .catch(done);
@@ -1533,7 +1535,7 @@ describe('apply function', () => {
         .then((compilation) => {
           const absFrom = path.resolve(HELPER_DIR, 'directory');
           const absFromNested = path.resolve(HELPER_DIR, 'directory', 'nested');
-          expect(compilation.contextDependencies.sort()).toEqual(
+          expect(Array.from(compilation.contextDependencies).sort()).toEqual(
             [absFrom, absFromNested].sort()
           );
         })
