@@ -2,12 +2,6 @@ import normalizePath from 'normalize-path';
 
 const normalizePatternFrom = (pattern) => {
   /* eslint-disable no-param-reassign */
-  pattern =
-    typeof pattern === 'string'
-      ? {
-          from: pattern,
-        }
-      : Object.assign({}, pattern);
 
   if (typeof pattern.from === 'string') {
     pattern.from = normalizePath(pattern.from);

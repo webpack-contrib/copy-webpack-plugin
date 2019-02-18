@@ -24,6 +24,13 @@ export default function preProcessPattern(globalRef, pattern) {
     compilation,
   } = globalRef;
 
+  pattern =
+    typeof pattern === 'string'
+      ? {
+          from: pattern,
+        }
+      : Object.assign({}, pattern);
+
   pattern = normalizePatternFrom(pattern);
 
   if (pattern.from === '') {
