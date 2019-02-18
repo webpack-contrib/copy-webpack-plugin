@@ -9,11 +9,11 @@ import isObject from './utils/isObject';
 
 export default function processPattern(globalRef, pattern) {
   const { info, debug, output, concurrency, contextDependencies } = globalRef;
-  const globArgs = Object.assign(
+  const globOptions = Object.assign(
     {
       cwd: pattern.context,
     },
-    pattern.fromArgs || {}
+    pattern.globOptions || {}
   );
 
   if (pattern.fromType === 'nonexistent') {
@@ -26,7 +26,7 @@ export default function processPattern(globalRef, pattern) {
     `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
   );
 
-  return globby(pattern.glob, globArgs).then((paths) =>
+  return globby(pattern.glob, globOptions).then((paths) =>
     Promise.all(
       paths.map((from) =>
         limit(() => {

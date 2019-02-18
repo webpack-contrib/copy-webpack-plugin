@@ -331,6 +331,22 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('can use a glob object to move a file to the root directory and respect glob options', (done) => {
+      runEmit({
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: {
+              glob: '*.txt',
+              dot: false,
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('can use a glob to move multiple files to the root directory', (done) => {
       runEmit({
         expectedAssetKeys: [
@@ -1680,7 +1696,7 @@ describe('apply function', () => {
             'noextension',
           ],
           options: {
-            ignore: ['.dottedfile'],
+            ignore: ['.dottedfile', '.file.txt'],
           },
           patterns: [
             {
@@ -1694,7 +1710,7 @@ describe('apply function', () => {
 
       it('ignores all files except those with dots', (done) => {
         runEmit({
-          expectedAssetKeys: ['directory/.dottedfile'],
+          expectedAssetKeys: ['.file.txt', 'directory/.dottedfile'],
           options: {
             ignore: [
               {
@@ -1732,6 +1748,7 @@ describe('apply function', () => {
       it('ignores nested directory', (done) => {
         runEmit({
           expectedAssetKeys: [
+            '.file.txt',
             '[!]/hello.txt',
             'binextension.bin',
             'file.txt',
@@ -1760,6 +1777,7 @@ describe('apply function', () => {
         it('ignores nested directory(can use "\\" to escape if path.sep is "/")', (done) => {
           runEmit({
             expectedAssetKeys: [
+              '.file.txt',
               '[!]/hello.txt',
               'binextension.bin',
               'file.txt',
