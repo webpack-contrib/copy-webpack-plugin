@@ -98,8 +98,9 @@ export default function processPattern(globalRef, pattern) {
 
           if (path.isAbsolute(file.webpackTo)) {
             if (output === '/') {
-              // eslint-disable-next-line no-throw-literal
-              throw '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths';
+              throw new Error(
+                '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths'
+              );
             }
 
             file.webpackTo = path.relative(output, file.webpackTo);
