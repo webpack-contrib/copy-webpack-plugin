@@ -1953,6 +1953,116 @@ describe('apply function', () => {
     });
   });
 
+  describe('modified files', () => {
+    it('copy only changed files', (done) => {
+      runChange({
+        expectedAssetKeys: ['dest1/tempfile1.txt'],
+        newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
+        newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt'),
+        patterns: [
+          {
+            context: 'directory',
+            from: '**/*.txt',
+            to: 'dest1',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('copy only changed files (multiple patterns)', (done) => {
+      runChange({
+        expectedAssetKeys: ['dest1/tempfile1.txt', 'dest2/tempfile1.txt'],
+        newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
+        newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt'),
+        patterns: [
+          {
+            context: 'directory',
+            from: '**/*.txt',
+            to: 'dest1',
+          },
+          {
+            context: 'directory',
+            from: '**/*.txt',
+            to: 'dest2',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('copy only changed files (multiple patterns with difference context)', (done) => {
+      runChange({
+        expectedAssetKeys: [
+          'dest1/tempfile1.txt',
+          'dest2/directory/tempfile1.txt',
+        ],
+        newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
+        newFileLoc2: path.join(HELPER_DIR, 'tempfile2.txt'),
+        patterns: [
+          {
+            context: 'directory',
+            from: '**/*.txt',
+            to: 'dest1',
+          },
+          {
+            from: '**/*.txt',
+            to: 'dest2',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('copy only changed files (multiple patterns with difference context 1)', (done) => {
+      runChange({
+        expectedAssetKeys: [
+          'dest1/directory/tempfile1.txt',
+          'dest2/tempfile1.txt',
+        ],
+        newFileLoc1: path.join(HELPER_DIR, 'directory', 'tempfile1.txt'),
+        newFileLoc2: path.join(HELPER_DIR, 'tempfile2.txt'),
+        patterns: [
+          {
+            from: '**/*.txt',
+            to: 'dest1',
+          },
+          {
+            context: 'directory',
+            from: '**/*.txt',
+            to: 'dest2',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('copy only changed files (multiple patterns with difference context 2)', (done) => {
+      runChange({
+        expectedAssetKeys: ['dest1/tempfile1.txt'],
+        newFileLoc1: path.join(HELPER_DIR, 'tempfile1.txt'),
+        newFileLoc2: path.join(HELPER_DIR, 'directory', 'tempfile2.txt'),
+        patterns: [
+          {
+            from: '**/*.txt',
+            to: 'dest1',
+          },
+          {
+            context: 'directory',
+            from: '**/*.txt',
+            to: 'dest2',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+  });
+
   describe('options', () => {
     describe('ignore', () => {
       it('ignores files when from is a file', (done) => {
