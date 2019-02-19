@@ -379,6 +379,9 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '[!]/hello.txt',
           'binextension.bin',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
           'file.txt',
           'file.txt.gz',
           'directory/directoryfile.txt',
@@ -404,6 +407,9 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'nested/[!]/hello.txt',
           'nested/binextension.bin',
+          'nested/dir (86)/file.txt',
+          'nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'nested/dir (86)/nesteddir/nestedfile.txt',
           'nested/file.txt',
           'nested/file.txt.gz',
           'nested/directory/directoryfile.txt',
@@ -431,6 +437,7 @@ describe('apply function', () => {
           '/some/path/(special-*file).txt.tst',
           '/some/path/binextension.bin.tst',
           '/some/path/deepnested.txt.tst',
+          '/some/path/deepnesteddir.txt.tst',
           '/some/path/file.txt.tst',
           '/some/path/file.txt.gz.tst',
           '/some/path/directoryfile.txt.tst',
@@ -461,6 +468,9 @@ describe('apply function', () => {
           'transformed/[special?directory]/(special-*file)-0bd650.txt',
           'transformed/[special?directory]/nested/nestedfile-d41d8c.txt',
           'transformed/binextension-d41d8c.bin',
+          'transformed/dir (86)/file-d41d8c.txt',
+          'transformed/dir (86)/nesteddir/deepnesteddir/deepnesteddir-d41d8c.txt',
+          'transformed/dir (86)/nesteddir/nestedfile-d41d8c.txt',
           'transformed/file-22af64.txt',
           'transformed/file.txt-5b311c.gz',
           'transformed/directory/directoryfile-22af64.txt',
@@ -602,6 +612,9 @@ describe('apply function', () => {
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
           '[special?directory]/nested/nestedfile.txt',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
         ],
         patterns: [
           {
@@ -618,6 +631,9 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'nested/[!]/hello-d41d8c.txt',
           'nested/binextension-d41d8c.bin',
+          'nested/dir (86)/file-d41d8c.txt',
+          'nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir-d41d8c.txt',
+          'nested/dir (86)/nesteddir/nestedfile-d41d8c.txt',
           'nested/file-22af64.txt',
           'nested/file.txt-5b311c.gz',
           'nested/directory/directoryfile-22af64.txt',
@@ -645,6 +661,7 @@ describe('apply function', () => {
           '[!]-hello.txt',
           '[special?directory]-(special-*file).txt',
           '[special?directory]-directoryfile.txt',
+          'dir (86)-file.txt',
           'directory-directoryfile.txt',
         ],
         patterns: [
@@ -1238,6 +1255,8 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '[!]/hello.txt',
           'binextension.bin',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
@@ -1861,6 +1880,9 @@ describe('apply function', () => {
           '[special?directory]/(special-*file).txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
         ],
         patterns: [
           {
@@ -1879,6 +1901,9 @@ describe('apply function', () => {
           '[special?directory]/(special-*file).txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
         ],
         patterns: [
           {
@@ -1990,6 +2015,9 @@ describe('apply function', () => {
           expectedAssetKeys: [
             '[!]/hello.txt',
             'binextension.bin',
+            'dir (86)/file.txt',
+            'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+            'dir (86)/nesteddir/nestedfile.txt',
             'file.txt',
             'file.txt.gz',
             'directory/directoryfile.txt',
@@ -2056,6 +2084,9 @@ describe('apply function', () => {
             '.file.txt',
             '[!]/hello.txt',
             'binextension.bin',
+            'dir (86)/file.txt',
+            'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+            'dir (86)/nesteddir/nestedfile.txt',
             'file.txt',
             'file.txt.gz',
             'noextension',
@@ -2085,6 +2116,9 @@ describe('apply function', () => {
               '.file.txt',
               '[!]/hello.txt',
               'binextension.bin',
+              'dir (86)/file.txt',
+              'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+              'dir (86)/nesteddir/nestedfile.txt',
               'file.txt',
               'file.txt.gz',
               'noextension',
@@ -2174,6 +2208,27 @@ describe('apply function', () => {
             {
               context: 'nested',
               from: '.',
+              to: 'newdirectory',
+            },
+          ],
+        })
+          .then(done)
+          .catch(done);
+      });
+
+      it('overrides webpack config context with absolute path', (done) => {
+        runEmit({
+          expectedAssetKeys: [
+            'newdirectory/file.txt',
+            'newdirectory/nesteddir/deepnesteddir/deepnesteddir.txt',
+            'newdirectory/nesteddir/nestedfile.txt',
+          ],
+          options: {
+            context: path.resolve(HELPER_DIR, 'dir (86)'),
+          },
+          patterns: [
+            {
+              from: '**/*',
               to: 'newdirectory',
             },
           ],
