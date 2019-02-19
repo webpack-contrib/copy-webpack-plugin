@@ -138,7 +138,9 @@ export default function preProcessPattern(globalRef, pattern) {
         pattern.fromType = 'dir';
         pattern.context = pattern.absoluteFrom;
         pattern.glob = normalize(pattern.absoluteFrom, '**/*');
-        pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
+        pattern.absoluteFrom = normalizePath(
+          path.join(pattern.absoluteFrom, '**/*')
+        );
         pattern.globOptions = {
           dot: true,
         };
@@ -146,7 +148,7 @@ export default function preProcessPattern(globalRef, pattern) {
         fileDependencies.add(pattern.absoluteFrom);
 
         pattern.fromType = 'file';
-        pattern.context = path.dirname(pattern.absoluteFrom);
+        pattern.context = normalizePath(path.dirname(pattern.absoluteFrom));
         pattern.glob = normalize(pattern.absoluteFrom);
         pattern.globOptions = {
           dot: true,

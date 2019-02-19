@@ -6,6 +6,7 @@ import loaderUtils from 'loader-utils';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
+import normalizePath from 'normalize-path';
 
 import { name, version } from '../package.json';
 
@@ -96,14 +97,17 @@ export default function postProcessPattern(globalRef, pattern, file) {
             file.webpackTo = file.webpackTo.replace(/\.?\[ext\]/g, '');
           }
 
-          file.webpackTo = loaderUtils.interpolateName(
-            { resourcePath: file.absoluteFrom },
-            file.webpackTo,
-            {
-              content,
-              regExp: file.webpackToRegExp,
-              context: pattern.context,
-            }
+          // Developers can use invalid slashes in regex we should fix it
+          file.webpackTo = normalizePath(
+            loaderUtils.interpolateName(
+              { resourcePath: file.absoluteFrom },
+              file.webpackTo,
+              {
+                content,
+                regExp: file.webpackToRegExp,
+                context: pattern.context,
+              }
+            )
           );
         }
 
@@ -115,7 +119,8 @@ export default function postProcessPattern(globalRef, pattern, file) {
             pattern.transformPath(file.webpackTo, file.absoluteFrom)
           )
             .then((newPath) => {
-              file.webpackTo = newPath;
+              // Developers can use invalid slashes we should fix it
+              file.webpackTo = normalizePath(newPath);
             })
             .then(() => content);
         }
@@ -127,9 +132,9 @@ export default function postProcessPattern(globalRef, pattern, file) {
 
         if (
           !copyUnmodified &&
-          written[file.absoluteFrom] &&
-          written[file.absoluteFrom].hash === hash &&
-          written[file.absoluteFrom].webpackTo === file.webpackTo
+          written[file.webpackTo] &&
+          written[file.webpackTo][file.absoluteFrom] &&
+          written[file.webpackTo][file.absoluteFrom] === hash
         ) {
           info(`skipping '${file.webpackTo}', because it hasn't changed`);
 
@@ -137,10 +142,12 @@ export default function postProcessPattern(globalRef, pattern, file) {
         }
 
         debug(`added ${hash} to written tracking for '${file.absoluteFrom}'`);
-        written[file.absoluteFrom] = {
-          hash,
-          webpackTo: file.webpackTo,
-        };
+
+        if (!written[file.webpackTo]) {
+          written[file.webpackTo] = {};
+        }
+
+        written[file.webpackTo][file.absoluteFrom] = hash;
 
         if (compilation.assets[file.webpackTo] && !file.force) {
           info(`skipping '${file.webpackTo}', because it already exists`);
