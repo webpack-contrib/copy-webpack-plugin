@@ -1,8 +1,9 @@
 import path from 'path';
 
 import isGlob from 'is-glob';
+import normalizePath from 'normalize-path';
 
-import escape from './utils/escape';
+import normalize from './utils/normalize';
 import isObject from './utils/isObject';
 import { stat } from './utils/promisify';
 
@@ -41,6 +42,7 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.context = path.join(context, pattern.context);
   }
 
+  pattern.context = normalizePath(pattern.context);
   pattern.ignore = globalRef.ignore.concat(pattern.ignore || []);
 
   info(`processing from: '${pattern.from}' to: '${pattern.to}'`);
@@ -68,9 +70,11 @@ export default function preProcessPattern(globalRef, pattern) {
     const globOptions = Object.assign({}, pattern.from);
     delete globOptions.glob;
 
-    pattern.glob = escape(pattern.context, pattern.from.glob);
+    pattern.glob = normalize(pattern.context, pattern.from.glob);
     pattern.globOptions = globOptions;
-    pattern.absoluteFrom = path.resolve(pattern.context, pattern.from.glob);
+    pattern.absoluteFrom = normalizePath(
+      path.resolve(pattern.context, pattern.from.glob)
+    );
 
     return Promise.resolve(pattern);
   }
@@ -81,6 +85,9 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
   }
 
+  // Normalize path when path separators are mixed (like `C:\\directory/nested-directory/`)
+  pattern.absoluteFrom = normalizePath(pattern.absoluteFrom);
+
   debug(
     `determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`
   );
@@ -89,7 +96,7 @@ export default function preProcessPattern(globalRef, pattern) {
     // If from doesn't appear to be a glob, then log a warning
     if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
       pattern.fromType = 'glob';
-      pattern.glob = escape(pattern.context, pattern.from);
+      pattern.glob = normalize(pattern.context, pattern.from);
 
       // We need to add context directory as dependencies to avoid problems when new files added in directories
       // when we already in watch mode and this directories are not in context dependencies
@@ -130,7 +137,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
         pattern.fromType = 'dir';
         pattern.context = pattern.absoluteFrom;
-        pattern.glob = escape(pattern.absoluteFrom, '**/*');
+        pattern.glob = normalize(pattern.absoluteFrom, '**/*');
         pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
         pattern.globOptions = {
           dot: true,
@@ -140,7 +147,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
         pattern.fromType = 'file';
         pattern.context = path.dirname(pattern.absoluteFrom);
-        pattern.glob = escape(pattern.absoluteFrom);
+        pattern.glob = normalize(pattern.absoluteFrom);
         pattern.globOptions = {
           dot: true,
         };

@@ -1,6 +1,8 @@
 import path from 'path';
 
-export default function escape(context, from) {
+import normalizePath from 'normalize-path';
+
+function escape(context, from) {
   if (from && path.isAbsolute(from)) {
     return from;
   }
@@ -23,4 +25,8 @@ export default function escape(context, from) {
   }
 
   return `${absoluteContext}/${from}`;
+}
+
+export default function normalize(context, from) {
+  return normalizePath(escape(context, from));
 }
