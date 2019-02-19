@@ -10,6 +10,7 @@ import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 import isGzip from 'is-gzip';
 import mkdirp from 'mkdirp';
+import normalizePath from 'normalize-path';
 
 import CopyPlugin from '../src/index';
 
@@ -327,6 +328,7 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
           'file.txt',
           'noextension',
@@ -380,6 +382,7 @@ describe('apply function', () => {
           'file.txt',
           'file.txt.gz',
           'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
@@ -404,6 +407,7 @@ describe('apply function', () => {
           'nested/file.txt',
           'nested/file.txt.gz',
           'nested/directory/directoryfile.txt',
+          'nested/directory/nested/deep-nested/deepnested.txt',
           'nested/directory/nested/nestedfile.txt',
           'nested/[special?directory]/directoryfile.txt',
           'nested/[special?directory]/(special-*file).txt',
@@ -426,6 +430,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '/some/path/(special-*file).txt.tst',
           '/some/path/binextension.bin.tst',
+          '/some/path/deepnested.txt.tst',
           '/some/path/file.txt.tst',
           '/some/path/file.txt.gz.tst',
           '/some/path/directoryfile.txt.tst',
@@ -459,6 +464,7 @@ describe('apply function', () => {
           'transformed/file-22af64.txt',
           'transformed/file.txt-5b311c.gz',
           'transformed/directory/directoryfile-22af64.txt',
+          'transformed/directory/nested/deep-nested/deepnested-d41d8c.txt',
           'transformed/directory/nested/nestedfile-d41d8c.txt',
           'transformed/noextension-d41d8c',
         ],
@@ -482,6 +488,7 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'nested/directoryfile.txt',
+          'nested/nested/deep-nested/deepnested.txt',
           'nested/nested/nestedfile.txt',
         ],
         patterns: [
@@ -535,6 +542,7 @@ describe('apply function', () => {
     it('can use a glob to flatten multiple files in a relative context to a non-root directory', (done) => {
       runEmit({
         expectedAssetKeys: [
+          'nested/deepnested.txt',
           'nested/directoryfile.txt',
           'nested/nestedfile.txt',
         ],
@@ -555,6 +563,7 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'nested/directoryfile.txt',
+          'nested/nested/deep-nested/deepnested.txt',
           'nested/nested/nestedfile.txt',
         ],
         patterns: [
@@ -588,6 +597,7 @@ describe('apply function', () => {
           '[!]/hello.txt',
           'file.txt',
           'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
@@ -611,6 +621,7 @@ describe('apply function', () => {
           'nested/file-22af64.txt',
           'nested/file.txt-5b311c.gz',
           'nested/directory/directoryfile-22af64.txt',
+          'nested/directory/nested/deep-nested/deepnested-d41d8c.txt',
           'nested/directory/nested/nestedfile-d41d8c.txt',
           'nested/[special?directory]/(special-*file)-0bd650.txt',
           'nested/[special?directory]/directoryfile-22af64.txt',
@@ -657,9 +668,11 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          expect(Array.from(compilation.contextDependencies).sort()).toEqual(
-            [HELPER_DIR].sort()
-          );
+          expect(
+            Array.from(compilation.contextDependencies)
+              .map((contextDependency) => normalizePath(contextDependency))
+              .sort()
+          ).toEqual([normalizePath(HELPER_DIR)].sort());
         })
         .then(done)
         .catch(done);
@@ -767,9 +780,9 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-              path.sep
-            }nonexistent.txt'`
+            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${normalizePath(
+              HELPER_DIR
+            )}/nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -788,9 +801,9 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-              path.sep
-            }nonexistent.txt'`
+            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${normalizePath(
+              HELPER_DIR
+            )}/nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -1192,7 +1205,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.join(HELPER_DIR, 'file.txt');
+          const absFrom = normalizePath(path.join(HELPER_DIR, 'file.txt'));
 
           expect(Array.from(compilation.fileDependencies).sort()).toEqual(
             [absFrom].sort()
@@ -1226,6 +1239,7 @@ describe('apply function', () => {
           '[!]/hello.txt',
           'binextension.bin',
           'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
@@ -1352,6 +1366,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '.dottedfile',
           'directoryfile.txt',
+          'nested/deep-nested/deepnested.txt',
           'nested/nestedfile.txt',
         ],
         patterns: [
@@ -1368,6 +1383,7 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           '/some/path/.dottedfile',
+          '/some/path/deepnested.txt',
           '/some/path/directoryfile.txt',
           '/some/path/nestedfile.txt',
         ],
@@ -1429,9 +1445,9 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `[copy-webpack-plugin] unable to locate 'nonexistent' at '${HELPER_DIR}${
-              path.sep
-            }nonexistent'`
+            `[copy-webpack-plugin] unable to locate 'nonexistent' at '${normalizePath(
+              HELPER_DIR
+            )}/nonexistent'`
           ),
         ],
         patterns: [
@@ -1451,6 +1467,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '.dottedfile',
           'directoryfile.txt',
+          'nested/deep-nested/deepnested.txt',
           'nested/nestedfile.txt',
         ],
         patterns: [
@@ -1468,6 +1485,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'newdirectory/.dottedfile',
           'newdirectory/directoryfile.txt',
+          'newdirectory/nested/deep-nested/deepnested.txt',
           'newdirectory/nested/nestedfile.txt',
         ],
         patterns: [
@@ -1483,7 +1501,10 @@ describe('apply function', () => {
 
     it("can move a directory's contents to a new directory using a pattern context", (done) => {
       runEmit({
-        expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+        expectedAssetKeys: [
+          'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/nestedfile.txt',
+        ],
         patterns: [
           {
             context: 'directory',
@@ -1500,6 +1521,7 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'newdirectory/.dottedfile',
+          'newdirectory/deepnested.txt',
           'newdirectory/directoryfile.txt',
           'newdirectory/nestedfile.txt',
         ],
@@ -1520,6 +1542,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '../tempdir/.dottedfile',
           '../tempdir/directoryfile.txt',
+          '../tempdir/nested/deep-nested/deepnested.txt',
           '../tempdir/nested/nestedfile.txt',
         ],
         patterns: [
@@ -1535,7 +1558,7 @@ describe('apply function', () => {
 
     it("can move a nested directory's contents to the root directory", (done) => {
       runEmit({
-        expectedAssetKeys: ['nestedfile.txt'],
+        expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
         patterns: [
           {
             from: 'directory/nested',
@@ -1548,7 +1571,10 @@ describe('apply function', () => {
 
     it("can move a nested directory's contents to a new directory", (done) => {
       runEmit({
-        expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+        expectedAssetKeys: [
+          'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/nestedfile.txt',
+        ],
         patterns: [
           {
             from: 'directory/nested',
@@ -1564,7 +1590,10 @@ describe('apply function', () => {
       const absolutePath = path.resolve(HELPER_DIR, 'directory', 'nested');
 
       runEmit({
-        expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+        expectedAssetKeys: [
+          'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/nestedfile.txt',
+        ],
         patterns: [
           {
             from: absolutePath,
@@ -1618,7 +1647,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.resolve(HELPER_DIR, 'directory');
+          const absFrom = normalizePath(path.resolve(HELPER_DIR, 'directory'));
           expect(Array.from(compilation.contextDependencies).sort()).toEqual(
             [absFrom].sort()
           );
@@ -1647,6 +1676,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '.dottedfile',
           'directoryfile.txt',
+          'nested/deep-nested/deepnested.txt',
           'nested/nestedfile.txt',
           'tempfile1.txt',
           'tempfile2.txt',
@@ -1671,6 +1701,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'nested/.dottedfile-79d39f',
           'nested/directoryfile-22af64.txt',
+          'nested/nested/deep-nested/deepnested-d41d8c.txt',
           'nested/nested/nestedfile-d41d8c.txt',
         ],
         patterns: [
@@ -1714,6 +1745,189 @@ describe('apply function', () => {
     });
   });
 
+  describe('with difference path segment separation', () => {
+    it('can normalize backslash path with glob in from', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: {
+              glob: 'directory\\nested\\*',
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash path with glob in from (mixed path segment separation)', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: {
+              glob: 'directory/nested\\*',
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash path with glob in from (simple)', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory\\nested\\*',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize mixed path segment separation with glob in from (simple)', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory/nested\\*',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash path with file in from', (done) => {
+      runEmit({
+        expectedAssetKeys: ['nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory\\nested\\nestedfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash path with file in from (mixed path segment separation)', (done) => {
+      runEmit({
+        expectedAssetKeys: ['nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory\\nested/nestedfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash path with directory in from', (done) => {
+      runEmit({
+        expectedAssetKeys: ['deepnested.txt'],
+        patterns: [
+          {
+            from: 'directory\\nested\\deep-nested',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash path with directory in from (mixed path segment separation)', (done) => {
+      runEmit({
+        expectedAssetKeys: ['deepnested.txt'],
+        patterns: [
+          {
+            from: 'directory\\nested\\deep-nested',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can exclude path', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: '!(directory)/**/*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can exclude path with backslash path', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: '!(directory)\\**\\*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash in context', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/nestedfile.txt',
+        ],
+        options: {
+          context: path.resolve(HELPER_DIR, 'directory\\'),
+        },
+        patterns: [
+          {
+            from: 'nested',
+            to: 'newdirectory',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can normalize backslash in context (2)', (done) => {
+      runEmit({
+        expectedAssetKeys: ['newdirectory/deepnested.txt'],
+        options: {
+          context: path.resolve(HELPER_DIR, 'directory\\nested'),
+        },
+        patterns: [
+          {
+            from: 'deep-nested',
+            to: 'newdirectory',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+  });
+
   describe('options', () => {
     describe('ignore', () => {
       it('ignores files when from is a file', (done) => {
@@ -1737,7 +1951,11 @@ describe('apply function', () => {
 
       it('ignores files when from is a directory', (done) => {
         runEmit({
-          expectedAssetKeys: ['.dottedfile', 'directoryfile.txt'],
+          expectedAssetKeys: [
+            '.dottedfile',
+            'directoryfile.txt',
+            'nested/deep-nested/deepnested.txt',
+          ],
           options: {
             ignore: ['*/nestedfile.*'],
           },
@@ -1775,6 +1993,7 @@ describe('apply function', () => {
             'file.txt',
             'file.txt.gz',
             'directory/directoryfile.txt',
+            'directory/nested/deep-nested/deepnested.txt',
             'directory/nested/nestedfile.txt',
             '[special?directory]/directoryfile.txt',
             '[special?directory]/(special-*file).txt',
@@ -1904,7 +2123,10 @@ describe('apply function', () => {
     describe('context', () => {
       it('overrides webpack config context with absolute path', (done) => {
         runEmit({
-          expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+          expectedAssetKeys: [
+            'newdirectory/deep-nested/deepnested.txt',
+            'newdirectory/nestedfile.txt',
+          ],
           options: {
             context: path.resolve(HELPER_DIR, 'directory'),
           },
@@ -1921,7 +2143,10 @@ describe('apply function', () => {
 
       it('overrides webpack config context with relative path', (done) => {
         runEmit({
-          expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+          expectedAssetKeys: [
+            'newdirectory/deep-nested/deepnested.txt',
+            'newdirectory/nestedfile.txt',
+          ],
           options: {
             context: 'directory',
           },
@@ -1938,7 +2163,10 @@ describe('apply function', () => {
 
       it('is overridden by pattern context', (done) => {
         runEmit({
-          expectedAssetKeys: ['newdirectory/nestedfile.txt'],
+          expectedAssetKeys: [
+            'newdirectory/deep-nested/deepnested.txt',
+            'newdirectory/nestedfile.txt',
+          ],
           options: {
             context: 'directory',
           },
@@ -2008,6 +2236,7 @@ describe('apply function', () => {
           expectedAssetKeys: [
             '.dottedfile',
             'directoryfile.txt',
+            'nested/deep-nested/deepnested.txt',
             'nested/nestedfile.txt',
           ],
           expectedAssetContent: {
