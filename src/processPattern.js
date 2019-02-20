@@ -8,7 +8,7 @@ import normalizePath from 'normalize-path';
 import isObject from './utils/isObject';
 
 export default function processPattern(globalRef, pattern) {
-  const { info, debug, output, concurrency } = globalRef;
+  const { logger, output, concurrency } = globalRef;
   const globOptions = Object.assign(
     {
       cwd: pattern.context,
@@ -23,7 +23,7 @@ export default function processPattern(globalRef, pattern) {
 
   const limit = pLimit(concurrency || 100);
 
-  info(
+  logger.info(
     `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
   );
 
@@ -45,7 +45,7 @@ export default function processPattern(globalRef, pattern) {
           // Ensure forward slashes
           file.relativeFrom = normalizePath(file.relativeFrom);
 
-          debug(`found ${from}`);
+          logger.debug(`found ${from}`);
 
           // Check the ignore list
           let il = pattern.ignore.length;
@@ -75,10 +75,10 @@ export default function processPattern(globalRef, pattern) {
               glob = '';
             }
 
-            debug(`testing ${glob} against ${file.relativeFrom}`);
+            logger.debug(`testing ${glob} against ${file.relativeFrom}`);
 
             if (minimatch(file.relativeFrom, glob, globParams)) {
-              info(
+              logger.info(
                 `ignoring '${
                   file.relativeFrom
                 }', because it matches the ignore glob '${glob}'`
@@ -87,7 +87,7 @@ export default function processPattern(globalRef, pattern) {
               return Promise.resolve();
             }
 
-            debug(`${glob} doesn't match ${file.relativeFrom}`);
+            logger.debug(`${glob} doesn't match ${file.relativeFrom}`);
           }
 
           // Change the to path to be relative for webpack
@@ -102,9 +102,12 @@ export default function processPattern(globalRef, pattern) {
 
           if (path.isAbsolute(file.webpackTo)) {
             if (output === '/') {
-              throw new Error(
-                '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths'
-              );
+              const message =
+                'using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths';
+
+              logger.error(message);
+
+              throw new Error(message);
             }
 
             file.webpackTo = path.relative(output, file.webpackTo);
@@ -113,7 +116,9 @@ export default function processPattern(globalRef, pattern) {
           // Ensure forward slashes
           file.webpackTo = normalizePath(file.webpackTo);
 
-          info(`determined that '${from}' should write to '${file.webpackTo}'`);
+          logger.info(
+            `determined that '${from}' should write to '${file.webpackTo}'`
+          );
 
           return file;
         })

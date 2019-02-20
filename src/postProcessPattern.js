@@ -16,8 +16,7 @@ import { stat, readFile } from './utils/promisify';
 
 export default function postProcessPattern(globalRef, pattern, file) {
   const {
-    info,
-    debug,
+    logger,
     compilation,
     fileDependencies,
     written,
@@ -25,9 +24,15 @@ export default function postProcessPattern(globalRef, pattern, file) {
     copyUnmodified,
   } = globalRef;
 
+  logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
+
   return stat(inputFileSystem, file.absoluteFrom).then((stats) => {
     // We don't write empty directories
     if (stats.isDirectory()) {
+      logger.debug(
+        `skipping '${file.absoluteFrom}' because it is empty directory`
+      );
+
       return Promise.resolve();
     }
 
@@ -36,11 +41,13 @@ export default function postProcessPattern(globalRef, pattern, file) {
       fileDependencies.add(file.absoluteFrom);
     }
 
-    info(`reading ${file.absoluteFrom} to write to assets`);
+    logger.debug(`reading '${file.absoluteFrom}' to write to assets`);
 
     return readFile(inputFileSystem, file.absoluteFrom)
       .then((content) => {
         if (pattern.transform) {
+          logger.info(`transforming content for '${file.absoluteFrom}'`);
+
           // eslint-disable-next-line no-shadow
           const transform = (content, absoluteFrom) =>
             pattern.transform(content, absoluteFrom);
@@ -65,16 +72,26 @@ export default function postProcessPattern(globalRef, pattern, file) {
                 });
 
             return cacache.get(globalRef.cacheDir, cacheKey).then(
-              (result) => result.data,
+              (result) => {
+                logger.debug(
+                  `getting cached transformation for '${file.absoluteFrom}'`
+                );
+
+                return result.data;
+              },
               () =>
                 Promise.resolve()
                   .then(() => transform(content, file.absoluteFrom))
                   // eslint-disable-next-line no-shadow
-                  .then((content) =>
-                    cacache
+                  .then((content) => {
+                    logger.debug(
+                      `caching transformation for '${file.absoluteFrom}'`
+                    );
+
+                    return cacache
                       .put(globalRef.cacheDir, cacheKey, content)
-                      .then(() => content)
-                  )
+                      .then(() => content);
+                  })
             );
           }
 
@@ -85,7 +102,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
       })
       .then((content) => {
         if (pattern.toType === 'template') {
-          info(
+          logger.info(
             `interpolating template '${file.webpackTo}' for '${
               file.relativeFrom
             }'`
@@ -115,6 +132,10 @@ export default function postProcessPattern(globalRef, pattern, file) {
       })
       .then((content) => {
         if (pattern.transformPath) {
+          logger.info(
+            `transforming path '${file.webpackTo}' for '${file.absoluteFrom}'`
+          );
+
           return Promise.resolve(
             pattern.transformPath(file.webpackTo, file.absoluteFrom)
           )
@@ -136,12 +157,14 @@ export default function postProcessPattern(globalRef, pattern, file) {
           written[file.webpackTo][file.absoluteFrom] &&
           written[file.webpackTo][file.absoluteFrom] === hash
         ) {
-          info(`skipping '${file.webpackTo}', because it hasn't changed`);
+          logger.info(
+            `skipping '${file.webpackTo}', because content hasn't changed`
+          );
 
           return;
         }
 
-        debug(`added ${hash} to written tracking for '${file.absoluteFrom}'`);
+        logger.debug(`adding '${file.webpackTo}' for tracking content changes`);
 
         if (!written[file.webpackTo]) {
           written[file.webpackTo] = {};
@@ -150,12 +173,14 @@ export default function postProcessPattern(globalRef, pattern, file) {
         written[file.webpackTo][file.absoluteFrom] = hash;
 
         if (compilation.assets[file.webpackTo] && !file.force) {
-          info(`skipping '${file.webpackTo}', because it already exists`);
+          logger.info(
+            `skipping '${file.webpackTo}', because it already exists`
+          );
 
           return;
         }
 
-        info(
+        logger.info(
           `writing '${file.webpackTo}' to compilation assets from '${
             file.absoluteFrom
           }'`
