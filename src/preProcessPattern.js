@@ -14,9 +14,7 @@ const isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\
 
 export default function preProcessPattern(globalRef, pattern) {
   const {
-    info,
-    debug,
-    warning,
+    logger,
     context,
     inputFileSystem,
     fileDependencies,
@@ -32,7 +30,11 @@ export default function preProcessPattern(globalRef, pattern) {
       : Object.assign({}, pattern);
 
   if (pattern.from === '') {
-    throw new Error('[copy-webpack-plugin] path "from" cannot be empty string');
+    const message = 'path "from" cannot be empty string';
+
+    logger.error(message);
+
+    throw new Error(message);
   }
 
   pattern.to = pattern.to || '';
@@ -45,7 +47,7 @@ export default function preProcessPattern(globalRef, pattern) {
   pattern.context = normalizePath(pattern.context);
   pattern.ignore = globalRef.ignore.concat(pattern.ignore || []);
 
-  info(`processing from: '${pattern.from}' to: '${pattern.to}'`);
+  logger.debug(`processing from: '${pattern.from}' to: '${pattern.to}'`);
 
   switch (true) {
     // if toType already exists
@@ -61,10 +63,10 @@ export default function preProcessPattern(globalRef, pattern) {
       pattern.toType = 'file';
   }
 
-  debug(`determined '${pattern.to}' is a '${pattern.toType}'`);
-
   // If we know it's a glob, then bail early
   if (isObject(pattern.from) && pattern.from.glob) {
+    logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
+
     pattern.fromType = 'glob';
 
     const globOptions = Object.assign({}, pattern.from);
@@ -88,13 +90,15 @@ export default function preProcessPattern(globalRef, pattern) {
   // Normalize path when path separators are mixed (like `C:\\directory/nested-directory/`)
   pattern.absoluteFrom = normalizePath(pattern.absoluteFrom);
 
-  debug(
+  logger.debug(
     `determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`
   );
 
   const noStatsHandler = () => {
     // If from doesn't appear to be a glob, then log a warning
     if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
+      logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
+
       pattern.fromType = 'glob';
       pattern.glob = normalize(pattern.context, pattern.from);
 
@@ -103,9 +107,7 @@ export default function preProcessPattern(globalRef, pattern) {
       contextDependencies.add(pattern.context);
     } else {
       const newWarning = new Error(
-        `[copy-webpack-plugin] unable to locate '${pattern.from}' at '${
-          pattern.absoluteFrom
-        }'`
+        `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
       );
       const hasWarning = compilation.warnings.some(
         // eslint-disable-next-line no-shadow
@@ -114,7 +116,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
       // Only display the same message once
       if (!hasWarning) {
-        warning(newWarning.message);
+        logger.warn(newWarning.message);
 
         compilation.warnings.push(newWarning);
       }
@@ -122,6 +124,10 @@ export default function preProcessPattern(globalRef, pattern) {
       pattern.fromType = 'nonexistent';
     }
   };
+
+  logger.debug(
+    `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
+  );
 
   return stat(inputFileSystem, pattern.absoluteFrom)
     .catch(() => noStatsHandler())
@@ -133,6 +139,8 @@ export default function preProcessPattern(globalRef, pattern) {
       }
 
       if (stats.isDirectory()) {
+        logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);
+
         contextDependencies.add(pattern.absoluteFrom);
 
         pattern.fromType = 'dir';
@@ -145,6 +153,8 @@ export default function preProcessPattern(globalRef, pattern) {
           dot: true,
         };
       } else if (stats.isFile()) {
+        logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
+
         fileDependencies.add(pattern.absoluteFrom);
 
         pattern.fromType = 'file';
@@ -154,7 +164,7 @@ export default function preProcessPattern(globalRef, pattern) {
           dot: true,
         };
       } else if (!pattern.fromType) {
-        info(`Unrecognized file type for ${pattern.from}`);
+        logger.warn(`unrecognized file type for ${pattern.from}`);
       }
 
       return pattern;

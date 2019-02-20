@@ -40,15 +40,16 @@
     "webpack": "^4.0.0"
   },
   "dependencies": {
-    "globby": "^7.1.1",
     "cacache": "^11.3.1",
     "find-cache-dir": "^2.0.0",
-    "serialize-javascript": "^1.4.0",
+    "globby": "^7.1.1",
     "is-glob": "^4.0.0",
     "loader-utils": "^1.1.0",
     "minimatch": "^3.0.4",
+    "normalize-path": "^3.0.0",
     "p-limit": "^2.1.0",
-    "normalize-path": "^3.0.0"
+    "serialize-javascript": "^1.4.0",
+    "webpack-log": "^2.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.5",

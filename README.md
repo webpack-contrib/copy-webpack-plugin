@@ -373,18 +373,26 @@ module.exports = {
 
 |                Name                 |    Type     |          Default           | Description                                                                                                                                       |
 | :---------------------------------: | :---------: | :------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------ |
-|          [`debug`](#debug)          | `{String}`  |      **`'warning'`**       | [Debug Options](#debug)                                                                                                                           |
+|       [`logLevel`](#logLevel)       | `{String}`  |      **`'warning'`**       | Level of messages that the module will log                                                                                                        |
 |         [`ignore`](#ignore)         |  `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                                                                                      |
 |        [`context`](#context)        | `{String}`  | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns                                                                  |
 | [`copyUnmodified`](#copyUnmodified) | `{Boolean}` |          `false`           | Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option |
 
-#### `debug`
+#### `logLevel`
 
-|      Name       |        Type         | Default | Description                  |
-| :-------------: | :-----------------: | :-----: | :--------------------------- |
-|  **`'info'`**   | `{String\|Boolean}` | `false` | File location and read info  |
-|  **`'debug'`**  |     `{String}`      | `false` | Very detailed debugging info |
-| **`'warning'`** |     `{String}`      | `true`  | Only warnings                |
+This property defines the level of messages that the module will log. Valid levels include:
+
+- `trace`
+- `debug`
+- `info`
+- `warn`
+- `error`
+- `silent`
+
+Setting a log level means that all other levels below it will be visible in the
+console. Setting `logLevel: 'silent'` will hide all console output. The module
+leverages [`webpack-log`](https://github.com/webpack-contrib/webpack-log#readme)
+for logging management, and more information can be found on its page.
 
 ##### `'info'`
 

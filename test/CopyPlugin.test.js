@@ -797,7 +797,7 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${normalizePath(
+            `unable to locate 'nonexistent.txt' at '${normalizePath(
               HELPER_DIR
             )}/nonexistent.txt'`
           ),
@@ -818,7 +818,7 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `[copy-webpack-plugin] unable to locate 'nonexistent.txt' at '${normalizePath(
+            `unable to locate 'nonexistent.txt' at '${normalizePath(
               HELPER_DIR
             )}/nonexistent.txt'`
           ),
@@ -942,7 +942,7 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            '[copy-webpack-plugin] Using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths'
+            'using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths'
           ),
         ],
         patterns: [
@@ -1464,7 +1464,7 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `[copy-webpack-plugin] unable to locate 'nonexistent' at '${normalizePath(
+            `unable to locate 'nonexistent' at '${normalizePath(
               HELPER_DIR
             )}/nonexistent'`
           ),
