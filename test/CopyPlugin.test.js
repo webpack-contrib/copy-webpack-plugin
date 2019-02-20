@@ -871,6 +871,20 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('warns when pattern is empty', (done) => {
+      runEmit({
+        expectedAssetKeys: [],
+        expectedErrors: [new Error(`path "from" cannot be empty string`)],
+        patterns: [
+          {
+            from: '',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('can use an absolute path to move a file to the root directory', (done) => {
       const absolutePath = path.resolve(HELPER_DIR, 'file.txt');
 
