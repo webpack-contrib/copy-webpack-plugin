@@ -2,6 +2,47 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.0"></a>
+# [5.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.6.0...v5.0.0) (2019-02-20)
+
+
+### Bug Fixes
+
+* copy only modified files when you use patterns with difference to ([#341](https://github.com/webpack-contrib/copy-webpack-plugin/issues/341)) ([e808aa2](https://github.com/webpack-contrib/copy-webpack-plugin/commit/e808aa2))
+* handle `[contenthash]` as template ([#328](https://github.com/webpack-contrib/copy-webpack-plugin/issues/328)) ([61dfe52](https://github.com/webpack-contrib/copy-webpack-plugin/commit/61dfe52))
+* handles new files when you in watch mode ([#333](https://github.com/webpack-contrib/copy-webpack-plugin/issues/333)) ([49a28f0](https://github.com/webpack-contrib/copy-webpack-plugin/commit/49a28f0))
+* normalize path segment separation ([#339](https://github.com/webpack-contrib/copy-webpack-plugin/issues/339)) ([8f5e638](https://github.com/webpack-contrib/copy-webpack-plugin/commit/8f5e638))
+* throw error if "from" is an empty string [#278](https://github.com/webpack-contrib/copy-webpack-plugin/issues/278) ([#285](https://github.com/webpack-contrib/copy-webpack-plugin/issues/285)) ([adf1046](https://github.com/webpack-contrib/copy-webpack-plugin/commit/adf1046))
+
+
+### Chores
+
+* drop support for node < 6.9 ([#320](https://github.com/webpack-contrib/copy-webpack-plugin/issues/320)) ([050a5bb](https://github.com/webpack-contrib/copy-webpack-plugin/commit/050a5bb))
+
+
+### Code Refactoring
+
+* break compatibility with < webpack 4 ([#329](https://github.com/webpack-contrib/copy-webpack-plugin/issues/329)) ([ab9439a](https://github.com/webpack-contrib/copy-webpack-plugin/commit/ab9439a))
+* debug option ([#342](https://github.com/webpack-contrib/copy-webpack-plugin/issues/342)) ([1f511b8](https://github.com/webpack-contrib/copy-webpack-plugin/commit/1f511b8))
+* rewrite on class ([#327](https://github.com/webpack-contrib/copy-webpack-plugin/issues/327)) ([6ea72d7](https://github.com/webpack-contrib/copy-webpack-plugin/commit/6ea72d7))
+
+
+### Features
+
+* emit warning instead error if file doesn't exist ([#338](https://github.com/webpack-contrib/copy-webpack-plugin/issues/338)) ([a1c5372](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a1c5372))
+* supports copy nested directories/files in symlink ([#335](https://github.com/webpack-contrib/copy-webpack-plugin/issues/335)) ([f551c0d](https://github.com/webpack-contrib/copy-webpack-plugin/commit/f551c0d))
+
+
+### BREAKING CHANGES
+
+* `debug` option was renamed to `logLevel`, it only accepts string values: `trace`, `debug`, `info`, `warn`, `error` and `silent`
+* plugin emit warning instead error if file doesn't exist
+* minimum require webpack version is 4
+* change `prototype` of plugin, now you can to get correct plugin name
+* drop support for node < 6.9
+
+
+
 <a name="4.6.0"></a>
 # [4.6.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.5.4...v4.6.0) (2018-10-31)
 
