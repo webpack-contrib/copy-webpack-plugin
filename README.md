@@ -373,7 +373,7 @@ module.exports = {
 
 |                Name                 |    Type     |          Default           | Description                                                                                                                                       |
 | :---------------------------------: | :---------: | :------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------ |
-|       [`logLevel`](#logLevel)       | `{String}`  |      **`'warning'`**       | Level of messages that the module will log                                                                                                        |
+|       [`logLevel`](#logLevel)       | `{String}`  |      **`'warn'`**       | Level of messages that the module will log                                                                                                        |
 |         [`ignore`](#ignore)         |  `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                                                                                      |
 |        [`context`](#context)        | `{String}`  | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns                                                                  |
 | [`copyUnmodified`](#copyUnmodified) | `{Boolean}` |          `false`           | Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option |
