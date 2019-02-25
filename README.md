@@ -373,7 +373,7 @@ module.exports = {
 
 |                Name                 |    Type     |          Default           | Description                                                                                                                                       |
 | :---------------------------------: | :---------: | :------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------ |
-|       [`logLevel`](#logLevel)       | `{String}`  |      **`'warn'`**       | Level of messages that the module will log                                                                                                        |
+|       [`logLevel`](#logLevel)       | `{String}`  |        **`'warn'`**        | Level of messages that the module will log                                                                                                        |
 |         [`ignore`](#ignore)         |  `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                                                                                      |
 |        [`context`](#context)        | `{String}`  | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns                                                                  |
 | [`copyUnmodified`](#copyUnmodified) | `{Boolean}` |          `false`           | Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option |
@@ -385,7 +385,7 @@ This property defines the level of messages that the module will log. Valid leve
 - `trace`
 - `debug`
 - `info`
-- `warn`
+- `warn` (default)
 - `error`
 - `silent`
 
@@ -394,33 +394,11 @@ console. Setting `logLevel: 'silent'` will hide all console output. The module
 leverages [`webpack-log`](https://github.com/webpack-contrib/webpack-log#readme)
 for logging management, and more information can be found on its page.
 
-##### `'info'`
-
 **webpack.config.js**
 
 ```js
 module.exports = {
-  plugins: [new CopyPlugin([...patterns], { debug: 'info' })],
-};
-```
-
-##### `'debug'`
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [new CopyPlugin([...patterns], { debug: 'debug' })],
-};
-```
-
-##### `'warning' (default)`
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [new CopyPlugin([...patterns], { debug: true })],
+  plugins: [new CopyPlugin([...patterns], { logLevel: 'debug' })],
 };
 ```
 
