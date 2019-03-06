@@ -112,6 +112,10 @@ describe('apply function', () => {
           warnings: [],
           fileDependencies: new Set(),
           contextDependencies: new Set(),
+          outputOptions: {
+            hashDigest: 'hex',
+            hashFunction: 'md5',
+          },
         },
         opts.compilation
       );
@@ -481,7 +485,7 @@ describe('apply function', () => {
         patterns: [
           {
             from: '**/*',
-            to: 'nested/[path][name]-[hash:6].[ext]',
+            to: 'nested/[path][name]-[contenthash:6].[ext]',
             transformPath(targetPath, absoluteFrom) {
               expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
 
@@ -626,7 +630,7 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('can use a glob to move multiple files to a non-root directory with name, hash and ext', (done) => {
+    it('can use a glob to move multiple files to a non-root directory with name, contenthash and ext', (done) => {
       runEmit({
         expectedAssetKeys: [
           'nested/[!]/hello-d41d8c.txt',
@@ -647,7 +651,7 @@ describe('apply function', () => {
         patterns: [
           {
             from: '**/*',
-            to: 'nested/[path][name]-[hash:6].[ext]',
+            to: 'nested/[path][name]-[contenthash:6].[ext]',
           },
         ],
       })
@@ -1290,13 +1294,27 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('allows pattern to contain name, hash or ext', (done) => {
+    it('allows pattern to contain name, hash, contenthash or ext', (done) => {
       runEmit({
-        expectedAssetKeys: ['directory/directoryfile-22af64.txt'],
+        expectedAssetKeys: ['directory/d41d8c/directoryfile-22af64.txt'],
         patterns: [
           {
             from: 'directory/directoryfile.txt',
-            to: 'directory/[name]-[hash:6].[ext]',
+            to: 'directory/[hash:6]/[name]-[contenthash:6].[ext]',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('allows pattern to contain hash', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/d41d8c.txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+            to: 'directory/[hash:6].txt',
           },
         ],
       })
@@ -1729,7 +1747,7 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('can move multiple files to a non-root directory with name, hash and ext', (done) => {
+    it('can move multiple files to a non-root directory with name, contenthash and ext', (done) => {
       runEmit({
         expectedAssetKeys: [
           'nested/.dottedfile-79d39f',
@@ -1740,7 +1758,7 @@ describe('apply function', () => {
         patterns: [
           {
             from: 'directory',
-            to: 'nested/[path][name]-[hash:6].[ext]',
+            to: 'nested/[path][name]-[contenthash:6].[ext]',
           },
         ],
       })

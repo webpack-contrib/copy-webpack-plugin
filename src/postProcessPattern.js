@@ -2,6 +2,7 @@ import path from 'path';
 
 import crypto from 'crypto';
 
+import webpack from 'webpack';
 import loaderUtils from 'loader-utils';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
@@ -23,6 +24,9 @@ export default function postProcessPattern(globalRef, pattern, file) {
     inputFileSystem,
     copyUnmodified,
   } = globalRef;
+
+  const { outputOptions } = compilation;
+  const { util } = webpack;
 
   logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
 
@@ -113,6 +117,18 @@ export default function postProcessPattern(globalRef, pattern, file) {
           if (!path.extname(file.relativeFrom)) {
             file.webpackTo = file.webpackTo.replace(/\.?\[ext\]/g, '');
           }
+
+          // loaderUtils treats `hash` and `contenthash` as the same value.
+          // However, we want `hash` to be the built-hash from webpack as
+          // expected.
+          const hash = util.createHash(outputOptions.hashFunction);
+          file.webpackTo = file.webpackTo.replace(
+            /\[hash(?::(\d+))?\]/gi,
+            (all, maxLength) =>
+              hash
+                .digest(outputOptions.hashDigest)
+                .substr(0, parseInt(maxLength, 10) || 9999)
+          );
 
           // Developers can use invalid slashes in regex we should fix it
           file.webpackTo = normalizePath(
