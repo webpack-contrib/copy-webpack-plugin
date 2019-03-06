@@ -329,7 +329,9 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/deep-nested/test.json',
           'directory/nested/nestedfile.txt',
+          'directory/nested/other-deep-nested/other-test.json',
           'file.txt',
           'noextension',
         ],
@@ -386,7 +388,9 @@ describe('apply function', () => {
           'file.txt.gz',
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/deep-nested/test.json',
           'directory/nested/nestedfile.txt',
+          'directory/nested/other-deep-nested/other-test.json',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
           '[special?directory]/nested/nestedfile.txt',
@@ -414,7 +418,9 @@ describe('apply function', () => {
           'nested/file.txt.gz',
           'nested/directory/directoryfile.txt',
           'nested/directory/nested/deep-nested/deepnested.txt',
+          'nested/directory/nested/deep-nested/test.json',
           'nested/directory/nested/nestedfile.txt',
+          'nested/directory/nested/other-deep-nested/other-test.json',
           'nested/[special?directory]/directoryfile.txt',
           'nested/[special?directory]/(special-*file).txt',
           'nested/[special?directory]/nested/nestedfile.txt',
@@ -444,6 +450,8 @@ describe('apply function', () => {
           '/some/path/nestedfile.txt.tst',
           '/some/path/noextension.tst',
           '/some/path/hello.txt.tst',
+          '/some/path/other-test.json.tst',
+          '/some/path/test.json.tst',
         ],
         patterns: [
           {
@@ -475,7 +483,9 @@ describe('apply function', () => {
           'transformed/file.txt-5b311c.gz',
           'transformed/directory/directoryfile-22af64.txt',
           'transformed/directory/nested/deep-nested/deepnested-d41d8c.txt',
+          'transformed/directory/nested/deep-nested/test-d03f72.json',
           'transformed/directory/nested/nestedfile-d41d8c.txt',
+          'transformed/directory/nested/other-deep-nested/other-test-67bc1b.json',
           'transformed/noextension-d41d8c',
         ],
         patterns: [
@@ -499,7 +509,9 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'nested/directoryfile.txt',
           'nested/nested/deep-nested/deepnested.txt',
+          'nested/nested/deep-nested/test.json',
           'nested/nested/nestedfile.txt',
+          'nested/nested/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -555,6 +567,8 @@ describe('apply function', () => {
           'nested/deepnested.txt',
           'nested/directoryfile.txt',
           'nested/nestedfile.txt',
+          'nested/other-test.json',
+          'nested/test.json',
         ],
         patterns: [
           {
@@ -574,7 +588,9 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'nested/directoryfile.txt',
           'nested/nested/deep-nested/deepnested.txt',
+          'nested/nested/deep-nested/test.json',
           'nested/nested/nestedfile.txt',
+          'nested/nested/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -639,9 +655,11 @@ describe('apply function', () => {
           'nested/directory/directoryfile-22af64.txt',
           'nested/directory/nested/deep-nested/deepnested-d41d8c.txt',
           'nested/directory/nested/nestedfile-d41d8c.txt',
+          'nested/directory/nested/other-deep-nested/other-test-67bc1b.json',
           'nested/[special?directory]/(special-*file)-0bd650.txt',
           'nested/[special?directory]/directoryfile-22af64.txt',
           'nested/[special?directory]/nested/nestedfile-d41d8c.txt',
+          'nested/directory/nested/deep-nested/test-d03f72.json',
           'nested/noextension-d41d8c',
         ],
         patterns: [
@@ -669,6 +687,21 @@ describe('apply function', () => {
             from: '*/*.*',
             test: `([^\\${path.sep}]+)\\${path.sep}([^\\${path.sep}]+)\\.\\w+$`,
             to: '[1]-[2].[ext]',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can support regexp in', (done) => {
+      runEmit({
+        expectedAssetKeys: ['json/other-test-test.json', 'json/test-test.json'],
+        patterns: [
+          {
+            from: 'directory/nested/**/*.json',
+            test: /directory\/nested\/(?:deep-nested|other-deep-nested)\/([^/]+)\/*.json/,
+            to: 'json/[1]-test.json',
           },
         ],
       })
@@ -1268,15 +1301,17 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
           'binextension.bin',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
           'dir (86)/nesteddir/nestedfile.txt',
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/deep-nested/test.json',
           'directory/nested/nestedfile.txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/nested/nestedfile.txt',
+          'directory/nested/other-deep-nested/other-test.json',
           'noextension',
         ],
         patterns: [
@@ -1400,7 +1435,9 @@ describe('apply function', () => {
           '.dottedfile',
           'directoryfile.txt',
           'nested/deep-nested/deepnested.txt',
+          'nested/deep-nested/test.json',
           'nested/nestedfile.txt',
+          'nested/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -1419,6 +1456,8 @@ describe('apply function', () => {
           '/some/path/deepnested.txt',
           '/some/path/directoryfile.txt',
           '/some/path/nestedfile.txt',
+          '/some/path/other-test.json',
+          '/some/path/test.json',
         ],
         patterns: [
           {
@@ -1501,7 +1540,9 @@ describe('apply function', () => {
           '.dottedfile',
           'directoryfile.txt',
           'nested/deep-nested/deepnested.txt',
+          'nested/deep-nested/test.json',
           'nested/nestedfile.txt',
+          'nested/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -1519,7 +1560,9 @@ describe('apply function', () => {
           'newdirectory/.dottedfile',
           'newdirectory/directoryfile.txt',
           'newdirectory/nested/deep-nested/deepnested.txt',
+          'newdirectory/nested/deep-nested/test.json',
           'newdirectory/nested/nestedfile.txt',
+          'newdirectory/nested/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -1536,7 +1579,9 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/deep-nested/test.json',
           'newdirectory/nestedfile.txt',
+          'newdirectory/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -1557,6 +1602,8 @@ describe('apply function', () => {
           'newdirectory/deepnested.txt',
           'newdirectory/directoryfile.txt',
           'newdirectory/nestedfile.txt',
+          'newdirectory/other-test.json',
+          'newdirectory/test.json',
         ],
         patterns: [
           {
@@ -1576,7 +1623,9 @@ describe('apply function', () => {
           '../tempdir/.dottedfile',
           '../tempdir/directoryfile.txt',
           '../tempdir/nested/deep-nested/deepnested.txt',
+          '../tempdir/nested/deep-nested/test.json',
           '../tempdir/nested/nestedfile.txt',
+          '../tempdir/nested/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -1591,7 +1640,12 @@ describe('apply function', () => {
 
     it("can move a nested directory's contents to the root directory", (done) => {
       runEmit({
-        expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
+        expectedAssetKeys: [
+          'deep-nested/deepnested.txt',
+          'deep-nested/test.json',
+          'nestedfile.txt',
+          'other-deep-nested/other-test.json',
+        ],
         patterns: [
           {
             from: 'directory/nested',
@@ -1606,7 +1660,9 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/deep-nested/test.json',
           'newdirectory/nestedfile.txt',
+          'newdirectory/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -1625,7 +1681,9 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/deep-nested/test.json',
           'newdirectory/nestedfile.txt',
+          'newdirectory/other-deep-nested/other-test.json',
         ],
         patterns: [
           {
@@ -1710,7 +1768,9 @@ describe('apply function', () => {
           '.dottedfile',
           'directoryfile.txt',
           'nested/deep-nested/deepnested.txt',
+          'nested/deep-nested/test.json',
           'nested/nestedfile.txt',
+          'nested/other-deep-nested/other-test.json',
           'tempfile1.txt',
           'tempfile2.txt',
         ],
@@ -1735,7 +1795,9 @@ describe('apply function', () => {
           'nested/.dottedfile-79d39f',
           'nested/directoryfile-22af64.txt',
           'nested/nested/deep-nested/deepnested-d41d8c.txt',
+          'nested/nested/deep-nested/test-d03f72.json',
           'nested/nested/nestedfile-d41d8c.txt',
+          'nested/nested/other-deep-nested/other-test-67bc1b.json',
         ],
         patterns: [
           {
@@ -1863,7 +1925,7 @@ describe('apply function', () => {
 
     it('can normalize backslash path with directory in from', (done) => {
       runEmit({
-        expectedAssetKeys: ['deepnested.txt'],
+        expectedAssetKeys: ['deepnested.txt', 'test.json'],
         patterns: [
           {
             from: 'directory\\nested\\deep-nested',
@@ -1876,7 +1938,7 @@ describe('apply function', () => {
 
     it('can normalize backslash path with directory in from (mixed path segment separation)', (done) => {
       runEmit({
-        expectedAssetKeys: ['deepnested.txt'],
+        expectedAssetKeys: ['deepnested.txt', 'test.json'],
         patterns: [
           {
             from: 'directory\\nested\\deep-nested',
@@ -1933,7 +1995,9 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/deep-nested/test.json',
           'newdirectory/nestedfile.txt',
+          'newdirectory/other-deep-nested/other-test.json',
         ],
         options: {
           context: path.resolve(HELPER_DIR, 'directory\\'),
@@ -1951,7 +2015,10 @@ describe('apply function', () => {
 
     it('can normalize backslash in context (2)', (done) => {
       runEmit({
-        expectedAssetKeys: ['newdirectory/deepnested.txt'],
+        expectedAssetKeys: [
+          'newdirectory/deepnested.txt',
+          'newdirectory/test.json',
+        ],
         options: {
           context: path.resolve(HELPER_DIR, 'directory\\nested'),
         },
@@ -2104,6 +2171,8 @@ describe('apply function', () => {
             '.dottedfile',
             'directoryfile.txt',
             'nested/deep-nested/deepnested.txt',
+            'nested/deep-nested/test.json',
+            'nested/other-deep-nested/other-test.json',
           ],
           options: {
             ignore: ['*/nestedfile.*'],
@@ -2122,7 +2191,7 @@ describe('apply function', () => {
         runEmit({
           expectedAssetKeys: ['.dottedfile'],
           options: {
-            ignore: ['*.txt'],
+            ignore: ['*.txt', '*.json'],
           },
           patterns: [
             {
@@ -2146,7 +2215,9 @@ describe('apply function', () => {
             'file.txt.gz',
             'directory/directoryfile.txt',
             'directory/nested/deep-nested/deepnested.txt',
+            'directory/nested/deep-nested/test.json',
             'directory/nested/nestedfile.txt',
+            'directory/nested/other-deep-nested/other-test.json',
             '[special?directory]/directoryfile.txt',
             '[special?directory]/(special-*file).txt',
             '[special?directory]/nested/nestedfile.txt',
@@ -2283,7 +2354,9 @@ describe('apply function', () => {
         runEmit({
           expectedAssetKeys: [
             'newdirectory/deep-nested/deepnested.txt',
+            'newdirectory/deep-nested/test.json',
             'newdirectory/nestedfile.txt',
+            'newdirectory/other-deep-nested/other-test.json',
           ],
           options: {
             context: path.resolve(HELPER_DIR, 'directory'),
@@ -2303,7 +2376,9 @@ describe('apply function', () => {
         runEmit({
           expectedAssetKeys: [
             'newdirectory/deep-nested/deepnested.txt',
+            'newdirectory/deep-nested/test.json',
             'newdirectory/nestedfile.txt',
+            'newdirectory/other-deep-nested/other-test.json',
           ],
           options: {
             context: 'directory',
@@ -2323,7 +2398,9 @@ describe('apply function', () => {
         runEmit({
           expectedAssetKeys: [
             'newdirectory/deep-nested/deepnested.txt',
+            'newdirectory/deep-nested/test.json',
             'newdirectory/nestedfile.txt',
+            'newdirectory/other-deep-nested/other-test.json',
           ],
           options: {
             context: 'directory',
@@ -2416,7 +2493,9 @@ describe('apply function', () => {
             '.dottedfile',
             'directoryfile.txt',
             'nested/deep-nested/deepnested.txt',
+            'nested/deep-nested/test.json',
             'nested/nestedfile.txt',
+            'nested/other-deep-nested/other-test.json',
           ],
           expectedAssetContent: {
             '.dottedfile': 'dottedfile contents\nchanged!',
@@ -2439,7 +2518,7 @@ describe('apply function', () => {
             cacache.ls(cacheDir).then((cacheEntries) => {
               const cacheKeys = Object.keys(cacheEntries);
 
-              expect(cacheKeys).toHaveLength(3);
+              expect(cacheKeys).toHaveLength(5);
 
               cacheKeys.forEach((cacheKey) => {
                 // eslint-disable-next-line no-new-func
