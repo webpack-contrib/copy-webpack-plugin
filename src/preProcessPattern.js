@@ -1,6 +1,7 @@
 import path from 'path';
 
 import isGlob from 'is-glob';
+import globParent from 'glob-parent';
 import normalizePath from 'normalize-path';
 
 import normalize from './utils/normalize';
@@ -104,7 +105,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
       // We need to add context directory as dependencies to avoid problems when new files added in directories
       // when we already in watch mode and this directories are not in context dependencies
-      contextDependencies.add(pattern.context);
+      contextDependencies.add(globParent(pattern.absoluteFrom));
     } else {
       const newWarning = new Error(
         `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`

@@ -689,7 +689,7 @@ describe('apply function', () => {
             Array.from(compilation.contextDependencies)
               .map((contextDependency) => normalizePath(contextDependency))
               .sort()
-          ).toEqual([normalizePath(HELPER_DIR)].sort());
+          ).toEqual([normalizePath(path.join(HELPER_DIR, 'directory'))].sort());
         })
         .then(done)
         .catch(done);
