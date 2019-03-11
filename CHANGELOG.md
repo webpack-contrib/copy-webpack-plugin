@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.1"></a>
+## [5.0.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.6.0...v5.0.1) (2019-03-11)
+
+
+### Bug Fixes
+
+* respect base of `glob` for context dependencies ([#352](https://github.com/webpack-contrib/copy-webpack-plugin/issues/352)) ([5b407f1](https://github.com/webpack-contrib/copy-webpack-plugin/commit/5b407f1))
+
+
 <a name="5.0.0"></a>
 # [5.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.6.0...v5.0.0) (2019-02-20)
 
