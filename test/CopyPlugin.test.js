@@ -449,7 +449,9 @@ describe('apply function', () => {
           {
             from: '**/*',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+              expect(absoluteFrom.includes(normalizePath(HELPER_DIR))).toBe(
+                true
+              );
 
               return `/some/path/${path.basename(targetPath)}.tst`;
             },
@@ -483,7 +485,9 @@ describe('apply function', () => {
             from: '**/*',
             to: 'nested/[path][name]-[hash:6].[ext]',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+              expect(absoluteFrom.includes(normalizePath(HELPER_DIR))).toBe(
+                true
+              );
 
               return targetPath.replace('nested/', 'transformed/');
             },
@@ -655,7 +659,7 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('can flatten or normalize glob matches', (done) => {
+    it.only('can flatten or normalize glob matches', (done) => {
       runEmit({
         expectedAssetKeys: [
           '[!]-hello.txt',
@@ -667,7 +671,7 @@ describe('apply function', () => {
         patterns: [
           {
             from: '*/*.*',
-            test: `([^\\${path.sep}]+)\\${path.sep}([^\\${path.sep}]+)\\.\\w+$`,
+            test: `([^\\/]+)\\/([^\\/]+)\\.\\w+$`,
             to: '[1]-[2].[ext]',
           },
         ],
@@ -763,7 +767,9 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             transform(content, absoluteFrom) {
-              expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
+              expect(absoluteFrom).toBe(
+                normalizePath(path.join(HELPER_DIR, 'file.txt'))
+              );
 
               return `${content}changed`;
             },
@@ -781,7 +787,9 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
+              expect(absoluteFrom).toBe(
+                normalizePath(path.join(HELPER_DIR, 'file.txt'))
+              );
 
               return targetPath.replace('file.txt', 'subdir/test.txt');
             },
@@ -1346,7 +1354,9 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+              expect(absoluteFrom.includes(normalizePath(HELPER_DIR))).toBe(
+                true
+              );
 
               return new Promise((resolve) => {
                 resolve(`/some/path/${path.basename(targetPath)}`);
@@ -1425,7 +1435,9 @@ describe('apply function', () => {
             from: 'directory',
             transformPath(targetPath, absoluteFrom) {
               expect(
-                absoluteFrom.includes(path.join(HELPER_DIR, 'directory'))
+                absoluteFrom.includes(
+                  normalizePath(path.join(HELPER_DIR, 'directory'))
+                )
               ).toBe(true);
 
               return `/some/path/${path.basename(targetPath)}`;

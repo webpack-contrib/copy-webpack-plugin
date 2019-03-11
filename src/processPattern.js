@@ -43,6 +43,7 @@ export default function processPattern(globalRef, pattern) {
           }
 
           // Ensure forward slashes
+          file.absoluteFrom = normalizePath(file.absoluteFrom);
           file.relativeFrom = normalizePath(file.relativeFrom);
 
           logger.debug(`found ${from}`);
