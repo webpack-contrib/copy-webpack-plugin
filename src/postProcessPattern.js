@@ -6,7 +6,6 @@ import loaderUtils from 'loader-utils';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
-import normalizePath from 'normalize-path';
 
 import { name, version } from '../package.json';
 
@@ -115,16 +114,14 @@ export default function postProcessPattern(globalRef, pattern, file) {
           }
 
           // Developers can use invalid slashes in regex we should fix it
-          file.webpackTo = normalizePath(
-            loaderUtils.interpolateName(
-              { resourcePath: file.absoluteFrom },
-              file.webpackTo,
-              {
-                content,
-                regExp: file.webpackToRegExp,
-                context: pattern.context,
-              }
-            )
+          file.webpackTo = loaderUtils.interpolateName(
+            { resourcePath: file.absoluteFrom },
+            file.webpackTo,
+            {
+              content,
+              regExp: file.webpackToRegExp,
+              context: pattern.context,
+            }
           );
         }
 
@@ -141,7 +138,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
           )
             .then((newPath) => {
               // Developers can use invalid slashes we should fix it
-              file.webpackTo = normalizePath(newPath);
+              file.webpackTo = newPath;
             })
             .then(() => content);
         }

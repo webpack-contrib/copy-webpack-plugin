@@ -2,7 +2,6 @@ import path from 'path';
 
 import isGlob from 'is-glob';
 import globParent from 'glob-parent';
-import normalizePath from 'normalize-path';
 
 import normalize from './utils/normalize';
 import isObject from './utils/isObject';
@@ -45,7 +44,6 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.context = path.join(context, pattern.context);
   }
 
-  pattern.context = normalizePath(pattern.context);
   pattern.ignore = globalRef.ignore.concat(pattern.ignore || []);
 
   logger.debug(`processing from: '${pattern.from}' to: '${pattern.to}'`);
@@ -75,9 +73,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
     pattern.glob = normalize(pattern.context, pattern.from.glob);
     pattern.globOptions = globOptions;
-    pattern.absoluteFrom = normalizePath(
-      path.resolve(pattern.context, pattern.from.glob)
-    );
+    pattern.absoluteFrom = path.resolve(pattern.context, pattern.from.glob);
 
     return Promise.resolve(pattern);
   }
@@ -87,9 +83,6 @@ export default function preProcessPattern(globalRef, pattern) {
   } else {
     pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
   }
-
-  // Normalize path when path separators are mixed (like `C:\\directory/nested-directory/`)
-  pattern.absoluteFrom = normalizePath(pattern.absoluteFrom);
 
   logger.debug(
     `determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`
@@ -147,9 +140,7 @@ export default function preProcessPattern(globalRef, pattern) {
         pattern.fromType = 'dir';
         pattern.context = pattern.absoluteFrom;
         pattern.glob = normalize(pattern.absoluteFrom, '**/*');
-        pattern.absoluteFrom = normalizePath(
-          path.join(pattern.absoluteFrom, '**/*')
-        );
+        pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
         pattern.globOptions = {
           dot: true,
         };
@@ -159,7 +150,7 @@ export default function preProcessPattern(globalRef, pattern) {
         fileDependencies.add(pattern.absoluteFrom);
 
         pattern.fromType = 'file';
-        pattern.context = normalizePath(path.dirname(pattern.absoluteFrom));
+        pattern.context = path.dirname(pattern.absoluteFrom);
         pattern.glob = normalize(pattern.absoluteFrom);
         pattern.globOptions = {
           dot: true,
