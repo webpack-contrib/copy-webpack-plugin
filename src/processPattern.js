@@ -91,12 +91,14 @@ export default function processPattern(globalRef, pattern) {
           }
 
           // Run ignore functions
-          for (let i = 0; i < pattern._ignoreFunctions.length; i++) {
-            debug(`running ignore function against ${file.relativeFrom}`);
+          for (let i = 0; i < pattern.allIgnoreFunctions.length; i++) {
+            logger.debug(
+              `running ignore function against ${file.relativeFrom}`
+            );
             if (
-              pattern._ignoreFunctions[i]({
+              pattern.allIgnoreFunctions[i]({
                 absolutePath: file.absoluteFrom,
-                relativePath: file.relativeFrom
+                relativePath: file.relativeFrom,
               })
             ) {
               return Promise.resolve();

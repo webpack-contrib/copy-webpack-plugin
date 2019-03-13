@@ -49,9 +49,11 @@ export default function preProcessPattern(globalRef, pattern) {
   pattern.ignore = globalRef.ignore.concat(pattern.ignore || []);
 
   // One global and one pattern-specific ignore function is allowed
-  pattern._ignoreFunctions = [];
-  if (globalRef.ignoreFiles && typeof globalRef.ignoreFiles === 'function') pattern._ignoreFunctions.push(globalRef.ignoreFiles);
-  if (pattern.ignoreFiles && typeof pattern.ignoreFiles === 'function') pattern._ignoreFunctions.push(pattern.ignoreFiles);
+  pattern.allIgnoreFunctions = [];
+  if (globalRef.ignoreFiles && typeof globalRef.ignoreFiles === 'function')
+    pattern.allIgnoreFunctions.push(globalRef.ignoreFiles);
+  if (pattern.ignoreFiles && typeof pattern.ignoreFiles === 'function')
+    pattern.allIgnoreFunctions.push(pattern.ignoreFiles);
 
   logger.debug(`processing from: '${pattern.from}' to: '${pattern.to}'`);
 
