@@ -51,7 +51,7 @@ class CopyPlugin {
         inputFileSystem: compiler.inputFileSystem,
         output: compiler.options.output.path,
         ignore: this.options.ignore || [],
-        ignoreFiles: options.ignoreFiles || null,
+        ignoreFiles: this.options.ignoreFiles || null,
         copyUnmodified: this.options.copyUnmodified,
         concurrency: this.options.concurrency,
       };
