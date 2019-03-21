@@ -58,21 +58,33 @@ module.exports = {
 
 ### Patterns
 
-|               Name                |         Type          |                     Default                     | Description                                                                                                                                                                      |
-| :-------------------------------: | :-------------------: | :---------------------------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-|          [`from`](#from)          |  `{String\|Object}`   |                   `undefined`                   | Globs accept [minimatch options](https://github.com/isaacs/minimatch). See the [`node-glob` options](https://github.com/isaacs/node-glob#options) in addition to the ones below. |
-|            [`to`](#to)            |  `{String\|Object}`   |                   `undefined`                   | Output root if `from` is file or dir, resolved glob path if `from` is glob.                                                                                                      |
-|        [`toType`](#toType)        |      `{String}`       |                   `undefined`                   | `[toType Options](#totype)`.                                                                                                                                                     |
-|          [`test`](#test)          |      `{RegExp}`       |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                                                                                                    |
-|         [`force`](#force)         |      `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).                                                                                       |
-|        [`ignore`](#ignore)        |       `{Array}`       |                      `[]`                       | Globs to ignore for this pattern.                                                                                                                                                |
-|       [`flatten`](#flatten)       |      `{Boolean}`      |                     `false`                     | Removes all directory references and only copies file names.⚠️ If files have the same name, the result is non-deterministic.                                                     |
-|     [`transform`](#transform)     | `{Function\|Promise}` |          `(content, path) => content`           | Function or Promise that modifies file contents before copying.                                                                                                                  |
-| [`transformPath`](#transformPath) | `{Function\|Promise}` |       `(targetPath, sourcePath) => path`        | Function or Promise that modifies file writing path.                                                                                                                             |
-|         [`cache`](#cache)         |  `{Boolean\|Object}`  |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache.                                                                            |
-|       [`context`](#context)       |      `{String}`       | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                                                                                                         |
+|               Name                |         Type          |                     Default                     | Description                                                                                           |
+| :-------------------------------: | :-------------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
+|          [`from`](#from)          |  `{String\|Object}`   |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
+|            [`to`](#to)            |      `{String}`       |                   `undefined`                   | Output path.                                                                                          |
+|       [`context`](#context)       |      `{String}`       | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
+|        [`toType`](#toType)        |      `{String}`       |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
+|          [`test`](#test)          |      `{RegExp}`       |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
+|         [`force`](#force)         |      `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
+|        [`ignore`](#ignore)        |       `{Array}`       |                      `[]`                       | Globs to ignore files.                                                                                |
+|       [`flatten`](#flatten)       |      `{Boolean}`      |                     `false`                     | Removes all directory references and only copies file names.                                          |
+|     [`transform`](#transform)     | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the file contents.                                                                   |
+|         [`cache`](#cache)         |  `{Boolean\|Object}`  |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+| [`transformPath`](#transformPath) | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the writing path.                                                                    |
 
 #### `from`
+
+Type: `String\|Object`
+Default: `undefined`
+
+Glob or path from where we сopy files.
+Globs accept [minimatch options](https://github.com/isaacs/minimatch).
+
+You can defined `from` as `Object` and use the [`node-glob` options](https://github.com/isaacs/node-glob#options).
+
+> ⚠️ Don't use directly `\\` in `from` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> On Windows, the forward slash and the backward slash are both separators.
+> Instead please use `/` or `path` methods.
 
 **webpack.config.js**
 
@@ -93,6 +105,15 @@ module.exports = {
 
 #### `to`
 
+Type: `String`
+Default: `undefined`
+
+Output path.
+
+> ⚠️ Don't use directly `\\` in `to` (i.e `path\to\dest`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> On Windows, the forward slash and the backward slash are both separators.
+> Instead please use `/` or `path` methods.
+
 **webpack.config.js**
 
 ```js
@@ -106,7 +127,42 @@ module.exports = {
 };
 ```
 
+#### `context`
+
+Type: `String`
+Default: `options.context|compiler.options.context`
+
+A path that determines how to interpret the `from` path.
+
+> ⚠️ Don't use directly `\\` in `context` (i.e `path\to\context`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> On Windows, the forward slash and the backward slash are both separators.
+> Instead please use `/` or `path` methods.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin([
+      {
+        from: 'src/*.txt',
+        to: 'dest/',
+        context: 'app/',
+      },
+    ]),
+  ],
+};
+```
+
 #### `toType`
+
+Type: `String`
+Default: `undefined`
+
+Determinate what is `to` option - directory, file or template.
+Sometimes it is hard to say what is `to`, example `path/to/dir-with.ext`.
+If you want to copy files in directory you need use `dir` option.
+We try to automatically determine the `type` so you most likely do not need this option.
 
 |       Name       |    Type    |   Default   | Description                                                                                        |
 | :--------------: | :--------: | :---------: | :------------------------------------------------------------------------------------------------- |
@@ -170,6 +226,11 @@ module.exports = {
 
 #### `test`
 
+Type: `RegExp`
+Default: `undefined`
+
+Pattern for extracting elements to be used in `to` templates.
+
 Defines a `{RegExp}` to match some parts of the file path.
 These capture groups can be reused in the name property using `[N]` placeholder.
 Note that `[0]` will be replaced by the entire path of the file,
@@ -194,6 +255,11 @@ module.exports = {
 
 #### `force`
 
+Type: `Boolean`
+Default: `false`
+
+Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).
+
 **webpack.config.js**
 
 ```js
@@ -211,6 +277,11 @@ module.exports = {
 ```
 
 #### `ignore`
+
+Type: `Array`
+Default: `[]`
+
+Globs to ignore files.
 
 **webpack.config.js**
 
@@ -230,6 +301,13 @@ module.exports = {
 
 #### `flatten`
 
+Type: `Boolean`
+Default: `false`
+
+Removes all directory references and only copies file names.
+
+> ⚠️ If files have the same name, the result is non-deterministic.
+
 **webpack.config.js**
 
 ```js
@@ -247,6 +325,11 @@ module.exports = {
 ```
 
 #### `transform`
+
+Type: `Function|Promise`
+Default: `undefined`
+
+Allows to modify the file contents.
 
 ##### `{Function}`
 
@@ -288,7 +371,43 @@ module.exports = {
 };
 ```
 
+#### `cache`
+
+Type: `Boolean|Object`
+Default: `false`
+
+Enable/disable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache.
+Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin([
+      {
+        from: 'src/*.png',
+        to: 'dest/',
+        transform(content, path) {
+          return optimize(content);
+        },
+        cache: true,
+      },
+    ]),
+  ],
+};
+```
+
 #### `transformPath`
+
+Type: `Function|Promise`
+Default: `undefined`
+
+Allows to modify the writing path.
+
+> ⚠️ Don't return directly `\\` in `transformPath` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> On Windows, the forward slash and the backward slash are both separators.
+> Instead please use `/` or `path` methods.
 
 ##### `{Function}`
 
@@ -330,45 +449,6 @@ module.exports = {
 };
 ```
 
-#### `cache`
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.png',
-        to: 'dest/',
-        transform(content, path) {
-          return optimize(content);
-        },
-        cache: true,
-      },
-    ]),
-  ],
-};
-```
-
-#### `context`
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.txt',
-        to: 'dest/',
-        context: 'app/',
-      },
-    ]),
-  ],
-};
-```
-
 ### Options
 
 |                Name                 |    Type     |          Default           | Description                                                                                                                                       |
@@ -404,6 +484,8 @@ module.exports = {
 
 #### `ignore`
 
+Array of globs to ignore (applied to `from`).
+
 **webpack.config.js**
 
 ```js
@@ -414,6 +496,8 @@ module.exports = {
 
 #### `context`
 
+A path that determines how to interpret the `from` path, shared for all patterns.
+
 **webpack.config.js**
 
 ```js
@@ -423,6 +507,8 @@ module.exports = {
 ```
 
 #### `copyUnmodified`
+
+Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option.
 
 > ℹ️ By default, we only copy **modified** files during a `webpack --watch` or `webpack-dev-server` build. Setting this option to `true` will copy all files.
 

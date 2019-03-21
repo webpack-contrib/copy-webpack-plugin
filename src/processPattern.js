@@ -3,7 +3,6 @@ import path from 'path';
 import globby from 'globby';
 import pLimit from 'p-limit';
 import minimatch from 'minimatch';
-import normalizePath from 'normalize-path';
 
 import isObject from './utils/isObject';
 
@@ -41,9 +40,6 @@ export default function processPattern(globalRef, pattern) {
           if (pattern.flatten) {
             file.relativeFrom = path.basename(file.relativeFrom);
           }
-
-          // Ensure forward slashes
-          file.relativeFrom = normalizePath(file.relativeFrom);
 
           logger.debug(`found ${from}`);
 
@@ -112,9 +108,6 @@ export default function processPattern(globalRef, pattern) {
 
             file.webpackTo = path.relative(output, file.webpackTo);
           }
-
-          // Ensure forward slashes
-          file.webpackTo = normalizePath(file.webpackTo);
 
           logger.info(
             `determined that '${from}' should write to '${file.webpackTo}'`

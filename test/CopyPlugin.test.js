@@ -10,7 +10,6 @@ import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 import isGzip from 'is-gzip';
 import mkdirp from 'mkdirp';
-import normalizePath from 'normalize-path';
 
 import CopyPlugin from '../src/index';
 
@@ -160,7 +159,10 @@ describe('apply function', () => {
     run(opts).then((compilation) => {
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
         expect(Object.keys(compilation.assets).sort()).toEqual(
-          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
+          opts.expectedAssetKeys
+            .sort()
+            .map(removeIllegalCharacterForWindows)
+            .map((item) => item.replace(/\//g, path.sep))
         );
       } else {
         expect(compilation.assets).toEqual({});
@@ -169,16 +171,18 @@ describe('apply function', () => {
       if (opts.expectedAssetContent) {
         // eslint-disable-next-line guard-for-in
         for (const key in opts.expectedAssetContent) {
-          expect(compilation.assets[key]).toBeDefined();
+          const assetName = key.replace(/(\/|\\)/g, path.sep);
 
-          if (compilation.assets[key]) {
+          expect(compilation.assets[assetName]).toBeDefined();
+
+          if (compilation.assets[assetName]) {
             let expectedContent = opts.expectedAssetContent[key];
 
             if (!Buffer.isBuffer(expectedContent)) {
               expectedContent = Buffer.from(expectedContent);
             }
 
-            let compiledContent = compilation.assets[key].source();
+            let compiledContent = compilation.assets[assetName].source();
 
             if (!Buffer.isBuffer(compiledContent)) {
               compiledContent = Buffer.from(compiledContent);
@@ -237,13 +241,17 @@ describe('apply function', () => {
       .then(() => {
         if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
           expect(Object.keys(compilation.assets).sort()).toEqual(
-            opts.expectedAssetKeys.sort()
+            opts.expectedAssetKeys
+              .sort()
+              .map(removeIllegalCharacterForWindows)
+              .map((item) => item.replace(/\//g, path.sep))
           );
         } else {
           expect(compilation.assets).toEqual({});
         }
       })
       .then(() => {
+        // Todo finally and check file exists
         fs.unlinkSync(opts.newFileLoc1);
         fs.unlinkSync(opts.newFileLoc2);
       });
@@ -485,7 +493,10 @@ describe('apply function', () => {
             transformPath(targetPath, absoluteFrom) {
               expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
 
-              return targetPath.replace('nested/', 'transformed/');
+              return targetPath.replace(
+                `nested${path.sep}`,
+                `transformed${path.sep}`
+              );
             },
           },
         ],
@@ -687,9 +698,9 @@ describe('apply function', () => {
         .then((compilation) => {
           expect(
             Array.from(compilation.contextDependencies)
-              .map((contextDependency) => normalizePath(contextDependency))
+              .map((contextDependency) => contextDependency)
               .sort()
-          ).toEqual([normalizePath(path.join(HELPER_DIR, 'directory'))].sort());
+          ).toEqual([path.join(HELPER_DIR, 'directory')].sort());
         })
         .then(done)
         .catch(done);
@@ -797,9 +808,9 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent.txt' at '${normalizePath(
-              HELPER_DIR
-            )}/nonexistent.txt'`
+            `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -818,9 +829,9 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent.txt' at '${normalizePath(
-              HELPER_DIR
-            )}/nonexistent.txt'`
+            `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -1057,13 +1068,13 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('can move a file to a new directory with an extension and forward slash', (done) => {
+    it('can move a file to a new directory with an extension and path separator at end', (done) => {
       runEmit({
         expectedAssetKeys: ['newdirectory.ext/file.txt'],
         patterns: [
           {
             from: 'file.txt',
-            to: 'newdirectory.ext/',
+            to: `newdirectory.ext${path.sep}`,
           },
         ],
       })
@@ -1236,7 +1247,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = normalizePath(path.join(HELPER_DIR, 'file.txt'));
+          const absFrom = path.join(HELPER_DIR, 'file.txt');
 
           expect(Array.from(compilation.fileDependencies).sort()).toEqual(
             [absFrom].sort()
@@ -1478,9 +1489,9 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent' at '${normalizePath(
-              HELPER_DIR
-            )}/nonexistent'`
+            `unable to locate 'nonexistent' at '${HELPER_DIR}${
+              path.sep
+            }nonexistent'`
           ),
         ],
         patterns: [
@@ -1680,7 +1691,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = normalizePath(path.resolve(HELPER_DIR, 'directory'));
+          const absFrom = path.resolve(HELPER_DIR, 'directory');
           expect(Array.from(compilation.contextDependencies).sort()).toEqual(
             [absFrom].sort()
           );
@@ -1822,71 +1833,6 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('can normalize mixed path segment separation with glob in from (simple)', (done) => {
-      runEmit({
-        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
-        patterns: [
-          {
-            from: 'directory/nested\\*',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can normalize backslash path with file in from', (done) => {
-      runEmit({
-        expectedAssetKeys: ['nestedfile.txt'],
-        patterns: [
-          {
-            from: 'directory\\nested\\nestedfile.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can normalize backslash path with file in from (mixed path segment separation)', (done) => {
-      runEmit({
-        expectedAssetKeys: ['nestedfile.txt'],
-        patterns: [
-          {
-            from: 'directory\\nested/nestedfile.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can normalize backslash path with directory in from', (done) => {
-      runEmit({
-        expectedAssetKeys: ['deepnested.txt'],
-        patterns: [
-          {
-            from: 'directory\\nested\\deep-nested',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can normalize backslash path with directory in from (mixed path segment separation)', (done) => {
-      runEmit({
-        expectedAssetKeys: ['deepnested.txt'],
-        patterns: [
-          {
-            from: 'directory\\nested\\deep-nested',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
     it('can exclude path', (done) => {
       runEmit({
         expectedAssetKeys: [
@@ -1922,43 +1868,6 @@ describe('apply function', () => {
         patterns: [
           {
             from: '!(directory)\\**\\*.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can normalize backslash in context', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          'newdirectory/deep-nested/deepnested.txt',
-          'newdirectory/nestedfile.txt',
-        ],
-        options: {
-          context: path.resolve(HELPER_DIR, 'directory\\'),
-        },
-        patterns: [
-          {
-            from: 'nested',
-            to: 'newdirectory',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can normalize backslash in context (2)', (done) => {
-      runEmit({
-        expectedAssetKeys: ['newdirectory/deepnested.txt'],
-        options: {
-          context: path.resolve(HELPER_DIR, 'directory\\nested'),
-        },
-        patterns: [
-          {
-            from: 'deep-nested',
-            to: 'newdirectory',
           },
         ],
       })
