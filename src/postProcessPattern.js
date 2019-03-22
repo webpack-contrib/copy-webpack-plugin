@@ -1,5 +1,5 @@
 import path from 'path';
-
+import os from 'os';
 import crypto from 'crypto';
 
 import loaderUtils from 'loader-utils';
@@ -53,9 +53,10 @@ export default function postProcessPattern(globalRef, pattern, file) {
 
           if (pattern.cache) {
             if (!globalRef.cacheDir) {
-              globalRef.cacheDir = findCacheDir({
-                name: 'copy-webpack-plugin',
-              });
+              globalRef.cacheDir =
+                findCacheDir({
+                  name: 'copy-webpack-plugin',
+                }) || os.tmpdir();
             }
 
             const cacheKey = pattern.cache.key
