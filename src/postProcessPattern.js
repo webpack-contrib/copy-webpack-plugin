@@ -6,7 +6,6 @@ import loaderUtils from 'loader-utils';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
-import normalizePath from 'normalize-path';
 
 import { name, version } from '../package.json';
 
@@ -114,18 +113,18 @@ export default function postProcessPattern(globalRef, pattern, file) {
             file.webpackTo = file.webpackTo.replace(/\.?\[ext\]/g, '');
           }
 
-          // Developers can use invalid slashes in regex we should fix it
-          file.webpackTo = normalizePath(
-            loaderUtils.interpolateName(
-              { resourcePath: file.absoluteFrom },
-              file.webpackTo,
-              {
-                content,
-                regExp: file.webpackToRegExp,
-                context: pattern.context,
-              }
-            )
+          file.webpackTo = loaderUtils.interpolateName(
+            { resourcePath: file.absoluteFrom },
+            file.webpackTo,
+            {
+              content,
+              regExp: file.webpackToRegExp,
+              context: pattern.context,
+            }
           );
+
+          // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
+          file.webpackTo = path.normalize(file.webpackTo);
         }
 
         return content;
@@ -141,7 +140,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
           )
             .then((newPath) => {
               // Developers can use invalid slashes we should fix it
-              file.webpackTo = normalizePath(newPath);
+              file.webpackTo = path.normalize(newPath);
             })
             .then(() => content);
         }

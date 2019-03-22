@@ -2,7 +2,6 @@ import path from 'path';
 
 import isGlob from 'is-glob';
 import globParent from 'glob-parent';
-import normalizePath from 'normalize-path';
 
 import normalize from './utils/normalize';
 import isObject from './utils/isObject';
@@ -45,7 +44,16 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.context = path.join(context, pattern.context);
   }
 
-  pattern.context = normalizePath(pattern.context);
+  const isFromGlobPatten = isObject(pattern.from) && pattern.from.glob;
+  // Todo remove this in next major
+  const isToDirectory =
+    path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
+
+  // Normalize paths
+  pattern.from = isFromGlobPatten ? pattern.from : path.normalize(pattern.from);
+  pattern.context = path.normalize(pattern.context);
+  pattern.to = path.normalize(pattern.to);
+
   pattern.ignore = globalRef.ignore.concat(pattern.ignore || []);
 
   logger.debug(`processing from: '${pattern.from}' to: '${pattern.to}'`);
@@ -57,7 +65,7 @@ export default function preProcessPattern(globalRef, pattern) {
     case isTemplateLike.test(pattern.to):
       pattern.toType = 'template';
       break;
-    case path.extname(pattern.to) === '' || pattern.to.slice(-1) === '/':
+    case isToDirectory:
       pattern.toType = 'dir';
       break;
     default:
@@ -65,7 +73,7 @@ export default function preProcessPattern(globalRef, pattern) {
   }
 
   // If we know it's a glob, then bail early
-  if (isObject(pattern.from) && pattern.from.glob) {
+  if (isFromGlobPatten) {
     logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
 
     pattern.fromType = 'glob';
@@ -75,9 +83,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
     pattern.glob = normalize(pattern.context, pattern.from.glob);
     pattern.globOptions = globOptions;
-    pattern.absoluteFrom = normalizePath(
-      path.resolve(pattern.context, pattern.from.glob)
-    );
+    pattern.absoluteFrom = path.resolve(pattern.context, pattern.from.glob);
 
     return Promise.resolve(pattern);
   }
@@ -87,9 +93,6 @@ export default function preProcessPattern(globalRef, pattern) {
   } else {
     pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
   }
-
-  // Normalize path when path separators are mixed (like `C:\\directory/nested-directory/`)
-  pattern.absoluteFrom = normalizePath(pattern.absoluteFrom);
 
   logger.debug(
     `determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`
@@ -105,7 +108,8 @@ export default function preProcessPattern(globalRef, pattern) {
 
       // We need to add context directory as dependencies to avoid problems when new files added in directories
       // when we already in watch mode and this directories are not in context dependencies
-      contextDependencies.add(globParent(pattern.absoluteFrom));
+      // `glob-parent` always return `/` we need normalize path
+      contextDependencies.add(path.normalize(globParent(pattern.absoluteFrom)));
     } else {
       const newWarning = new Error(
         `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
@@ -147,9 +151,7 @@ export default function preProcessPattern(globalRef, pattern) {
         pattern.fromType = 'dir';
         pattern.context = pattern.absoluteFrom;
         pattern.glob = normalize(pattern.absoluteFrom, '**/*');
-        pattern.absoluteFrom = normalizePath(
-          path.join(pattern.absoluteFrom, '**/*')
-        );
+        pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
         pattern.globOptions = {
           dot: true,
         };
@@ -159,7 +161,7 @@ export default function preProcessPattern(globalRef, pattern) {
         fileDependencies.add(pattern.absoluteFrom);
 
         pattern.fromType = 'file';
-        pattern.context = normalizePath(path.dirname(pattern.absoluteFrom));
+        pattern.context = path.dirname(pattern.absoluteFrom);
         pattern.glob = normalize(pattern.absoluteFrom);
         pattern.globOptions = {
           dot: true,
