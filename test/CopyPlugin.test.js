@@ -157,6 +157,10 @@ describe('apply function', () => {
 
   const runEmit = (opts) =>
     run(opts).then((compilation) => {
+      if (opts.skipAssetsTesting) {
+        return;
+      }
+
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
         expect(Object.keys(compilation.assets).sort()).toEqual(
           opts.expectedAssetKeys
@@ -884,7 +888,24 @@ describe('apply function', () => {
 
     it('warns when pattern is empty', (done) => {
       runEmit({
-        expectedAssetKeys: [],
+        expectedAssetKeys: [
+          '.file.txt',
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+          'binextension.bin',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
+          'directory/.dottedfile',
+          'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/nestedfile.txt',
+          'file.txt',
+          'file.txt.gz',
+          'noextension',
+        ],
         expectedErrors: [new Error(`path "from" cannot be empty string`)],
         patterns: [
           {
@@ -964,7 +985,7 @@ describe('apply function', () => {
         compiler: new MockCompiler({
           outputPath: '/',
         }),
-        expectedAssetKeys: [],
+        skipAssetsTesting: true,
         expectedErrors: [
           new Error(
             'using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths'

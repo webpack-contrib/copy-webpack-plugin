@@ -7,7 +7,7 @@ import minimatch from 'minimatch';
 import isObject from './utils/isObject';
 
 export default function processPattern(globalRef, pattern) {
-  const { logger, output, concurrency } = globalRef;
+  const { logger, output, concurrency, compilation } = globalRef;
   const globOptions = Object.assign(
     {
       cwd: pattern.context,
@@ -103,7 +103,7 @@ export default function processPattern(globalRef, pattern) {
 
               logger.error(message);
 
-              throw new Error(message);
+              compilation.errors.push(new Error(message));
             }
 
             file.webpackTo = path.relative(output, file.webpackTo);
