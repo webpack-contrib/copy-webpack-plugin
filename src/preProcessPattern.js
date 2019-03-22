@@ -34,7 +34,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
     logger.error(message);
 
-    throw new Error(message);
+    compilation.errors.push(new Error(message));
   }
 
   pattern.to = pattern.to || '';
