@@ -1350,6 +1350,34 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('allows pattern to contain custoh `contenthash` digest', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/c2a6.txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+            to: 'directory/[sha1:contenthash:hex:4].txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('allows pattern to contain `hashType` without `hash` or `contenthash`', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/[md5::base64:20].txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+            to: 'directory/[md5::base64:20].txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('transform with promise', (done) => {
       runEmit({
         expectedAssetKeys: ['file.txt'],

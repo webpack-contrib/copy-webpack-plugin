@@ -4,11 +4,9 @@ import isGlob from 'is-glob';
 import globParent from 'glob-parent';
 
 import normalize from './utils/normalize';
+import isTemplateLike from './utils/isTemplateLike';
 import isObject from './utils/isObject';
 import { stat } from './utils/promisify';
-
-// https://www.debuggex.com/r/VH2yS2mvJOitiyr3
-const isTemplateLike = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(:\d+)?\])|(\[(\w+:)?(hash|contenthash)(:\w+)?(:\d+)?\])|(\[\d+\])/;
 
 /* eslint-disable no-param-reassign */
 
@@ -62,7 +60,7 @@ export default function preProcessPattern(globalRef, pattern) {
     // if toType already exists
     case !!pattern.toType:
       break;
-    case isTemplateLike.test(pattern.to):
+    case isTemplateLike(pattern.to):
       pattern.toType = 'template';
       break;
     case isToDirectory:
