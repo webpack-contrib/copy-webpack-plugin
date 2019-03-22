@@ -155,6 +155,16 @@ export default function postProcessPattern(globalRef, pattern, file) {
       .then((content) => {
         const hash = loaderUtils.getHashDigest(content);
 
+        // persist assets between rebuilds
+        compilation.assets[file.webpackTo] = {
+          size() {
+            return stats.size;
+          },
+          source() {
+            return content;
+          },
+        };
+
         if (
           !copyUnmodified &&
           written[file.webpackTo] &&
@@ -189,15 +199,6 @@ export default function postProcessPattern(globalRef, pattern, file) {
             file.absoluteFrom
           }'`
         );
-
-        compilation.assets[file.webpackTo] = {
-          size() {
-            return stats.size;
-          },
-          source() {
-            return content;
-          },
-        };
       });
   });
 }
