@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.2"></a>
+## [5.0.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.1...v5.0.2) (2019-03-22)
+
+
+### Bug Fixes
+
+* add fallback to transform cache directory ([#361](https://github.com/webpack-contrib/copy-webpack-plugin/issues/361)) ([05963eb](https://github.com/webpack-contrib/copy-webpack-plugin/commit/05963eb))
+* better determinate template in `to` option ([#363](https://github.com/webpack-contrib/copy-webpack-plugin/issues/363)) ([52f8be6](https://github.com/webpack-contrib/copy-webpack-plugin/commit/52f8be6))
+* emit errors instead throw ([#362](https://github.com/webpack-contrib/copy-webpack-plugin/issues/362)) ([3946473](https://github.com/webpack-contrib/copy-webpack-plugin/commit/3946473))
+* watch on windows ([#359](https://github.com/webpack-contrib/copy-webpack-plugin/issues/359)) ([eaf4306](https://github.com/webpack-contrib/copy-webpack-plugin/commit/eaf4306))
+
+
+### Performance Improvements
+
+* avoid extra call `stat` for file ([#365](https://github.com/webpack-contrib/copy-webpack-plugin/issues/365)) ([ae2258f](https://github.com/webpack-contrib/copy-webpack-plugin/commit/ae2258f))
+
+
+
 <a name="5.0.1"></a>
 ## [5.0.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v4.6.0...v5.0.1) (2019-03-11)
 
