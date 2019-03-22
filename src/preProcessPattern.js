@@ -158,6 +158,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
         fileDependencies.add(pattern.absoluteFrom);
 
+        pattern.stats = stats;
         pattern.fromType = 'file';
         pattern.context = path.dirname(pattern.absoluteFrom);
         pattern.glob = normalize(pattern.absoluteFrom);
