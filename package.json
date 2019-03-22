@@ -55,7 +55,6 @@
   "devDependencies": {
     "@babel/cli": "^7.1.5",
     "@babel/core": "^7.1.6",
-    "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.1.6",
     "@commitlint/cli": "^7.5.2",
     "@commitlint/config-conventional": "^7.5.0",
@@ -63,9 +62,9 @@
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-jest": "^24.1.0",
     "cross-env": "^5.1.3",
-    "del": "^3.0.0",
+    "del": "^4.0.0",
     "del-cli": "^1.1.0",
-    "enhanced-resolve": "^3.4.1",
+    "enhanced-resolve": "^4.1.0",
     "eslint": "^5.13.0",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^3.0.0",
@@ -94,8 +93,7 @@
         {
           "targets": {
             "node": "6.9.0"
-          },
-          "useBuiltIns": "usage"
+          }
         }
       ]
     ]
