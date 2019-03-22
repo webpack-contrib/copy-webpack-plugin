@@ -17,7 +17,6 @@
     "build": "cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js' --copy-files",
     "clean": "del-cli dist",
     "commitlint": "commitlint",
-    "commitmsg": "commitlint -e $GIT_PARAMS",
     "lint": "eslint --cache src test",
     "prepublish": "npm run build",
     "release": "standard-version",
@@ -75,7 +74,6 @@
     "memory-fs": "^0.4.1",
     "mkdirp": "^0.5.1",
     "prettier": "^1.14.0",
-    "spdy": "^4.0.0",
     "standard-version": "^5.0.0",
     "webpack": "^4.29.4"
   },
