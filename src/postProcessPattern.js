@@ -25,7 +25,11 @@ export default function postProcessPattern(globalRef, pattern, file) {
 
   logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
 
-  return stat(inputFileSystem, file.absoluteFrom).then((stats) => {
+  const getStats = pattern.stats
+    ? Promise.resolve().then(() => pattern.stats)
+    : stat(inputFileSystem, file.absoluteFrom);
+
+  return getStats.then((stats) => {
     // We don't write empty directories
     if (stats.isDirectory()) {
       logger.debug(
