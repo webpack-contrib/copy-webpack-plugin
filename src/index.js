@@ -20,6 +20,7 @@ class CopyPlugin {
     const fileDependencies = new Set();
     const contextDependencies = new Set();
     const written = {};
+    const compilerHook = this.options.compilerHook ? this.options.compilerHook || 'emit';
 
     let context;
 
@@ -38,8 +39,8 @@ class CopyPlugin {
 
     const plugin = { name: 'CopyPlugin' };
 
-    compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
-      logger.debug('starting emit');
+    compiler.hooks[compilerHook]tapAsync(plugin, (compilation, callback) => {
+      logger.debug(`starting ${compilerHook}`);
 
       const globalRef = {
         logger,
@@ -90,11 +91,12 @@ class CopyPlugin {
           compilation.errors.push(error);
         })
         .then(() => {
-          logger.debug('finishing emit');
+          logger.debug(`finishing ${compilerHook}`);
 
           callback();
         });
     });
+
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
       logger.debug('starting after-emit');
 
