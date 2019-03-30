@@ -20,7 +20,9 @@ class CopyPlugin {
     const fileDependencies = new Set();
     const contextDependencies = new Set();
     const written = {};
-    const compilerHook = this.options.compilerHook ? this.options.compilerHook || 'emit';
+    const compilerHook = this.options.compilerHook
+      ? this.options.compilerHook
+      : 'emit';
 
     let context;
 
@@ -39,7 +41,7 @@ class CopyPlugin {
 
     const plugin = { name: 'CopyPlugin' };
 
-    compiler.hooks[compilerHook]tapAsync(plugin, (compilation, callback) => {
+    compiler.hooks[compilerHook].tapAsync(plugin, (compilation, callback) => {
       logger.debug(`starting ${compilerHook}`);
 
       const globalRef = {
