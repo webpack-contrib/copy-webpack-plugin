@@ -15,7 +15,7 @@
 
 # copy-webpack-plugin
 
-Copies individual files or entire directories to the build directory.
+Copies individual files or entire directories, which already exist, to the build directory.
 
 ## Getting Started
 
@@ -43,6 +43,8 @@ module.exports = {
 ```
 
 > ℹ️ If you want `webpack-dev-server` to write files to the output directory during development, you can force it with the [`writeToDisk`](https://github.com/webpack/webpack-dev-middleware#writetodisk) option or the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
+
+> ℹ️ `webpack-copy-plugin` is not designed to copy files generated from the build process; rather, it is to copy files that already exist in the source tree, as part of the build process.
 
 ## Options
 
