@@ -403,6 +403,8 @@ describe('apply function', () => {
           '[special?directory]/(special-*file).txt',
           '[special?directory]/nested/nestedfile.txt',
           'noextension',
+          'pattern-order/base.txt',
+          'pattern-order/override.txt',
         ],
         patterns: [
           {
@@ -431,6 +433,8 @@ describe('apply function', () => {
           'nested/[special?directory]/(special-*file).txt',
           'nested/[special?directory]/nested/nestedfile.txt',
           'nested/noextension',
+          'nested/pattern-order/base.txt',
+          'nested/pattern-order/override.txt',
         ],
         patterns: [
           {
@@ -456,6 +460,8 @@ describe('apply function', () => {
           '/some/path/nestedfile.txt.tst',
           '/some/path/noextension.tst',
           '/some/path/hello.txt.tst',
+          '/some/path/base.txt.tst',
+          '/some/path/override.txt.tst',
         ],
         patterns: [
           {
@@ -489,6 +495,8 @@ describe('apply function', () => {
           'transformed/directory/nested/deep-nested/deepnested-d41d8c.txt',
           'transformed/directory/nested/nestedfile-d41d8c.txt',
           'transformed/noextension-d41d8c',
+          'transformed/pattern-order/base-593616.txt',
+          'transformed/pattern-order/override-e3b3f5.txt',
         ],
         patterns: [
           {
@@ -630,6 +638,8 @@ describe('apply function', () => {
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
           'dir (86)/nesteddir/nestedfile.txt',
+          'pattern-order/base.txt',
+          'pattern-order/override.txt',
         ],
         patterns: [
           {
@@ -658,6 +668,8 @@ describe('apply function', () => {
           'nested/[special?directory]/directoryfile-22af64.txt',
           'nested/[special?directory]/nested/nestedfile-d41d8c.txt',
           'nested/noextension-d41d8c',
+          'nested/pattern-order/base-593616.txt',
+          'nested/pattern-order/override-e3b3f5.txt',
         ],
         patterns: [
           {
@@ -678,6 +690,8 @@ describe('apply function', () => {
           '[special?directory]-directoryfile.txt',
           'dir (86)-file.txt',
           'directory-directoryfile.txt',
+          'pattern-order-base.txt',
+          'pattern-order-override.txt',
         ],
         patterns: [
           {
@@ -746,6 +760,35 @@ describe('apply function', () => {
         patterns: [
           {
             from: 'symlink/**/*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('emits files in pattern order', (done) => {
+      runEmit({
+        expectedAssetKeys: ['pattern-order/output.txt'],
+        expectedAssetContent: {
+          'pattern-order/output.txt': 'base',
+        },
+        patterns: [
+          {
+            from: 'pattern-order/**/base.txt',
+            transformPath(targetPath) {
+              return new Promise((resolve) => {
+                setTimeout(() => {
+                  resolve(path.join(path.parse(targetPath).dir, 'output.txt'));
+                }, 1);
+              });
+            },
+          },
+          {
+            from: 'pattern-order/**/override.txt',
+            transformPath(targetPath) {
+              return path.join(path.parse(targetPath).dir, 'output.txt');
+            },
           },
         ],
       })
@@ -905,6 +948,8 @@ describe('apply function', () => {
           'file.txt',
           'file.txt.gz',
           'noextension',
+          'pattern-order/base.txt',
+          'pattern-order/override.txt',
         ],
         expectedErrors: [new Error(`path "from" cannot be empty string`)],
         patterns: [
@@ -1310,6 +1355,8 @@ describe('apply function', () => {
           '[special?directory]/(special-*file).txt',
           '[special?directory]/nested/nestedfile.txt',
           'noextension',
+          'pattern-order/base.txt',
+          'pattern-order/override.txt',
         ],
         patterns: [
           {
@@ -1892,6 +1939,8 @@ describe('apply function', () => {
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
           'dir (86)/nesteddir/nestedfile.txt',
+          'pattern-order/base.txt',
+          'pattern-order/override.txt',
         ],
         patterns: [
           {
@@ -1913,6 +1962,8 @@ describe('apply function', () => {
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
           'dir (86)/nesteddir/nestedfile.txt',
+          'pattern-order/base.txt',
+          'pattern-order/override.txt',
         ],
         patterns: [
           {
@@ -2109,6 +2160,8 @@ describe('apply function', () => {
             '[special?directory]/(special-*file).txt',
             '[special?directory]/nested/nestedfile.txt',
             'noextension',
+            'pattern-order/base.txt',
+            'pattern-order/override.txt',
           ],
           options: {
             ignore: ['.dottedfile', '.file.txt'],
@@ -2172,6 +2225,8 @@ describe('apply function', () => {
             'file.txt',
             'file.txt.gz',
             'noextension',
+            'pattern-order/base.txt',
+            'pattern-order/override.txt',
           ],
           options: {
             ignore: [
@@ -2204,6 +2259,8 @@ describe('apply function', () => {
               'file.txt',
               'file.txt.gz',
               'noextension',
+              'pattern-order/base.txt',
+              'pattern-order/override.txt',
             ],
             options: {
               ignore: ['directory/**/*', '\\[special\\?directory\\]/**/*'],

@@ -14,14 +14,7 @@ import { stat, readFile } from './utils/promisify';
 /* eslint-disable no-param-reassign */
 
 export default function postProcessPattern(globalRef, pattern, file) {
-  const {
-    logger,
-    compilation,
-    fileDependencies,
-    written,
-    inputFileSystem,
-    copyUnmodified,
-  } = globalRef;
+  const { logger, fileDependencies, inputFileSystem } = globalRef;
 
   logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
 
@@ -153,50 +146,9 @@ export default function postProcessPattern(globalRef, pattern, file) {
         return content;
       })
       .then((content) => {
-        const hash = loaderUtils.getHashDigest(content);
-
-        if (
-          !copyUnmodified &&
-          written[file.webpackTo] &&
-          written[file.webpackTo][file.absoluteFrom] &&
-          written[file.webpackTo][file.absoluteFrom] === hash
-        ) {
-          logger.info(
-            `skipping '${file.webpackTo}', because content hasn't changed`
-          );
-
-          return;
-        }
-
-        logger.debug(`adding '${file.webpackTo}' for tracking content changes`);
-
-        if (!written[file.webpackTo]) {
-          written[file.webpackTo] = {};
-        }
-
-        written[file.webpackTo][file.absoluteFrom] = hash;
-
-        if (compilation.assets[file.webpackTo] && !file.force) {
-          logger.info(
-            `skipping '${file.webpackTo}', because it already exists`
-          );
-
-          return;
-        }
-
-        logger.info(
-          `writing '${file.webpackTo}' to compilation assets from '${
-            file.absoluteFrom
-          }'`
-        );
-
-        compilation.assets[file.webpackTo] = {
-          size() {
-            return stats.size;
-          },
-          source() {
-            return content;
-          },
+        return {
+          content,
+          stats,
         };
       });
   });

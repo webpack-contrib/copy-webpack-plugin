@@ -2,6 +2,7 @@ import path from 'path';
 
 import log from 'webpack-log';
 
+import emitFile from './emitFile';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
@@ -74,27 +75,45 @@ class CopyPlugin {
             .then((pattern) =>
               processPattern(globalRef, pattern).then((files) => {
                 if (!files) {
-                  return Promise.resolve();
+                  return Promise.resolve([]);
                 }
 
                 return Promise.all(
-                  files
-                    .filter(Boolean)
-                    .map((file) => postProcessPattern(globalRef, pattern, file))
+                  files.filter(Boolean).map((file) =>
+                    postProcessPattern(globalRef, pattern, file)
+                      .then(({ content, stats }) => {
+                        return {
+                          content,
+                          file,
+                          stats,
+                        };
+                      })
+                      .catch((error) => {
+                        compilation.errors.push(error);
+                      })
+                  )
                 );
               })
             )
+            .catch((error) => {
+              compilation.errors.push(error);
+            })
         )
-      )
-        .catch((error) => {
-          compilation.errors.push(error);
-        })
-        .then(() => {
-          logger.debug('finishing emit');
-
-          callback();
+      ).then((filesInPatternOrder) => {
+        filesInPatternOrder.forEach((files) => {
+          files
+            .filter(Boolean)
+            .forEach(({ content, file, stats }) =>
+              emitFile(globalRef, content, file, stats)
+            );
         });
+
+        logger.debug('finishing emit');
+
+        callback();
+      });
     });
+
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
       logger.debug('starting after-emit');
 
