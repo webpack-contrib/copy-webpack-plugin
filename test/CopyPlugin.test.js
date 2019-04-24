@@ -1808,6 +1808,21 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    it('can move multiple files to a non-root directory with [1]', (done) => {
+      runEmit({
+        expectedAssetKeys: ['nested/txt'],
+        patterns: [
+          {
+            from: 'directory/nested/deep-nested',
+            to: 'nested/[1]',
+            test: /\.(.*)$/,
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it("can move a directory's contents to the root directory from symbolic link", (done) => {
       runEmit({
         // Windows doesn't support symbolic link
