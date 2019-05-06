@@ -175,22 +175,24 @@ export default function postProcessPattern(globalRef, pattern, file) {
         }
 
         written[file.webpackTo][file.absoluteFrom] = hash;
+      
+        const assetKey = file.webpackTo.replace(/\\/g, '/');
 
-        if (compilation.assets[file.webpackTo] && !file.force) {
+        if (compilation.assets[assetKey] && !file.force) {
           logger.info(
-            `skipping '${file.webpackTo}', because it already exists`
+            `skipping '${assetKey}', because it already exists`
           );
 
           return;
         }
 
         logger.info(
-          `writing '${file.webpackTo}' to compilation assets from '${
+          `writing '${assetKey}' to compilation assets from '${
             file.absoluteFrom
           }'`
         );
 
-        compilation.assets[file.webpackTo] = {
+        compilation.assets[assetKey] = {
           size() {
             return stats.size;
           },
