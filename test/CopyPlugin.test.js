@@ -13,11 +13,18 @@ import mkdirp from 'mkdirp';
 
 import CopyPlugin from '../src/index';
 
-import removeIllegalCharacterForWindows from './utils/removeIllegalCharacterForWindows';
+import {
+  removeIllegalCharacterForWindows,
+  removeIllegalCharacterAndSepForWindows,
+} from './utils/removeIllegalCharacterForWindows';
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
 const TEMP_DIR = path.join(__dirname, 'tempdir');
+
+const supportLn = fs.existsSync(
+  path.join(HELPER_DIR, 'symlink/directory-ln/file.txt')
+);
 
 class MockCompiler {
   constructor(options = {}) {
@@ -165,8 +172,8 @@ describe('apply function', () => {
         expect(Object.keys(compilation.assets).sort()).toEqual(
           opts.expectedAssetKeys
             .sort()
-            .map(removeIllegalCharacterForWindows)
-            .map((item) => item.replace(/\//g, path.sep))
+            .map(removeIllegalCharacterAndSepForWindows)
+            .map((item) => item)
         );
       } else {
         expect(compilation.assets).toEqual({});
@@ -175,7 +182,7 @@ describe('apply function', () => {
       if (opts.expectedAssetContent) {
         // eslint-disable-next-line guard-for-in
         for (const key in opts.expectedAssetContent) {
-          const assetName = key.replace(/(\/|\\)/g, path.sep);
+          const assetName = key;
 
           expect(compilation.assets[assetName]).toBeDefined();
 
@@ -258,12 +265,18 @@ describe('apply function', () => {
         // Todo finally and check file exists
         fs.unlinkSync(opts.newFileLoc1);
         fs.unlinkSync(opts.newFileLoc2);
+      })
+      .catch(() => {
+        // Todo finally and check file exists
+        fs.unlinkSync(opts.newFileLoc1);
+        fs.unlinkSync(opts.newFileLoc2);
       });
   };
 
   const specialFiles = {
     '[special?directory]/nested/nestedfile.txt': '',
     '[special?directory]/(special-*file).txt': 'special',
+    '[special?directory]/[special\\directory]/spec\\ialfile.txt': 'new',
     '[special?directory]/directoryfile.txt': 'new',
   };
 
@@ -271,12 +284,20 @@ describe('apply function', () => {
 
   beforeAll(() => {
     Object.keys(specialFiles).forEach((originFile) => {
-      const file = removeIllegalCharacterForWindows(originFile);
+      const file = removeIllegalCharacterAndSepForWindows(originFile);
       const dir = path.dirname(file);
 
       mkdirp.sync(path.join(baseDir, dir));
 
       fs.writeFileSync(path.join(baseDir, file), specialFiles[originFile]);
+    });
+  });
+
+  afterAll(() => {
+    Object.keys(specialFiles).forEach((originFile) => {
+      const file = removeIllegalCharacterAndSepForWindows(originFile);
+
+      fs.unlinkSync(path.join(baseDir, file));
     });
   });
 
@@ -401,6 +422,7 @@ describe('apply function', () => {
           'directory/nested/nestedfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
+          '[special?directory]/[special\\directory]/spec\\ialfile.txt',
           '[special?directory]/nested/nestedfile.txt',
           'noextension',
         ],
@@ -429,6 +451,7 @@ describe('apply function', () => {
           'nested/directory/nested/nestedfile.txt',
           'nested/[special?directory]/directoryfile.txt',
           'nested/[special?directory]/(special-*file).txt',
+          'nested/[special?directory]/[special\\directory]/spec\\ialfile.txt',
           'nested/[special?directory]/nested/nestedfile.txt',
           'nested/noextension',
         ],
@@ -447,6 +470,10 @@ describe('apply function', () => {
       runEmit({
         expectedAssetKeys: [
           '/some/path/(special-*file).txt.tst',
+          // in windows basename is ialfile.txt, in linux basename is spec\ialfile.txt
+          process.platform === 'win32'
+            ? '/some/path/ialfile.txt.tst'
+            : '/some/path/spec\\ialfile.txt.tst',
           '/some/path/binextension.bin.tst',
           '/some/path/deepnested.txt.tst',
           '/some/path/deepnesteddir.txt.tst',
@@ -478,6 +505,8 @@ describe('apply function', () => {
           'transformed/[!]/hello-d41d8c.txt',
           'transformed/[special?directory]/directoryfile-22af64.txt',
           'transformed/[special?directory]/(special-*file)-0bd650.txt',
+          // TODO: // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
+          'transformed/[special?directory]/[special/directory]/spec\\ialfile-22af64.txt',
           'transformed/[special?directory]/nested/nestedfile-d41d8c.txt',
           'transformed/binextension-d41d8c.bin',
           'transformed/dir (86)/file-d41d8c.txt',
@@ -533,6 +562,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'directoryfile.txt',
           '(special-*file).txt',
+          '[special\\directory]/spec\\ialfile.txt',
           'nested/nestedfile.txt',
         ],
         patterns: [
@@ -551,6 +581,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'directoryfile.txt',
           '(special-*file).txt',
+          '[special\\directory]/spec\\ialfile.txt',
           'nested/nestedfile.txt',
         ],
         patterns: [
@@ -626,6 +657,7 @@ describe('apply function', () => {
           'directory/nested/nestedfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
+          '[special?directory]/[special\\directory]/spec\\ialfile.txt',
           '[special?directory]/nested/nestedfile.txt',
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
@@ -655,6 +687,8 @@ describe('apply function', () => {
           'nested/directory/nested/deep-nested/deepnested-d41d8c.txt',
           'nested/directory/nested/nestedfile-d41d8c.txt',
           'nested/[special?directory]/(special-*file)-0bd650.txt',
+          // TODO: // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
+          'nested/[special?directory]/[special/directory]/spec\\ialfile-22af64.txt',
           'nested/[special?directory]/directoryfile-22af64.txt',
           'nested/[special?directory]/nested/nestedfile-d41d8c.txt',
           'nested/noextension-d41d8c',
@@ -892,6 +926,7 @@ describe('apply function', () => {
           '.file.txt',
           '[!]/hello.txt',
           '[special?directory]/(special-*file).txt',
+          '[special?directory]/[special\\directory]/spec\\ialfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',
           'binextension.bin',
@@ -1308,6 +1343,7 @@ describe('apply function', () => {
           'directory/nested/nestedfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/(special-*file).txt',
+          '[special?directory]/[special\\directory]/spec\\ialfile.txt',
           '[special?directory]/nested/nestedfile.txt',
           'noextension',
         ],
@@ -1502,6 +1538,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'directoryfile.txt',
           '(special-*file).txt',
+          '[special\\directory]/spec\\ialfile.txt',
           'nested/nestedfile.txt',
         ],
         patterns: [
@@ -1520,6 +1557,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           'directoryfile.txt',
           '(special-*file).txt',
+          '[special\\directory]/spec\\ialfile.txt',
           'nested/nestedfile.txt',
         ],
         patterns: [
@@ -1825,12 +1863,11 @@ describe('apply function', () => {
 
     it("can move a directory's contents to the root directory from symbolic link", (done) => {
       runEmit({
-        // Windows doesn't support symbolic link
+        // Windows may not support symbolic links
         symlink: true,
-        expectedAssetKeys:
-          process.platform === 'win32'
-            ? []
-            : ['file.txt', 'nested-directory/file-in-nested-directory.txt'],
+        expectedAssetKeys: !supportLn
+          ? []
+          : ['file.txt', 'nested-directory/file-in-nested-directory.txt'],
         patterns: [
           {
             from: 'symlink/directory-ln',
@@ -1902,6 +1939,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '[!]/hello.txt',
           '[special?directory]/(special-*file).txt',
+          '[special?directory]/[special\\directory]/spec\\ialfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',
           'dir (86)/file.txt',
@@ -1923,6 +1961,7 @@ describe('apply function', () => {
         expectedAssetKeys: [
           '[!]/hello.txt',
           '[special?directory]/(special-*file).txt',
+          '[special?directory]/[special\\directory]/spec\\ialfile.txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',
           'dir (86)/file.txt',
@@ -2122,6 +2161,7 @@ describe('apply function', () => {
             'directory/nested/nestedfile.txt',
             '[special?directory]/directoryfile.txt',
             '[special?directory]/(special-*file).txt',
+            '[special?directory]/[special\\directory]/spec\\ialfile.txt',
             '[special?directory]/nested/nestedfile.txt',
             'noextension',
           ],

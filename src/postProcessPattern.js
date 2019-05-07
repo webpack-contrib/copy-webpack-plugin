@@ -6,6 +6,7 @@ import loaderUtils from 'loader-utils';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
+import normalizePath from 'normalize-path';
 
 import { name, version } from '../package.json';
 
@@ -175,13 +176,14 @@ export default function postProcessPattern(globalRef, pattern, file) {
         }
 
         written[file.webpackTo][file.absoluteFrom] = hash;
-      
-        const assetKey = file.webpackTo.replace(/\\/g, '/');
+
+        const assetKey =
+          process.platform !== 'win32'
+            ? file.webpackTo
+            : normalizePath(file.webpackTo);
 
         if (compilation.assets[assetKey] && !file.force) {
-          logger.info(
-            `skipping '${assetKey}', because it already exists`
-          );
+          logger.info(`skipping '${assetKey}', because it already exists`);
 
           return;
         }
