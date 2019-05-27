@@ -25,7 +25,7 @@ To begin, you'll need to install `copy-webpack-plugin`:
 $ npm install copy-webpack-plugin --save-dev
 ```
 
-Then add the loader to your `webpack` config. For example:
+Then add the plugin to your `webpack` config. For example:
 
 **webpack.config.js**
 
