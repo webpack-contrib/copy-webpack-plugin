@@ -163,10 +163,7 @@ describe('apply function', () => {
 
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
         expect(Object.keys(compilation.assets).sort()).toEqual(
-          opts.expectedAssetKeys
-            .sort()
-            .map(removeIllegalCharacterForWindows)
-            .map((item) => item.replace(/\//g, path.sep))
+          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
         );
       } else {
         expect(compilation.assets).toEqual({});
@@ -175,7 +172,7 @@ describe('apply function', () => {
       if (opts.expectedAssetContent) {
         // eslint-disable-next-line guard-for-in
         for (const key in opts.expectedAssetContent) {
-          const assetName = key.replace(/(\/|\\)/g, path.sep);
+          const assetName = key.replace(/\\/g, '/');
 
           expect(compilation.assets[assetName]).toBeDefined();
 
@@ -245,10 +242,7 @@ describe('apply function', () => {
       .then(() => {
         if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
           expect(Object.keys(compilation.assets).sort()).toEqual(
-            opts.expectedAssetKeys
-              .sort()
-              .map(removeIllegalCharacterForWindows)
-              .map((item) => item.replace(/\//g, path.sep))
+            opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
           );
         } else {
           expect(compilation.assets).toEqual({});

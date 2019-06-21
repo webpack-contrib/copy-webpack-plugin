@@ -176,7 +176,11 @@ export default function postProcessPattern(globalRef, pattern, file) {
 
         written[file.webpackTo][file.absoluteFrom] = hash;
 
-        if (compilation.assets[file.webpackTo] && !file.force) {
+        // In Windows we should not set assets using \ seperators
+        // Because files will end up being set incorrecly when using the MemoryFileSystem system
+        const posixWebpackTo = file.webpackTo.replace(/\\/g, '/');
+
+        if (compilation.assets[posixWebpackTo] && !file.force) {
           logger.info(
             `skipping '${file.webpackTo}', because it already exists`
           );
@@ -190,7 +194,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
           }'`
         );
 
-        compilation.assets[file.webpackTo] = {
+        compilation.assets[posixWebpackTo] = {
           size() {
             return stats.size;
           },
