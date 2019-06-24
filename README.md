@@ -80,7 +80,7 @@ Default: `undefined`
 Glob or path from where we сopy files.
 Globs accept [minimatch options](https://github.com/isaacs/minimatch).
 
-You can defined `from` as `Object` and use the [`node-glob` options](https://github.com/isaacs/node-glob#options).
+You can define `from` as `Object` and use the [`node-glob` options](https://github.com/isaacs/node-glob#options).
 
 > ⚠️ Don't use directly `\\` in `from` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
