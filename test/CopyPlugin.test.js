@@ -1853,7 +1853,7 @@ describe('apply function', () => {
           {
             from: 'directory/nested/deep-nested',
             to: 'nested/[1]',
-            test: /\.(.*)$/,
+            test: /\.([^.]*)$/,
           },
         ],
       })
