@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="5.0.3"></a>
+## [5.0.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.2...v5.0.3) (2019-04-24)
+
+
+### Bug Fixes
+
+* alone `[N]` interpolation in `to` option ([#375](https://github.com/webpack-contrib/copy-webpack-plugin/issues/375)) ([70917b7](https://github.com/webpack-contrib/copy-webpack-plugin/commit/70917b7))
+
+
+
 <a name="5.0.2"></a>
 ## [5.0.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.1...v5.0.2) (2019-03-22)
 

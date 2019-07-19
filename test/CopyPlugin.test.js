@@ -1,4 +1,3 @@
-/* globals describe, it, __dirname */
 import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
@@ -812,9 +811,7 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-              path.sep
-            }nonexistent.txt'`
+            `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -833,9 +830,7 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${
-              path.sep
-            }nonexistent.txt'`
+            `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -1538,9 +1533,7 @@ describe('apply function', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent' at '${HELPER_DIR}${
-              path.sep
-            }nonexistent'`
+            `unable to locate 'nonexistent' at '${HELPER_DIR}${path.sep}nonexistent'`
           ),
         ],
         patterns: [
@@ -1801,6 +1794,21 @@ describe('apply function', () => {
           {
             from: 'directory',
             to: 'nested/[path][name]-[hash:6].[ext]',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('can move multiple files to a non-root directory with [1]', (done) => {
+      runEmit({
+        expectedAssetKeys: ['nested/txt'],
+        patterns: [
+          {
+            from: 'directory/nested/deep-nested',
+            to: 'nested/[1]',
+            test: /\.([^.]*)$/,
           },
         ],
       })

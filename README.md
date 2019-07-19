@@ -25,7 +25,7 @@ To begin, you'll need to install `copy-webpack-plugin`:
 $ npm install copy-webpack-plugin --save-dev
 ```
 
-Then add the loader to your `webpack` config. For example:
+Then add the plugin to your `webpack` config. For example:
 
 **webpack.config.js**
 
@@ -82,7 +82,7 @@ Default: `undefined`
 Glob or path from where we сopy files.
 Globs accept [minimatch options](https://github.com/isaacs/minimatch).
 
-You can defined `from` as `Object` and use the [`node-glob` options](https://github.com/isaacs/node-glob#options).
+You can define `from` as `Object` and use the [`node-glob` options](https://github.com/isaacs/node-glob#options).
 
 > ⚠️ Don't use directly `\\` in `from` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -538,8 +538,8 @@ Please take a moment to read our contributing guidelines if you haven't yet done
 [node-url]: https://nodejs.org
 [deps]: https://david-dm.org/webpack-contrib/copy-webpack-plugin.svg
 [deps-url]: https://david-dm.org/webpack-contrib/copy-webpack-plugin
-[tests]: https://secure.travis-ci.org/webpack-contrib/copy-webpack-plugin.svg
-[tests-url]: http://travis-ci.org/webpack-contrib/copy-webpack-plugin
+[tests]: https://dev.azure.com/webpack-contrib/copy-webpack-plugin/_apis/build/status/webpack-contrib.copy-webpack-plugin?branchName=master
+[tests-url]: https://dev.azure.com/webpack-contrib/copy-webpack-plugin/_build/latest?definitionId=5&branchName=master
 [cover]: https://codecov.io/gh/webpack-contrib/copy-webpack-plugin/branch/master/graph/badge.svg
 [cover-url]: https://codecov.io/gh/webpack-contrib/copy-webpack-plugin
 [chat]: https://img.shields.io/badge/gitter-webpack%2Fwebpack-brightgreen.svg

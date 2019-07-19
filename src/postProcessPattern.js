@@ -107,9 +107,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
       .then((content) => {
         if (pattern.toType === 'template') {
           logger.info(
-            `interpolating template '${file.webpackTo}' for '${
-              file.relativeFrom
-            }'`
+            `interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`
           );
 
           // If it doesn't have an extension, remove it from the pattern
@@ -185,9 +183,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
         }
 
         logger.info(
-          `writing '${file.webpackTo}' to compilation assets from '${
-            file.absoluteFrom
-          }'`
+          `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
         );
 
         compilation.assets[file.webpackTo] = {

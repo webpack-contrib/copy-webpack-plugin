@@ -1,6 +1,6 @@
 {
   "name": "copy-webpack-plugin",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "Copy files && directories with webpack",
   "license": "MIT",
   "repository": "webpack-contrib/copy-webpack-plugin",
@@ -14,22 +14,20 @@
   "scripts": {
     "start": "npm run build -- -w",
     "prebuild": "npm run clean",
-    "build": "cross-env NODE_ENV=production babel src -d dist --ignore 'src/**/*.test.js' --copy-files",
+    "build": "cross-env NODE_ENV=production babel src -d dist --ignore \"src/**/*.test.js\" --copy-files",
     "clean": "del-cli dist",
-    "commitlint": "commitlint",
-    "lint": "eslint --cache src test",
-    "prepublish": "npm run build",
+    "commitlint": "commitlint --from=master",
+    "lint:prettier": "prettier \"{**/*,*}.{js,json,md,yml,css}\" --list-different",
+    "lint:js": "eslint --cache src test",
+    "lint": "npm-run-all -l -p \"lint:**\"",
+    "prepare": "npm run build",
     "release": "standard-version",
     "security": "npm audit",
-    "test:only": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --collectCoverageFrom='src/**/*.js' --coverage",
+    "test:only": "cross-env NODE_ENV=test jest",
+    "test:watch": "cross-env NODE_ENV=test jest --watch",
+    "test:coverage": "cross-env NODE_ENV=test jest --collectCoverageFrom=\"src/**/*.js\" --coverage",
     "pretest": "npm run lint",
-    "test": "npm run test:only",
-    "ci:lint": "npm run lint && npm run security",
-    "ci:test": "npm run test:only -- --runInBand",
-    "ci:coverage": "npm run test:coverage -- --runInBand",
-    "ci:lint:commits": "commitlint --from=origin/master --to=${CIRCLE_SHA1}",
+    "test": "cross-env NODE_ENV=test npm run test:coverage",
     "defaults": "webpack-defaults"
   },
   "files": [
@@ -39,43 +37,47 @@
     "webpack": "^4.0.0"
   },
   "dependencies": {
-    "cacache": "^11.3.1",
-    "find-cache-dir": "^2.0.0",
-    "globby": "^7.1.1",
+    "cacache": "^11.3.3",
+    "find-cache-dir": "^2.1.0",
     "glob-parent": "^3.1.0",
-    "is-glob": "^4.0.0",
-    "loader-utils": "^1.1.0",
+    "globby": "^7.1.1",
+    "is-glob": "^4.0.1",
+    "loader-utils": "^1.2.3",
     "minimatch": "^3.0.4",
     "normalize-path": "^3.0.0",
-    "p-limit": "^2.1.0",
-    "serialize-javascript": "^1.4.0",
+    "p-limit": "^2.2.0",
+    "schema-utils": "^1.0.0",
+    "serialize-javascript": "^1.7.0",
     "webpack-log": "^2.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.6",
-    "@babel/preset-env": "^7.1.6",
-    "@commitlint/cli": "^7.5.2",
-    "@commitlint/config-conventional": "^7.5.0",
-    "@webpack-contrib/defaults": "^3.0.5",
+    "@babel/cli": "^7.5.5",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@commitlint/cli": "^8.1.0",
+    "@commitlint/config-conventional": "^8.1.0",
+    "@webpack-contrib/defaults": "^5.0.2",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
-    "babel-jest": "^24.1.0",
-    "cross-env": "^5.1.3",
-    "del": "^4.0.0",
+    "babel-jest": "^24.8.0",
+    "commitlint-azure-pipelines-cli": "^1.0.1",
+    "cross-env": "^5.2.0",
+    "del": "^4.1.1",
     "del-cli": "^1.1.0",
     "enhanced-resolve": "^4.1.0",
-    "eslint": "^5.13.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "husky": "^1.2.1",
+    "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-import": "^2.18.1",
+    "husky": "^3.0.1",
     "is-gzip": "^2.0.0",
-    "jest": "^24.0.0",
-    "lint-staged": "^8.1.0",
+    "jest": "^24.8.0",
+    "jest-junit": "^6.4.0",
+    "lint-staged": "^9.2.0",
     "memory-fs": "^0.4.1",
     "mkdirp": "^0.5.1",
-    "prettier": "^1.14.0",
-    "standard-version": "^5.0.0",
-    "webpack": "^4.29.4"
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.18.2",
+    "standard-version": "^6.0.1",
+    "webpack": "^4.36.1"
   },
   "keywords": [
     "webpack",
@@ -83,38 +85,5 @@
     "transfer",
     "move",
     "copy"
-  ],
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "targets": {
-            "node": "6.9.0"
-          }
-        }
-      ]
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.js": [
-      "eslint --fix",
-      "git add"
-    ]
-  },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "prettier": {
-    "singleQuote": true,
-    "trailingComma": "es5",
-    "arrowParens": "always"
-  }
+  ]
 }
