@@ -6,6 +6,7 @@ import loaderUtils from 'loader-utils';
 import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
+import normalizePath from 'normalize-path';
 
 import { name, version } from '../package.json';
 
@@ -138,26 +139,29 @@ export default function postProcessPattern(globalRef, pattern, file) {
             `transforming path '${file.webpackTo}' for '${file.absoluteFrom}'`
           );
 
-          return Promise.resolve(
-            pattern.transformPath(file.webpackTo, file.absoluteFrom)
-          )
+          return Promise.resolve()
+            .then(() =>
+              pattern.transformPath(file.webpackTo, file.absoluteFrom)
+            )
             .then((newPath) => {
-              // Developers can use invalid slashes we should fix it
-              file.webpackTo = path.normalize(newPath);
-            })
-            .then(() => content);
+              file.webpackTo = newPath;
+
+              return content;
+            });
         }
 
         return content;
       })
       .then((content) => {
         const hash = loaderUtils.getHashDigest(content);
+        const targetPath = normalizePath(file.webpackTo);
+        const targetAbsolutePath = normalizePath(file.absoluteFrom);
 
         if (
           !copyUnmodified &&
-          written[file.webpackTo] &&
-          written[file.webpackTo][file.absoluteFrom] &&
-          written[file.webpackTo][file.absoluteFrom] === hash
+          written[targetPath] &&
+          written[targetPath][targetAbsolutePath] &&
+          written[targetPath][targetAbsolutePath] === hash
         ) {
           logger.info(
             `skipping '${file.webpackTo}', because content hasn't changed`
@@ -168,13 +172,13 @@ export default function postProcessPattern(globalRef, pattern, file) {
 
         logger.debug(`adding '${file.webpackTo}' for tracking content changes`);
 
-        if (!written[file.webpackTo]) {
-          written[file.webpackTo] = {};
+        if (!written[targetPath]) {
+          written[targetPath] = {};
         }
 
-        written[file.webpackTo][file.absoluteFrom] = hash;
+        written[targetPath][targetAbsolutePath] = hash;
 
-        if (compilation.assets[file.webpackTo] && !file.force) {
+        if (compilation.assets[targetPath] && !file.force) {
           logger.info(
             `skipping '${file.webpackTo}', because it already exists`
           );
@@ -186,7 +190,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
           `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
         );
 
-        compilation.assets[file.webpackTo] = {
+        compilation.assets[targetPath] = {
           size() {
             return stats.size;
           },

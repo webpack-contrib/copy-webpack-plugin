@@ -162,10 +162,7 @@ describe('apply function', () => {
 
       if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
         expect(Object.keys(compilation.assets).sort()).toEqual(
-          opts.expectedAssetKeys
-            .sort()
-            .map(removeIllegalCharacterForWindows)
-            .map((item) => item.replace(/\//g, path.sep))
+          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
         );
       } else {
         expect(compilation.assets).toEqual({});
@@ -173,13 +170,11 @@ describe('apply function', () => {
 
       if (opts.expectedAssetContent) {
         // eslint-disable-next-line guard-for-in
-        for (const key in opts.expectedAssetContent) {
-          const assetName = key.replace(/(\/|\\)/g, path.sep);
-
+        for (const assetName in opts.expectedAssetContent) {
           expect(compilation.assets[assetName]).toBeDefined();
 
           if (compilation.assets[assetName]) {
-            let expectedContent = opts.expectedAssetContent[key];
+            let expectedContent = opts.expectedAssetContent[assetName];
 
             if (!Buffer.isBuffer(expectedContent)) {
               expectedContent = Buffer.from(expectedContent);
@@ -244,10 +239,7 @@ describe('apply function', () => {
       .then(() => {
         if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
           expect(Object.keys(compilation.assets).sort()).toEqual(
-            opts.expectedAssetKeys
-              .sort()
-              .map(removeIllegalCharacterForWindows)
-              .map((item) => item.replace(/\//g, path.sep))
+            opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
           );
         } else {
           expect(compilation.assets).toEqual({});
@@ -2565,5 +2557,20 @@ describe('apply function', () => {
           .catch(done);
       });
     });
+  });
+
+  it('should move a file and use posix separator for emitting assets', (done) => {
+    runEmit({
+      expectedAssetKeys: ['dir/nestedfile.txt'],
+      patterns: [
+        {
+          context: HELPER_DIR,
+          from: 'directory/nested/nestedfile.txt',
+          to: 'dir',
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
   });
 });
