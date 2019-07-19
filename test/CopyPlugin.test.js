@@ -2,9 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
 
-import NodeJsInputFileSystem from 'enhanced-resolve/lib/NodeJsInputFileSystem';
-import CachedInputFileSystem from 'enhanced-resolve/lib/CachedInputFileSystem';
-
 import findCacheDir from 'find-cache-dir';
 import cacache from 'cacache';
 import isGzip from 'is-gzip';
@@ -14,244 +11,14 @@ import CopyPlugin from '../src/index';
 
 import removeIllegalCharacterForWindows from './utils/removeIllegalCharacterForWindows';
 
+import { MockCompiler, MockCompilerNoStat } from './utils/mocks';
+import { run, runEmit, runForce, runChange } from './utils/run';
+
 const BUILD_DIR = path.join(__dirname, 'build');
 const HELPER_DIR = path.join(__dirname, 'helpers');
 const TEMP_DIR = path.join(__dirname, 'tempdir');
 
-class MockCompiler {
-  constructor(options = {}) {
-    this.options = {
-      context: HELPER_DIR,
-      output: {
-        path: options.outputPath || BUILD_DIR,
-      },
-    };
-
-    if (options.devServer && options.devServer.outputPath) {
-      this.options.devServer = {
-        outputPath: options.devServer.outputPath,
-      };
-    }
-
-    this.inputFileSystem = new CachedInputFileSystem(
-      new NodeJsInputFileSystem(),
-      0
-    );
-
-    this.hooks = {
-      emit: {
-        tapAsync: (plugin, fn) => {
-          this.hooks.emit = fn;
-        },
-      },
-      afterEmit: {
-        tapAsync: (plugin, fn) => {
-          this.hooks.afterEmit = fn;
-        },
-      },
-    };
-
-    this.outputFileSystem = {
-      constructor: {
-        name: 'NotMemoryFileSystem',
-      },
-    };
-  }
-}
-
-class MockCompilerNoStat extends MockCompiler {
-  constructor(options = {}) {
-    super(options);
-
-    // eslint-disable-next-line no-undefined
-    this.inputFileSystem.stat = (file, cb) => cb(undefined, undefined);
-  }
-}
-
 describe('apply function', () => {
-  // Ideally we pass in patterns and confirm the resulting assets
-  const run = (opts) =>
-    new Promise((resolve, reject) => {
-      if (Array.isArray(opts.patterns)) {
-        opts.patterns.forEach((pattern) => {
-          if (pattern.context) {
-            // eslint-disable-next-line no-param-reassign
-            pattern.context = removeIllegalCharacterForWindows(pattern.context);
-          }
-        });
-      }
-
-      // Get a mock compiler to pass to plugin.apply
-      const compiler = opts.compiler || new MockCompiler();
-
-      const isWin = process.platform === 'win32';
-
-      if (!opts.symlink || isWin) {
-        if (!opts.options) {
-          // eslint-disable-next-line no-param-reassign
-          opts.options = {};
-        }
-
-        if (!opts.options.ignore) {
-          // eslint-disable-next-line no-param-reassign
-          opts.options.ignore = [];
-        }
-
-        opts.options.ignore.push('symlink/**/*', 'file-ln.txt', 'directory-ln');
-      }
-
-      new CopyPlugin(opts.patterns, opts.options).apply(compiler);
-
-      // Call the registered function with a mock compilation and callback
-      const compilation = Object.assign(
-        {
-          assets: {},
-          errors: [],
-          warnings: [],
-          fileDependencies: new Set(),
-          contextDependencies: new Set(),
-        },
-        opts.compilation
-      );
-
-      // Execute the functions in series
-      return Promise.resolve()
-        .then(
-          () =>
-            new Promise((res, rej) => {
-              try {
-                compiler.hooks.emit(compilation, res);
-              } catch (error) {
-                rej(error);
-              }
-            })
-        )
-        .then(
-          () =>
-            new Promise((res, rej) => {
-              try {
-                compiler.hooks.afterEmit(compilation, res);
-              } catch (error) {
-                rej(error);
-              }
-            })
-        )
-        .then(() => {
-          if (opts.expectedErrors) {
-            expect(compilation.errors).toEqual(opts.expectedErrors);
-          } else if (compilation.errors.length > 0) {
-            throw compilation.errors[0];
-          }
-
-          if (opts.expectedWarnings) {
-            expect(compilation.warnings).toEqual(opts.expectedWarnings);
-          } else if (compilation.warnings.length > 0) {
-            throw compilation.warnings[0];
-          }
-
-          resolve(compilation);
-        })
-        .catch(reject);
-    });
-
-  const runEmit = (opts) =>
-    run(opts).then((compilation) => {
-      if (opts.skipAssetsTesting) {
-        return;
-      }
-
-      if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-        expect(Object.keys(compilation.assets).sort()).toEqual(
-          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
-        );
-      } else {
-        expect(compilation.assets).toEqual({});
-      }
-
-      if (opts.expectedAssetContent) {
-        // eslint-disable-next-line guard-for-in
-        for (const assetName in opts.expectedAssetContent) {
-          expect(compilation.assets[assetName]).toBeDefined();
-
-          if (compilation.assets[assetName]) {
-            let expectedContent = opts.expectedAssetContent[assetName];
-
-            if (!Buffer.isBuffer(expectedContent)) {
-              expectedContent = Buffer.from(expectedContent);
-            }
-
-            let compiledContent = compilation.assets[assetName].source();
-
-            if (!Buffer.isBuffer(compiledContent)) {
-              compiledContent = Buffer.from(compiledContent);
-            }
-
-            expect(Buffer.compare(expectedContent, compiledContent)).toBe(0);
-          }
-        }
-      }
-    });
-
-  const runForce = (opts) => {
-    // eslint-disable-next-line no-param-reassign
-    opts.compilation = {
-      assets: {},
-    };
-    // eslint-disable-next-line no-param-reassign
-    opts.compilation.assets[opts.existingAsset] = {
-      source() {
-        return 'existing';
-      },
-    };
-
-    return run(opts).then(() => {});
-  };
-
-  const runChange = (opts) => {
-    // Create two test files
-    fs.writeFileSync(opts.newFileLoc1, 'file1contents');
-    fs.writeFileSync(opts.newFileLoc2, 'file2contents');
-
-    // Create a reference to the compiler
-    const compiler = new MockCompiler();
-    const compilation = {
-      assets: {},
-      errors: [],
-      warnings: [],
-      fileDependencies: new Set(),
-      contextDependencies: new Set(),
-    };
-
-    return run({
-      compiler,
-      options: opts.options,
-      patterns: opts.patterns,
-    })
-      .then(() => {
-        // Change a file
-        fs.appendFileSync(opts.newFileLoc1, 'extra');
-
-        // Trigger another compile
-        return new Promise((res) => {
-          compiler.hooks.emit(compilation, res);
-        });
-      })
-      .then(() => {
-        if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-          expect(Object.keys(compilation.assets).sort()).toEqual(
-            opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
-          );
-        } else {
-          expect(compilation.assets).toEqual({});
-        }
-      })
-      .then(() => {
-        // Todo finally and check file exists
-        fs.unlinkSync(opts.newFileLoc1);
-        fs.unlinkSync(opts.newFileLoc2);
-      });
-  };
-
   const specialFiles = {
     '[special?directory]/nested/nestedfile.txt': '',
     '[special?directory]/(special-*file).txt': 'special',
@@ -427,72 +194,6 @@ describe('apply function', () => {
           {
             from: '**/*',
             to: 'nested',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can transform target path of every file in glob', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          '/some/path/(special-*file).txt.tst',
-          '/some/path/binextension.bin.tst',
-          '/some/path/deepnested.txt.tst',
-          '/some/path/deepnesteddir.txt.tst',
-          '/some/path/file.txt.tst',
-          '/some/path/file.txt.gz.tst',
-          '/some/path/directoryfile.txt.tst',
-          '/some/path/nestedfile.txt.tst',
-          '/some/path/noextension.tst',
-          '/some/path/hello.txt.tst',
-        ],
-        patterns: [
-          {
-            from: '**/*',
-            transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
-
-              return `/some/path/${path.basename(targetPath)}.tst`;
-            },
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can transform target path of every file in glob after applying template', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          'transformed/[!]/hello-d41d8c.txt',
-          'transformed/[special?directory]/directoryfile-22af64.txt',
-          'transformed/[special?directory]/(special-*file)-0bd650.txt',
-          'transformed/[special?directory]/nested/nestedfile-d41d8c.txt',
-          'transformed/binextension-d41d8c.bin',
-          'transformed/dir (86)/file-d41d8c.txt',
-          'transformed/dir (86)/nesteddir/deepnesteddir/deepnesteddir-d41d8c.txt',
-          'transformed/dir (86)/nesteddir/nestedfile-d41d8c.txt',
-          'transformed/file-22af64.txt',
-          'transformed/file.txt-5b311c.gz',
-          'transformed/directory/directoryfile-22af64.txt',
-          'transformed/directory/nested/deep-nested/deepnested-d41d8c.txt',
-          'transformed/directory/nested/nestedfile-d41d8c.txt',
-          'transformed/noextension-d41d8c',
-        ],
-        patterns: [
-          {
-            from: '**/*',
-            to: 'nested/[path][name]-[hash:6].[ext]',
-            transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
-
-              return targetPath.replace(
-                `nested${path.sep}`,
-                `transformed${path.sep}`
-              );
-            },
           },
         ],
       })
@@ -780,24 +481,6 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('can transform target path', (done) => {
-      runEmit({
-        expectedAssetKeys: ['subdir/test.txt'],
-        patterns: [
-          {
-            from: 'file.txt',
-            transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
-
-              return targetPath.replace('file.txt', 'subdir/test.txt');
-            },
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
     it('warns when file not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
@@ -845,24 +528,6 @@ describe('apply function', () => {
           {
             from: 'file.txt',
             transform() {
-              // eslint-disable-next-line no-throw-literal
-              throw 'a failure happened';
-            },
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('warns when tranformPath failed', (done) => {
-      runEmit({
-        expectedAssetKeys: [],
-        expectedErrors: ['a failure happened'],
-        patterns: [
-          {
-            from: 'file.txt',
-            transformPath() {
               // eslint-disable-next-line no-throw-literal
               throw 'a failure happened';
             },
@@ -1386,26 +1051,6 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('transformPath with promise', (done) => {
-      runEmit({
-        expectedAssetKeys: ['/some/path/file.txt'],
-        patterns: [
-          {
-            from: 'file.txt',
-            transformPath(targetPath, absoluteFrom) {
-              expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
-
-              return new Promise((resolve) => {
-                resolve(`/some/path/${path.basename(targetPath)}`);
-              });
-            },
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
     it('same file to multiple targets', (done) => {
       runEmit({
         expectedAssetKeys: ['first/file.txt', 'second/file.txt'],
@@ -1452,31 +1097,6 @@ describe('apply function', () => {
         patterns: [
           {
             from: 'directory',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('can transform target path of every file in directory', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          '/some/path/.dottedfile',
-          '/some/path/deepnested.txt',
-          '/some/path/directoryfile.txt',
-          '/some/path/nestedfile.txt',
-        ],
-        patterns: [
-          {
-            from: 'directory',
-            transformPath(targetPath, absoluteFrom) {
-              expect(
-                absoluteFrom.includes(path.join(HELPER_DIR, 'directory'))
-              ).toBe(true);
-
-              return `/some/path/${path.basename(targetPath)}`;
-            },
           },
         ],
       })

@@ -68,8 +68,8 @@ module.exports = {
 |         [`force`](#force)         |      `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
 |        [`ignore`](#ignore)        |       `{Array}`       |                      `[]`                       | Globs to ignore files.                                                                                |
 |       [`flatten`](#flatten)       |      `{Boolean}`      |                     `false`                     | Removes all directory references and only copies file names.                                          |
-|     [`transform`](#transform)     | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the file contents.                                                                   |
 |         [`cache`](#cache)         |  `{Boolean\|Object}`  |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|     [`transform`](#transform)     | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the file contents.                                                                   |
 | [`transformPath`](#transformPath) | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the writing path.                                                                    |
 
 #### `from`
@@ -324,6 +324,33 @@ module.exports = {
 };
 ```
 
+#### `cache`
+
+Type: `Boolean|Object`
+Default: `false`
+
+Enable/disable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache.
+Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin([
+      {
+        from: 'src/*.png',
+        to: 'dest/',
+        transform(content, path) {
+          return optimize(content);
+        },
+        cache: true,
+      },
+    ]),
+  ],
+};
+```
+
 #### `transform`
 
 Type: `Function|Promise`
@@ -365,33 +392,6 @@ module.exports = {
         transform(content, path) {
           return Promise.resolve(optimize(content));
         },
-      },
-    ]),
-  ],
-};
-```
-
-#### `cache`
-
-Type: `Boolean|Object`
-Default: `false`
-
-Enable/disable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache.
-Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.png',
-        to: 'dest/',
-        transform(content, path) {
-          return optimize(content);
-        },
-        cache: true,
       },
     ]),
   ],
