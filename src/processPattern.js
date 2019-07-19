@@ -75,9 +75,7 @@ export default function processPattern(globalRef, pattern) {
 
             if (minimatch(file.relativeFrom, glob, globParams)) {
               logger.info(
-                `ignoring '${
-                  file.relativeFrom
-                }', because it matches the ignore glob '${glob}'`
+                `ignoring '${file.relativeFrom}', because it matches the ignore glob '${glob}'`
               );
 
               return Promise.resolve();
