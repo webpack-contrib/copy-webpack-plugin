@@ -89,37 +89,6 @@ describe('from option', () => {
         .then(done)
         .catch(done);
     });
-
-    it('should warn when pattern is empty', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          '.file.txt',
-          '[!]/hello.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/nested/nestedfile.txt',
-          'binextension.bin',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
-          'directory/.dottedfile',
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
-          'file.txt',
-          'file.txt.gz',
-          'noextension',
-        ],
-        expectedErrors: [new Error(`path "from" cannot be empty string`)],
-        patterns: [
-          {
-            from: '',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
   });
 
   describe('is a directory', () => {
