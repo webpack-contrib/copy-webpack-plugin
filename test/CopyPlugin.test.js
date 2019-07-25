@@ -10,7 +10,204 @@ const HELPER_DIR = path.join(__dirname, 'helpers');
 
 describe('apply function', () => {
   describe('basic', () => {
-    it('should works with multiple patterns with same "from"', (done) => {
+    it('should copy a file', (done) => {
+      runEmit({
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy a file to a new file', (done) => {
+      runEmit({
+        expectedAssetKeys: ['newfile.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy a file to a new file with context', (done) => {
+      runEmit({
+        expectedAssetKeys: ['newfile.txt'],
+        patterns: [
+          {
+            from: 'directoryfile.txt',
+            context: 'directory',
+            to: 'newfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '.dottedfile',
+          'directoryfile.txt',
+          'nested/deep-nested/deepnested.txt',
+          'nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: 'directory',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files to new directory', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          'newdirectory/.dottedfile',
+          'newdirectory/directoryfile.txt',
+          'newdirectory/nested/deep-nested/deepnested.txt',
+          'newdirectory/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: 'directory',
+            to: 'newdirectory',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files to new directory with context', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          'newdirectory/deep-nested/deepnested.txt',
+          'newdirectory/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: 'nested',
+            context: 'directory',
+            to: 'newdirectory',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files using glob', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: 'directory/**/*',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files using glob to new directory', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          'newdirectory/directory/directoryfile.txt',
+          'newdirectory/directory/nested/deep-nested/deepnested.txt',
+          'newdirectory/directory/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: 'directory/**/*',
+            to: 'newdirectory',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files using glob to new directory with context', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          'newdirectory/nested/deep-nested/deepnested.txt',
+          'newdirectory/nested/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: 'nested/**/*',
+            context: 'directory',
+            to: 'newdirectory',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy a file to a new file', (done) => {
+      runEmit({
+        expectedAssetKeys: ['newfile.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy a file to a new file with context', (done) => {
+      runEmit({
+        expectedAssetKeys: ['newfile.txt'],
+        patterns: [
+          {
+            from: 'directoryfile.txt',
+            context: 'directory',
+            to: 'newfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should multiple files to a new file', (done) => {
+      runEmit({
+        expectedAssetKeys: ['newfile.txt', 'newbinextension.bin'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newfile.txt',
+          },
+          {
+            from: 'binextension.bin',
+            to: 'newbinextension.bin',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy multiple files with same "from"', (done) => {
       runEmit({
         expectedAssetKeys: ['first/file.txt', 'second/file.txt'],
         patterns: [
