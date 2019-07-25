@@ -454,7 +454,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.resolve(HELPER_DIR, 'directory');
+          const absFrom = path.join(HELPER_DIR, 'directory');
 
           expect(Array.from(compilation.contextDependencies).sort()).toEqual(
             [absFrom].sort()
@@ -494,7 +494,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.resolve(HELPER_DIR, 'directory');
+          const absFrom = path.join(HELPER_DIR, 'directory');
 
           expect(compilation.contextDependencies).not.toContain(absFrom);
         })

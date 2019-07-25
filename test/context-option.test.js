@@ -177,7 +177,7 @@ describe('context option', () => {
       patterns: [
         {
           from: 'directoryfile.txt',
-          context: path.resolve(HELPER_DIR, 'directory'),
+          context: path.join(HELPER_DIR, 'directory'),
         },
       ],
     })
@@ -192,7 +192,7 @@ describe('context option', () => {
         'newdirectory/nestedfile.txt',
       ],
       options: {
-        context: path.resolve(HELPER_DIR, 'directory'),
+        context: path.join(HELPER_DIR, 'directory'),
       },
       patterns: [
         {
@@ -254,7 +254,7 @@ describe('context option', () => {
         'newdirectory/nesteddir/nestedfile.txt',
       ],
       options: {
-        context: path.resolve(HELPER_DIR, 'dir (86)'),
+        context: path.join(HELPER_DIR, 'dir (86)'),
       },
       patterns: [
         {

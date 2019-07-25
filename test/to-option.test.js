@@ -28,7 +28,7 @@ describe('to option', () => {
         patterns: [
           {
             from: 'file.txt',
-            to: path.resolve(TEMP_DIR, 'newfile.txt'),
+            to: path.join(TEMP_DIR, 'newfile.txt'),
           },
         ],
       })
@@ -183,7 +183,7 @@ describe('to option', () => {
         expectedAssetKeys: ['newdirectory/directoryfile.txt'],
         patterns: [
           {
-            from: path.resolve(HELPER_DIR, 'directory', 'directoryfile.txt'),
+            from: path.join(HELPER_DIR, 'directory', 'directoryfile.txt'),
             to: 'newdirectory',
           },
         ],
@@ -197,7 +197,7 @@ describe('to option', () => {
         expectedAssetKeys: ['newdirectory/directoryfile.txt'],
         patterns: [
           {
-            from: path.resolve(HELPER_DIR, 'directory', 'directoryfile.txt'),
+            from: path.join(HELPER_DIR, 'directory', 'directoryfile.txt'),
             to: 'newdirectory/',
           },
         ],
@@ -233,7 +233,7 @@ describe('to option', () => {
         ],
         patterns: [
           {
-            from: path.resolve(HELPER_DIR, 'directory', 'nested'),
+            from: path.join(HELPER_DIR, 'directory', 'nested'),
             to: 'newdirectory',
           },
         ],

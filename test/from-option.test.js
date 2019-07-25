@@ -24,7 +24,7 @@ describe('from option', () => {
         expectedAssetKeys: ['file.txt'],
         patterns: [
           {
-            from: path.resolve(HELPER_DIR, 'file.txt'),
+            from: path.join(HELPER_DIR, 'file.txt'),
           },
         ],
       })
@@ -187,7 +187,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: path.resolve(HELPER_DIR, 'directory'),
+            from: path.join(HELPER_DIR, 'directory'),
           },
         ],
       })
