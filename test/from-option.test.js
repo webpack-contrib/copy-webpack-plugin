@@ -241,7 +241,7 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files when a glob has absolute path', (done) => {
+    it('should move files when a glob contains absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ['file.txt'],
         patterns: [
@@ -282,7 +282,7 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files using globstar contains an absolute path', (done) => {
+    it('should move files using globstar and contains an absolute path', (done) => {
       runEmit({
         expectedAssetKeys: [
           '[!]/hello.txt',
