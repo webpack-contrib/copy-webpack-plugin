@@ -8,7 +8,7 @@ const HELPER_DIR = path.join(__dirname, 'helpers');
 
 describe('to option', () => {
   describe('is a file', () => {
-    it('should a file to a new file', (done) => {
+    it('should move a file to a new file', (done) => {
       runEmit({
         expectedAssetKeys: ['newfile.txt'],
         patterns: [
@@ -22,7 +22,7 @@ describe('to option', () => {
         .catch(done);
     });
 
-    it('should a file to a new file when "to" is absolute path', (done) => {
+    it('should move a file to a new file when "to" is absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ['../tempdir/newfile.txt'],
         patterns: [
@@ -36,7 +36,7 @@ describe('to option', () => {
         .catch(done);
     });
 
-    it('should a file to a new file inside nested directory', (done) => {
+    it('should move a file to a new file inside nested directory', (done) => {
       runEmit({
         expectedAssetKeys: ['newdirectory/newfile.txt'],
         patterns: [
@@ -50,7 +50,21 @@ describe('to option', () => {
         .catch(done);
     });
 
-    it('should a file to a new file inside nested directory out of context', (done) => {
+    it('should move a file to a new file inside nested directory when "to" an absolute path', (done) => {
+      runEmit({
+        expectedAssetKeys: ['newdirectory/newfile.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: path.join(BUILD_DIR, 'newdirectory/newfile.txt'),
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move a file to a new file inside other directory what out of context', (done) => {
       runEmit({
         expectedAssetKeys: ['../tempdir/newdirectory/newfile.txt'],
         patterns: [
