@@ -109,8 +109,6 @@ describe('from option', () => {
           'file.txt',
           'file.txt.gz',
           'noextension',
-          'watch/.gitkeep',
-          'watch/directory/.gitkeep',
         ],
         expectedErrors: [new Error(`path "from" cannot be empty string`)],
         patterns: [

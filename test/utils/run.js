@@ -34,7 +34,12 @@ function run(opts) {
         opts.options.ignore = [];
       }
 
-      opts.options.ignore.push('symlink/**/*', 'file-ln.txt', 'directory-ln');
+      opts.options.ignore.push(
+        'symlink/**/*',
+        'file-ln.txt',
+        'directory-ln',
+        'watch/**/*'
+      );
     }
 
     new CopyPlugin(opts.patterns, opts.options).apply(compiler);
