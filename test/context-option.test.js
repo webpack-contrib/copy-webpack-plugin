@@ -19,6 +19,20 @@ describe('context option', () => {
       .catch(done);
   });
 
+  it('should work when "from" is a file and "context" with special characters', (done) => {
+    runEmit({
+      expectedAssetKeys: ['directoryfile.txt'],
+      patterns: [
+        {
+          from: 'directoryfile.txt',
+          context: '[special?directory]',
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
   it('should work when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
@@ -87,6 +101,44 @@ describe('context option', () => {
       .catch(done);
   });
 
+  it('should work when "from" is a glob and "to" is a directory', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        'nested/directoryfile.txt',
+        'nested/nested/deep-nested/deepnested.txt',
+        'nested/nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          context: 'directory',
+          from: '**/*',
+          to: 'nested',
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work when "from" is a glob and "to" is a directory and "content" is an absolute path', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        'nested/directoryfile.txt',
+        'nested/nested/deep-nested/deepnested.txt',
+        'nested/nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          context: path.join(HELPER_DIR, 'directory'),
+          from: '**/*',
+          to: 'nested',
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
   it('should work when "from" is a glob and "context" with special characters', (done) => {
     runEmit({
       expectedAssetKeys: [
@@ -97,6 +149,20 @@ describe('context option', () => {
       patterns: [
         {
           from: '**/*',
+          context: '[special?directory]',
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work when "from" is a glob and "context" with special characters #2', (done) => {
+    runEmit({
+      expectedAssetKeys: ['(special-*file).txt'],
+      patterns: [
+        {
+          from: '(special-*file).txt',
           context: '[special?directory]',
         },
       ],

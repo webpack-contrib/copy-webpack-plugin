@@ -19,14 +19,52 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move a file when from an absolute path', (done) => {
-      const absolutePath = path.resolve(HELPER_DIR, 'file.txt');
-
+    it('should move a file when "from" an absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ['file.txt'],
         patterns: [
           {
-            from: absolutePath,
+            from: path.resolve(HELPER_DIR, 'file.txt'),
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move a file from nesting directory', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directoryfile.txt'],
+        patterns: [
+          {
+            from: 'directory/directoryfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move a file from nesting directory when "from" an absolute path', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directoryfile.txt'],
+        patterns: [
+          {
+            from: path.join(HELPER_DIR, 'directory/directoryfile.txt'),
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move a file (symbolic link)', (done) => {
+      runEmit({
+        symlink: true,
+        expectedAssetKeys: process.platform === 'win32' ? [] : ['file-ln.txt'],
+        patterns: [
+          {
+            from: 'symlink/file-ln.txt',
           },
         ],
       })
@@ -177,6 +215,32 @@ describe('from option', () => {
         .catch(done);
     });
 
+    it('should move files from nested directory', (done) => {
+      runEmit({
+        expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory/nested',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move files from nested directory with an absolute path', (done) => {
+      runEmit({
+        expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
+        patterns: [
+          {
+            from: path.join(HELPER_DIR, 'directory/nested'),
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('should warn when directory not found', (done) => {
       runEmit({
         expectedAssetKeys: [],
@@ -210,6 +274,19 @@ describe('from option', () => {
         .catch(done);
     });
 
+    it('should move files when a glob has absolute path', (done) => {
+      runEmit({
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: path.join(HELPER_DIR, '*.txt'),
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('should move files using globstar', (done) => {
       runEmit({
         expectedAssetKeys: [
@@ -231,6 +308,60 @@ describe('from option', () => {
         patterns: [
           {
             from: '**/*',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move files using globstar contains an absolute path', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '[!]/hello.txt',
+          'file.txt',
+          'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/nestedfile.txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/nested/nestedfile.txt',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: path.join(HELPER_DIR, '**/*.txt'),
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move files in nested directory using globstar', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          'nested/[!]/hello-d41d8c.txt',
+          'nested/binextension-d41d8c.bin',
+          'nested/dir (86)/file-d41d8c.txt',
+          'nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir-d41d8c.txt',
+          'nested/dir (86)/nesteddir/nestedfile-d41d8c.txt',
+          'nested/file-22af64.txt',
+          'nested/file.txt-5b311c.gz',
+          'nested/directory/directoryfile-22af64.txt',
+          'nested/directory/nested/deep-nested/deepnested-d41d8c.txt',
+          'nested/directory/nested/nestedfile-d41d8c.txt',
+          'nested/[special?directory]/(special-*file)-0bd650.txt',
+          'nested/[special?directory]/directoryfile-22af64.txt',
+          'nested/[special?directory]/nested/nestedfile-d41d8c.txt',
+          'nested/noextension-d41d8c',
+        ],
+        patterns: [
+          {
+            from: '**/*',
+            to: 'nested/[path][name]-[hash:6].[ext]',
           },
         ],
       })
@@ -280,6 +411,31 @@ describe('from option', () => {
         patterns: [
           {
             from: '{file.txt,noextension,directory/**/*}',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move files (symbolic link)', (done) => {
+      runEmit({
+        // Windows doesn't support symbolic link
+        symlink: true,
+        expectedAssetKeys:
+          process.platform === 'win32'
+            ? []
+            : [
+                'symlink/directory-ln/file.txt',
+                'symlink/directory-ln/nested-directory/file-in-nested-directory.txt',
+                'symlink/directory/file.txt',
+                'symlink/directory/nested-directory/file-in-nested-directory.txt',
+                'symlink/file-ln.txt',
+                'symlink/file.txt',
+              ],
+        patterns: [
+          {
+            from: 'symlink/**/*.txt',
           },
         ],
       })
