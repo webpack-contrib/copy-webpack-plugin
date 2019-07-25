@@ -110,6 +110,66 @@ describe('from option', () => {
         .catch(done);
     });
 
+    it('should move files when "from" is current directory', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '.file.txt',
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+          'binextension.bin',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
+          'directory/.dottedfile',
+          'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/nestedfile.txt',
+          'file.txt',
+          'file.txt.gz',
+          'noextension',
+        ],
+        patterns: [
+          {
+            from: '.',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move files when "from" is relative path to context', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '.file.txt',
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+          'binextension.bin',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
+          'directory/.dottedfile',
+          'directory/directoryfile.txt',
+          'directory/nested/deep-nested/deepnested.txt',
+          'directory/nested/nestedfile.txt',
+          'file.txt',
+          'file.txt.gz',
+          'noextension',
+        ],
+        patterns: [
+          {
+            from: '../helpers',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('should move files with a forward slash', (done) => {
       runEmit({
         expectedAssetKeys: [
