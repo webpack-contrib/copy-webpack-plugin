@@ -1,6 +1,15 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [5.0.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.3...v5.0.4) (2019-07-26)
+
+
+### Bug Fixes
+
+* use posix separator for emitting assets ([#392](https://github.com/webpack-contrib/copy-webpack-plugin/issues/392)) ([7f08be6](https://github.com/webpack-contrib/copy-webpack-plugin/commit/7f08be6))
+
+
 
 <a name="5.0.3"></a>
 ## [5.0.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.2...v5.0.3) (2019-04-24)
