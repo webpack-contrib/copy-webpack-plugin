@@ -34,7 +34,12 @@ function run(opts) {
         opts.options.ignore = [];
       }
 
-      opts.options.ignore.push('symlink/**/*', 'file-ln.txt', 'directory-ln');
+      opts.options.ignore.push(
+        'symlink/**/*',
+        'file-ln.txt',
+        'directory-ln',
+        'watch/**/*'
+      );
     }
 
     new CopyPlugin(opts.patterns, opts.options).apply(compiler);
@@ -136,14 +141,17 @@ function runForce(opts) {
   opts.compilation = {
     assets: {},
   };
-  // eslint-disable-next-line no-param-reassign
-  opts.compilation.assets[opts.existingAsset] = {
-    source() {
-      return 'existing';
-    },
-  };
 
-  return run(opts).then(() => {});
+  opts.existingAssets.forEach((assetName) => {
+    // eslint-disable-next-line no-param-reassign
+    opts.compilation.assets[assetName] = {
+      source() {
+        return 'existing';
+      },
+    };
+  });
+
+  return runEmit(opts).then(() => {});
 }
 
 function runChange(opts) {
@@ -163,7 +171,7 @@ function runChange(opts) {
 
   return run({
     compiler,
-    options: opts.options,
+    options: Object.assign({}, opts.options, { context: 'watch' }),
     patterns: opts.patterns,
   })
     .then(() => {

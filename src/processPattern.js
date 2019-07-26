@@ -12,6 +12,8 @@ export default function processPattern(globalRef, pattern) {
     {
       cwd: pattern.context,
       follow: true,
+      // Todo in next major release
+      // dot: false
     },
     pattern.globOptions || {}
   );

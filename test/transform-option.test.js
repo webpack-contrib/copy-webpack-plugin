@@ -4,17 +4,20 @@ import { runEmit } from './utils/run';
 
 const HELPER_DIR = path.join(__dirname, 'helpers');
 
-describe('transformPath option', () => {
-  it('should transform target path when "from" is a file', (done) => {
+describe('transform option', () => {
+  it('should transform file when "from" is a file', (done) => {
     runEmit({
-      expectedAssetKeys: ['subdir/test.txt'],
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': 'newchanged',
+      },
       patterns: [
         {
           from: 'file.txt',
-          transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
+          transform(content, absoluteFrom) {
+            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
 
-            return targetPath.replace('file.txt', 'subdir/test.txt');
+            return `${content}changed`;
           },
         },
       ],
@@ -26,20 +29,24 @@ describe('transformPath option', () => {
   it('should transform target path of every when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '/some/path/.dottedfile',
-        '/some/path/deepnested.txt',
-        '/some/path/directoryfile.txt',
-        '/some/path/nestedfile.txt',
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
       ],
+      expectedAssetContent: {
+        '.dottedfile': 'dottedfile contents\nchanged',
+        'directoryfile.txt': 'newchanged',
+        'nested/deep-nested/deepnested.txt': 'changed',
+        'nested/nestedfile.txt': 'changed',
+      },
       patterns: [
         {
           from: 'directory',
-          transformPath(targetPath, absoluteFrom) {
-            expect(
-              absoluteFrom.includes(path.join(HELPER_DIR, 'directory'))
-            ).toBe(true);
+          transform(content, absoluteFrom) {
+            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
 
-            return `/some/path/${path.basename(targetPath)}`;
+            return `${content}changed`;
           },
         },
       ],
@@ -51,17 +58,22 @@ describe('transformPath option', () => {
   it('should transform target path of every file when "from" is a glob', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '/some/path/deepnested.txt.tst',
-        '/some/path/directoryfile.txt.tst',
-        '/some/path/nestedfile.txt.tst',
+        'directory/directoryfile.txt',
+        'directory/nested/deep-nested/deepnested.txt',
+        'directory/nested/nestedfile.txt',
       ],
+      expectedAssetContent: {
+        'directory/directoryfile.txt': 'newchanged',
+        'directory/nested/deep-nested/deepnested.txt': 'changed',
+        'directory/nested/nestedfile.txt': 'changed',
+      },
       patterns: [
         {
           from: 'directory/**/*',
-          transformPath(targetPath, absoluteFrom) {
+          transform(content, absoluteFrom) {
             expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
 
-            return `/some/path/${path.basename(targetPath)}.tst`;
+            return `${content}changed`;
           },
         },
       ],
@@ -70,17 +82,18 @@ describe('transformPath option', () => {
       .catch(done);
   });
 
-  it('should transform target path when function return Promise', (done) => {
+  it('should transform file when function return Promise', (done) => {
     runEmit({
-      expectedAssetKeys: ['/some/path/file.txt'],
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': 'newchanged!',
+      },
       patterns: [
         {
           from: 'file.txt',
-          transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
-
+          transform(content) {
             return new Promise((resolve) => {
-              resolve(`/some/path/${path.basename(targetPath)}`);
+              resolve(`${content}changed!`);
             });
           },
         },
@@ -92,15 +105,16 @@ describe('transformPath option', () => {
 
   it('should transform target path when async function used', (done) => {
     runEmit({
-      expectedAssetKeys: ['/some/path/file.txt'],
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': 'newchanged!',
+      },
       patterns: [
         {
           from: 'file.txt',
-          async transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
-
+          async transform(content) {
             const newPath = await new Promise((resolve) => {
-              resolve(`/some/path/${path.basename(targetPath)}`);
+              resolve(`${content}changed!`);
             });
 
             return newPath;
@@ -119,7 +133,8 @@ describe('transformPath option', () => {
       patterns: [
         {
           from: 'file.txt',
-          transformPath() {
+          transform() {
+            // eslint-disable-next-line no-throw-literal
             throw new Error('a failure happened');
           },
         },
@@ -136,7 +151,7 @@ describe('transformPath option', () => {
       patterns: [
         {
           from: 'file.txt',
-          transformPath() {
+          transform() {
             return new Promise((resolve, reject) => {
               return reject(new Error('a failure happened'));
             });
@@ -155,36 +170,10 @@ describe('transformPath option', () => {
       patterns: [
         {
           from: 'file.txt',
-          async transformPath() {
+          async transform() {
             await new Promise((resolve, reject) => {
               reject(new Error('a failure happened'));
             });
-          },
-        },
-      ],
-    })
-      .then(done)
-      .catch(done);
-  });
-
-  it('should transform target path of every file in glob after applying template', (done) => {
-    runEmit({
-      expectedAssetKeys: [
-        'transformed/directory/directoryfile-22af64.txt',
-        'transformed/directory/nested/deep-nested/deepnested-d41d8c.txt',
-        'transformed/directory/nested/nestedfile-d41d8c.txt',
-      ],
-      patterns: [
-        {
-          from: 'directory/**/*',
-          to: 'nested/[path][name]-[hash:6].[ext]',
-          transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
-
-            return targetPath.replace(
-              `nested${path.sep}`,
-              `transformed${path.sep}`
-            );
           },
         },
       ],

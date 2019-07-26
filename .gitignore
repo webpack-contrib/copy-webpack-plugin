@@ -8,6 +8,7 @@ npm-debug.log*
 /local
 /reports
 /node_modules
+/test/helpers/\[special\?directory\]
 
 .DS_Store
 Thumbs.db
