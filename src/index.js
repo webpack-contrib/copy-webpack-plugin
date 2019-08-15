@@ -100,26 +100,26 @@ class CopyPlugin {
 
       // Add file dependencies if they're not already tracked
       for (const fileDependency of fileDependencies) {
-        if (compilation.fileDependencies.has(fileDependency)) {
-          logger.debug(
-            `not adding '${fileDependency}' to change tracking, because it's already tracked`
-          );
-        } else {
-          logger.debug(`adding '${fileDependency}' to change tracking`);
+        const dependencyIsTracked = compilation.fileDependencies.has(
+          fileDependency
+        );
 
+        this.log(dependencyIsTracked, fileDependency, logger);
+
+        if (!dependencyIsTracked) {
           compilation.fileDependencies.add(fileDependency);
         }
       }
 
       // Add context dependencies if they're not already tracked
       for (const contextDependency of contextDependencies) {
-        if (compilation.contextDependencies.has(contextDependency)) {
-          logger.debug(
-            `not adding '${contextDependency}' to change tracking, because it's already tracked`
-          );
-        } else {
-          logger.debug(`adding '${contextDependency}' to change tracking`);
+        const dependencyIsTracked = compilation.contextDependencies.has(
+          contextDependency
+        );
 
+        this.log(dependencyIsTracked, contextDependency, logger);
+
+        if (!dependencyIsTracked) {
           compilation.contextDependencies.add(contextDependency);
         }
       }
@@ -128,6 +128,18 @@ class CopyPlugin {
 
       callback();
     });
+  }
+
+  // eslint-disable-next-line
+  log(dependencyIsTracked, dependency, logger) {
+    let msg = `not adding '${dependency}' to change tracking`;
+
+    // Just gonna rephrase the message as we intend
+    msg = dependencyIsTracked
+      ? (msg += `, because it's already tracked`)
+      : msg.slice(3);
+
+    logger.debug(msg);
   }
 }
 
