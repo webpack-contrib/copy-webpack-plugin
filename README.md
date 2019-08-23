@@ -65,14 +65,14 @@ module.exports = {
 |          [`from`](#from)          |  `{String\|Object}`   |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
 |            [`to`](#to)            |      `{String}`       |                   `undefined`                   | Output path.                                                                                          |
 |       [`context`](#context)       |      `{String}`       | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|        [`toType`](#toType)        |      `{String}`       |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
+|        [`toType`](#totype)        |      `{String}`       |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
 |          [`test`](#test)          |      `{RegExp}`       |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
 |         [`force`](#force)         |      `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
 |        [`ignore`](#ignore)        |       `{Array}`       |                      `[]`                       | Globs to ignore files.                                                                                |
 |       [`flatten`](#flatten)       |      `{Boolean}`      |                     `false`                     | Removes all directory references and only copies file names.                                          |
 |         [`cache`](#cache)         |  `{Boolean\|Object}`  |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
 |     [`transform`](#transform)     | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the file contents.                                                                   |
-| [`transformPath`](#transformPath) | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the writing path.                                                                    |
+| [`transformPath`](#transformpath) | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the writing path.                                                                    |
 
 #### `from`
 
@@ -455,10 +455,10 @@ module.exports = {
 
 |                Name                 |    Type     |          Default           | Description                                                                                                                                       |
 | :---------------------------------: | :---------: | :------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------ |
-|       [`logLevel`](#logLevel)       | `{String}`  |        **`'warn'`**        | Level of messages that the module will log                                                                                                        |
+|       [`logLevel`](#loglevel)       | `{String}`  |        **`'warn'`**        | Level of messages that the module will log                                                                                                        |
 |         [`ignore`](#ignore)         |  `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                                                                                      |
 |        [`context`](#context)        | `{String}`  | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns                                                                  |
-| [`copyUnmodified`](#copyUnmodified) | `{Boolean}` |          `false`           | Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option |
+| [`copyUnmodified`](#copyunmodified) | `{Boolean}` |          `false`           | Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option |
 
 #### `logLevel`
 
