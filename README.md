@@ -442,7 +442,7 @@ module.exports = {
       {
         from: 'src/*.png',
         to: 'dest/',
-        transformPath(targePath, absolutePath) {
+        transformPath(targetPath, absolutePath) {
           return Promise.resolve('newPath');
         },
       },
