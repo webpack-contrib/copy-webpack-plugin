@@ -98,28 +98,20 @@ class CopyPlugin {
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
       logger.debug('starting after-emit');
 
-      // Add file dependencies if they're not already tracked
-      for (const fileDependency of fileDependencies) {
-        if (compilation.fileDependencies.has(fileDependency)) {
-          logger.debug(
-            `not adding '${fileDependency}' to change tracking, because it's already tracked`
-          );
-        } else {
-          logger.debug(`adding '${fileDependency}' to change tracking`);
-
+      // Add file dependencies
+      if ("addAll" in compilation.fileDependencies) {
+        compilation.fileDependencies.addAll(fileDependencies);
+      } else {
+        for (const fileDependency of fileDependencies) {
           compilation.fileDependencies.add(fileDependency);
         }
       }
 
-      // Add context dependencies if they're not already tracked
-      for (const contextDependency of contextDependencies) {
-        if (compilation.contextDependencies.has(contextDependency)) {
-          logger.debug(
-            `not adding '${contextDependency}' to change tracking, because it's already tracked`
-          );
-        } else {
-          logger.debug(`adding '${contextDependency}' to change tracking`);
-
+      // Add context dependencies
+      if ("addAll" in compilation.contextDependencies) {
+        compilation.contextDependencies.addAll(contextDependencies);
+      } else {
+        for (const contextDependency of contextDependencies) {
           compilation.contextDependencies.add(contextDependency);
         }
       }
