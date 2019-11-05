@@ -98,7 +98,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
   const noStatsHandler = () => {
     // If from doesn't appear to be a glob, then log a warning
-    if (isGlob(pattern.from) || pattern.from.indexOf('*') !== -1) {
+    if (isGlob(pattern.from) || pattern.from.includes('*')) {
       logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
 
       pattern.fromType = 'glob';
