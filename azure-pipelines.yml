@@ -36,8 +36,11 @@ jobs:
     pool:
       vmImage: ubuntu-16.04
     strategy:
-      maxParallel: 5
+      maxParallel: 6
       matrix:
+        node-13:
+          node_version: ^13.0.0
+          webpack_version: latest
         node-12:
           node_version: ^12.0.0
           webpack_version: latest
@@ -50,10 +53,9 @@ jobs:
         node-6:
           node_version: ^6.9.0
           webpack_version: latest
-        node-8-canary:
-          node_version: ^8.9.0
+        node-10-canary:
+          node_version: ^10.13.0
           webpack_version: next
-          continue_on_error: true
     steps:
       - task: NodeTool@0
         inputs:
@@ -93,6 +95,9 @@ jobs:
     strategy:
       maxParallel: 5
       matrix:
+        node-13:
+          node_version: ^13.0.0
+          webpack_version: latest
         node-12:
           node_version: ^12.0.0
           webpack_version: latest
@@ -105,10 +110,9 @@ jobs:
         node-6:
           node_version: ^6.9.0
           webpack_version: latest
-        node-8-canary:
-          node_version: ^8.9.0
+        node-10-canary:
+          node_version: ^10.13.0
           webpack_version: next
-          continue_on_error: true
     steps:
       - task: NodeTool@0
         inputs:
@@ -148,6 +152,9 @@ jobs:
     strategy:
       maxParallel: 5
       matrix:
+        node-13:
+          node_version: ^13.0.0
+          webpack_version: latest
         node-12:
           node_version: ^12.0.0
           webpack_version: latest
@@ -160,10 +167,9 @@ jobs:
         node-6:
           node_version: ^6.9.0
           webpack_version: latest
-        node-8-canary:
-          node_version: ^8.9.0
+        node-10-canary:
+          node_version: ^10.13.0
           webpack_version: next
-          continue_on_error: true
     steps:
       - script: 'git config --global core.autocrlf input'
         displayName: 'Config git core.autocrlf'
