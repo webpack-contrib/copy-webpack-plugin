@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.0.5](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.4...v5.0.5) (2019-11-06)
+
+
+### Performance Improvements
+
+* improvements for webpack@5
+
+
+
 ### [5.0.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.3...v5.0.4) (2019-07-26)
 
 
