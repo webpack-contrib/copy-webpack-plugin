@@ -1,4 +1,4 @@
-import { runForce } from './utils/run';
+import { runForce } from './helpers/run';
 
 describe('force option', () => {
   describe('is not specified', () => {

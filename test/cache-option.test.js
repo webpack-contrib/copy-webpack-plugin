@@ -6,9 +6,9 @@ import cacache from 'cacache';
 import findCacheDir from 'find-cache-dir';
 import isGzip from 'is-gzip';
 
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('cache option', () => {
   const cacheDir = findCacheDir({ name: 'copy-webpack-plugin' });
@@ -184,7 +184,7 @@ describe('cache option', () => {
 
   it('should cache binary file', (done) => {
     const from = 'file.txt.gz';
-    const content = fs.readFileSync(path.join(HELPER_DIR, from));
+    const content = fs.readFileSync(path.join(FIXTURES_DIR, from));
     const expectedNewContent = zlib.gzipSync('newchanged!');
 
     expect(isGzip(content)).toBe(true);

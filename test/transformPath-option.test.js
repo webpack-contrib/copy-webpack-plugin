@@ -1,8 +1,8 @@
 import path from 'path';
 
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('transformPath option', () => {
   it('should transform target path when "from" is a file', (done) => {
@@ -12,7 +12,7 @@ describe('transformPath option', () => {
         {
           from: 'file.txt',
           transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom).toBe(path.join(HELPER_DIR, 'file.txt'));
+            expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, 'file.txt'));
 
             return targetPath.replace('file.txt', 'subdir/test.txt');
           },
@@ -36,7 +36,7 @@ describe('transformPath option', () => {
           from: 'directory',
           transformPath(targetPath, absoluteFrom) {
             expect(
-              absoluteFrom.includes(path.join(HELPER_DIR, 'directory'))
+              absoluteFrom.includes(path.join(FIXTURES_DIR, 'directory'))
             ).toBe(true);
 
             return `/some/path/${path.basename(targetPath)}`;
@@ -59,7 +59,7 @@ describe('transformPath option', () => {
         {
           from: 'directory/**/*',
           transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
             return `/some/path/${path.basename(targetPath)}.tst`;
           },
@@ -77,7 +77,7 @@ describe('transformPath option', () => {
         {
           from: 'file.txt',
           transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
             return new Promise((resolve) => {
               resolve(`/some/path/${path.basename(targetPath)}`);
@@ -97,7 +97,7 @@ describe('transformPath option', () => {
         {
           from: 'file.txt',
           async transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
             const newPath = await new Promise((resolve) => {
               resolve(`/some/path/${path.basename(targetPath)}`);
@@ -179,7 +179,7 @@ describe('transformPath option', () => {
           from: 'directory/**/*',
           to: 'nested/[path][name]-[hash:6].[ext]',
           transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
             return targetPath.replace(
               `nested${path.sep}`,

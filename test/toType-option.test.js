@@ -1,9 +1,9 @@
 import path from 'path';
 
-import { runEmit } from './utils/run';
-import { MockCompilerNoStat } from './utils/mocks';
+import { runEmit } from './helpers/run';
+import { MockCompilerNoStat } from './helpers/mocks';
 
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('toType option', () => {
   it('should move a file to a new file', (done) => {
@@ -90,7 +90,7 @@ describe('toType option', () => {
       expectedAssetKeys: [],
       expectedWarnings: [
         new Error(
-          `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`
+          `unable to locate 'nonexistent.txt' at '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
         ),
       ],
       patterns: [

@@ -1,4 +1,4 @@
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
 describe('from option', () => {
   it('should move files exclude dot files', (done) => {

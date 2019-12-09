@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
 describe('test option', () => {
   it('should move files to a root directory with [1]', (done) => {

@@ -1,10 +1,10 @@
 import path from 'path';
 
-import { MockCompiler } from './utils/mocks';
-import { run, runEmit, runChange } from './utils/run';
+import { MockCompiler } from './helpers/mocks';
+import { run, runEmit, runChange } from './helpers/run';
 
 const BUILD_DIR = path.join(__dirname, 'build');
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('apply function', () => {
   describe('basic', () => {
@@ -393,7 +393,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.join(HELPER_DIR, 'file.txt');
+          const absFrom = path.join(FIXTURES_DIR, 'file.txt');
 
           expect(Array.from(compilation.fileDependencies).sort()).toEqual(
             [absFrom].sort()
@@ -412,7 +412,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.join(HELPER_DIR, 'directory');
+          const absFrom = path.join(FIXTURES_DIR, 'directory');
 
           expect(Array.from(compilation.contextDependencies).sort()).toEqual(
             [absFrom].sort()
@@ -435,7 +435,7 @@ describe('apply function', () => {
             Array.from(compilation.contextDependencies)
               .map((contextDependency) => contextDependency)
               .sort()
-          ).toEqual([path.join(HELPER_DIR, 'directory')].sort());
+          ).toEqual([path.join(FIXTURES_DIR, 'directory')].sort());
         })
         .then(done)
         .catch(done);
@@ -452,7 +452,7 @@ describe('apply function', () => {
         ],
       })
         .then((compilation) => {
-          const absFrom = path.join(HELPER_DIR, 'directory');
+          const absFrom = path.join(FIXTURES_DIR, 'directory');
 
           expect(compilation.contextDependencies).not.toContain(absFrom);
         })
@@ -463,8 +463,8 @@ describe('apply function', () => {
     it('only include files that have changed', (done) => {
       runChange({
         expectedAssetKeys: ['tempfile1.txt'],
-        newFileLoc1: path.join(HELPER_DIR, 'watch', 'tempfile1.txt'),
-        newFileLoc2: path.join(HELPER_DIR, 'watch', 'tempfile2.txt'),
+        newFileLoc1: path.join(FIXTURES_DIR, 'watch', 'tempfile1.txt'),
+        newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
         patterns: [
           {
             from: 'tempfile1.txt',
@@ -482,13 +482,13 @@ describe('apply function', () => {
       runChange({
         expectedAssetKeys: ['tempfile1.txt'],
         newFileLoc1: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile1.txt'
         ),
         newFileLoc2: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile2.txt'
@@ -507,13 +507,13 @@ describe('apply function', () => {
       runChange({
         expectedAssetKeys: ['tempfile1.txt', 'tempfile2.txt', '.gitkeep'],
         newFileLoc1: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile1.txt'
         ),
         newFileLoc2: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile2.txt'
@@ -535,13 +535,13 @@ describe('apply function', () => {
       runChange({
         expectedAssetKeys: ['dest1/tempfile1.txt'],
         newFileLoc1: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile1.txt'
         ),
         newFileLoc2: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile2.txt'
@@ -562,13 +562,13 @@ describe('apply function', () => {
       runChange({
         expectedAssetKeys: ['dest1/tempfile1.txt', 'dest2/tempfile1.txt'],
         newFileLoc1: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile1.txt'
         ),
         newFileLoc2: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile2.txt'
@@ -597,12 +597,12 @@ describe('apply function', () => {
           'dest2/directory/tempfile1.txt',
         ],
         newFileLoc1: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile1.txt'
         ),
-        newFileLoc2: path.join(HELPER_DIR, 'watch', 'tempfile2.txt'),
+        newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
         patterns: [
           {
             context: 'directory',
@@ -626,12 +626,12 @@ describe('apply function', () => {
           'dest2/tempfile1.txt',
         ],
         newFileLoc1: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile1.txt'
         ),
-        newFileLoc2: path.join(HELPER_DIR, 'watch', 'tempfile2.txt'),
+        newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
         patterns: [
           {
             from: '**/*.txt',
@@ -651,9 +651,9 @@ describe('apply function', () => {
     it('copy only changed files (multiple patterns with difference context 2)', (done) => {
       runChange({
         expectedAssetKeys: ['dest1/tempfile1.txt'],
-        newFileLoc1: path.join(HELPER_DIR, 'watch', 'tempfile1.txt'),
+        newFileLoc1: path.join(FIXTURES_DIR, 'watch', 'tempfile1.txt'),
         newFileLoc2: path.join(
-          HELPER_DIR,
+          FIXTURES_DIR,
           'watch',
           'directory',
           'tempfile2.txt'

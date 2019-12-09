@@ -1,4 +1,4 @@
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
 describe('ignore option', () => {
   it('should ignore files when "from" is a file', (done) => {

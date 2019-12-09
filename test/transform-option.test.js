@@ -1,8 +1,8 @@
 import path from 'path';
 
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('transform option', () => {
   it('should transform file when "from" is a file', (done) => {
@@ -15,7 +15,7 @@ describe('transform option', () => {
         {
           from: 'file.txt',
           transform(content, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
             return `${content}changed`;
           },
@@ -44,7 +44,7 @@ describe('transform option', () => {
         {
           from: 'directory',
           transform(content, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
             return `${content}changed`;
           },
@@ -71,7 +71,7 @@ describe('transform option', () => {
         {
           from: 'directory/**/*',
           transform(content, absoluteFrom) {
-            expect(absoluteFrom.includes(HELPER_DIR)).toBe(true);
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
             return `${content}changed`;
           },
