@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.5...v5.1.0) (2019-12-09)
+
+
+### Features
+
+* validate options ([#419](https://github.com/webpack-contrib/copy-webpack-plugin/issues/419)) ([452539a](https://github.com/webpack-contrib/copy-webpack-plugin/commit/452539ad6498583901536e89204d6004a618cb4a))
+
+
+### Bug Fixes
+
+* better to determine when glob is used ([4826e56](https://github.com/webpack-contrib/copy-webpack-plugin/commit/4826e56c9c034113eadd86b46a97ed1254bf3252))
+
 ### [5.0.5](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.4...v5.0.5) (2019-11-06)
 
 
