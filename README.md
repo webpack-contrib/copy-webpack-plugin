@@ -135,6 +135,10 @@ module.exports = {
         from: '**/*',
         to: '/absolute/path/to/dest/',
       },
+      {
+        from: '**/*',
+        to: '[path][name].[contenthash].[ext]',
+      },
     ]),
   ],
 };
