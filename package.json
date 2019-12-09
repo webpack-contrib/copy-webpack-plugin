@@ -7,34 +7,38 @@
   "author": "Len Boyette",
   "homepage": "https://github.com/webpack-contrib/copy-webpack-plugin",
   "bugs": "https://github.com/webpack-contrib/copy-webpack-plugin/issues",
+  "funding": {
+    "type": "opencollective",
+    "url": "https://opencollective.com/webpack"
+  },
   "main": "dist/cjs.js",
   "engines": {
     "node": ">= 6.9.0"
   },
   "scripts": {
     "start": "npm run build -- -w",
-    "prebuild": "npm run clean",
-    "build": "cross-env NODE_ENV=production babel src -d dist --ignore \"src/**/*.test.js\" --copy-files",
     "clean": "del-cli dist",
+    "prebuild": "npm run clean",
+    "build": "cross-env NODE_ENV=production babel src -d dist --copy-files",
     "commitlint": "commitlint --from=master",
-    "lint:prettier": "prettier \"{**/*,*}.{js,json,md,yml,css}\" --list-different",
-    "lint:js": "eslint --cache src test",
+    "security": "npm audit",
+    "lint:prettier": "prettier \"{**/*,*}.{js,json,md,yml,css,ts}\" --list-different",
+    "lint:js": "eslint --cache .",
     "lint": "npm-run-all -l -p \"lint:**\"",
+    "test:only": "cross-env NODE_ENV=test jest",
+    "test:watch": "npm run test:only -- --watch",
+    "test:coverage": "npm run test:only -- --collectCoverageFrom=\"src/**/*.js\" --coverage",
+    "pretest": "npm run lint",
+    "test": "npm run test:coverage",
     "prepare": "npm run build",
     "release": "standard-version",
-    "security": "npm audit",
-    "test:only": "cross-env NODE_ENV=test jest",
-    "test:watch": "cross-env NODE_ENV=test jest --watch",
-    "test:coverage": "cross-env NODE_ENV=test jest --collectCoverageFrom=\"src/**/*.js\" --coverage",
-    "pretest": "npm run lint",
-    "test": "cross-env NODE_ENV=test npm run test:coverage",
     "defaults": "webpack-defaults"
   },
   "files": [
     "dist"
   ],
   "peerDependencies": {
-    "webpack": "^4.0.0"
+    "webpack": "^4.0.0 || ^5.0.0"
   },
   "dependencies": {
     "cacache": "^12.0.3",
@@ -72,7 +76,7 @@
     "jest": "^24.9.0",
     "jest-junit": "^10.0.0",
     "lint-staged": "^9.5.0",
-    "memory-fs": "^0.5.0",
+    "memfs": "^3.0.1",
     "mkdirp": "^0.5.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.19.1",
