@@ -1,8 +1,8 @@
 import path from 'path';
 
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('from option', () => {
   describe('is a file', () => {
@@ -24,7 +24,7 @@ describe('from option', () => {
         expectedAssetKeys: ['file.txt'],
         patterns: [
           {
-            from: path.join(HELPER_DIR, 'file.txt'),
+            from: path.join(FIXTURES_DIR, 'file.txt'),
           },
         ],
       })
@@ -50,7 +50,7 @@ describe('from option', () => {
         expectedAssetKeys: ['directoryfile.txt'],
         patterns: [
           {
-            from: path.join(HELPER_DIR, 'directory/directoryfile.txt'),
+            from: path.join(FIXTURES_DIR, 'directory/directoryfile.txt'),
           },
         ],
       })
@@ -77,7 +77,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent.txt' at '${HELPER_DIR}${path.sep}nonexistent.txt'`
+            `unable to locate 'nonexistent.txt' at '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -162,7 +162,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: '../helpers',
+            from: '../fixtures',
           },
         ],
       })
@@ -216,7 +216,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: path.join(HELPER_DIR, 'directory'),
+            from: path.join(FIXTURES_DIR, 'directory'),
           },
         ],
       })
@@ -260,7 +260,7 @@ describe('from option', () => {
         expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
         patterns: [
           {
-            from: path.join(HELPER_DIR, 'directory/nested'),
+            from: path.join(FIXTURES_DIR, 'directory/nested'),
           },
         ],
       })
@@ -273,7 +273,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedWarnings: [
           new Error(
-            `unable to locate 'nonexistent' at '${HELPER_DIR}${path.sep}nonexistent'`
+            `unable to locate 'nonexistent' at '${FIXTURES_DIR}${path.sep}nonexistent'`
           ),
         ],
         patterns: [
@@ -306,7 +306,7 @@ describe('from option', () => {
         expectedAssetKeys: ['file.txt'],
         patterns: [
           {
-            from: path.join(HELPER_DIR, '*.txt'),
+            from: path.join(FIXTURES_DIR, '*.txt'),
           },
         ],
       })
@@ -359,7 +359,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: path.join(HELPER_DIR, '**/*.txt'),
+            from: path.join(FIXTURES_DIR, '**/*.txt'),
           },
         ],
       })

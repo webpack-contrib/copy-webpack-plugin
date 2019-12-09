@@ -4,12 +4,12 @@ import CachedInputFileSystem from 'enhanced-resolve/lib/CachedInputFileSystem';
 import NodeJsInputFileSystem from 'enhanced-resolve/lib/NodeJsInputFileSystem';
 
 const BUILD_DIR = path.join(__dirname, '../build');
-const HELPER_DIR = path.join(__dirname, '../helpers');
+const FIXTURES_DIR = path.join(__dirname, '../fixtures');
 
 class MockCompiler {
   constructor(options = {}) {
     this.options = {
-      context: HELPER_DIR,
+      context: FIXTURES_DIR,
       output: {
         path: options.outputPath || BUILD_DIR,
       },

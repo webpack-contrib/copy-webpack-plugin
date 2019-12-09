@@ -1,8 +1,8 @@
 import path from 'path';
 
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('context option', () => {
   it('should work when "from" is a file', (done) => {
@@ -74,7 +74,7 @@ describe('context option', () => {
       ],
       patterns: [
         {
-          // Todo strange behavour when you use `HELPER_DIR`, need investigate for next major release
+          // Todo strange behavour when you use `FIXTURES_DIR`, need investigate for next major release
           from: '.',
           context: '[special?directory]',
         },
@@ -129,7 +129,7 @@ describe('context option', () => {
       ],
       patterns: [
         {
-          context: path.join(HELPER_DIR, 'directory'),
+          context: path.join(FIXTURES_DIR, 'directory'),
           from: '**/*',
           to: 'nested',
         },
@@ -177,7 +177,7 @@ describe('context option', () => {
       patterns: [
         {
           from: 'directoryfile.txt',
-          context: path.join(HELPER_DIR, 'directory'),
+          context: path.join(FIXTURES_DIR, 'directory'),
         },
       ],
     })
@@ -192,7 +192,7 @@ describe('context option', () => {
         'newdirectory/nestedfile.txt',
       ],
       options: {
-        context: path.join(HELPER_DIR, 'directory'),
+        context: path.join(FIXTURES_DIR, 'directory'),
       },
       patterns: [
         {
@@ -254,7 +254,7 @@ describe('context option', () => {
         'newdirectory/nesteddir/nestedfile.txt',
       ],
       options: {
-        context: path.join(HELPER_DIR, 'dir (86)'),
+        context: path.join(FIXTURES_DIR, 'dir (86)'),
       },
       patterns: [
         {

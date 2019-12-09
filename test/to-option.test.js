@@ -1,10 +1,10 @@
 import path from 'path';
 
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
 const BUILD_DIR = path.join(__dirname, 'build');
 const TEMP_DIR = path.join(__dirname, 'tempdir');
-const HELPER_DIR = path.join(__dirname, 'helpers');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('to option', () => {
   describe('is a file', () => {
@@ -197,7 +197,7 @@ describe('to option', () => {
         expectedAssetKeys: ['newdirectory/directoryfile.txt'],
         patterns: [
           {
-            from: path.join(HELPER_DIR, 'directory', 'directoryfile.txt'),
+            from: path.join(FIXTURES_DIR, 'directory', 'directoryfile.txt'),
             to: 'newdirectory',
           },
         ],
@@ -211,7 +211,7 @@ describe('to option', () => {
         expectedAssetKeys: ['newdirectory/directoryfile.txt'],
         patterns: [
           {
-            from: path.join(HELPER_DIR, 'directory', 'directoryfile.txt'),
+            from: path.join(FIXTURES_DIR, 'directory', 'directoryfile.txt'),
             to: 'newdirectory/',
           },
         ],
@@ -247,7 +247,7 @@ describe('to option', () => {
         ],
         patterns: [
           {
-            from: path.join(HELPER_DIR, 'directory', 'nested'),
+            from: path.join(FIXTURES_DIR, 'directory', 'nested'),
             to: 'newdirectory',
           },
         ],

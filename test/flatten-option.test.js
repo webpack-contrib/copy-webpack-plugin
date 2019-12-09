@@ -1,4 +1,4 @@
-import { runEmit } from './utils/run';
+import { runEmit } from './helpers/run';
 
 describe('flatten option', () => {
   it('should flatten a directory\'s files to a root directory when "from" is a file', (done) => {
