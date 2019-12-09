@@ -1,16 +1,16 @@
 import path from 'path';
 
+import validateOptions from 'schema-utils';
 import log from 'webpack-log';
 
+import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
 
 class CopyPlugin {
   constructor(patterns = [], options = {}) {
-    if (!Array.isArray(patterns)) {
-      throw new Error('[copy-webpack-plugin] patterns must be an array');
-    }
+    validateOptions(schema, patterns, this.constructor.name);
 
     this.patterns = patterns;
     this.options = options;
@@ -95,11 +95,12 @@ class CopyPlugin {
           callback();
         });
     });
+
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
       logger.debug('starting after-emit');
 
       // Add file dependencies
-      if ("addAll" in compilation.fileDependencies) {
+      if ('addAll' in compilation.fileDependencies) {
         compilation.fileDependencies.addAll(fileDependencies);
       } else {
         for (const fileDependency of fileDependencies) {
@@ -108,7 +109,7 @@ class CopyPlugin {
       }
 
       // Add context dependencies
-      if ("addAll" in compilation.contextDependencies) {
+      if ('addAll' in compilation.contextDependencies) {
         compilation.contextDependencies.addAll(contextDependencies);
       } else {
         for (const contextDependency of contextDependencies) {

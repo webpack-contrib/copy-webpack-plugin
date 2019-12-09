@@ -60,23 +60,23 @@ module.exports = {
 
 ### Patterns
 
-|               Name                |         Type          |                     Default                     | Description                                                                                           |
-| :-------------------------------: | :-------------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
-|          [`from`](#from)          |  `{String\|Object}`   |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
-|            [`to`](#to)            |      `{String}`       |                   `undefined`                   | Output path.                                                                                          |
-|       [`context`](#context)       |      `{String}`       | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|        [`toType`](#totype)        |      `{String}`       |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
-|          [`test`](#test)          |      `{RegExp}`       |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
-|         [`force`](#force)         |      `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
-|        [`ignore`](#ignore)        |       `{Array}`       |                      `[]`                       | Globs to ignore files.                                                                                |
-|       [`flatten`](#flatten)       |      `{Boolean}`      |                     `false`                     | Removes all directory references and only copies file names.                                          |
-|         [`cache`](#cache)         |  `{Boolean\|Object}`  |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
-|     [`transform`](#transform)     | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the file contents.                                                                   |
-| [`transformPath`](#transformpath) | `{Function\|Promise}` |                   `undefined`                   | Allows to modify the writing path.                                                                    |
+|               Name                |        Type         |                     Default                     | Description                                                                                           |
+| :-------------------------------: | :-----------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
+|          [`from`](#from)          | `{String\|Object}`  |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
+|            [`to`](#to)            |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
+|       [`context`](#context)       |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
+|        [`toType`](#totype)        |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
+|          [`test`](#test)          | `{String\|RegExp}`  |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
+|         [`force`](#force)         |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
+|        [`ignore`](#ignore)        |      `{Array}`      |                      `[]`                       | Globs to ignore files.                                                                                |
+|       [`flatten`](#flatten)       |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
+|         [`cache`](#cache)         | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|     [`transform`](#transform)     |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
+| [`transformPath`](#transformpath) |    `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                    |
 
 #### `from`
 
-Type: `String\|Object`
+Type: `String|Object`
 Default: `undefined`
 
 Glob or path from where we сopy files.
@@ -99,7 +99,12 @@ module.exports = {
       'relative/path/to/dir',
       '/absolute/path/to/dir',
       '**/*',
-      { glob: '**/*', dot: false },
+      {
+        from: '**/*',
+        globOptions: {
+          dot: false,
+        },
+      },
     ]),
   ],
 };
@@ -108,7 +113,7 @@ module.exports = {
 #### `to`
 
 Type: `String`
-Default: `undefined`
+Default: `compiler.options.output`
 
 Output path.
 
@@ -122,8 +127,18 @@ Output path.
 module.exports = {
   plugins: [
     new CopyPlugin([
-      { from: '**/*', to: 'relative/path/to/dest/' },
-      { from: '**/*', to: '/absolute/path/to/dest/' },
+      {
+        from: '**/*',
+        to: 'relative/path/to/dest/',
+      },
+      {
+        from: '**/*',
+        to: '/absolute/path/to/dest/',
+      },
+      {
+        from: '**/*',
+        to: '[path][name].[contenthash].[ext]',
+      },
     ]),
   ],
 };
@@ -228,7 +243,7 @@ module.exports = {
 
 #### `test`
 
-Type: `RegExp`
+Type: `string|RegExp`
 Default: `undefined`
 
 Pattern for extracting elements to be used in `to` templates.
@@ -372,12 +387,10 @@ module.exports = {
 
 #### `transform`
 
-Type: `Function|Promise`
+Type: `Function`
 Default: `undefined`
 
 Allows to modify the file contents.
-
-##### `{Function}`
 
 **webpack.config.js**
 
@@ -396,8 +409,6 @@ module.exports = {
   ],
 };
 ```
-
-##### `{Promise}`
 
 **webpack.config.js**
 
@@ -419,7 +430,7 @@ module.exports = {
 
 #### `transformPath`
 
-Type: `Function|Promise`
+Type: `Function`
 Default: `undefined`
 
 Allows to modify the writing path.
@@ -427,8 +438,6 @@ Allows to modify the writing path.
 > ⚠️ Don't return directly `\\` in `transformPath` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
 > Instead please use `/` or `path` methods.
-
-##### `{Function}`
 
 **webpack.config.js**
 
@@ -447,8 +456,6 @@ module.exports = {
   ],
 };
 ```
-
-##### `{Promise}`
 
 **webpack.config.js**
 

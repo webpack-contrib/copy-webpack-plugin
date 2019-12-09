@@ -448,5 +448,20 @@ describe('to option', () => {
         .then(done)
         .catch(done);
     });
+
+    it('should move a file to "compiler.options.output" by default', (done) => {
+      runEmit({
+        compilation: { output: { path: '/path/to' } },
+        expectedAssetKeys: ['newfile.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: 'newfile.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
   });
 });

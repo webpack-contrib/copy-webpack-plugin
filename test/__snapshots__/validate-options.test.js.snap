@@ -1,0 +1,163 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validate options should throw an error on the "patterns" option with "" value 1`] = `
+"CopyPlugin Invalid Options
+
+options should be array
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[""]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should NOT be shorter than 1 characters
+options.0 should be object
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"","to":"dir","context":"context"}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.from should NOT be shorter than 1 characters
+options.0.from should be object
+options.0.from should match some schema in anyOf
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","flatten":"true"}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.flatten should be boolean
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","force":"true"}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.force should be boolean
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","ignore":true}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.ignore should be array
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","test":true}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.test should be string
+options.0.test should pass \\"instanceof\\" keyword validation
+options.0.test should match some schema in anyOf
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","toType":"foo"}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.toType should be equal to one of the allowed values
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","transform":true}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.transform should pass \\"instanceof\\" keyword validation
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","transformPath":true}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.transformPath should pass \\"instanceof\\" keyword validation
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context"}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.cache should be boolean
+options.0.cache should be object
+options.0.cache should match some schema in anyOf
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":true}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.context should be string
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":true,"context":"context"}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.to should be string
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":true,"to":"dir","context":"context"}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.from should be string
+options.0.from should be object
+options.0.from should match some schema in anyOf
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0 should have required property 'from'
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "{}" value 1`] = `
+"CopyPlugin Invalid Options
+
+options should be array
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "true" value 1`] = `
+"CopyPlugin Invalid Options
+
+options should be array
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "true" value 2`] = `
+"CopyPlugin Invalid Options
+
+options should be array
+"
+`;

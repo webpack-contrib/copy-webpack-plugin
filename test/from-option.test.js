@@ -518,5 +518,37 @@ describe('from option', () => {
         .then(done)
         .catch(done);
     });
+
+    it('should move files with the "globOptions" option', (done) => {
+      runEmit({
+        expectedAssetKeys: ['.file.txt', 'file.txt'],
+        patterns: [
+          {
+            from: '*.txt',
+            globOptions: {
+              dot: true,
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should move files with the "globOptions" option #2', (done) => {
+      runEmit({
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: '*.txt',
+            globOptions: {
+              dot: false,
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
   });
 });

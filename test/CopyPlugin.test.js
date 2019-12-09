@@ -1,7 +1,5 @@
 import path from 'path';
 
-import CopyPlugin from '../src/index';
-
 import { MockCompiler } from './utils/mocks';
 import { run, runEmit, runChange } from './utils/run';
 
@@ -333,77 +331,6 @@ describe('apply function', () => {
         patterns: [
           {
             from: '!(directory)\\**\\*.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-  });
-
-  describe('errors', () => {
-    it('should not throw an error if no patterns are passed', (done) => {
-      runEmit({
-        expectedAssetKeys: [],
-        patterns: undefined, // eslint-disable-line no-undefined
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should throw an error if the patterns are an object', () => {
-      const createPluginWithObject = () => {
-        // eslint-disable-next-line no-new
-        new CopyPlugin({});
-      };
-
-      expect(createPluginWithObject).toThrow(Error);
-    });
-
-    it('should throw an error if the patterns are null', () => {
-      const createPluginWithNull = () => {
-        // eslint-disable-next-line no-new
-        new CopyPlugin(null);
-      };
-
-      expect(createPluginWithNull).toThrow(Error);
-    });
-
-    it('should throw an error if the "from" path is an empty string', () => {
-      const createPluginWithNull = () => {
-        // eslint-disable-next-line no-new
-        new CopyPlugin({
-          from: '',
-        });
-      };
-
-      expect(createPluginWithNull).toThrow(Error);
-    });
-
-    it('should warn when pattern is empty', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          '.file.txt',
-          '[!]/hello.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/nested/nestedfile.txt',
-          'binextension.bin',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
-          'directory/.dottedfile',
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
-          'file.txt',
-          'file.txt.gz',
-          'noextension',
-        ],
-        expectedErrors: [new Error(`path "from" cannot be empty string`)],
-        patterns: [
-          {
-            from: '',
           },
         ],
       })
