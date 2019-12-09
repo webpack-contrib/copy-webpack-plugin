@@ -95,6 +95,7 @@ class CopyPlugin {
           callback();
         });
     });
+
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
       logger.debug('starting after-emit');
 

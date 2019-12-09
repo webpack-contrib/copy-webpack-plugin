@@ -63,7 +63,7 @@ module.exports = {
 |               Name                |         Type          |                     Default                     | Description                                                                                           |
 | :-------------------------------: | :-------------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
 |          [`from`](#from)          |  `{String\|Object}`   |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
-|            [`to`](#to)            |      `{String}`       |                   `undefined`                   | Output path.                                                                                          |
+|            [`to`](#to)            |      `{String}`       |            `compiler.options.output`            | Output path.                                                                                          |
 |       [`context`](#context)       |      `{String}`       | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
 |        [`toType`](#totype)        |      `{String}`       |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
 |          [`test`](#test)          |      `{RegExp}`       |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
@@ -108,7 +108,7 @@ module.exports = {
 #### `to`
 
 Type: `String`
-Default: `undefined`
+Default: `compiler.options.output`
 
 Output path.
 
