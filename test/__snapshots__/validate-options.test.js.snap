@@ -45,6 +45,28 @@ options.0 should match some schema in anyOf
 "
 `;
 
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","ignore":["test.txt",true]}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.ignore.1 should be string
+options.0.ignore.1 should be object
+options.0.ignore.1 should match some schema in anyOf
+options.0 should match some schema in anyOf
+"
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","ignore":[true]}]" value 1`] = `
+"CopyPlugin Invalid Options
+
+options.0 should be string
+options.0.ignore.0 should be string
+options.0.ignore.0 should be object
+options.0.ignore.0 should match some schema in anyOf
+options.0 should match some schema in anyOf
+"
+`;
+
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","ignore":true}]" value 1`] = `
 "CopyPlugin Invalid Options
 

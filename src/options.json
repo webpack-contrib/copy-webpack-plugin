@@ -37,7 +37,17 @@
           "type": "boolean"
         },
         "ignore": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
         },
         "flatten": {
           "type": "boolean"
