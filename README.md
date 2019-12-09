@@ -100,6 +100,12 @@ module.exports = {
       '/absolute/path/to/dir',
       '**/*',
       { glob: '**/*', dot: false },
+      {
+        from: '**/*',
+        globOptions: {
+          dot: false,
+        },
+      },
     ]),
   ],
 };
@@ -122,8 +128,14 @@ Output path.
 module.exports = {
   plugins: [
     new CopyPlugin([
-      { from: '**/*', to: 'relative/path/to/dest/' },
-      { from: '**/*', to: '/absolute/path/to/dest/' },
+      {
+        from: '**/*',
+        to: 'relative/path/to/dest/',
+      },
+      {
+        from: '**/*',
+        to: '/absolute/path/to/dest/',
+      },
     ]),
   ],
 };
