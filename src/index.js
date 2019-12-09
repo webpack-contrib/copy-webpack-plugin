@@ -99,7 +99,7 @@ class CopyPlugin {
       logger.debug('starting after-emit');
 
       // Add file dependencies
-      if ("addAll" in compilation.fileDependencies) {
+      if ('addAll' in compilation.fileDependencies) {
         compilation.fileDependencies.addAll(fileDependencies);
       } else {
         for (const fileDependency of fileDependencies) {
@@ -108,7 +108,7 @@ class CopyPlugin {
       }
 
       // Add context dependencies
-      if ("addAll" in compilation.contextDependencies) {
+      if ('addAll' in compilation.contextDependencies) {
         compilation.contextDependencies.addAll(contextDependencies);
       } else {
         for (const contextDependency of contextDependencies) {
