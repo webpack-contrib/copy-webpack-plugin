@@ -25,14 +25,6 @@ export default function preProcessPattern(globalRef, pattern) {
       ? { from: pattern }
       : Object.assign({}, pattern);
 
-  if (pattern.from === '') {
-    const message = 'path "from" cannot be empty string';
-
-    logger.error(message);
-
-    compilation.errors.push(new Error(message));
-  }
-
   pattern.to = pattern.to || '';
   pattern.context = pattern.context || context;
 

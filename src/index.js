@@ -1,16 +1,16 @@
 import path from 'path';
 
+import validateOptions from 'schema-utils';
 import log from 'webpack-log';
 
+import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
 
 class CopyPlugin {
   constructor(patterns = [], options = {}) {
-    if (!Array.isArray(patterns)) {
-      throw new Error('[copy-webpack-plugin] patterns must be an array');
-    }
+    validateOptions(schema, patterns, this.constructor.name);
 
     this.patterns = patterns;
     this.options = options;
