@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.0...v5.1.1) (2019-12-12)
+
+
+### Bug Fixes
+
+* allow to setup empty array ([#425](https://github.com/webpack-contrib/copy-webpack-plugin/issues/425)) ([3b79595](https://github.com/webpack-contrib/copy-webpack-plugin/commit/3b79595d6ef3527a26588112ad17e3c54e264d5c))
+
 ## [5.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.0.5...v5.1.0) (2019-12-09)
 
 
