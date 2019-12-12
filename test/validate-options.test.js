@@ -20,6 +20,7 @@ describe('validate options', () => {
   const tests = {
     patterns: {
       success: [
+        [],
         ['test.txt'],
         ['test.txt', 'test-other.txt'],
         [

@@ -77,7 +77,6 @@
     }
   },
   "type": "array",
-  "minItems": 1,
   "items": {
     "anyOf": [
       {
