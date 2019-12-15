@@ -2,6 +2,7 @@ import path from 'path';
 
 import validateOptions from 'schema-utils';
 import log from 'webpack-log';
+import pLimit from 'p-limit';
 
 import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
@@ -77,10 +78,14 @@ class CopyPlugin {
                   return Promise.resolve();
                 }
 
+                const limit = pLimit(globalRef.concurrency || Infinity);
+
                 return Promise.all(
                   files
                     .filter(Boolean)
-                    .map((file) => postProcessPattern(globalRef, pattern, file))
+                    .map((file) =>
+                      limit(() => postProcessPattern(globalRef, pattern, file))
+                    )
                 );
               })
             )
