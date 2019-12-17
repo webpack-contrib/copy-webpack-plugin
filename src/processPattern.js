@@ -22,7 +22,7 @@ export default function processPattern(globalRef, pattern) {
     return Promise.resolve();
   }
 
-  const limit = pLimit(concurrency || Infinity);
+  const limit = pLimit(concurrency || 100);
 
   logger.info(
     `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
