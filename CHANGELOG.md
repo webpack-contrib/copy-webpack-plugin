@@ -2,17 +2,6 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [5.1.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.1...v5.1.2) (2019-12-17)
-
-
-### Features
-
-* add concurrency control
-
-### Bug Fixes
-
-* fix error: too many open files
-
 ### [5.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.0...v5.1.1) (2019-12-12)
 
 
