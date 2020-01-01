@@ -1,7 +1,7 @@
 import path from 'path';
 
 import validateOptions from 'schema-utils';
-import log from 'webpack-log';
+import logging from 'webpack/lib/logging/runtime';
 
 import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
@@ -31,15 +31,14 @@ class CopyPlugin {
       ({ context } = this.options);
     }
 
-    const logger = log({
-      name: 'copy-webpack-plugin',
+    logging.configureDefaultLogger({
       level: this.options.logLevel || 'warn',
     });
 
     const plugin = { name: 'CopyPlugin' };
 
     compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
-      logger.debug('starting emit');
+      const logger = logging.getLogger(plugin.name);
 
       const globalRef = {
         logger,
@@ -97,7 +96,7 @@ class CopyPlugin {
     });
 
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
-      logger.debug('starting after-emit');
+      const logger = logging.getLogger(plugin.name);
 
       // Add file dependencies
       if ('addAll' in compilation.fileDependencies) {
