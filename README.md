@@ -316,7 +316,7 @@ module.exports = {
 };
 ```
 
-> ⚠️ Note that only relative path should be provided to ignore option, an example to ignore `src/assets/subfolder/ignorfile.js` :
+> ⚠️ Note that only relative path should be provided to ignore option, an example to ignore `src/assets/subfolder/ignorefile.js` :
 
 **webpack.config.js**
 
@@ -327,7 +327,7 @@ module.exports = {
       {
         from: 'src/assets',
         to: 'dest/',
-        ignore: ['subfolder/ingorefile.js'],
+        ignore: ['subfolder/ignorefile.js'],
       },
     ]),
   ],
