@@ -21,35 +21,6 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('should copy a file to a new file', (done) => {
-      runEmit({
-        expectedAssetKeys: ['newfile.txt'],
-        patterns: [
-          {
-            from: 'file.txt',
-            to: 'newfile.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should copy a file to a new file with context', (done) => {
-      runEmit({
-        expectedAssetKeys: ['newfile.txt'],
-        patterns: [
-          {
-            from: 'directoryfile.txt',
-            context: 'directory',
-            to: 'newfile.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
     it('should copy files', (done) => {
       runEmit({
         expectedAssetKeys: [
