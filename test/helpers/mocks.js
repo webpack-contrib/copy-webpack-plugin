@@ -3,8 +3,81 @@ import path from 'path';
 import CachedInputFileSystem from 'enhanced-resolve/lib/CachedInputFileSystem';
 import NodeJsInputFileSystem from 'enhanced-resolve/lib/NodeJsInputFileSystem';
 
+const { Logger } = require('webpack/lib/logging/Logger');
+
 const BUILD_DIR = path.join(__dirname, '../build');
 const FIXTURES_DIR = path.join(__dirname, '../fixtures');
+
+const getInfrastructureLogger = (name) => {
+  if (!name) {
+    throw new TypeError(
+      'Compiler.getInfrastructureLogger(name) called without a name'
+    );
+  }
+  return new Logger(
+    // eslint-disable-next-line no-unused-vars
+    (type, args) => {
+      if (typeof name === 'function') {
+        name = name();
+        if (!name) {
+          throw new TypeError(
+            'Compiler.getInfrastructureLogger(name) called with a function not returning a name'
+          );
+        }
+      }
+    },
+    (childName) => {
+      if (typeof name === 'function') {
+        if (typeof childName === 'function') {
+          return this.getInfrastructureLogger(() => {
+            if (typeof name === 'function') {
+              name = name();
+              if (!name) {
+                throw new TypeError(
+                  'Compiler.getInfrastructureLogger(name) called with a function not returning a name'
+                );
+              }
+            }
+            if (typeof childName === 'function') {
+              childName = childName();
+              if (!childName) {
+                throw new TypeError(
+                  'Logger.getChildLogger(name) called with a function not returning a name'
+                );
+              }
+            }
+            return `${name}/${childName}`;
+          });
+        }
+        return this.getInfrastructureLogger(() => {
+          if (typeof name === 'function') {
+            name = name();
+            if (!name) {
+              throw new TypeError(
+                'Compiler.getInfrastructureLogger(name) called with a function not returning a name'
+              );
+            }
+          }
+          return `${name}/${childName}`;
+        });
+      }
+      if (typeof childName === 'function') {
+        return this.getInfrastructureLogger(() => {
+          if (typeof childName === 'function') {
+            childName = childName();
+            if (!childName) {
+              throw new TypeError(
+                'Logger.getChildLogger(name) called with a function not returning a name'
+              );
+            }
+          }
+          return `${name}/${childName}`;
+        });
+      }
+      return this.getInfrastructureLogger(`${name}/${childName}`);
+    }
+  );
+};
 
 class MockCompiler {
   constructor(options = {}) {
@@ -25,7 +98,7 @@ class MockCompiler {
       new NodeJsInputFileSystem(),
       0
     );
-
+    this.getInfrastructureLogger = getInfrastructureLogger;
     this.hooks = {
       emit: {
         tapAsync: (plugin, fn) => {
