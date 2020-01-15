@@ -31,9 +31,10 @@ class CopyPlugin {
     }
 
     const plugin = { name: 'CopyPlugin' };
-    compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
-      const logger = compiler.getInfrastructureLogger(plugin.name);
 
+    const logger = compiler.getInfrastructureLogger(plugin.name);
+
+    compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
       const globalRef = {
         logger,
         compilation,
@@ -90,8 +91,6 @@ class CopyPlugin {
     });
 
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
-      const logger = compiler.getInfrastructureLogger(plugin.name);
-
       // Add file dependencies
       if ('addAll' in compilation.fileDependencies) {
         compilation.fileDependencies.addAll(fileDependencies);
