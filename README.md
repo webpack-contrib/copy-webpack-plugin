@@ -62,7 +62,7 @@ module.exports = {
 
 |               Name                |        Type         |                     Default                     | Description                                                                                           |
 | :-------------------------------: | :-----------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
-|          [`from`](#from)          | `{String\|Object}`  |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
+|          [`from`](#from)          |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
 |            [`to`](#to)            |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
 |       [`context`](#context)       |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
 |        [`toType`](#totype)        |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
@@ -73,16 +73,15 @@ module.exports = {
 |         [`cache`](#cache)         | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
 |     [`transform`](#transform)     |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
 | [`transformPath`](#transformpath) |    `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                    |
+|   [`globOptions`](#globoptions)   |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library                                   |
 
 #### `from`
 
-Type: `String|Object`
+Type: `String`
 Default: `undefined`
 
 Glob or path from where we сopy files.
 Globs accept [minimatch options](https://github.com/isaacs/minimatch).
-
-You can define `from` as `Object` and use the [`node-glob` options](https://github.com/isaacs/node-glob#options).
 
 > ⚠️ Don't use directly `\\` in `from` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -101,9 +100,6 @@ module.exports = {
       '**/*',
       {
         from: '**/*',
-        globOptions: {
-          dot: false,
-        },
       },
     ]),
   ],
@@ -476,6 +472,31 @@ module.exports = {
 };
 ```
 
+#### `globOptions`
+
+Type: `Object`
+Default: `undefined`
+
+Allows to configute the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin([
+      {
+        from: 'public/**/*',
+        globOptions: {
+          dot: true,
+          gitignore: true,
+        },
+      },
+    ]),
+  ],
+};
+```
+
 ### Options
 
 |                Name                 |    Type     |          Default           | Description                                                                                                                                       |
@@ -571,3 +592,4 @@ Please take a moment to read our contributing guidelines if you haven't yet done
 [chat-url]: https://gitter.im/webpack/webpack
 [size]: https://packagephobia.now.sh/badge?p=copy-webpack-plugin
 [size-url]: https://packagephobia.now.sh/result?p=copy-webpack-plugin
+[glob-options]: https://github.com/sindresorhus/globby#options
