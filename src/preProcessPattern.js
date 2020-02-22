@@ -27,6 +27,7 @@ export default function preProcessPattern(globalRef, pattern) {
 
   pattern.to = pattern.to || '';
   pattern.context = pattern.context || context;
+  if (!pattern.mandatory) pattern.mandatory = false;
 
   if (!path.isAbsolute(pattern.context)) {
     pattern.context = path.join(context, pattern.context);
@@ -121,7 +122,8 @@ export default function preProcessPattern(globalRef, pattern) {
       if (!hasWarning) {
         logger.warn(newWarning.message);
 
-        compilation.warnings.push(newWarning);
+        if (!pattern.mandatory) compilation.warnings.push(newWarning);
+        else compilation.errors.push(newWarning);
       }
 
       pattern.fromType = 'nonexistent';
