@@ -7,6 +7,7 @@ import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
+import updateTimes from './updateTimes';
 
 class CopyPlugin {
   constructor(patterns = [], options = {}) {
@@ -52,6 +53,7 @@ class CopyPlugin {
         output: compiler.options.output.path,
         ignore: this.options.ignore || [],
         copyUnmodified: this.options.copyUnmodified,
+        keepTimes: this.options.keepTimes,
         concurrency: this.options.concurrency,
       };
 
@@ -115,6 +117,10 @@ class CopyPlugin {
         for (const contextDependency of contextDependencies) {
           compilation.contextDependencies.add(contextDependency);
         }
+      }
+
+      if (this.options.keepTimes) {
+        updateTimes(compiler, compilation, logger);
       }
 
       logger.debug('finishing after-emit');

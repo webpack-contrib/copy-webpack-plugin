@@ -505,6 +505,7 @@ module.exports = {
 |         [`ignore`](#ignore)         |  `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                                                                                      |
 |        [`context`](#context)        | `{String}`  | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns                                                                  |
 | [`copyUnmodified`](#copyunmodified) | `{Boolean}` |          `false`           | Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option |
+|      [`keepTimes`](#keeptimes)      | `{Boolean}` |          `false`           | Copy the original access and modification over to the destination files, when possible                                                            |
 
 #### `logLevel`
 
@@ -565,6 +566,18 @@ Copies files, regardless of modification when using watch or `webpack-dev-server
 ```js
 module.exports = {
   plugins: [new CopyPlugin([...patterns], { copyUnmodified: true })],
+};
+```
+
+#### `keepTimes`
+
+Attempt to copy source files' access and modification times over to the destination files.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [new CopyPlugin([...patterns], { keepTimes: true })],
 };
 ```
 

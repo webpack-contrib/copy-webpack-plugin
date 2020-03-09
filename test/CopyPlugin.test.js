@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 import { MockCompiler } from './helpers/mocks';
 import { run, runEmit, runChange } from './helpers/run';
@@ -247,6 +248,38 @@ describe('apply function', () => {
           },
         ],
       })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy file modification times when told to', (done) => {
+      const origStat = fs.statSync(path.join(FIXTURES_DIR, 'file.txt'));
+      const utimeCalls = {};
+      const compiler = new MockCompiler();
+      // Patch in some things that are missing by default...
+      compiler.outputFileSystem.join = (a, b) => path.join(a || '', b);
+      compiler.outputFileSystem.utimes = (pth, atime, mtime, callback) => {
+        utimeCalls[pth] = { atime, mtime };
+        callback(null);
+      };
+
+      runEmit({
+        compiler,
+        expectedAssetKeys: ['file.txt'],
+        options: {
+          keepTimes: true,
+        },
+        patterns: [
+          {
+            from: 'file.txt',
+          },
+        ],
+      })
+        .then(() => {
+          const { atime, mtime } = utimeCalls['file.txt'];
+          expect(atime).toEqual(origStat.atime);
+          expect(mtime).toEqual(origStat.mtime);
+        })
         .then(done)
         .catch(done);
     });

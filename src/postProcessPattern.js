@@ -197,6 +197,10 @@ export default function postProcessPattern(globalRef, pattern, file) {
           source() {
             return content;
           },
+          copyPluginTimes: {
+            atime: stats.atime,
+            mtime: stats.mtime,
+          },
         };
       });
   });

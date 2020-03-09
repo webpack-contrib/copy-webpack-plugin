@@ -67,6 +67,9 @@
         },
         "transformPath": {
           "instanceof": "Function"
+        },
+        "keepTimes": {
+          "type": "boolean"
         }
       },
       "required": ["from"]
