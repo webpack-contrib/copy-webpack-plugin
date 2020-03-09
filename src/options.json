@@ -1,90 +1,33 @@
 {
-  "definitions": {
-    "ObjectPattern": {
-      "type": "object",
-      "properties": {
-        "from": {
-          "anyOf": [
-            {
-              "type": "string",
-              "minLength": 1
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "to": {
-          "type": "string"
-        },
-        "context": {
-          "type": "string"
-        },
-        "toType": {
-          "enum": ["dir", "file", "template"]
-        },
-        "test": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "instanceof": "RegExp"
-            }
-          ]
-        },
-        "force": {
-          "type": "boolean"
-        },
-        "ignore": {
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
-        "flatten": {
-          "type": "boolean"
-        },
-        "cache": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "object"
-            }
-          ]
-        },
-        "transform": {
-          "instanceof": "Function"
-        },
-        "transformPath": {
-          "instanceof": "Function"
-        }
-      },
-      "required": ["from"]
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "logLevel": {
+      "description": "Level of messages that the module will log",
+      "enum": ["trace", "debug", "info", "warn", "error", "silent"]
     },
-    "StringPattern": {
-      "type": "string",
-      "minLength": 1
+    "ignore": {
+      "description": "Array of globs to ignore (applied to `from`)",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object"
+          }
+        ]
+      }
+    },
+    "context": {
+      "description": "A path that determines how to interpret the `from` path, shared for all patterns",
+      "type": "string"
+    },
+    "copyUnmodified": {
+      "description": "Copies files, regardless of modification, when using watchers",
+      "type": "boolean"
     }
   },
-  "type": "array",
-  "items": {
-    "anyOf": [
-      {
-        "$ref": "#/definitions/StringPattern"
-      },
-      {
-        "$ref": "#/definitions/ObjectPattern"
-      }
-    ]
-  }
+  "title": "Options"
 }

@@ -3,14 +3,16 @@ import path from 'path';
 import validateOptions from 'schema-utils';
 import log from 'webpack-log';
 
-import schema from './options.json';
+import patternsSchema from './patterns.json';
+import optionsSchema from './options.json';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
 
 class CopyPlugin {
   constructor(patterns = [], options = {}) {
-    validateOptions(schema, patterns, this.constructor.name);
+    validateOptions(patternsSchema, patterns, this.constructor.name);
+    validateOptions(optionsSchema, options, this.constructor.name);
 
     this.patterns = patterns;
     this.options = options;

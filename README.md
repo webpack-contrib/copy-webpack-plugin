@@ -296,6 +296,8 @@ Default: `[]`
 
 Globs to ignore files.
 
+May also contain Minimatch setting objects (e.g. `{dot: true, matchBase: true}`).
+
 **webpack.config.js**
 
 ```js
@@ -533,6 +535,8 @@ module.exports = {
 #### `ignore`
 
 Array of globs to ignore (applied to `from`).
+
+Like per-pattern ignores, may also contain Minimatch setting objects.
 
 **webpack.config.js**
 
