@@ -21,7 +21,7 @@
     "prebuild": "npm run clean",
     "build": "cross-env NODE_ENV=production babel src -d dist --copy-files",
     "commitlint": "commitlint --from=master",
-    "security": "npm audit",
+    "security": "npm audit --audit-level=moderate --parseable --production",
     "lint:prettier": "prettier \"{**/*,*}.{js,json,md,yml,css,ts}\" --list-different",
     "lint:js": "eslint --cache .",
     "lint": "npm-run-all -l -p \"lint:**\"",
