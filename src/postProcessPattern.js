@@ -70,10 +70,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
                   name,
                   version,
                   pattern,
-                  hash: crypto
-                    .createHash('md4')
-                    .update(content)
-                    .digest('hex'),
+                  hash: crypto.createHash('md4').update(content).digest('hex'),
                 });
 
             return cacache.get(globalRef.cacheDir, cacheKey).then(
