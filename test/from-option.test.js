@@ -426,7 +426,7 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files using bracketed glob', (done) => {
+    it.only('should move files using bracketed glob', (done) => {
       runEmit({
         expectedAssetKeys: [
           'directory/directoryfile.txt',
