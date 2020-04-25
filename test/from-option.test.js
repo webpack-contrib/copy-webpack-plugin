@@ -370,20 +370,20 @@ describe('from option', () => {
     it('should move files in nested directory using globstar', (done) => {
       runEmit({
         expectedAssetKeys: [
-          'nested/[!]/hello-d41d8c.txt',
-          'nested/binextension-d41d8c.bin',
-          'nested/dir (86)/file-d41d8c.txt',
-          'nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir-d41d8c.txt',
-          'nested/dir (86)/nesteddir/nestedfile-d41d8c.txt',
-          'nested/file-22af64.txt',
-          'nested/file.txt-5b311c.gz',
-          'nested/directory/directoryfile-22af64.txt',
-          'nested/directory/nested/deep-nested/deepnested-d41d8c.txt',
-          'nested/directory/nested/nestedfile-d41d8c.txt',
-          'nested/[special?directory]/(special-*file)-0bd650.txt',
-          'nested/[special?directory]/directoryfile-22af64.txt',
-          'nested/[special?directory]/nested/nestedfile-d41d8c.txt',
-          'nested/noextension-d41d8c',
+          'nested/[!]/hello-31d6cf.txt',
+          'nested/binextension-31d6cf.bin',
+          'nested/dir (86)/file-31d6cf.txt',
+          'nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir-31d6cf.txt',
+          'nested/dir (86)/nesteddir/nestedfile-31d6cf.txt',
+          'nested/file-5d7817.txt',
+          'nested/file.txt-f18c8d.gz',
+          'nested/directory/directoryfile-5d7817.txt',
+          'nested/directory/nested/deep-nested/deepnested-31d6cf.txt',
+          'nested/directory/nested/nestedfile-31d6cf.txt',
+          'nested/[special?directory]/(special-*file)-517cf2.txt',
+          'nested/[special?directory]/directoryfile-5d7817.txt',
+          'nested/[special?directory]/nested/nestedfile-31d6cf.txt',
+          'nested/noextension-31d6cf',
         ],
         patterns: [
           {
@@ -426,7 +426,7 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it.only('should move files using bracketed glob', (done) => {
+    it('should move files using bracketed glob', (done) => {
       runEmit({
         expectedAssetKeys: [
           'directory/directoryfile.txt',

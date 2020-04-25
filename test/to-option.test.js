@@ -334,7 +334,7 @@ describe('to option', () => {
   describe('is a template', () => {
     it('should move a file using "contenthash"', (done) => {
       runEmit({
-        expectedAssetKeys: ['directory/22af64.txt'],
+        expectedAssetKeys: ['directory/5d7817.txt'],
         patterns: [
           {
             from: 'directory/directoryfile.txt',
@@ -376,7 +376,7 @@ describe('to option', () => {
 
     it('should move a file using "name", "contenthash" and "ext"', (done) => {
       runEmit({
-        expectedAssetKeys: ['file-22af64.txt'],
+        expectedAssetKeys: ['file-5d7817.txt'],
         patterns: [
           {
             from: 'file.txt',
@@ -390,7 +390,7 @@ describe('to option', () => {
 
     it('should move a file from nested directory', (done) => {
       runEmit({
-        expectedAssetKeys: ['directoryfile-22af64.txt'],
+        expectedAssetKeys: ['directoryfile-5d7817.txt'],
         patterns: [
           {
             from: 'directory/directoryfile.txt',
@@ -404,7 +404,7 @@ describe('to option', () => {
 
     it('should move a file from nested directory to new directory', (done) => {
       runEmit({
-        expectedAssetKeys: ['newdirectory/directoryfile-22af64.txt'],
+        expectedAssetKeys: ['newdirectory/directoryfile-5d7817.txt'],
         patterns: [
           {
             from: 'directory/directoryfile.txt',
@@ -418,7 +418,7 @@ describe('to option', () => {
 
     it('should move a file without an extension using "name", "ext"', (done) => {
       runEmit({
-        expectedAssetKeys: ['noextension.d41d8c.newext'],
+        expectedAssetKeys: ['noextension.31d6cf.newext'],
         patterns: [
           {
             from: 'noextension',
@@ -433,10 +433,10 @@ describe('to option', () => {
     it('should move files using "path", "name", "contenthash" and "ext"', (done) => {
       runEmit({
         expectedAssetKeys: [
-          'newdirectory/.dottedfile-79d39f',
-          'newdirectory/directoryfile-22af64.txt',
-          'newdirectory/nested/deep-nested/deepnested-d41d8c.txt',
-          'newdirectory/nested/nestedfile-d41d8c.txt',
+          'newdirectory/.dottedfile-5e294e',
+          'newdirectory/directoryfile-5d7817.txt',
+          'newdirectory/nested/deep-nested/deepnested-31d6cf.txt',
+          'newdirectory/nested/nestedfile-31d6cf.txt',
         ],
         patterns: [
           {

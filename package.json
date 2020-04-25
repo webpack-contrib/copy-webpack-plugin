@@ -46,10 +46,10 @@
     "glob-parent": "^5.1.1",
     "globby": "^11.0.0",
     "is-glob": "^4.0.1",
-    "loader-utils": "^1.4.0",
+    "loader-utils": "^2.0.0",
     "minimatch": "^3.0.4",
     "normalize-path": "^3.0.0",
-    "p-limit": "^2.3.0",
+    "p-limit": "^2.2.1",
     "schema-utils": "^1.0.0",
     "serialize-javascript": "^3.0.0",
     "webpack-log": "^3.0.1"

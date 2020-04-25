@@ -39,7 +39,7 @@ describe('toType option', () => {
   it('should move a file to a new directory', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'directory/directorynew-directoryfile.txt.22af645d1859cb5ca6da0c484f1f37ea.22af645d1859cb5ca6da0c484f1f37ea.22af645d.22af645d.txt',
+        'directory/directorynew-directoryfile.txt.5d7817ed5bc246756d73d6a4c8e94c33.5d7817ed5bc246756d73d6a4c8e94c33.22af645d.22af645d.txt',
       ],
       patterns: [
         {

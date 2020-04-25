@@ -170,9 +170,9 @@ describe('transformPath option', () => {
   it('should transform target path of every file in glob after applying template', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'transformed/directory/directoryfile-22af64.txt',
-        'transformed/directory/nested/deep-nested/deepnested-d41d8c.txt',
-        'transformed/directory/nested/nestedfile-d41d8c.txt',
+        'transformed/directory/directoryfile-5d7817.txt',
+        'transformed/directory/nested/deep-nested/deepnested-31d6cf.txt',
+        'transformed/directory/nested/nestedfile-31d6cf.txt',
       ],
       patterns: [
         {
