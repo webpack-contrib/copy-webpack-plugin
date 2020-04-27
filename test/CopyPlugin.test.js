@@ -1,9 +1,7 @@
 import path from 'path';
 
-import { MockCompiler } from './helpers/mocks';
 import { run, runEmit, runChange } from './helpers/run';
 
-const BUILD_DIR = path.join(__dirname, 'build');
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('apply function', () => {
@@ -302,50 +300,6 @@ describe('apply function', () => {
         patterns: [
           {
             from: '!(directory)\\**\\*.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-  });
-
-  describe('dev server', () => {
-    it('should work with absolute to if outpath is defined with webpack-dev-server', (done) => {
-      runEmit({
-        compiler: new MockCompiler({
-          outputPath: '/',
-          devServer: {
-            outputPath: BUILD_DIR,
-          },
-        }),
-        expectedAssetKeys: ['file.txt'],
-        patterns: [
-          {
-            from: 'file.txt',
-            to: BUILD_DIR,
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should throw an error when output path isn't defined with webpack-dev-server", (done) => {
-      runEmit({
-        compiler: new MockCompiler({
-          outputPath: '/',
-        }),
-        skipAssetsTesting: true,
-        expectedErrors: [
-          new Error(
-            'using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths'
-          ),
-        ],
-        patterns: [
-          {
-            from: 'file.txt',
-            to: BUILD_DIR,
           },
         ],
       })

@@ -7,7 +7,7 @@ import minimatch from 'minimatch';
 import isObject from './utils/isObject';
 
 export default function processPattern(globalRef, pattern) {
-  const { logger, output, concurrency, compilation } = globalRef;
+  const { logger, output, concurrency } = globalRef;
   const globOptions = Object.assign(
     {
       cwd: pattern.context,
@@ -97,15 +97,6 @@ export default function processPattern(globalRef, pattern) {
           }
 
           if (path.isAbsolute(file.webpackTo)) {
-            if (output === '/') {
-              const message =
-                'using older versions of webpack-dev-server, devServer.outputPath must be defined to write to absolute paths';
-
-              logger.error(message);
-
-              compilation.errors.push(new Error(message));
-            }
-
             file.webpackTo = path.relative(output, file.webpackTo);
           }
 
