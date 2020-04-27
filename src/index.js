@@ -10,7 +10,11 @@ import postProcessPattern from './postProcessPattern';
 
 class CopyPlugin {
   constructor(patterns = [], options = {}) {
-    validateOptions(schema, patterns, this.constructor.name);
+    validateOptions(
+      schema,
+      { patterns, options },
+      { name: 'Copy Plugin', baseDataPath: 'options' }
+    );
 
     this.patterns = patterns;
     this.options = options;
