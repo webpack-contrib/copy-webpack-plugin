@@ -22,7 +22,6 @@ class CopyPlugin {
   apply(compiler) {
     const fileDependencies = new Set();
     const contextDependencies = new Set();
-    const written = {};
 
     let context;
 
@@ -44,14 +43,12 @@ class CopyPlugin {
       const globalRef = {
         logger,
         compilation,
-        written,
         fileDependencies,
         contextDependencies,
         context,
         inputFileSystem: compiler.inputFileSystem,
         output: compiler.options.output.path,
         ignore: this.options.ignore || [],
-        copyUnmodified: this.options.copyUnmodified,
         concurrency: this.options.concurrency,
       };
 

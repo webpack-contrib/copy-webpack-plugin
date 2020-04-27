@@ -15,14 +15,7 @@ import { stat, readFile } from './utils/promisify';
 /* eslint-disable no-param-reassign */
 
 export default function postProcessPattern(globalRef, pattern, file) {
-  const {
-    logger,
-    compilation,
-    fileDependencies,
-    written,
-    inputFileSystem,
-    copyUnmodified,
-  } = globalRef;
+  const { logger, compilation, fileDependencies, inputFileSystem } = globalRef;
 
   logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
 
@@ -148,30 +141,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
         return content;
       })
       .then((content) => {
-        const hash = loaderUtils.getHashDigest(content);
         const targetPath = normalizePath(file.webpackTo);
-        const targetAbsolutePath = normalizePath(file.absoluteFrom);
-
-        if (
-          !copyUnmodified &&
-          written[targetPath] &&
-          written[targetPath][targetAbsolutePath] &&
-          written[targetPath][targetAbsolutePath] === hash
-        ) {
-          logger.log(
-            `skipping '${file.webpackTo}', because content hasn't changed`
-          );
-
-          return;
-        }
-
-        logger.debug(`adding '${file.webpackTo}' for tracking content changes`);
-
-        if (!written[targetPath]) {
-          written[targetPath] = {};
-        }
-
-        written[targetPath][targetAbsolutePath] = hash;
 
         if (compilation.assets[targetPath] && !file.force) {
           logger.log(`skipping '${file.webpackTo}', because it already exists`);
