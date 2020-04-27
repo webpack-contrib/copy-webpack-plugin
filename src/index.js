@@ -55,14 +55,6 @@ class CopyPlugin {
         concurrency: this.options.concurrency,
       };
 
-      if (
-        globalRef.output === '/' &&
-        compiler.options.devServer &&
-        compiler.options.devServer.outputPath
-      ) {
-        globalRef.output = compiler.options.devServer.outputPath;
-      }
-
       const { patterns } = this;
 
       Promise.all(
