@@ -1,7 +1,6 @@
 import path from 'path';
 
 import validateOptions from 'schema-utils';
-import log from 'webpack-log';
 
 import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
@@ -35,10 +34,7 @@ class CopyPlugin {
       ({ context } = this.options);
     }
 
-    const logger = log({
-      name: 'copy-webpack-plugin',
-      level: this.options.logLevel || 'warn',
-    });
+    const logger = compiler.getInfrastructureLogger('copy-webpack-plugin');
 
     const plugin = { name: 'CopyPlugin' };
 

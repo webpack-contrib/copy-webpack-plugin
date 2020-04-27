@@ -24,7 +24,7 @@ export default function processPattern(globalRef, pattern) {
 
   const limit = pLimit(concurrency || 100);
 
-  logger.info(
+  logger.log(
     `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
   );
 
@@ -76,7 +76,7 @@ export default function processPattern(globalRef, pattern) {
             logger.debug(`testing ${glob} against ${file.relativeFrom}`);
 
             if (minimatch(file.relativeFrom, glob, globParams)) {
-              logger.info(
+              logger.log(
                 `ignoring '${file.relativeFrom}', because it matches the ignore glob '${glob}'`
               );
 
@@ -109,7 +109,7 @@ export default function processPattern(globalRef, pattern) {
             file.webpackTo = path.relative(output, file.webpackTo);
           }
 
-          logger.info(
+          logger.log(
             `determined that '${from}' should write to '${file.webpackTo}'`
           );
 

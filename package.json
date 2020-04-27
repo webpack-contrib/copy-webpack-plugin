@@ -38,7 +38,7 @@
     "dist"
   ],
   "peerDependencies": {
-    "webpack": "^4.0.0 || ^5.0.0"
+    "webpack": "^4.37.0 || ^5.0.0"
   },
   "dependencies": {
     "cacache": "^15.0.0",
@@ -51,8 +51,7 @@
     "normalize-path": "^3.0.0",
     "p-limit": "^2.3.0",
     "schema-utils": "^2.6.6",
-    "serialize-javascript": "^3.0.0",
-    "webpack-log": "^2.0.0"
+    "serialize-javascript": "^3.0.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
