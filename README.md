@@ -499,11 +499,10 @@ module.exports = {
 
 ### Options
 
-|                Name                 |    Type     |          Default           | Description                                                                                                                                       |
-| :---------------------------------: | :---------: | :------------------------: | :------------------------------------------------------------------------------------------------------------------------------------------------ |
-|         [`ignore`](#ignore)         |  `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                                                                                      |
-|        [`context`](#context)        | `{String}`  | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns                                                                  |
-| [`copyUnmodified`](#copyunmodified) | `{Boolean}` |          `false`           | Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option |
+|         Name          |    Type    |          Default           | Description                                                                      |
+| :-------------------: | :--------: | :------------------------: | :------------------------------------------------------------------------------- |
+|  [`ignore`](#ignore)  | `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                     |
+| [`context`](#context) | `{String}` | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns |
 
 #### `ignore`
 
@@ -526,20 +525,6 @@ A path that determines how to interpret the `from` path, shared for all patterns
 ```js
 module.exports = {
   plugins: [new CopyPlugin([...patterns], { context: '/app' })],
-};
-```
-
-#### `copyUnmodified`
-
-Copies files, regardless of modification when using watch or `webpack-dev-server`. All files are copied on first build, regardless of this option.
-
-> ℹ️ By default, we only copy **modified** files during a `webpack --watch` or `webpack-dev-server` build. Setting this option to `true` will copy all files.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [new CopyPlugin([...patterns], { copyUnmodified: true })],
 };
 ```
 

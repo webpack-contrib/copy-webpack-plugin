@@ -385,9 +385,9 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('only include files that have changed', (done) => {
+    it('should include files that have changed when `from` is a file', (done) => {
       runChange({
-        expectedAssetKeys: ['tempfile1.txt'],
+        expectedAssetKeys: ['tempfile1.txt', 'tempfile2.txt'],
         newFileLoc1: path.join(FIXTURES_DIR, 'watch', 'tempfile1.txt'),
         newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
         patterns: [
@@ -403,9 +403,9 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('only include files that have changed', (done) => {
+    it('should include all files when `from` is a directory', (done) => {
       runChange({
-        expectedAssetKeys: ['tempfile1.txt'],
+        expectedAssetKeys: ['.gitkeep', 'tempfile1.txt', 'tempfile2.txt'],
         newFileLoc1: path.join(
           FIXTURES_DIR,
           'watch',
@@ -428,37 +428,9 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('include all files if copyUnmodified is true', (done) => {
+    it('should include all files when `from` is a glob', (done) => {
       runChange({
-        expectedAssetKeys: ['tempfile1.txt', 'tempfile2.txt', '.gitkeep'],
-        newFileLoc1: path.join(
-          FIXTURES_DIR,
-          'watch',
-          'directory',
-          'tempfile1.txt'
-        ),
-        newFileLoc2: path.join(
-          FIXTURES_DIR,
-          'watch',
-          'directory',
-          'tempfile2.txt'
-        ),
-        options: {
-          copyUnmodified: true,
-        },
-        patterns: [
-          {
-            from: 'directory',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('copy only changed files', (done) => {
-      runChange({
-        expectedAssetKeys: ['dest1/tempfile1.txt'],
+        expectedAssetKeys: ['dest1/tempfile1.txt', 'dest1/tempfile2.txt'],
         newFileLoc1: path.join(
           FIXTURES_DIR,
           'watch',
@@ -483,9 +455,14 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('copy only changed files (multiple patterns)', (done) => {
+    it('should include all files when multiple patterns used', (done) => {
       runChange({
-        expectedAssetKeys: ['dest1/tempfile1.txt', 'dest2/tempfile1.txt'],
+        expectedAssetKeys: [
+          'dest1/tempfile1.txt',
+          'dest1/tempfile2.txt',
+          'dest2/tempfile1.txt',
+          'dest2/tempfile2.txt',
+        ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
           'watch',
@@ -515,11 +492,12 @@ describe('apply function', () => {
         .catch(done);
     });
 
-    it('copy only changed files (multiple patterns with difference context)', (done) => {
+    it('should include all files when multiple patterns with difference contexts', (done) => {
       runChange({
         expectedAssetKeys: [
           'dest1/tempfile1.txt',
           'dest2/directory/tempfile1.txt',
+          'dest2/tempfile2.txt',
         ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
@@ -535,61 +513,6 @@ describe('apply function', () => {
             to: 'dest1',
           },
           {
-            from: '**/*.txt',
-            to: 'dest2',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('copy only changed files (multiple patterns with difference context 1)', (done) => {
-      runChange({
-        expectedAssetKeys: [
-          'dest1/directory/tempfile1.txt',
-          'dest2/tempfile1.txt',
-        ],
-        newFileLoc1: path.join(
-          FIXTURES_DIR,
-          'watch',
-          'directory',
-          'tempfile1.txt'
-        ),
-        newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
-        patterns: [
-          {
-            from: '**/*.txt',
-            to: 'dest1',
-          },
-          {
-            context: 'directory',
-            from: '**/*.txt',
-            to: 'dest2',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('copy only changed files (multiple patterns with difference context 2)', (done) => {
-      runChange({
-        expectedAssetKeys: ['dest1/tempfile1.txt'],
-        newFileLoc1: path.join(FIXTURES_DIR, 'watch', 'tempfile1.txt'),
-        newFileLoc2: path.join(
-          FIXTURES_DIR,
-          'watch',
-          'directory',
-          'tempfile2.txt'
-        ),
-        patterns: [
-          {
-            from: '**/*.txt',
-            to: 'dest1',
-          },
-          {
-            context: 'directory',
             from: '**/*.txt',
             to: 'dest2',
           },

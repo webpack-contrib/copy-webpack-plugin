@@ -101,12 +101,6 @@
         },
         "ignore": {
           "type": "array"
-        },
-        "logLevel": {
-          "type": "string"
-        },
-        "copyUnmodified": {
-          "type": "boolean"
         }
       }
     }
