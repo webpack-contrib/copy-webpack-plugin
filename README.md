@@ -584,8 +584,8 @@ Please take a moment to read our contributing guidelines if you haven't yet done
 [node-url]: https://nodejs.org
 [deps]: https://david-dm.org/webpack-contrib/copy-webpack-plugin.svg
 [deps-url]: https://david-dm.org/webpack-contrib/copy-webpack-plugin
-[tests]: https://dev.azure.com/webpack-contrib/copy-webpack-plugin/_apis/build/status/webpack-contrib.copy-webpack-plugin?branchName=master
-[tests-url]: https://dev.azure.com/webpack-contrib/copy-webpack-plugin/_build/latest?definitionId=5&branchName=master
+[tests]: https://github.com/webpack-contrib/copy-webpack-plugin/workflows/copy-webpack-plugin/badge.svg
+[tests-url]: https://github.com/webpack-contrib/copy-webpack-plugin/actions
 [cover]: https://codecov.io/gh/webpack-contrib/copy-webpack-plugin/branch/master/graph/badge.svg
 [cover-url]: https://codecov.io/gh/webpack-contrib/copy-webpack-plugin
 [chat]: https://img.shields.io/badge/gitter-webpack%2Fwebpack-brightgreen.svg

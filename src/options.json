@@ -76,15 +76,39 @@
       "minLength": 1
     }
   },
-  "type": "array",
-  "items": {
-    "anyOf": [
-      {
-        "$ref": "#/definitions/StringPattern"
-      },
-      {
-        "$ref": "#/definitions/ObjectPattern"
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "patterns": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "$ref": "#/definitions/StringPattern"
+          },
+          {
+            "$ref": "#/definitions/ObjectPattern"
+          }
+        ]
       }
-    ]
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "type": "string"
+        },
+        "ignore": {
+          "type": "array"
+        },
+        "logLevel": {
+          "type": "string"
+        },
+        "copyUnmodified": {
+          "type": "boolean"
+        }
+      }
+    }
   }
 }

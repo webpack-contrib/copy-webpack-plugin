@@ -59,9 +59,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
           if (pattern.cache) {
             if (!globalRef.cacheDir) {
               globalRef.cacheDir =
-                findCacheDir({
-                  name: 'copy-webpack-plugin',
-                }) || os.tmpdir();
+                findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
             }
 
             const cacheKey = pattern.cache.key
@@ -70,10 +68,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
                   name,
                   version,
                   pattern,
-                  hash: crypto
-                    .createHash('md4')
-                    .update(content)
-                    .digest('hex'),
+                  hash: crypto.createHash('md4').update(content).digest('hex'),
                 });
 
             return cacache.get(globalRef.cacheDir, cacheKey).then(
