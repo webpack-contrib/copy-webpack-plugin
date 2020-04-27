@@ -50,7 +50,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
     return readFile(inputFileSystem, file.absoluteFrom)
       .then((content) => {
         if (pattern.transform) {
-          logger.info(`transforming content for '${file.absoluteFrom}'`);
+          logger.log(`transforming content for '${file.absoluteFrom}'`);
 
           // eslint-disable-next-line no-shadow
           const transform = (content, absoluteFrom) =>
@@ -102,7 +102,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
       })
       .then((content) => {
         if (pattern.toType === 'template') {
-          logger.info(
+          logger.log(
             `interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`
           );
 
@@ -130,7 +130,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
       })
       .then((content) => {
         if (pattern.transformPath) {
-          logger.info(
+          logger.log(
             `transforming path '${file.webpackTo}' for '${file.absoluteFrom}'`
           );
 
@@ -158,7 +158,7 @@ export default function postProcessPattern(globalRef, pattern, file) {
           written[targetPath][targetAbsolutePath] &&
           written[targetPath][targetAbsolutePath] === hash
         ) {
-          logger.info(
+          logger.log(
             `skipping '${file.webpackTo}', because content hasn't changed`
           );
 
@@ -174,14 +174,12 @@ export default function postProcessPattern(globalRef, pattern, file) {
         written[targetPath][targetAbsolutePath] = hash;
 
         if (compilation.assets[targetPath] && !file.force) {
-          logger.info(
-            `skipping '${file.webpackTo}', because it already exists`
-          );
+          logger.log(`skipping '${file.webpackTo}', because it already exists`);
 
           return;
         }
 
-        logger.info(
+        logger.log(
           `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
         );
 

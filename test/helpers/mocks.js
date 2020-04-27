@@ -21,6 +21,14 @@ class MockCompiler {
       };
     }
 
+    this.getInfrastructureLogger = () => ({
+      error() {},
+      warn() {},
+      info() {},
+      log() {},
+      debug() {},
+    });
+
     this.inputFileSystem = new CachedInputFileSystem(
       new NodeJsInputFileSystem(),
       0
