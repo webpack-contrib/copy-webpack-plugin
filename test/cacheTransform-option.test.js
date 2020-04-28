@@ -27,7 +27,7 @@ describe('cache option', () => {
       patterns: [
         {
           from,
-          cache: true,
+          cacheTransform: true,
           transform: function transform(content) {
             return new Promise((resolve) => {
               resolve(`${content}changed!`);
@@ -74,7 +74,7 @@ describe('cache option', () => {
       patterns: [
         {
           from,
-          cache: true,
+          cacheTransform: true,
           transform: function transform(content) {
             return new Promise((resolve) => {
               resolve(`${content}changed!`);
@@ -114,7 +114,7 @@ describe('cache option', () => {
       patterns: [
         {
           from,
-          cache: true,
+          cacheTransform: true,
           transform: function transform(content) {
             return new Promise((resolve) => {
               resolve(`${content}changed!`);
@@ -156,7 +156,7 @@ describe('cache option', () => {
       patterns: [
         {
           from,
-          cache: {
+          cacheTransform: {
             key: 'foobar',
           },
           transform(content) {
@@ -198,7 +198,7 @@ describe('cache option', () => {
       patterns: [
         {
           from,
-          cache: true,
+          cacheTransform: true,
           // eslint-disable-next-line no-shadow
           transform: function transform(content) {
             expect(isGzip(content)).toBe(true);

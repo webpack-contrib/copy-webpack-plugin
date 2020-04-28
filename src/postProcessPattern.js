@@ -49,14 +49,14 @@ export default function postProcessPattern(globalRef, pattern, file) {
           const transform = (content, absoluteFrom) =>
             pattern.transform(content, absoluteFrom);
 
-          if (pattern.cache) {
+          if (pattern.cacheTransform) {
             if (!globalRef.cacheDir) {
               globalRef.cacheDir =
                 findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
             }
 
-            const cacheKey = pattern.cache.key
-              ? pattern.cache.key
+            const cacheKey = pattern.cacheTransform.key
+              ? pattern.cacheTransform.key
               : serialize({
                   name,
                   version,

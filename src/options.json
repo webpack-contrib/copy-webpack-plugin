@@ -45,7 +45,10 @@
         "flatten": {
           "type": "boolean"
         },
-        "cache": {
+        "transform": {
+          "instanceof": "Function"
+        },
+        "cacheTransform": {
           "anyOf": [
             {
               "type": "boolean"
@@ -54,9 +57,6 @@
               "type": "object"
             }
           ]
-        },
-        "transform": {
-          "instanceof": "Function"
         },
         "transformPath": {
           "instanceof": "Function"
