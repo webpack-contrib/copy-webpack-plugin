@@ -240,9 +240,7 @@ describe('apply function', () => {
         expectedAssetKeys: ['directory/nested/nestedfile.txt'],
         patterns: [
           {
-            from: {
-              glob: 'directory\\nested\\*',
-            },
+            from: 'directory\\nested\\*',
           },
         ],
       })
@@ -255,9 +253,7 @@ describe('apply function', () => {
         expectedAssetKeys: ['directory/nested/nestedfile.txt'],
         patterns: [
           {
-            from: {
-              glob: 'directory/nested\\*',
-            },
+            from: 'directory/nested\\*',
           },
         ],
       })
@@ -370,9 +366,7 @@ describe('apply function', () => {
       run({
         patterns: [
           {
-            from: {
-              glob: 'directory/directoryfile.txt',
-            },
+            from: 'directory/directoryfile.txt',
           },
         ],
       })

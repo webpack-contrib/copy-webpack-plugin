@@ -72,19 +72,6 @@ describe('validate options', () => {
         ],
         [
           {
-            from: {
-              glob: '**/*',
-              dot: false,
-            },
-            to: 'dir',
-            context: 'context',
-            globOptions: {
-              dot: false,
-            },
-          },
-        ],
-        [
-          {
             from: 'test.txt',
             to: 'dir',
             context: 'context',
@@ -233,6 +220,16 @@ describe('validate options', () => {
             to: 'dir',
             context: 'context',
             transformPath: true,
+          },
+        ],
+        [
+          {
+            from: {
+              glob: '**/*',
+              dot: false,
+            },
+            to: 'dir',
+            context: 'context',
           },
         ],
       ],

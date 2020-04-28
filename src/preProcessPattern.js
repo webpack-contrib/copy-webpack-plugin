@@ -5,7 +5,6 @@ import globParent from 'glob-parent';
 
 import normalize from './utils/normalize';
 import isTemplateLike from './utils/isTemplateLike';
-import isObject from './utils/isObject';
 import { stat } from './utils/promisify';
 
 /* eslint-disable no-param-reassign */
@@ -32,8 +31,7 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.context = path.join(context, pattern.context);
   }
 
-  const isFromGlobPatten =
-    (isObject(pattern.from) && pattern.from.glob) || pattern.globOptions;
+  const isFromGlobPatten = pattern.globOptions;
   // Todo remove this in next major
   const isToDirectory =
     path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
@@ -67,21 +65,9 @@ export default function preProcessPattern(globalRef, pattern) {
 
     pattern.fromType = 'glob';
 
-    const globOptions = Object.assign(
-      {},
-      pattern.globOptions ? pattern.globOptions : pattern.from
-    );
-    delete globOptions.glob;
-
-    pattern.absoluteFrom = path.resolve(
-      pattern.context,
-      pattern.globOptions ? pattern.from : pattern.from.glob
-    );
-    pattern.glob = normalize(
-      pattern.context,
-      pattern.globOptions ? pattern.from : pattern.from.glob
-    );
-    pattern.globOptions = globOptions;
+    pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
+    pattern.glob = normalize(pattern.context, pattern.from);
+    pattern.globOptions = pattern.globOptions || {};
 
     return Promise.resolve(pattern);
   }
