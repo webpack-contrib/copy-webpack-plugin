@@ -173,7 +173,7 @@ function runChange(opts) {
 
   return run({
     compiler,
-    options: Object.assign({}, opts.options, { context: 'watch' }),
+    options: Object.assign({}, opts.options),
     patterns: opts.patterns,
   })
     .then(() => {

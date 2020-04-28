@@ -1,5 +1,3 @@
-import path from 'path';
-
 import validateOptions from 'schema-utils';
 
 import schema from './options.json';
@@ -21,40 +19,26 @@ class CopyPlugin {
   apply(compiler) {
     const fileDependencies = new Set();
     const contextDependencies = new Set();
-
-    let context;
-
-    if (!this.options.context) {
-      ({ context } = compiler.options);
-    } else if (!path.isAbsolute(this.options.context)) {
-      context = path.join(compiler.options.context, this.options.context);
-    } else {
-      ({ context } = this.options);
-    }
-
-    const logger = compiler.getInfrastructureLogger('copy-webpack-plugin');
-
     const plugin = { name: 'CopyPlugin' };
+    const logger = compiler.getInfrastructureLogger('copy-webpack-plugin');
 
     compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
       logger.debug('starting emit');
 
       const globalRef = {
+        context: compiler.options.context,
         logger,
         compilation,
         fileDependencies,
         contextDependencies,
-        context,
         inputFileSystem: compiler.inputFileSystem,
         output: compiler.options.output.path,
         ignore: this.options.ignore || [],
         concurrency: this.options.concurrency,
       };
 
-      const { patterns } = this;
-
       Promise.all(
-        patterns.map((pattern) =>
+        this.patterns.map((pattern) =>
           Promise.resolve()
             .then(() => preProcessPattern(globalRef, pattern))
             // Every source (from) is assumed to exist here

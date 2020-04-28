@@ -547,10 +547,9 @@ module.exports = {
 
 ### Options
 
-|         Name          |    Type    |          Default           | Description                                                                      |
-| :-------------------: | :--------: | :------------------------: | :------------------------------------------------------------------------------- |
-|  [`ignore`](#ignore)  | `{Array}`  |            `[]`            | Array of globs to ignore (applied to `from`)                                     |
-| [`context`](#context) | `{String}` | `compiler.options.context` | A path that determines how to interpret the `from` path, shared for all patterns |
+|        Name         |   Type    | Default | Description                                  |
+| :-----------------: | :-------: | :-----: | :------------------------------------------- |
+| [`ignore`](#ignore) | `{Array}` |  `[]`   | Array of globs to ignore (applied to `from`) |
 
 #### `ignore`
 
@@ -564,23 +563,6 @@ module.exports = {
     new CopyPlugin({
       patterns: [...patterns],
       options: { ignore: ['*.js', '*.css'] },
-    }),
-  ],
-};
-```
-
-#### `context`
-
-A path that determines how to interpret the `from` path, shared for all patterns.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [...patterns],
-      options: { context: '/app' },
     }),
   ],
 };

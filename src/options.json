@@ -90,9 +90,6 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "context": {
-          "type": "string"
-        },
         "ignore": {
           "type": "array"
         }

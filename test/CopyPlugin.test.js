@@ -387,9 +387,11 @@ describe('apply function', () => {
         patterns: [
           {
             from: 'tempfile1.txt',
+            context: 'watch',
           },
           {
             from: 'tempfile2.txt',
+            context: 'watch',
           },
         ],
       })
@@ -414,7 +416,7 @@ describe('apply function', () => {
         ),
         patterns: [
           {
-            from: 'directory',
+            from: 'watch/directory',
           },
         ],
       })
@@ -439,7 +441,7 @@ describe('apply function', () => {
         ),
         patterns: [
           {
-            context: 'directory',
+            context: 'watch/directory',
             from: '**/*.txt',
             to: 'dest1',
           },
@@ -471,12 +473,12 @@ describe('apply function', () => {
         ),
         patterns: [
           {
-            context: 'directory',
+            context: 'watch/directory',
             from: '**/*.txt',
             to: 'dest1',
           },
           {
-            context: 'directory',
+            context: 'watch/directory',
             from: '**/*.txt',
             to: 'dest2',
           },
@@ -502,11 +504,12 @@ describe('apply function', () => {
         newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
         patterns: [
           {
-            context: 'directory',
+            context: 'watch/directory',
             from: '**/*.txt',
             to: 'dest1',
           },
           {
+            context: 'watch',
             from: '**/*.txt',
             to: 'dest2',
           },
