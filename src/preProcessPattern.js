@@ -11,8 +11,8 @@ import { stat } from './utils/promisify';
 
 export default function preProcessPattern(globalRef, pattern) {
   const {
-    logger,
     context,
+    logger,
     inputFileSystem,
     fileDependencies,
     contextDependencies,

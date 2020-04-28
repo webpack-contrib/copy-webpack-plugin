@@ -235,8 +235,8 @@ describe('validate options', () => {
       ],
     },
     options: {
-      success: [{ context: 'context' }, { ignore: ['test'] }],
-      failure: [{ context: true }, { ignore: true }],
+      success: [{ ignore: ['test'] }],
+      failure: [{ unknown: true }, { ignore: true }],
     },
     unknown: {
       success: [],
