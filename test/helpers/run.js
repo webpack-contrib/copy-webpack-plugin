@@ -42,7 +42,9 @@ function run(opts) {
       );
     }
 
-    new CopyPlugin(opts.patterns, opts.options).apply(compiler);
+    new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
+      compiler
+    );
 
     // Call the registered function with a mock compilation and callback
     const compilation = Object.assign(

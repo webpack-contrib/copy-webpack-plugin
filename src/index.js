@@ -8,15 +8,14 @@ import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
 
 class CopyPlugin {
-  constructor(patterns = [], options = {}) {
-    validateOptions(
-      schema,
-      { patterns, options },
-      { name: 'Copy Plugin', baseDataPath: 'options' }
-    );
+  constructor(options = {}) {
+    validateOptions(schema, options, {
+      name: 'Copy Plugin',
+      baseDataPath: 'options',
+    });
 
-    this.patterns = patterns;
-    this.options = options;
+    this.patterns = options.patterns;
+    this.options = options.options || {};
   }
 
   apply(compiler) {

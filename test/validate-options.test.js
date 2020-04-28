@@ -20,7 +20,6 @@ describe('validate options', () => {
   const tests = {
     patterns: {
       success: [
-        [],
         ['test.txt'],
         ['test.txt', 'test-other.txt'],
         [
@@ -112,6 +111,7 @@ describe('validate options', () => {
         'true',
         '',
         {},
+        [],
         [''],
         [{}],
         [
@@ -234,6 +234,14 @@ describe('validate options', () => {
         ],
       ],
     },
+    options: {
+      success: [{ context: 'context' }, { ignore: ['test'] }],
+      failure: [{ context: true }, { ignore: true }],
+    },
+    unknown: {
+      success: [],
+      failure: [1, true, false, 'test', /test/, [], {}, { foo: 'bar' }],
+    },
   };
 
   function stringifyValue(value) {
@@ -255,7 +263,7 @@ describe('validate options', () => {
 
       try {
         // eslint-disable-next-line no-new
-        new CopyPlugin(key === 'patterns' ? value : { [key]: value });
+        new CopyPlugin({ [key]: value });
       } catch (errorFromPlugin) {
         if (errorFromPlugin.name !== 'ValidationError') {
           throw errorFromPlugin;
