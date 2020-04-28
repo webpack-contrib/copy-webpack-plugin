@@ -4,15 +4,8 @@
       "type": "object",
       "properties": {
         "from": {
-          "anyOf": [
-            {
-              "type": "string",
-              "minLength": 1
-            },
-            {
-              "type": "object"
-            }
-          ]
+          "type": "string",
+          "minLength": 1
         },
         "to": {
           "type": "string"
