@@ -1,14 +1,30 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`validate options should throw an error on the "options" option with "{"context":true}" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.options.context should be a string."
+`;
+
+exports[`validate options should throw an error on the "options" option with "{"ignore":true}" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.options.ignore should be an array:
+   [any, ...]"
+`;
+
 exports[`validate options should throw an error on the "patterns" option with "" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...]"
+   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[""]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns[0] should be an non-empty string."
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[]" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.patterns should be an non-empty array."
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"","to":"dir","context":"context"}]" value 1`] = `
@@ -128,17 +144,65 @@ exports[`validate options should throw an error on the "patterns" option with "[
 exports[`validate options should throw an error on the "patterns" option with "{}" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...]"
+   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "true" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...]"
+   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "true" value 2`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...]"
+   [non-empty string | object { from, to?, context?, toType?, test?, force?, ignore?, flatten?, cache?, transform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "/test/" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "[]" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "{"foo":"bar"}" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "{}" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "1" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "false" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "test" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
+`;
+
+exports[`validate options should throw an error on the "unknown" option with "true" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options has an unknown property 'unknown'. These properties are valid:
+   object { patterns?, options? }"
 `;

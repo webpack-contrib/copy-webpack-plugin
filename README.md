@@ -34,10 +34,12 @@ const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      { from: 'source', to: 'dest' },
-      { from: 'other', to: 'public' },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        { from: 'source', to: 'dest' },
+        { from: 'other', to: 'public' },
+      ],
+    }),
   ],
 };
 ```
@@ -53,8 +55,20 @@ The plugin's signature:
 **webpack.config.js**
 
 ```js
+const CopyPlugin = require('copy-webpack-plugin');
+
 module.exports = {
-  plugins: [new CopyPlugin(patterns, options)],
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: 'source', to: 'dest' },
+        { from: 'other', to: 'public' },
+      ],
+      options: {
+        ignore: ['*.bin'],
+      },
+    }),
+  ],
 };
 ```
 
@@ -92,16 +106,18 @@ Globs accept [minimatch options](https://github.com/isaacs/minimatch).
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      'relative/path/to/file.ext',
-      '/absolute/path/to/file.ext',
-      'relative/path/to/dir',
-      '/absolute/path/to/dir',
-      '**/*',
-      {
-        from: '**/*',
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        'relative/path/to/file.ext',
+        '/absolute/path/to/file.ext',
+        'relative/path/to/dir',
+        '/absolute/path/to/dir',
+        '**/*',
+        {
+          from: '**/*',
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -122,20 +138,22 @@ Output path.
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: '**/*',
-        to: 'relative/path/to/dest/',
-      },
-      {
-        from: '**/*',
-        to: '/absolute/path/to/dest/',
-      },
-      {
-        from: '**/*',
-        to: '[path][name].[contenthash].[ext]',
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: '**/*',
+          to: 'relative/path/to/dest/',
+        },
+        {
+          from: '**/*',
+          to: '/absolute/path/to/dest/',
+        },
+        {
+          from: '**/*',
+          to: '[path][name].[contenthash].[ext]',
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -156,13 +174,15 @@ A path that determines how to interpret the `from` path.
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.txt',
-        to: 'dest/',
-        context: 'app/',
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.txt',
+          to: 'dest/',
+          context: 'app/',
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -190,13 +210,15 @@ We try to automatically determine the `type` so you most likely do not need this
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'path/to/file.txt',
-        to: 'directory/with/extension.ext',
-        toType: 'dir',
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'path/to/file.txt',
+          to: 'directory/with/extension.ext',
+          toType: 'dir',
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -208,13 +230,15 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'path/to/file.txt',
-        to: 'file/without/extension',
-        toType: 'file',
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'path/to/file.txt',
+          to: 'file/without/extension',
+          toType: 'file',
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -226,13 +250,15 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/',
-        to: 'dest/[name].[hash].[ext]',
-        toType: 'template',
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/',
+          to: 'dest/[name].[hash].[ext]',
+          toType: 'template',
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -255,13 +281,15 @@ and so on...
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: '*/*',
-        to: '[1]-[2].[hash].[ext]',
-        test: /([^/]+)\/(.+)\.png$/,
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: '*/*',
+          to: '[1]-[2].[hash].[ext]',
+          test: /([^/]+)\/(.+)\.png$/,
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -278,13 +306,15 @@ Overwrites files already in `compilation.assets` (usually added by other plugins
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/**/*',
-        to: 'dest/',
-        force: true,
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/**/*',
+          to: 'dest/',
+          force: true,
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -301,13 +331,15 @@ Globs to ignore files.
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/**/*',
-        to: 'dest/',
-        ignore: ['*.js'],
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/**/*',
+          to: 'dest/',
+          ignore: ['*.js'],
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -319,13 +351,15 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/assets',
-        to: 'dest/',
-        ignore: ['subfolder/ignorefile.js'],
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/assets',
+          to: 'dest/',
+          ignore: ['subfolder/ignorefile.js'],
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -344,13 +378,15 @@ Removes all directory references and only copies file names.
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/**/*',
-        to: 'dest/',
-        flatten: true,
-      },
-    ]),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/**/*',
+          to: 'dest/',
+          flatten: true,
+        },
+      ],
+    }),
   ],
 };
 ```
@@ -368,16 +404,18 @@ Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.png',
-        to: 'dest/',
-        transform(content, path) {
-          return optimize(content);
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return optimize(content);
+          },
+          cache: true,
         },
-        cache: true,
-      },
-    ]),
+      ],
+    }),
   ],
 };
 ```
@@ -394,15 +432,17 @@ Allows to modify the file contents.
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.png',
-        to: 'dest/',
-        transform(content, path) {
-          return optimize(content);
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return optimize(content);
+          },
         },
-      },
-    ]),
+      ],
+    }),
   ],
 };
 ```
@@ -412,15 +452,17 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.png',
-        to: 'dest/',
-        transform(content, path) {
-          return Promise.resolve(optimize(content));
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return Promise.resolve(optimize(content));
+          },
         },
-      },
-    ]),
+      ],
+    }),
   ],
 };
 ```
@@ -441,15 +483,17 @@ Allows to modify the writing path.
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.png',
-        to: 'dest/',
-        transformPath(targetPath, absolutePath) {
-          return 'newPath';
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transformPath(targetPath, absolutePath) {
+            return 'newPath';
+          },
         },
-      },
-    ]),
+      ],
+    }),
   ],
 };
 ```
@@ -459,15 +503,17 @@ module.exports = {
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'src/*.png',
-        to: 'dest/',
-        transformPath(targetPath, absolutePath) {
-          return Promise.resolve('newPath');
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transformPath(targetPath, absolutePath) {
+            return Promise.resolve('newPath');
+          },
         },
-      },
-    ]),
+      ],
+    }),
   ],
 };
 ```
@@ -484,15 +530,17 @@ Allows to configute the glob pattern matching library used by the plugin. [See t
 ```js
 module.exports = {
   plugins: [
-    new CopyPlugin([
-      {
-        from: 'public/**/*',
-        globOptions: {
-          dot: true,
-          gitignore: true,
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'public/**/*',
+          globOptions: {
+            dot: true,
+            gitignore: true,
+          },
         },
-      },
-    ]),
+      ],
+    }),
   ],
 };
 ```
@@ -512,7 +560,12 @@ Array of globs to ignore (applied to `from`).
 
 ```js
 module.exports = {
-  plugins: [new CopyPlugin([...patterns], { ignore: ['*.js', '*.css'] })],
+  plugins: [
+    new CopyPlugin({
+      patterns: [...patterns],
+      options: { ignore: ['*.js', '*.css'] },
+    }),
+  ],
 };
 ```
 
@@ -524,7 +577,12 @@ A path that determines how to interpret the `from` path, shared for all patterns
 
 ```js
 module.exports = {
-  plugins: [new CopyPlugin([...patterns], { context: '/app' })],
+  plugins: [
+    new CopyPlugin({
+      patterns: [...patterns],
+      options: { context: '/app' },
+    }),
+  ],
 };
 ```
 
