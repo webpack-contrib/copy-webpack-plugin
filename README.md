@@ -74,20 +74,20 @@ module.exports = {
 
 ### Patterns
 
-|               Name                |        Type         |                     Default                     | Description                                                                                           |
-| :-------------------------------: | :-----------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
-|          [`from`](#from)          |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
-|            [`to`](#to)            |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
-|       [`context`](#context)       |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|        [`toType`](#totype)        |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
-|          [`test`](#test)          | `{String\|RegExp}`  |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
-|         [`force`](#force)         |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
-|        [`ignore`](#ignore)        |      `{Array}`      |                      `[]`                       | Globs to ignore files.                                                                                |
-|       [`flatten`](#flatten)       |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
-|         [`cache`](#cache)         | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
-|     [`transform`](#transform)     |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
-| [`transformPath`](#transformpath) |    `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                    |
-|   [`globOptions`](#globoptions)   |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library                                   |
+|                Name                 |        Type         |                     Default                     | Description                                                                                           |
+| :---------------------------------: | :-----------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
+|           [`from`](#from)           |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
+|             [`to`](#to)             |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
+|        [`context`](#context)        |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
+|    [`globOptions`](#globoptions)    |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library                                   |
+|         [`toType`](#totype)         |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
+|           [`test`](#test)           | `{String\|RegExp}`  |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
+|          [`force`](#force)          |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
+|         [`ignore`](#ignore)         |      `{Array}`      |                      `[]`                       | Globs to ignore files.                                                                                |
+|        [`flatten`](#flatten)        |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
+|      [`transform`](#transform)      |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
+| [`cacheTransform`](#cacheTransform) | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|  [`transformPath`](#transformpath)  |    `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                    |
 
 #### `from`
 
@@ -180,6 +180,33 @@ module.exports = {
           from: 'src/*.txt',
           to: 'dest/',
           context: 'app/',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+#### `globOptions`
+
+Type: `Object`
+Default: `undefined`
+
+Allows to configute the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'public/**/*',
+          globOptions: {
+            dot: true,
+            gitignore: true,
+          },
         },
       ],
     }),
@@ -391,35 +418,6 @@ module.exports = {
 };
 ```
 
-#### `cache`
-
-Type: `Boolean|Object`
-Default: `false`
-
-Enable/disable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache.
-Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: 'src/*.png',
-          to: 'dest/',
-          transform(content, path) {
-            return optimize(content);
-          },
-          cache: true,
-        },
-      ],
-    }),
-  ],
-};
-```
-
 #### `transform`
 
 Type: `Function`
@@ -460,6 +458,35 @@ module.exports = {
           transform(content, path) {
             return Promise.resolve(optimize(content));
           },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+#### `cacheTransform`
+
+Type: `Boolean|Object`
+Default: `false`
+
+Enable/disable `transform` caching. You can use `{ cacheTransform: { key: 'my-cache-key' } }` to invalidate the cache.
+Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return optimize(content);
+          },
+          cacheTransform: true,
         },
       ],
     }),
@@ -510,33 +537,6 @@ module.exports = {
           to: 'dest/',
           transformPath(targetPath, absolutePath) {
             return Promise.resolve('newPath');
-          },
-        },
-      ],
-    }),
-  ],
-};
-```
-
-#### `globOptions`
-
-Type: `Object`
-Default: `undefined`
-
-Allows to configute the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: 'public/**/*',
-          globOptions: {
-            dot: true,
-            gitignore: true,
           },
         },
       ],

@@ -64,8 +64,8 @@ describe('validate options', () => {
               },
             ],
             flatten: true,
-            cache: true,
             transform: () => {},
+            cacheTransform: true,
             transformPath: () => {},
           },
         ],
@@ -100,7 +100,7 @@ describe('validate options', () => {
             from: 'test.txt',
             to: 'dir',
             context: 'context',
-            cache: {
+            cacheTransform: {
               foo: 'bar',
             },
           },
@@ -203,7 +203,7 @@ describe('validate options', () => {
             from: 'test.txt',
             to: 'dir',
             context: 'context',
-            cache: () => {},
+            cacheTransform: () => {},
           },
         ],
         [
