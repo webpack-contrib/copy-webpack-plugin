@@ -3,6 +3,9 @@ import path from 'path';
 import { runEmit } from './helpers/run';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+const FIXTURES_DIR_NORMALIZED = path
+  .join(__dirname, 'fixtures')
+  .replace(/\\/g, '/');
 
 describe('from option', () => {
   describe('is a file', () => {
@@ -24,7 +27,7 @@ describe('from option', () => {
         expectedAssetKeys: ['file.txt'],
         patterns: [
           {
-            from: path.join(FIXTURES_DIR, 'file.txt'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'file.txt'),
           },
         ],
       })
@@ -50,7 +53,10 @@ describe('from option', () => {
         expectedAssetKeys: ['directoryfile.txt'],
         patterns: [
           {
-            from: path.join(FIXTURES_DIR, 'directory/directoryfile.txt'),
+            from: path.posix.join(
+              FIXTURES_DIR_NORMALIZED,
+              'directory/directoryfile.txt'
+            ),
           },
         ],
       })
@@ -216,7 +222,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: path.join(FIXTURES_DIR, 'directory'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'directory'),
           },
         ],
       })
@@ -260,7 +266,7 @@ describe('from option', () => {
         expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
         patterns: [
           {
-            from: path.join(FIXTURES_DIR, 'directory/nested'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'directory/nested'),
           },
         ],
       })
@@ -306,7 +312,7 @@ describe('from option', () => {
         expectedAssetKeys: ['file.txt'],
         patterns: [
           {
-            from: path.join(FIXTURES_DIR, '*.txt'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, '*.txt'),
           },
         ],
       })
@@ -359,7 +365,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: path.join(FIXTURES_DIR, '**/*.txt'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, '**/*.txt'),
           },
         ],
       })
