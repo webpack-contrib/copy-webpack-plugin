@@ -37,9 +37,11 @@ export default function preProcessPattern(globalRef, pattern) {
     path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
 
   // Normalize paths
-  pattern.from = isFromGlobPatten ? pattern.from : path.normalize(pattern.from);
-  pattern.context = path.normalize(pattern.context);
-  pattern.to = path.normalize(pattern.to);
+  pattern.from = isFromGlobPatten
+    ? pattern.from
+    : path.posix.normalize(pattern.from);
+  pattern.context = path.posix.normalize(pattern.context);
+  pattern.to = path.posix.normalize(pattern.to);
 
   pattern.ignore = globalRef.ignore.concat(pattern.ignore || []);
 
@@ -66,7 +68,7 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.fromType = 'glob';
 
     pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
-    pattern.glob = normalize(pattern.context, pattern.from);
+    pattern.glob = normalize(pattern.context, pattern.from, true);
     pattern.globOptions = pattern.globOptions || {};
 
     return Promise.resolve(pattern);
@@ -88,7 +90,7 @@ export default function preProcessPattern(globalRef, pattern) {
       logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
 
       pattern.fromType = 'glob';
-      pattern.glob = normalize(pattern.context, pattern.from);
+      pattern.glob = normalize(pattern.context, pattern.from, true);
 
       // We need to add context directory as dependencies to avoid problems when new files added in directories
       // when we already in watch mode and this directories are not in context dependencies

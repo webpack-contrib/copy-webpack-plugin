@@ -151,7 +151,7 @@ describe('context option', () => {
       expectedAssetKeys: ['(special-*file).txt'],
       patterns: [
         {
-          from: '(special-*file).txt',
+          from: '\\(special-*file\\).txt',
           context: '[special?directory]',
         },
       ],
