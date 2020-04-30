@@ -5,22 +5,13 @@ import pLimit from 'p-limit';
 import minimatch from 'minimatch';
 
 import isObject from './utils/isObject';
+import createPatternGlob from './utils/createPatternGlob';
+
+/* eslint-disable no-param-reassign */
 
 export default function processPattern(globalRef, pattern) {
-  const { logger, output, concurrency } = globalRef;
-  const globOptions = Object.assign(
-    {
-      cwd: pattern.context,
-      follow: true,
-      // Todo in next major release
-      // dot: false
-    },
-    pattern.globOptions || {}
-  );
-
-  if (pattern.fromType === 'nonexistent') {
-    return Promise.resolve();
-  }
+  const { logger, output, concurrency, compilation } = globalRef;
+  createPatternGlob(pattern, globalRef);
 
   const limit = pLimit(concurrency || 100);
 
@@ -28,8 +19,26 @@ export default function processPattern(globalRef, pattern) {
     `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
   );
 
-  return globby(pattern.glob, globOptions).then((paths) =>
-    Promise.all(
+  return globby(pattern.glob, pattern.globOptions).then((paths) => {
+    if (paths.length === 0) {
+      const newWarning = new Error(
+        `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
+      );
+      const hasWarning = compilation.warnings.some(
+        // eslint-disable-next-line no-shadow
+        (warning) => warning.message === newWarning.message
+      );
+
+      // Only display the same message once
+      if (!hasWarning) {
+        logger.warn(newWarning.message);
+
+        compilation.warnings.push(newWarning);
+      }
+
+      return Promise.resolve();
+    }
+    return Promise.all(
       paths.map((from) =>
         limit(() => {
           const file = {
@@ -107,6 +116,6 @@ export default function processPattern(globalRef, pattern) {
           return file;
         })
       )
-    )
-  );
+    );
+  });
 }

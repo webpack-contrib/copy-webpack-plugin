@@ -1,23 +1,12 @@
 import path from 'path';
 
-import isGlob from 'is-glob';
-import globParent from 'glob-parent';
-
-import normalize from './utils/normalize';
 import isTemplateLike from './utils/isTemplateLike';
 import { stat } from './utils/promisify';
 
 /* eslint-disable no-param-reassign */
 
 export default function preProcessPattern(globalRef, pattern) {
-  const {
-    context,
-    logger,
-    inputFileSystem,
-    fileDependencies,
-    contextDependencies,
-    compilation,
-  } = globalRef;
+  const { context, logger, inputFileSystem } = globalRef;
 
   pattern =
     typeof pattern === 'string'
@@ -31,13 +20,12 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.context = path.join(context, pattern.context);
   }
 
-  const isFromGlobPatten = pattern.globOptions;
   // Todo remove this in next major
   const isToDirectory =
     path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
 
-  // Normalize paths
-  pattern.from = isFromGlobPatten ? pattern.from : path.normalize(pattern.from);
+  pattern.fromOrigin = pattern.from;
+  pattern.from = path.normalize(pattern.from);
   pattern.context = path.normalize(pattern.context);
   pattern.to = path.normalize(pattern.to);
 
@@ -59,19 +47,6 @@ export default function preProcessPattern(globalRef, pattern) {
       pattern.toType = 'file';
   }
 
-  // If we know it's a glob, then bail early
-  if (isFromGlobPatten) {
-    logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
-
-    pattern.fromType = 'glob';
-
-    pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
-    pattern.glob = normalize(pattern.context, pattern.from);
-    pattern.globOptions = pattern.globOptions || {};
-
-    return Promise.resolve(pattern);
-  }
-
   if (path.isAbsolute(pattern.from)) {
     pattern.absoluteFrom = pattern.from;
   } else {
@@ -79,82 +54,25 @@ export default function preProcessPattern(globalRef, pattern) {
   }
 
   logger.debug(
-    `determined '${pattern.from}' to be read from '${pattern.absoluteFrom}'`
-  );
-
-  const noStatsHandler = () => {
-    // If from doesn't appear to be a glob, then log a warning
-    if (isGlob(pattern.from) || pattern.from.includes('*')) {
-      logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
-
-      pattern.fromType = 'glob';
-      pattern.glob = normalize(pattern.context, pattern.from);
-
-      // We need to add context directory as dependencies to avoid problems when new files added in directories
-      // when we already in watch mode and this directories are not in context dependencies
-      // `glob-parent` always return `/` we need normalize path
-      contextDependencies.add(path.normalize(globParent(pattern.absoluteFrom)));
-    } else {
-      const newWarning = new Error(
-        `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
-      );
-      const hasWarning = compilation.warnings.some(
-        // eslint-disable-next-line no-shadow
-        (warning) => warning.message === newWarning.message
-      );
-
-      // Only display the same message once
-      if (!hasWarning) {
-        logger.warn(newWarning.message);
-
-        compilation.warnings.push(newWarning);
-      }
-
-      pattern.fromType = 'nonexistent';
-    }
-  };
-
-  logger.debug(
     `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
   );
 
   return stat(inputFileSystem, pattern.absoluteFrom)
-    .catch(() => noStatsHandler())
     .then((stats) => {
       if (!stats) {
-        noStatsHandler();
-
         return pattern;
       }
 
       if (stats.isDirectory()) {
-        logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);
-
-        contextDependencies.add(pattern.absoluteFrom);
-
         pattern.fromType = 'dir';
-        pattern.context = pattern.absoluteFrom;
-        pattern.glob = normalize(pattern.absoluteFrom, '**/*');
-        pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
-        pattern.globOptions = {
-          dot: true,
-        };
       } else if (stats.isFile()) {
-        logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
-
-        fileDependencies.add(pattern.absoluteFrom);
-
-        pattern.stats = stats;
         pattern.fromType = 'file';
-        pattern.context = path.dirname(pattern.absoluteFrom);
-        pattern.glob = normalize(pattern.absoluteFrom);
-        pattern.globOptions = {
-          dot: true,
-        };
+        pattern.stats = stats;
       } else if (!pattern.fromType) {
         logger.warn(`unrecognized file type for ${pattern.from}`);
       }
 
       return pattern;
-    });
+    })
+    .catch(() => pattern);
 }
