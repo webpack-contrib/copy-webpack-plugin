@@ -5,22 +5,13 @@ import pLimit from 'p-limit';
 import minimatch from 'minimatch';
 
 import isObject from './utils/isObject';
+import createPatternGlob from './utils/createPatternGlob';
 
 /* eslint-disable no-param-reassign */
 
 export default function processPattern(globalRef, pattern) {
   const { logger, output, concurrency, compilation } = globalRef;
-  const globOptions = Object.assign(
-    {
-      cwd: pattern.context,
-      followSymbolicLinks: true,
-    },
-    pattern.globOptions || {}
-  );
-
-  if (pattern.fromType === 'nonexistent') {
-    return Promise.resolve();
-  }
+  createPatternGlob(pattern, globalRef);
 
   const limit = pLimit(concurrency || 100);
 
@@ -28,7 +19,7 @@ export default function processPattern(globalRef, pattern) {
     `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
   );
 
-  return globby(pattern.glob, globOptions).then((paths) => {
+  return globby(pattern.glob, pattern.globOptions).then((paths) => {
     if (paths.length === 0) {
       const newWarning = new Error(
         `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
@@ -45,7 +36,7 @@ export default function processPattern(globalRef, pattern) {
         compilation.warnings.push(newWarning);
       }
 
-      pattern.fromType = 'nonexistent';
+      return Promise.resolve();
     }
     return Promise.all(
       paths.map((from) =>

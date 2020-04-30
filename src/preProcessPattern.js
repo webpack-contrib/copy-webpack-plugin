@@ -1,6 +1,5 @@
 import path from 'path';
 
-import createPatternGlob from './utils/createPatternGlob';
 import isTemplateLike from './utils/isTemplateLike';
 import { stat } from './utils/promisify';
 
@@ -58,32 +57,22 @@ export default function preProcessPattern(globalRef, pattern) {
     `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
   );
 
-  return defineFromType();
-
-  async function defineFromType() {
-    try {
-      const stats = await stat(inputFileSystem, pattern.absoluteFrom);
-
+  return stat(inputFileSystem, pattern.absoluteFrom)
+    .then((stats) => {
       if (!stats) {
-        createPatternGlob(pattern, globalRef);
-
         return pattern;
       }
 
       if (stats.isDirectory()) {
         pattern.fromType = 'dir';
-        createPatternGlob(pattern, globalRef);
       } else if (stats.isFile()) {
         pattern.fromType = 'file';
-        createPatternGlob(pattern, globalRef);
         pattern.stats = stats;
       } else if (!pattern.fromType) {
         logger.warn(`unrecognized file type for ${pattern.from}`);
       }
-    } catch (e) {
-      createPatternGlob(pattern, globalRef);
-    }
 
-    return pattern;
-  }
+      return pattern;
+    })
+    .catch(() => pattern);
 }

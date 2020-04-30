@@ -235,6 +235,34 @@ describe('apply function', () => {
         .catch(done);
     });
 
+    // Windows path segment (\\) can not use as path segment in glob, but can use as dirname at linux
+    it.skip('should work with windows path segment separation path when "from" is glob', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory\\nested\\*',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    // Windows path segment (\\) can not use as path segment in glob, but can use as dirname at linux
+    it.skip('should work with mixed path segment separation path when "from" is glob', (done) => {
+      runEmit({
+        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        patterns: [
+          {
+            from: 'directory/nested\\*',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('should exclude path with linux path segment separators', (done) => {
       runEmit({
         expectedAssetKeys: [
@@ -249,6 +277,28 @@ describe('apply function', () => {
         patterns: [
           {
             from: '!(directory)/**/*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    // Windows path segment (\\) can not use as path segment in glob, but can use as dirname at linux
+    it.skip('should exclude path with windows path segment separators', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          '[!]/hello.txt',
+          '[special?directory]/(special-*file).txt',
+          '[special?directory]/directoryfile.txt',
+          '[special?directory]/nested/nestedfile.txt',
+          'dir (86)/file.txt',
+          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
+          'dir (86)/nesteddir/nestedfile.txt',
+        ],
+        patterns: [
+          {
+            from: '!(directory)\\**\\*.txt',
           },
         ],
       })

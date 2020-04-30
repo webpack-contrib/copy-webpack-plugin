@@ -95,7 +95,7 @@ Type: `String`
 Default: `undefined`
 
 Glob or path from where we сopy files.
-Globs accept [minimatch options](https://github.com/isaacs/minimatch).
+Globs accept [micromatch options](https://github.com/micromatch/micromatch).
 
 > ⚠️ Don't use directly `\\` in `from` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -120,6 +120,27 @@ module.exports = {
     }),
   ],
 };
+```
+
+##### `For windows`
+
+If you define `from` as file path or folder path on `Windows`, you can use windows path segment (`\\`)
+
+```
+...
+from: path.resolve('__dirname', 'file.txt'),
+...
+```
+
+But you should always use forward-slashes in `glob` expressions
+See [fast-glob manual](https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows).
+
+```
+...
+const FIXTURES_DIR_NORMALIZED = path.resolve(__dirname, 'fixtures').replace(/\\/g, '/');
+
+from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'file.txt'),
+...
 ```
 
 #### `to`

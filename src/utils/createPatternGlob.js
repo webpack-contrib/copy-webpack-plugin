@@ -18,6 +18,14 @@ function getAbsoluteContext(context) {
 function createPatternGlob(pattern, globalRef) {
   const { logger, fileDependencies, contextDependencies } = globalRef;
 
+  pattern.globOptions = Object.assign(
+    {
+      cwd: pattern.context,
+      followSymbolicLinks: true,
+    },
+    pattern.globOptions || {}
+  );
+
   switch (pattern.fromType) {
     case 'dir':
       logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);
