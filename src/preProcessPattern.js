@@ -7,7 +7,7 @@ import { stat } from './utils/promisify';
 /* eslint-disable no-param-reassign */
 
 export default function preProcessPattern(globalRef, pattern) {
-  const { context, logger, inputFileSystem, compilation } = globalRef;
+  const { context, logger, inputFileSystem } = globalRef;
 
   pattern =
     typeof pattern === 'string'
@@ -54,43 +54,19 @@ export default function preProcessPattern(globalRef, pattern) {
     pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
   }
 
-  const noStatsHandler = (isFirstRun) => {
-    if (
-      isFirstRun ||
-      pattern.fromType === 'glob' ||
-      pattern.fromType === 'dir' ||
-      pattern.fromType === 'file'
-    ) {
-      createPatternGlob(pattern, globalRef);
-    } else {
-      const newWarning = new Error(
-        `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
-      );
-      const hasWarning = compilation.warnings.some(
-        // eslint-disable-next-line no-shadow
-        (warning) => warning.message === newWarning.message
-      );
-
-      // Only display the same message once
-      if (!hasWarning) {
-        logger.warn(newWarning.message);
-
-        compilation.warnings.push(newWarning);
-      }
-
-      pattern.fromType = 'nonexistent';
-    }
-  };
-
   logger.debug(
     `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
   );
 
-  return stat(inputFileSystem, pattern.absoluteFrom)
-    .catch(() => noStatsHandler(true))
-    .then((stats) => {
+  return defineFromType();
+
+  async function defineFromType() {
+    try {
+      const stats = await stat(inputFileSystem, pattern.absoluteFrom);
+
       if (!stats) {
-        noStatsHandler();
+        createPatternGlob(pattern, globalRef);
+
         return pattern;
       }
 
@@ -104,7 +80,10 @@ export default function preProcessPattern(globalRef, pattern) {
       } else if (!pattern.fromType) {
         logger.warn(`unrecognized file type for ${pattern.from}`);
       }
+    } catch (e) {
+      createPatternGlob(pattern, globalRef);
+    }
 
-      return pattern;
-    });
+    return pattern;
+  }
 }

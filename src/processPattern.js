@@ -6,14 +6,14 @@ import minimatch from 'minimatch';
 
 import isObject from './utils/isObject';
 
+/* eslint-disable no-param-reassign */
+
 export default function processPattern(globalRef, pattern) {
-  const { logger, output, concurrency } = globalRef;
+  const { logger, output, concurrency, compilation } = globalRef;
   const globOptions = Object.assign(
     {
       cwd: pattern.context,
-      follow: true,
-      // Todo in next major release
-      // dot: false
+      followSymbolicLinks: true,
     },
     pattern.globOptions || {}
   );
@@ -28,8 +28,26 @@ export default function processPattern(globalRef, pattern) {
     `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
   );
 
-  return globby(pattern.glob, globOptions).then((paths) =>
-    Promise.all(
+  return globby(pattern.glob, globOptions).then((paths) => {
+    if (paths.length === 0) {
+      const newWarning = new Error(
+        `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
+      );
+      const hasWarning = compilation.warnings.some(
+        // eslint-disable-next-line no-shadow
+        (warning) => warning.message === newWarning.message
+      );
+
+      // Only display the same message once
+      if (!hasWarning) {
+        logger.warn(newWarning.message);
+
+        compilation.warnings.push(newWarning);
+      }
+
+      pattern.fromType = 'nonexistent';
+    }
+    return Promise.all(
       paths.map((from) =>
         limit(() => {
           const file = {
@@ -107,6 +125,6 @@ export default function processPattern(globalRef, pattern) {
           return file;
         })
       )
-    )
-  );
+    );
+  });
 }
