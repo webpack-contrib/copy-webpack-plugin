@@ -1,5 +1,6 @@
 // Ideally we pass in patterns and confirm the resulting assets
 import fs from 'fs';
+import path from 'path';
 
 import CopyPlugin from '../../src';
 
@@ -64,8 +65,7 @@ function run(opts) {
           throw compilation.warnings[0];
         }
 
-        const enryPoint =
-          '/media/veracrypt1/OS/copy-webpack-plugin/test/helpers/enter.js';
+        const enryPoint = path.resolve(__dirname, 'enter.js');
 
         if (compilation.fileDependencies.has(enryPoint)) {
           compilation.fileDependencies.delete(enryPoint);
@@ -158,7 +158,6 @@ function runChange(opts) {
     await delay(100);
 
     fs.appendFileSync(opts.newFileLoc1, 'extra');
-    // fs.appendFileSync(opts.newFileLoc2, 'extra');
 
     await delay(300);
 

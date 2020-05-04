@@ -308,7 +308,7 @@ describe('apply function', () => {
   });
 
   describe('watch mode', () => {
-    it('should add the file to the watch list when "from" is a file', (done) => {
+    it.only('should add the file to the watch list when "from" is a file', (done) => {
       run({
         patterns: [
           {
