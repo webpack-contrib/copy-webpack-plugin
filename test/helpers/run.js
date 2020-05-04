@@ -1,11 +1,14 @@
 // Ideally we pass in patterns and confirm the resulting assets
 import fs from 'fs';
+import path from 'path';
 
 import CopyPlugin from '../../src';
 
+import PreCopyPlugin from './PreCopyPlugin';
+
 import removeIllegalCharacterForWindows from './removeIllegalCharacterForWindows';
 
-import { MockCompiler } from './mocks';
+import { compile, getCompiler } from './';
 
 function run(opts) {
   return new Promise((resolve, reject) => {
@@ -18,8 +21,7 @@ function run(opts) {
       });
     }
 
-    // Get a mock compiler to pass to plugin.apply
-    const compiler = opts.compiler || new MockCompiler();
+    const compiler = opts.compiler || getCompiler();
 
     const isWin = process.platform === 'win32';
 
@@ -46,41 +48,11 @@ function run(opts) {
       compiler
     );
 
-    // Call the registered function with a mock compilation and callback
-    const compilation = Object.assign(
-      {
-        assets: {},
-        errors: [],
-        warnings: [],
-        fileDependencies: new Set(),
-        contextDependencies: new Set(),
-      },
-      opts.compilation
-    );
-
     // Execute the functions in series
-    return Promise.resolve()
-      .then(
-        () =>
-          new Promise((res, rej) => {
-            try {
-              compiler.hooks.emit(compilation, res);
-            } catch (error) {
-              rej(error);
-            }
-          })
-      )
-      .then(
-        () =>
-          new Promise((res, rej) => {
-            try {
-              compiler.hooks.afterEmit(compilation, res);
-            } catch (error) {
-              rej(error);
-            }
-          })
-      )
-      .then(() => {
+    return compile(compiler)
+      .then((stats) => {
+        const { compilation } = stats;
+
         if (opts.expectedErrors) {
           expect(compilation.errors).toEqual(opts.expectedErrors);
         } else if (compilation.errors.length > 0) {
@@ -91,6 +63,12 @@ function run(opts) {
           expect(compilation.warnings).toEqual(opts.expectedWarnings);
         } else if (compilation.warnings.length > 0) {
           throw compilation.warnings[0];
+        }
+
+        const enryPoint = path.resolve(__dirname, 'enter.js');
+
+        if (compilation.fileDependencies.has(enryPoint)) {
+          compilation.fileDependencies.delete(enryPoint);
         }
 
         resolve(compilation);
@@ -106,10 +84,16 @@ function runEmit(opts) {
     }
 
     if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-      expect(Object.keys(compilation.assets).sort()).toEqual(
+      expect(
+        Object.keys(compilation.assets)
+          .filter((a) => a !== 'main.js')
+          .sort()
+      ).toEqual(
         opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
       );
     } else {
+      // eslint-disable-next-line no-param-reassign
+      delete compilation.assets['main.js'];
       expect(compilation.assets).toEqual({});
     }
 
@@ -140,65 +124,88 @@ function runEmit(opts) {
 
 function runForce(opts) {
   // eslint-disable-next-line no-param-reassign
-  opts.compilation = {
-    assets: {},
-  };
+  opts.compiler = getCompiler();
 
-  opts.existingAssets.forEach((assetName) => {
-    // eslint-disable-next-line no-param-reassign
-    opts.compilation.assets[assetName] = {
-      source() {
-        return 'existing';
-      },
-    };
-  });
+  new PreCopyPlugin({ options: opts }).apply(opts.compiler);
 
   return runEmit(opts).then(() => {});
 }
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 function runChange(opts) {
-  // Create two test files
-  fs.writeFileSync(opts.newFileLoc1, 'file1contents');
-  fs.writeFileSync(opts.newFileLoc2, 'file2contents');
+  return new Promise(async (resolve) => {
+    const compiler = getCompiler();
 
-  // Create a reference to the compiler
-  const compiler = new MockCompiler();
-  const compilation = {
-    assets: {},
-    errors: [],
-    warnings: [],
-    fileDependencies: new Set(),
-    contextDependencies: new Set(),
-  };
+    new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
+      compiler
+    );
 
-  return run({
-    compiler,
-    options: Object.assign({}, opts.options),
-    patterns: opts.patterns,
-  })
-    .then(() => {
-      // Change a file
-      fs.appendFileSync(opts.newFileLoc1, 'extra');
+    // Create two test files
+    fs.writeFileSync(opts.newFileLoc1, 'file1contents');
+    fs.writeFileSync(opts.newFileLoc2, 'file2contents');
 
-      // Trigger another compile
-      return new Promise((res) => {
-        compiler.hooks.emit(compilation, res);
-      });
-    })
-    .then(() => {
-      if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
-        expect(Object.keys(compilation.assets).sort()).toEqual(
+    const arrayOfStats = [];
+
+    const watching = compiler.watch({}, (error, stats) => {
+      if (error || stats.hasErrors()) {
+        throw error;
+      }
+
+      arrayOfStats.push(stats);
+    });
+
+    await delay(500);
+
+    fs.appendFileSync(opts.newFileLoc1, 'extra');
+
+    await delay(500);
+
+    watching.close(() => {
+      const statsBefore = arrayOfStats[0].compilation.assets;
+      const statsAfter = arrayOfStats.pop().compilation.assets;
+      const filesForCompare = Object.keys(statsBefore);
+      const changedFiles = [];
+
+      filesForCompare
+        .filter((file) => file !== 'main.js')
+        .forEach((file) => {
+          if (
+            Buffer.compare(
+              statsBefore[file].source(),
+              statsAfter[file].source()
+            ) !== 0
+          ) {
+            changedFiles.push(file);
+          }
+        });
+
+      const lastFiles = Object.keys(statsAfter).filter(
+        (file) => file !== 'main.js'
+      );
+
+      if (
+        opts.expectedAssetKeys &&
+        opts.expectedAssetKeys.length > 0 &&
+        changedFiles.length > 0
+      ) {
+        expect(lastFiles.sort()).toEqual(
           opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
         );
       } else {
-        expect(compilation.assets).toEqual({});
+        expect(lastFiles).toEqual({});
       }
-    })
-    .then(() => {
-      // Todo finally and check file exists
-      fs.unlinkSync(opts.newFileLoc1);
-      fs.unlinkSync(opts.newFileLoc2);
+
+      resolve(watching);
     });
+    // eslint-disable-next-line no-unused-vars
+  }).then((watching) => {
+    // eslint-disable-next-line no-param-reassign
+    watching = null;
+
+    fs.unlinkSync(opts.newFileLoc1);
+    fs.unlinkSync(opts.newFileLoc2);
+  });
 }
 
 export { run, runChange, runEmit, runForce };
