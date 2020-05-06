@@ -8,7 +8,7 @@ import PreCopyPlugin from './PreCopyPlugin';
 
 import removeIllegalCharacterForWindows from './removeIllegalCharacterForWindows';
 
-import { compile, getCompiler } from './';
+import { compile, getCompiler, readAssets } from './';
 
 function run(opts) {
   return new Promise((resolve, reject) => {
@@ -50,7 +50,7 @@ function run(opts) {
 
     // Execute the functions in series
     return compile(compiler)
-      .then((stats) => {
+      .then(({ stats }) => {
         const { compilation } = stats;
 
         if (opts.expectedErrors) {
@@ -71,14 +71,14 @@ function run(opts) {
           compilation.fileDependencies.delete(enryPoint);
         }
 
-        resolve(compilation);
+        resolve({ compilation, compiler, stats });
       })
       .catch(reject);
   });
 }
 
 function runEmit(opts) {
-  return run(opts).then((compilation) => {
+  return run(opts).then(({ compilation, compiler, stats }) => {
     if (opts.skipAssetsTesting) {
       return;
     }
@@ -104,12 +104,11 @@ function runEmit(opts) {
 
         if (compilation.assets[assetName]) {
           let expectedContent = opts.expectedAssetContent[assetName];
+          let compiledContent = readAssets(compiler, stats)[assetName];
 
           if (!Buffer.isBuffer(expectedContent)) {
             expectedContent = Buffer.from(expectedContent);
           }
-
-          let compiledContent = compilation.assets[assetName].source();
 
           if (!Buffer.isBuffer(compiledContent)) {
             compiledContent = Buffer.from(compiledContent);
@@ -162,27 +161,18 @@ function runChange(opts) {
     await delay(500);
 
     watching.close(() => {
-      const statsBefore = arrayOfStats[0].compilation.assets;
-      const statsAfter = arrayOfStats.pop().compilation.assets;
-      const filesForCompare = Object.keys(statsBefore);
+      const assetsBefore = readAssets(compiler, arrayOfStats[0]);
+      const assetsAfter = readAssets(compiler, arrayOfStats.pop());
+      const filesForCompare = Object.keys(assetsBefore);
       const changedFiles = [];
 
-      filesForCompare
-        .filter((file) => file !== 'main.js')
-        .forEach((file) => {
-          if (
-            Buffer.compare(
-              statsBefore[file].source(),
-              statsAfter[file].source()
-            ) !== 0
-          ) {
-            changedFiles.push(file);
-          }
-        });
+      filesForCompare.forEach((file) => {
+        if (assetsBefore[file] === assetsAfter[file]) {
+          changedFiles.push(file);
+        }
+      });
 
-      const lastFiles = Object.keys(statsAfter).filter(
-        (file) => file !== 'main.js'
-      );
+      const lastFiles = Object.keys(assetsAfter);
 
       if (
         opts.expectedAssetKeys &&

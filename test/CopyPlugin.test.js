@@ -2,6 +2,8 @@ import path from 'path';
 
 import { run, runEmit, runChange } from './helpers/run';
 
+import { readAssets } from './helpers';
+
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('apply function', () => {
@@ -309,6 +311,8 @@ describe('apply function', () => {
 
   describe('watch mode', () => {
     it('should add the file to the watch list when "from" is a file', (done) => {
+      const expectedAssetKeys = ['file.txt'];
+
       run({
         patterns: [
           {
@@ -316,12 +320,10 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          const absFrom = path.join(FIXTURES_DIR, 'file.txt');
-
-          expect(Array.from(compilation.fileDependencies).sort()).toEqual(
-            [absFrom].sort()
-          );
+        .then(({ compiler, stats }) => {
+          expect(
+            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+          ).toEqual(expectedAssetKeys);
         })
         .then(done)
         .catch(done);
@@ -335,12 +337,13 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          const absFrom = path.join(FIXTURES_DIR, 'directory');
-
-          expect(Array.from(compilation.contextDependencies).sort()).toEqual(
-            [absFrom].sort()
+        .then(({ stats }) => {
+          const { contextDependencies } = stats.compilation;
+          const isIncludeDependency = contextDependencies.has(
+            path.join(FIXTURES_DIR, 'directory')
           );
+
+          expect(isIncludeDependency).toBe(true);
         })
         .then(done)
         .catch(done);
@@ -354,18 +357,21 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          expect(
-            Array.from(compilation.contextDependencies)
-              .map((contextDependency) => contextDependency)
-              .sort()
-          ).toEqual([path.join(FIXTURES_DIR, 'directory')].sort());
+        .then(({ stats }) => {
+          const { contextDependencies } = stats.compilation;
+          const isIncludeDependency = contextDependencies.has(
+            path.join(FIXTURES_DIR, 'directory')
+          );
+
+          expect(isIncludeDependency).toBe(true);
         })
         .then(done)
         .catch(done);
     });
 
     it('should not add the directory to the watch list when glob is a file', (done) => {
+      const expectedAssetKeys = ['directoryfile.txt'];
+
       run({
         patterns: [
           {
@@ -373,10 +379,10 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          const absFrom = path.join(FIXTURES_DIR, 'directory');
-
-          expect(compilation.contextDependencies).not.toContain(absFrom);
+        .then(({ compiler, stats }) => {
+          expect(Array.from(Object.keys(readAssets(compiler, stats)))).toEqual(
+            expectedAssetKeys
+          );
         })
         .then(done)
         .catch(done);

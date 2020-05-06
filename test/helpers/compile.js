@@ -5,7 +5,7 @@ export default (compiler) => {
         return reject(error);
       }
 
-      return resolve(stats);
+      return resolve({ stats, compiler });
     });
   });
 };
