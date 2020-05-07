@@ -562,7 +562,7 @@ describe('logging', () => {
         expect(
           Array.from(Object.keys(readAssets(compiler, stats))).sort()
         ).toEqual(expectedAssetKeys);
-        expect(logs).toMatchSnapshot(logs);
+        expect({ result: logs }).toMatchSnapshot({ result: logs });
       })
       .then(done)
       .catch(done);

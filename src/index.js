@@ -17,8 +17,6 @@ class CopyPlugin {
   }
 
   apply(compiler) {
-    const fileDependencies = new Set();
-    const contextDependencies = new Set();
     const plugin = { name: 'CopyPlugin' };
 
     compiler.hooks.compilation.tap(plugin, (compilation) => {
@@ -27,14 +25,12 @@ class CopyPlugin {
       compilation.hooks.additionalAssets.tapAsync(
         'copy-webpack-plugin',
         (callback) => {
-          logger.debug('starting emit');
+          logger.debug('start to adding additionalAssets');
 
           const globalRef = {
             context: compiler.options.context,
             logger,
             compilation,
-            fileDependencies,
-            contextDependencies,
             inputFileSystem: compiler.inputFileSystem,
             output: compiler.options.output.path,
             ignore: this.options.ignore || [],
@@ -68,40 +64,12 @@ class CopyPlugin {
               compilation.errors.push(error);
             })
             .then(() => {
-              logger.debug('finishing emit');
+              logger.debug('end to adding additionalAssets');
 
               callback();
             });
         }
       );
-    });
-
-    compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
-      const logger = compilation.getLogger('copy-webpack-plugin');
-
-      logger.debug('starting after-emit');
-
-      // Add file dependencies
-      if ('addAll' in compilation.fileDependencies) {
-        compilation.fileDependencies.addAll(fileDependencies);
-      } else {
-        for (const fileDependency of fileDependencies) {
-          compilation.fileDependencies.add(fileDependency);
-        }
-      }
-
-      // Add context dependencies
-      if ('addAll' in compilation.contextDependencies) {
-        compilation.contextDependencies.addAll(contextDependencies);
-      } else {
-        for (const contextDependency of contextDependencies) {
-          compilation.contextDependencies.add(contextDependency);
-        }
-      }
-
-      logger.debug('finishing after-emit');
-
-      callback();
     });
   }
 }

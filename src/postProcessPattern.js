@@ -15,7 +15,7 @@ import { stat, readFile } from './utils/promisify';
 /* eslint-disable no-param-reassign */
 
 export default function postProcessPattern(globalRef, pattern, file) {
-  const { logger, compilation, fileDependencies, inputFileSystem } = globalRef;
+  const { logger, compilation, inputFileSystem } = globalRef;
 
   logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
 
@@ -35,7 +35,8 @@ export default function postProcessPattern(globalRef, pattern, file) {
 
     // If this came from a glob, add it to the file watchlist
     if (pattern.fromType === 'glob') {
-      fileDependencies.add(file.absoluteFrom);
+      logger.debug(`add ${file.absoluteFrom} as fileDependencies`);
+      compilation.fileDependencies.add(file.absoluteFrom);
     }
 
     logger.debug(`reading '${file.absoluteFrom}' to write to assets`);
