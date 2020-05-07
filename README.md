@@ -128,7 +128,7 @@ If you define `from` as file path or folder path on `Windows`, you can use windo
 
 ```
 ...
-from: path.resolve('__dirname', 'file.txt'),
+from: path.resolve(__dirname, 'file.txt'),
 ...
 ```
 
