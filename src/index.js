@@ -20,55 +20,65 @@ class CopyPlugin {
     const fileDependencies = new Set();
     const contextDependencies = new Set();
     const plugin = { name: 'CopyPlugin' };
-    const logger = compiler.getInfrastructureLogger('copy-webpack-plugin');
 
-    compiler.hooks.emit.tapAsync(plugin, (compilation, callback) => {
-      logger.debug('starting emit');
+    compiler.hooks.compilation.tap(plugin, (compilation) => {
+      const logger = compilation.getLogger('copy-webpack-plugin');
 
-      const globalRef = {
-        context: compiler.options.context,
-        logger,
-        compilation,
-        fileDependencies,
-        contextDependencies,
-        inputFileSystem: compiler.inputFileSystem,
-        output: compiler.options.output.path,
-        ignore: this.options.ignore || [],
-        concurrency: this.options.concurrency,
-      };
+      compilation.hooks.additionalAssets.tapAsync(
+        'copy-webpack-plugin',
+        (callback) => {
+          logger.debug('starting emit');
 
-      Promise.all(
-        this.patterns.map((pattern) =>
-          Promise.resolve()
-            .then(() => preProcessPattern(globalRef, pattern))
-            // Every source (from) is assumed to exist here
-            // eslint-disable-next-line no-shadow
-            .then((pattern) =>
-              processPattern(globalRef, pattern).then((files) => {
-                if (!files) {
-                  return Promise.resolve();
-                }
+          const globalRef = {
+            context: compiler.options.context,
+            logger,
+            compilation,
+            fileDependencies,
+            contextDependencies,
+            inputFileSystem: compiler.inputFileSystem,
+            output: compiler.options.output.path,
+            ignore: this.options.ignore || [],
+            concurrency: this.options.concurrency,
+          };
 
-                return Promise.all(
-                  files
-                    .filter(Boolean)
-                    .map((file) => postProcessPattern(globalRef, pattern, file))
-                );
-              })
+          Promise.all(
+            this.patterns.map((pattern) =>
+              Promise.resolve()
+                .then(() => preProcessPattern(globalRef, pattern))
+                // Every source (from) is assumed to exist here
+                // eslint-disable-next-line no-shadow
+                .then((pattern) =>
+                  processPattern(globalRef, pattern).then((files) => {
+                    if (!files) {
+                      return Promise.resolve();
+                    }
+
+                    return Promise.all(
+                      files
+                        .filter(Boolean)
+                        .map((file) =>
+                          postProcessPattern(globalRef, pattern, file)
+                        )
+                    );
+                  })
+                )
             )
-        )
-      )
-        .catch((error) => {
-          compilation.errors.push(error);
-        })
-        .then(() => {
-          logger.debug('finishing emit');
+          )
+            .catch((error) => {
+              compilation.errors.push(error);
+            })
+            .then(() => {
+              logger.debug('finishing emit');
 
-          callback();
-        });
+              callback();
+            });
+        }
+      );
     });
 
     compiler.hooks.afterEmit.tapAsync(plugin, (compilation, callback) => {
+      const logger = compilation.getLogger('copy-webpack-plugin');
+
       logger.debug('starting after-emit');
 
       // Add file dependencies
