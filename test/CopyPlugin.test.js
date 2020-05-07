@@ -2,6 +2,8 @@ import path from 'path';
 
 import { run, runEmit, runChange } from './helpers/run';
 
+import { readAssets } from './helpers';
+
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('apply function', () => {
@@ -309,6 +311,8 @@ describe('apply function', () => {
 
   describe('watch mode', () => {
     it('should add the file to the watch list when "from" is a file', (done) => {
+      const expectedAssetKeys = ['file.txt'];
+
       run({
         patterns: [
           {
@@ -316,12 +320,10 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          const absFrom = path.join(FIXTURES_DIR, 'file.txt');
-
-          expect(Array.from(compilation.fileDependencies).sort()).toEqual(
-            [absFrom].sort()
-          );
+        .then(({ compiler, stats }) => {
+          expect(
+            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+          ).toEqual(expectedAssetKeys);
         })
         .then(done)
         .catch(done);
@@ -335,12 +337,13 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          const absFrom = path.join(FIXTURES_DIR, 'directory');
-
-          expect(Array.from(compilation.contextDependencies).sort()).toEqual(
-            [absFrom].sort()
+        .then(({ stats }) => {
+          const { contextDependencies } = stats.compilation;
+          const isIncludeDependency = contextDependencies.has(
+            path.join(FIXTURES_DIR, 'directory')
           );
+
+          expect(isIncludeDependency).toBe(true);
         })
         .then(done)
         .catch(done);
@@ -354,18 +357,21 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          expect(
-            Array.from(compilation.contextDependencies)
-              .map((contextDependency) => contextDependency)
-              .sort()
-          ).toEqual([path.join(FIXTURES_DIR, 'directory')].sort());
+        .then(({ stats }) => {
+          const { contextDependencies } = stats.compilation;
+          const isIncludeDependency = contextDependencies.has(
+            path.join(FIXTURES_DIR, 'directory')
+          );
+
+          expect(isIncludeDependency).toBe(true);
         })
         .then(done)
         .catch(done);
     });
 
     it('should not add the directory to the watch list when glob is a file', (done) => {
+      const expectedAssetKeys = ['directoryfile.txt'];
+
       run({
         patterns: [
           {
@@ -373,10 +379,10 @@ describe('apply function', () => {
           },
         ],
       })
-        .then((compilation) => {
-          const absFrom = path.join(FIXTURES_DIR, 'directory');
-
-          expect(compilation.contextDependencies).not.toContain(absFrom);
+        .then(({ compiler, stats }) => {
+          expect(Array.from(Object.keys(readAssets(compiler, stats)))).toEqual(
+            expectedAssetKeys
+          );
         })
         .then(done)
         .catch(done);
@@ -385,16 +391,16 @@ describe('apply function', () => {
     it('should include files that have changed when `from` is a file', (done) => {
       runChange({
         expectedAssetKeys: ['tempfile1.txt', 'tempfile2.txt'],
-        newFileLoc1: path.join(FIXTURES_DIR, 'watch', 'tempfile1.txt'),
-        newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
+        newFileLoc1: path.join(FIXTURES_DIR, 'watch', '_t5', 'tempfile1.txt'),
+        newFileLoc2: path.join(FIXTURES_DIR, 'watch', '_t5', 'tempfile2.txt'),
         patterns: [
           {
             from: 'tempfile1.txt',
-            context: 'watch',
+            context: 'watch/_t5',
           },
           {
             from: 'tempfile2.txt',
-            context: 'watch',
+            context: 'watch/_t5',
           },
         ],
       })
@@ -408,18 +414,20 @@ describe('apply function', () => {
         newFileLoc1: path.join(
           FIXTURES_DIR,
           'watch',
+          '_t4',
           'directory',
           'tempfile1.txt'
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
           'watch',
+          '_t4',
           'directory',
           'tempfile2.txt'
         ),
         patterns: [
           {
-            from: 'watch/directory',
+            from: 'watch/_t4/directory',
           },
         ],
       })
@@ -429,24 +437,29 @@ describe('apply function', () => {
 
     it('should include all files when `from` is a glob', (done) => {
       runChange({
-        expectedAssetKeys: ['dest1/tempfile1.txt', 'dest1/tempfile2.txt'],
+        expectedAssetKeys: [
+          '_t3/dest1/tempfile1.txt',
+          '_t3/dest1/tempfile2.txt',
+        ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
           'watch',
+          '_t3',
           'directory',
           'tempfile1.txt'
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
           'watch',
+          '_t3',
           'directory',
           'tempfile2.txt'
         ),
         patterns: [
           {
-            context: 'watch/directory',
+            context: 'watch/_t3/directory',
             from: '**/*.txt',
-            to: 'dest1',
+            to: '_t3/dest1',
           },
         ],
       })
@@ -457,33 +470,35 @@ describe('apply function', () => {
     it('should include all files when multiple patterns used', (done) => {
       runChange({
         expectedAssetKeys: [
-          'dest1/tempfile1.txt',
-          'dest1/tempfile2.txt',
-          'dest2/tempfile1.txt',
-          'dest2/tempfile2.txt',
+          '_t2/dest1/tempfile1.txt',
+          '_t2/dest1/tempfile2.txt',
+          '_t2/dest2/tempfile1.txt',
+          '_t2/dest2/tempfile2.txt',
         ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
           'watch',
+          '_t2',
           'directory',
           'tempfile1.txt'
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
           'watch',
+          '_t2',
           'directory',
           'tempfile2.txt'
         ),
         patterns: [
           {
-            context: 'watch/directory',
+            context: 'watch/_t2/directory',
             from: '**/*.txt',
-            to: 'dest1',
+            to: '_t2/dest1',
           },
           {
-            context: 'watch/directory',
+            context: 'watch/_t2/directory',
             from: '**/*.txt',
-            to: 'dest2',
+            to: '_t2/dest2',
           },
         ],
       })
@@ -494,27 +509,28 @@ describe('apply function', () => {
     it('should include all files when multiple patterns with difference contexts', (done) => {
       runChange({
         expectedAssetKeys: [
-          'dest1/tempfile1.txt',
-          'dest2/directory/tempfile1.txt',
-          'dest2/tempfile2.txt',
+          '_t1/dest1/tempfile1.txt',
+          '_t1/dest2/directory/tempfile1.txt',
+          '_t1/dest2/tempfile2.txt',
         ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
           'watch',
+          '_t1',
           'directory',
           'tempfile1.txt'
         ),
-        newFileLoc2: path.join(FIXTURES_DIR, 'watch', 'tempfile2.txt'),
+        newFileLoc2: path.join(FIXTURES_DIR, 'watch', '_t1', 'tempfile2.txt'),
         patterns: [
           {
-            context: 'watch/directory',
+            context: 'watch/_t1/directory',
             from: '**/*.txt',
-            to: 'dest1',
+            to: '_t1/dest1',
           },
           {
-            context: 'watch',
+            context: 'watch/_t1',
             from: '**/*.txt',
-            to: 'dest2',
+            to: '_t1/dest2',
           },
         ],
       })

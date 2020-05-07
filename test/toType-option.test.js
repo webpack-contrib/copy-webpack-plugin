@@ -1,7 +1,6 @@
 import path from 'path';
 
 import { runEmit } from './helpers/run';
-import { MockCompilerNoStat } from './helpers/mocks';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
@@ -86,7 +85,6 @@ describe('toType option', () => {
 
   it('should warn when file not found and stats is undefined', (done) => {
     runEmit({
-      compiler: new MockCompilerNoStat(),
       expectedAssetKeys: [],
       expectedWarnings: [
         new Error(

@@ -57,6 +57,13 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [10.x, 12.x, 14.x]
         webpack-version: [latest, next]
+        exclude:
+          - os: macos-latest
+            node-version: 12.x
+            webpack-version: latest
+          - os: macos-latest
+            node-version: 14.x
+            webpack-version: latest
 
     runs-on: ${{ matrix.os }}
 
