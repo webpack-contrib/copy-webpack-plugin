@@ -5,7 +5,7 @@ import { stat } from './utils/promisify';
 
 /* eslint-disable no-param-reassign */
 
-export default function preProcessPattern(globalRef, pattern) {
+export default async function preProcessPattern(globalRef, pattern) {
   const { context, logger, inputFileSystem } = globalRef;
 
   pattern =
@@ -57,22 +57,24 @@ export default function preProcessPattern(globalRef, pattern) {
     `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
   );
 
-  return stat(inputFileSystem, pattern.absoluteFrom)
-    .then((stats) => {
-      if (!stats) {
-        return pattern;
-      }
+  try {
+    const stats = await stat(inputFileSystem, pattern.absoluteFrom);
 
-      if (stats.isDirectory()) {
-        pattern.fromType = 'dir';
-      } else if (stats.isFile()) {
-        pattern.fromType = 'file';
-        pattern.stats = stats;
-      } else if (!pattern.fromType) {
-        logger.warn(`unrecognized file type for ${pattern.from}`);
-      }
-
+    if (!stats) {
       return pattern;
-    })
-    .catch(() => pattern);
+    }
+
+    if (stats.isDirectory()) {
+      pattern.fromType = 'dir';
+    } else if (stats.isFile()) {
+      pattern.fromType = 'file';
+      pattern.stats = stats;
+    } else if (!pattern.fromType) {
+      logger.warn(`unrecognized file type for ${pattern.from}`);
+    }
+  } catch (error) {
+    return pattern;
+  }
+
+  return pattern;
 }
