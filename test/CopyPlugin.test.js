@@ -539,3 +539,32 @@ describe('apply function', () => {
     });
   });
 });
+
+describe('logging', () => {
+  it('should logging', (done) => {
+    const expectedAssetKeys = ['file.txt'];
+
+    run({
+      patterns: [
+        {
+          from: 'file.txt',
+        },
+      ],
+    })
+      .then(({ compiler, stats }) => {
+        const root = path.resolve(__dirname).replace(/\\/g, '/');
+        const logs = stats.compilation.logging
+          .get('copy-webpack-plugin')
+          .map((entry) =>
+            entry.args[0].replace(/\\/g, '/').split(root).join('.')
+          );
+
+        expect(
+          Array.from(Object.keys(readAssets(compiler, stats))).sort()
+        ).toEqual(expectedAssetKeys);
+        expect({ result: logs }).toMatchSnapshot({ result: logs });
+      })
+      .then(done)
+      .catch(done);
+  });
+});

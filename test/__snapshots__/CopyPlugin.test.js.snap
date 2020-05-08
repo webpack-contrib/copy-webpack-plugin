@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`logging should logging 1`] = `
+Object {
+  "result": Array [
+    "start to adding additionalAssets",
+    "processing from: 'file.txt' to: '.'",
+    "getting stats for './fixtures/file.txt' to determinate 'fromType'",
+    "determined './fixtures/file.txt' is a file",
+    "add ./fixtures/file.txt as fileDependencies",
+    "begin globbing './fixtures/file.txt' with a context of './fixtures'",
+    "found ./fixtures/file.txt",
+    "testing watch/**/* against file.txt",
+    "watch/**/* doesn't match file.txt",
+    "testing directory-ln against file.txt",
+    "directory-ln doesn't match file.txt",
+    "testing file-ln.txt against file.txt",
+    "file-ln.txt doesn't match file.txt",
+    "testing symlink/**/* against file.txt",
+    "symlink/**/* doesn't match file.txt",
+    "determined that './fixtures/file.txt' should write to 'file.txt'",
+    "getting stats for './fixtures/file.txt' to write to assets",
+    "reading './fixtures/file.txt' to write to assets",
+    "writing 'file.txt' to compilation assets from './fixtures/file.txt'",
+    "end to adding additionalAssets",
+  ],
+}
+`;
