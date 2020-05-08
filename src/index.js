@@ -24,7 +24,7 @@ class CopyPlugin {
 
       compilation.hooks.additionalAssets.tapAsync(
         'copy-webpack-plugin',
-        (callback) => {
+        async (callback) => {
           logger.debug('start to adding additionalAssets');
 
           const globalRef = {
@@ -37,37 +37,44 @@ class CopyPlugin {
             concurrency: this.options.concurrency,
           };
 
-          Promise.all(
-            this.patterns.map((pattern) =>
-              Promise.resolve()
-                .then(() => preProcessPattern(globalRef, pattern))
-                // Every source (from) is assumed to exist here
-                // eslint-disable-next-line no-shadow
-                .then((pattern) =>
-                  processPattern(globalRef, pattern).then((files) => {
-                    if (!files) {
-                      return Promise.resolve();
-                    }
+          try {
+            await Promise.all(
+              this.patterns.map(async (pattern) => {
+                const patternAfterPreProcess = await preProcessPattern(
+                  globalRef,
+                  pattern
+                );
 
-                    return Promise.all(
-                      files
-                        .filter(Boolean)
-                        .map((file) =>
-                          postProcessPattern(globalRef, pattern, file)
-                        )
-                    );
-                  })
-                )
-            )
-          )
-            .catch((error) => {
-              compilation.errors.push(error);
-            })
-            .then(() => {
-              logger.debug('end to adding additionalAssets');
+                const files = await processPattern(
+                  globalRef,
+                  patternAfterPreProcess
+                );
 
-              callback();
-            });
+                if (!files) {
+                  return Promise.resolve();
+                }
+
+                return Promise.all(
+                  files
+                    .filter(Boolean)
+                    .map((file) =>
+                      postProcessPattern(
+                        globalRef,
+                        patternAfterPreProcess,
+                        file
+                      )
+                    )
+                );
+              })
+            );
+
+            logger.debug('end to adding additionalAssets');
+
+            callback();
+          } catch (error) {
+            compilation.errors.push(error);
+            callback();
+          }
         }
       );
     });
