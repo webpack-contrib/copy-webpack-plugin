@@ -55,14 +55,6 @@ describe('validate options', () => {
             toType: 'file',
             test: /test/,
             force: true,
-            ignore: [
-              'ignore-1',
-              'ignore-2',
-              {
-                dot: false,
-                glob: '**/*',
-              },
-            ],
             flatten: true,
             transform: () => {},
             cacheTransform: true,
@@ -171,30 +163,6 @@ describe('validate options', () => {
             from: 'test.txt',
             to: 'dir',
             context: 'context',
-            ignore: true,
-          },
-        ],
-        [
-          {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            ignore: [true],
-          },
-        ],
-        [
-          {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            ignore: ['test.txt', true],
-          },
-        ],
-        [
-          {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
             flatten: 'true',
           },
         ],
@@ -235,8 +203,8 @@ describe('validate options', () => {
       ],
     },
     options: {
-      success: [{ ignore: ['test'] }],
-      failure: [{ unknown: true }, { ignore: true }],
+      success: [{}],
+      failure: [{ unknown: true }],
     },
     unknown: {
       success: [],

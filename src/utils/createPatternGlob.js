@@ -38,9 +38,11 @@ function createPatternGlob(pattern, globalRef) {
         '**/*'
       );
       pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
-      pattern.globOptions = {
-        dot: true,
-      };
+
+      if (typeof pattern.globOptions.dot === 'undefined') {
+        pattern.globOptions.dot = true;
+      }
+
       break;
 
     case 'file':
@@ -50,9 +52,11 @@ function createPatternGlob(pattern, globalRef) {
 
       pattern.context = path.dirname(pattern.absoluteFrom);
       pattern.glob = getAbsoluteContext(pattern.absoluteFrom);
-      pattern.globOptions = {
-        dot: true,
-      };
+
+      if (typeof pattern.globOptions.dot === 'undefined') {
+        pattern.globOptions.dot = true;
+      }
+
       break;
 
     default:
@@ -67,7 +71,6 @@ function createPatternGlob(pattern, globalRef) {
       compilation.contextDependencies.add(contextDependencies);
 
       pattern.fromType = 'glob';
-      pattern.globOptions = pattern.globOptions || {};
       pattern.glob = path.isAbsolute(pattern.fromOrigin)
         ? pattern.fromOrigin
         : path.posix.join(

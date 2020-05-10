@@ -29,19 +29,6 @@
         "force": {
           "type": "boolean"
         },
-        "ignore": {
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "object"
-              }
-            ]
-          }
-        },
         "flatten": {
           "type": "boolean"
         },
@@ -89,11 +76,7 @@
     "options": {
       "type": "object",
       "additionalProperties": false,
-      "properties": {
-        "ignore": {
-          "type": "array"
-        }
-      }
+      "properties": {}
     }
   }
 }

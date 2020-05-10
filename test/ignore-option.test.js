@@ -1,13 +1,23 @@
+import path from 'path';
+
 import { runEmit } from './helpers/run';
+
+const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('ignore option', () => {
   it('should ignore files when "from" is a file', (done) => {
     runEmit({
-      expectedAssetKeys: [],
+      expectedWarnings: [
+        new Error(
+          `unable to locate 'file.txt' at '${FIXTURES_DIR}${path.sep}file.txt'`
+        ),
+      ],
       patterns: [
         {
-          ignore: ['file.*'],
           from: 'file.txt',
+          globOptions: {
+            ignore: ['**/file.*'],
+          },
         },
       ],
     })
@@ -24,8 +34,10 @@ describe('ignore option', () => {
       ],
       patterns: [
         {
-          ignore: ['*/nestedfile.*'],
           from: 'directory',
+          globOptions: {
+            ignore: ['**/nestedfile.*'],
+          },
         },
       ],
     })
@@ -38,8 +50,10 @@ describe('ignore option', () => {
       expectedAssetKeys: ['.dottedfile', 'directoryfile.txt'],
       patterns: [
         {
-          ignore: ['**/nested/**'],
           from: 'directory',
+          globOptions: {
+            ignore: ['**/nested/**'],
+          },
         },
       ],
     })
@@ -55,8 +69,10 @@ describe('ignore option', () => {
       ],
       patterns: [
         {
-          ignore: ['*nestedfile.*'],
           from: 'directory/**/*',
+          globOptions: {
+            ignore: ['**/nestedfile.*'],
+          },
         },
       ],
     })
@@ -69,8 +85,10 @@ describe('ignore option', () => {
       expectedAssetKeys: ['directory/directoryfile.txt'],
       patterns: [
         {
-          ignore: ['*/nested/**'],
           from: 'directory/**/*',
+          globOptions: {
+            ignore: ['**/nested/**'],
+          },
         },
       ],
     })
@@ -83,8 +101,10 @@ describe('ignore option', () => {
       expectedAssetKeys: ['.dottedfile'],
       patterns: [
         {
-          ignore: ['*.txt'],
           from: 'directory',
+          globOptions: {
+            ignore: ['**/*.txt'],
+          },
         },
       ],
     })
@@ -97,8 +117,10 @@ describe('ignore option', () => {
       expectedAssetKeys: ['directory/nested/nestedfile.txt'],
       patterns: [
         {
-          ignore: ['directoryfile.*', '**/deep-nested/**'],
           from: 'directory/**/*',
+          globOptions: {
+            ignore: ['**/directoryfile.*', '**/deep-nested/**'],
+          },
         },
       ],
     })
@@ -109,23 +131,12 @@ describe('ignore option', () => {
   it('should ignore files except those with dots', (done) => {
     runEmit({
       expectedAssetKeys: ['.dottedfile'],
-      options: {
-        ignore: [
-          {
-            dot: false,
-            glob: '**/*',
-          },
-        ],
-      },
       patterns: [
         {
           from: 'directory',
-          ignore: [
-            {
-              dot: false,
-              glob: '**/*',
-            },
-          ],
+          globOptions: {
+            ignore: ['!(**/.*)'],
+          },
         },
       ],
     })
@@ -142,8 +153,10 @@ describe('ignore option', () => {
       ],
       patterns: [
         {
-          ignore: ['.dottedfile'],
           from: 'directory',
+          globOptions: {
+            ignore: ['**/.*'],
+          },
         },
       ],
     })
@@ -153,13 +166,17 @@ describe('ignore option', () => {
 
   it('should ignores all files even if they start with a dot', (done) => {
     runEmit({
-      expectedAssetKeys: [],
-      options: {
-        ignore: ['**/*'],
-      },
+      expectedWarnings: [
+        new Error(
+          `unable to locate 'directory' at '${FIXTURES_DIR}${path.sep}directory${path.sep}**${path.sep}*'`
+        ),
+      ],
       patterns: [
         {
           from: 'directory',
+          globOptions: {
+            ignore: ['**/*'],
+          },
         },
       ],
     })
@@ -169,14 +186,18 @@ describe('ignore option', () => {
 
   it('should ignore files when "from" is a file (global ignore)', (done) => {
     runEmit({
-      expectedAssetKeys: [],
-      options: {
-        ignore: ['file.*'],
-      },
+      expectedWarnings: [
+        new Error(
+          `unable to locate 'file.txt' at '${FIXTURES_DIR}${path.sep}file.txt'`
+        ),
+      ],
       patterns: [
         {
           ignore: ['file.*'],
           from: 'file.txt',
+          globOptions: {
+            ignore: ['**/file.*'],
+          },
         },
       ],
     })
