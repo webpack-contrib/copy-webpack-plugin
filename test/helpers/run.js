@@ -10,6 +10,17 @@ import removeIllegalCharacterForWindows from './removeIllegalCharacterForWindows
 
 import { compile, getCompiler, readAssets } from './';
 
+/* eslint-disable no-param-reassign */
+
+const isWin = process.platform === 'win32';
+
+const ignore = [
+  '**/symlink/**/*',
+  '**/file-ln.txt',
+  '**/directory-ln',
+  '**/watch/**/*',
+];
+
 function run(opts) {
   return new Promise((resolve, reject) => {
     if (Array.isArray(opts.patterns)) {
@@ -18,31 +29,20 @@ function run(opts) {
           // eslint-disable-next-line no-param-reassign
           pattern.context = removeIllegalCharacterForWindows(pattern.context);
         }
+
+        if (typeof pattern !== 'string') {
+          if (!opts.symlink || isWin) {
+            pattern.globOptions = pattern.globOptions || {};
+            pattern.globOptions.ignore = [
+              ...ignore,
+              ...(pattern.globOptions.ignore || []),
+            ];
+          }
+        }
       });
     }
 
     const compiler = opts.compiler || getCompiler();
-
-    const isWin = process.platform === 'win32';
-
-    if (!opts.symlink || isWin) {
-      if (!opts.options) {
-        // eslint-disable-next-line no-param-reassign
-        opts.options = {};
-      }
-
-      if (!opts.options.ignore) {
-        // eslint-disable-next-line no-param-reassign
-        opts.options.ignore = [];
-      }
-
-      opts.options.ignore.push(
-        'symlink/**/*',
-        'file-ln.txt',
-        'directory-ln',
-        'watch/**/*'
-      );
-    }
 
     new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
       compiler

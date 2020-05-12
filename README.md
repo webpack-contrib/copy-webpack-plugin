@@ -79,11 +79,10 @@ module.exports = {
 |           [`from`](#from)           |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
 |             [`to`](#to)             |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
 |        [`context`](#context)        |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|    [`globOptions`](#globoptions)    |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library                                   |
+|    [`globOptions`](#globoptions)    |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library, including `ignore` option        |
 |         [`toType`](#totype)         |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
 |           [`test`](#test)           | `{String\|RegExp}`  |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
 |          [`force`](#force)          |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
-|         [`ignore`](#ignore)         |      `{Array}`      |                      `[]`                       | Globs to ignore files.                                                                                |
 |        [`flatten`](#flatten)        |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
 |      [`transform`](#transform)      |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
 | [`cacheTransform`](#cacheTransform) | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
@@ -95,7 +94,8 @@ Type: `String`
 Default: `undefined`
 
 Glob or path from where we сopy files.
-Globs accept [micromatch options](https://github.com/micromatch/micromatch).
+Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
+Glob can only be a `string`.
 
 > ⚠️ Don't use directly `\\` in `from` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -126,21 +126,62 @@ module.exports = {
 
 If you define `from` as file path or folder path on `Windows`, you can use windows path segment (`\\`)
 
-```
-...
-from: path.resolve('__dirname', 'file.txt'),
-...
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve('__dirname', 'file.txt'),
+        },
+      ],
+    }),
+  ],
+};
 ```
 
 But you should always use forward-slashes in `glob` expressions
 See [fast-glob manual](https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows).
 
-```
-...
-const FIXTURES_DIR_NORMALIZED = path.resolve(__dirname, 'fixtures').replace(/\\/g, '/');
+```js
+const FIXTURES_DIR_NORMALIZED = path
+  .resolve(__dirname, 'fixtures')
+  .replace(/\\/g, '/');
 
-from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'file.txt'),
-...
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'file.txt'),
+        },
+      ],
+    }),
+  ],
+};
+```
+
+##### `For exclude files`
+
+To exclude files from the selection, you should use [globOptions.ignore option](https://github.com/mrmlnc/fast-glob#ignore)
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: '**/*',
+          globOptions: {
+            ignore: ['**/file.*', '**/ignored-directory/**'],
+          },
+        },
+      ],
+    }),
+  ],
+};
 ```
 
 #### `to`
@@ -367,51 +408,6 @@ module.exports = {
 };
 ```
 
-#### `ignore`
-
-Type: `Array`
-Default: `[]`
-
-Globs to ignore files.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: 'src/**/*',
-          to: 'dest/',
-          ignore: ['*.js'],
-        },
-      ],
-    }),
-  ],
-};
-```
-
-> ⚠️ Note that only relative path should be provided to ignore option, an example to ignore `src/assets/subfolder/ignorefile.js` :
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: 'src/assets',
-          to: 'dest/',
-          ignore: ['subfolder/ignorefile.js'],
-        },
-      ],
-    }),
-  ],
-};
-```
-
 #### `flatten`
 
 Type: `Boolean`
@@ -565,12 +561,6 @@ module.exports = {
   ],
 };
 ```
-
-### Options
-
-|        Name         |   Type    | Default | Description                                  |
-| :-----------------: | :-------: | :-----: | :------------------------------------------- |
-| [`ignore`](#ignore) | `{Array}` |  `[]`   | Array of globs to ignore (applied to `from`) |
 
 #### `ignore`
 

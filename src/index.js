@@ -33,7 +33,6 @@ class CopyPlugin {
             compilation,
             inputFileSystem: compiler.inputFileSystem,
             output: compiler.options.output.path,
-            ignore: this.options.ignore || [],
             concurrency: this.options.concurrency,
           };
 

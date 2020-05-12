@@ -67,6 +67,14 @@ describe('from option', () => {
     it('should move a file (symbolic link)', (done) => {
       runEmit({
         symlink: true,
+        expectedWarnings:
+          process.platform === 'win32'
+            ? [
+                new Error(
+                  `unable to locate 'symlink${path.sep}file-ln.txt' at '${FIXTURES_DIR}${path.sep}symlink${path.sep}file-ln.txt'`
+                ),
+              ]
+            : [],
         expectedAssetKeys: process.platform === 'win32' ? [] : ['file-ln.txt'],
         patterns: [
           {
@@ -198,6 +206,14 @@ describe('from option', () => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,
+        expectedWarnings:
+          process.platform === 'win32'
+            ? [
+                new Error(
+                  `unable to locate 'symlink${path.sep}directory-ln' at '${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln'`
+                ),
+              ]
+            : [],
         expectedAssetKeys:
           process.platform === 'win32'
             ? []
@@ -455,6 +471,14 @@ describe('from option', () => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,
+        expectedWarnings:
+          process.platform === 'win32'
+            ? [
+                new Error(
+                  `unable to locate 'symlink\\**\\*.txt' at '${FIXTURES_DIR}${path.sep}symlink\\**\\*.txt'`
+                ),
+              ]
+            : [],
         expectedAssetKeys:
           process.platform === 'win32'
             ? []

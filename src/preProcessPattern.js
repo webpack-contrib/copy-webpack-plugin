@@ -29,8 +29,6 @@ export default async function preProcessPattern(globalRef, pattern) {
   pattern.context = path.normalize(pattern.context);
   pattern.to = path.normalize(pattern.to);
 
-  pattern.ignore = globalRef.ignore.concat(pattern.ignore || []);
-
   logger.debug(`processing from: '${pattern.from}' to: '${pattern.to}'`);
 
   switch (true) {
