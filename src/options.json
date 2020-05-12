@@ -76,7 +76,11 @@
     "options": {
       "type": "object",
       "additionalProperties": false,
-      "properties": {}
+      "properties": {
+        "concurrency": {
+          "type": "number"
+        }
+      }
     }
   }
 }

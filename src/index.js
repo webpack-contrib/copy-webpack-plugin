@@ -1,4 +1,5 @@
 import validateOptions from 'schema-utils';
+import pLimit from 'p-limit';
 
 import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
@@ -18,6 +19,7 @@ class CopyPlugin {
 
   apply(compiler) {
     const plugin = { name: 'CopyPlugin' };
+    const limit = pLimit(this.options.concurrency || 100);
 
     compiler.hooks.compilation.tap(plugin, (compilation) => {
       const logger = compilation.getLogger('copy-webpack-plugin');
@@ -33,38 +35,39 @@ class CopyPlugin {
             compilation,
             inputFileSystem: compiler.inputFileSystem,
             output: compiler.options.output.path,
-            concurrency: this.options.concurrency,
           };
 
           try {
             await Promise.all(
-              this.patterns.map(async (pattern) => {
-                const patternAfterPreProcess = await preProcessPattern(
-                  globalRef,
-                  pattern
-                );
+              this.patterns.map((pattern) =>
+                limit(async () => {
+                  const patternAfterPreProcess = await preProcessPattern(
+                    globalRef,
+                    pattern
+                  );
 
-                const files = await processPattern(
-                  globalRef,
-                  patternAfterPreProcess
-                );
+                  const files = await processPattern(
+                    globalRef,
+                    patternAfterPreProcess
+                  );
 
-                if (!files) {
-                  return Promise.resolve();
-                }
+                  if (!files) {
+                    return Promise.resolve();
+                  }
 
-                return Promise.all(
-                  files
-                    .filter(Boolean)
-                    .map((file) =>
-                      postProcessPattern(
-                        globalRef,
-                        patternAfterPreProcess,
-                        file
-                      )
+                  return Promise.all(
+                    files.filter(Boolean).map((file) =>
+                      limit(() => {
+                        return postProcessPattern(
+                          globalRef,
+                          patternAfterPreProcess,
+                          file
+                        );
+                      })
                     )
-                );
-              })
+                  );
+                })
+              )
             );
 
             logger.debug('end to adding additionalAssets');

@@ -65,7 +65,7 @@ module.exports = {
         { from: 'other', to: 'public' },
       ],
       options: {
-        ignore: ['*.bin'],
+        concurrency: 100,
       },
     }),
   ],
@@ -562,9 +562,15 @@ module.exports = {
 };
 ```
 
-#### `ignore`
+### Options
 
-Array of globs to ignore (applied to `from`).
+|             Name              |    Type    | Default | Description                                      |
+| :---------------------------: | :--------: | :-----: | :----------------------------------------------- |
+| [`concurrency`](#concurrency) | `{Number}` |  `100`  | Limits the number of simultaneous requests to fs |
+
+#### `concurrency`
+
+limits the number of simultaneous requests to fs
 
 **webpack.config.js**
 
@@ -573,7 +579,7 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [...patterns],
-      options: { ignore: ['*.js', '*.css'] },
+      options: { concurrency: 50 },
     }),
   ],
 };
