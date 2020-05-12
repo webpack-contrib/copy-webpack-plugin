@@ -128,6 +128,24 @@ describe('ignore option', () => {
       .catch(done);
   });
 
+  it('should ignore files with flatten true', (done) => {
+    runEmit({
+      expectedAssetKeys: ['img/.dottedfile', 'img/nestedfile.txt'],
+      patterns: [
+        {
+          from: 'directory/',
+          to: 'img/',
+          flatten: true,
+          globOptions: {
+            ignore: ['**/directoryfile.*', '**/deep-nested/**'],
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
   it('should ignore files except those with dots', (done) => {
     runEmit({
       expectedAssetKeys: ['.dottedfile'],
