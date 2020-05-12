@@ -29,6 +29,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     stats = await getStats;
   } catch (error) {
     compilation.errors.push(error);
+    return;
   }
 
   if (stats.isDirectory()) {
@@ -51,6 +52,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     content = await readFile(inputFileSystem, file.absoluteFrom);
   } catch (error) {
     compilation.errors.push(error);
+    return;
   }
 
   if (pattern.transform) {
