@@ -19,130 +19,138 @@ export default async function postProcessPattern(globalRef, pattern, file) {
 
   logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
 
+  const getStats = pattern.stats
+    ? Promise.resolve().then(() => pattern.stats)
+    : stat(inputFileSystem, file.absoluteFrom);
+
+  let stats;
+
   try {
-    const getStats = pattern.stats
-      ? Promise.resolve().then(() => pattern.stats)
-      : stat(inputFileSystem, file.absoluteFrom);
+    stats = await getStats;
+  } catch (error) {
+    compilation.errors.push(error);
+  }
 
-    const stats = await getStats;
+  if (stats.isDirectory()) {
+    logger.debug(
+      `skipping '${file.absoluteFrom}' because it is empty directory`
+    );
+  }
 
-    if (stats.isDirectory()) {
-      logger.debug(
-        `skipping '${file.absoluteFrom}' because it is empty directory`
-      );
-    }
+  // If this came from a glob, add it to the file watchlist
+  if (pattern.fromType === 'glob') {
+    logger.debug(`add ${file.absoluteFrom} as fileDependencies`);
+    compilation.fileDependencies.add(file.absoluteFrom);
+  }
 
-    // If this came from a glob, add it to the file watchlist
-    if (pattern.fromType === 'glob') {
-      logger.debug(`add ${file.absoluteFrom} as fileDependencies`);
-      compilation.fileDependencies.add(file.absoluteFrom);
-    }
+  logger.debug(`reading '${file.absoluteFrom}' to write to assets`);
 
-    logger.debug(`reading '${file.absoluteFrom}' to write to assets`);
+  let content;
 
-    let content = await readFile(inputFileSystem, file.absoluteFrom);
+  try {
+    content = await readFile(inputFileSystem, file.absoluteFrom);
+  } catch (error) {
+    compilation.errors.push(error);
+  }
 
-    if (pattern.transform) {
-      logger.log(`transforming content for '${file.absoluteFrom}'`);
+  if (pattern.transform) {
+    logger.log(`transforming content for '${file.absoluteFrom}'`);
 
-      // eslint-disable-next-line no-shadow
-      const transform = (content, absoluteFrom) =>
-        pattern.transform(content, absoluteFrom);
+    // eslint-disable-next-line no-shadow
+    const transform = (content, absoluteFrom) =>
+      pattern.transform(content, absoluteFrom);
 
-      if (pattern.cacheTransform) {
-        if (!globalRef.cacheDir) {
-          globalRef.cacheDir =
-            findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
-        }
+    if (pattern.cacheTransform) {
+      if (!globalRef.cacheDir) {
+        globalRef.cacheDir =
+          findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
+      }
 
-        const cacheKey = pattern.cacheTransform.key
-          ? pattern.cacheTransform.key
-          : serialize({
-              name,
-              version,
-              pattern,
-              hash: crypto.createHash('md4').update(content).digest('hex'),
-            });
+      const cacheKey = pattern.cacheTransform.key
+        ? pattern.cacheTransform.key
+        : serialize({
+            name,
+            version,
+            pattern,
+            hash: crypto.createHash('md4').update(content).digest('hex'),
+          });
 
-        try {
-          const result = await cacache.get(globalRef.cacheDir, cacheKey);
+      try {
+        const result = await cacache.get(globalRef.cacheDir, cacheKey);
 
-          logger.debug(
-            `getting cached transformation for '${file.absoluteFrom}'`
-          );
+        logger.debug(
+          `getting cached transformation for '${file.absoluteFrom}'`
+        );
 
-          content = await result.data;
-        } catch (e) {
-          content = await transform(content, file.absoluteFrom);
-
-          logger.debug(`caching transformation for '${file.absoluteFrom}'`);
-
-          content = await cacache
-            .put(globalRef.cacheDir, cacheKey, content)
-            .then(() => content);
-        }
-      } else {
+        content = result.data;
+      } catch (e) {
         content = await transform(content, file.absoluteFrom);
+
+        logger.debug(`caching transformation for '${file.absoluteFrom}'`);
+
+        content = await cacache
+          .put(globalRef.cacheDir, cacheKey, content)
+          .then(() => content);
       }
+    } else {
+      content = await transform(content, file.absoluteFrom);
     }
+  }
 
-    if (pattern.toType === 'template') {
-      logger.log(
-        `interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`
-      );
-
-      // If it doesn't have an extension, remove it from the pattern
-      // ie. [name].[ext] or [name][ext] both become [name]
-      if (!path.extname(file.relativeFrom)) {
-        file.webpackTo = file.webpackTo.replace(/\.?\[ext\]/g, '');
-      }
-
-      file.webpackTo = loaderUtils.interpolateName(
-        { resourcePath: file.absoluteFrom },
-        file.webpackTo,
-        {
-          content,
-          regExp: file.webpackToRegExp,
-          context: pattern.context,
-        }
-      );
-
-      // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
-      file.webpackTo = path.normalize(file.webpackTo);
-    }
-
-    if (pattern.transformPath) {
-      logger.log(
-        `transforming path '${file.webpackTo}' for '${file.absoluteFrom}'`
-      );
-
-      file.webpackTo = await pattern.transformPath(
-        file.webpackTo,
-        file.absoluteFrom
-      );
-    }
-
-    const targetPath = normalizePath(file.webpackTo);
-
-    if (compilation.assets[targetPath] && !file.force) {
-      logger.log(`skipping '${file.webpackTo}', because it already exists`);
-
-      return;
-    }
-
+  if (pattern.toType === 'template') {
     logger.log(
-      `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
+      `interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`
     );
 
-    compilation.assets[targetPath] = {
-      size() {
-        return stats.size;
-      },
-      source() {
-        return content;
-      },
-    };
-  } catch (error) {
-    throw error;
+    // If it doesn't have an extension, remove it from the pattern
+    // ie. [name].[ext] or [name][ext] both become [name]
+    if (!path.extname(file.relativeFrom)) {
+      file.webpackTo = file.webpackTo.replace(/\.?\[ext\]/g, '');
+    }
+
+    file.webpackTo = loaderUtils.interpolateName(
+      { resourcePath: file.absoluteFrom },
+      file.webpackTo,
+      {
+        content,
+        regExp: file.webpackToRegExp,
+        context: pattern.context,
+      }
+    );
+
+    // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
+    file.webpackTo = path.normalize(file.webpackTo);
   }
+
+  if (pattern.transformPath) {
+    logger.log(
+      `transforming path '${file.webpackTo}' for '${file.absoluteFrom}'`
+    );
+
+    file.webpackTo = await pattern.transformPath(
+      file.webpackTo,
+      file.absoluteFrom
+    );
+  }
+
+  const targetPath = normalizePath(file.webpackTo);
+
+  if (compilation.assets[targetPath] && !file.force) {
+    logger.log(`skipping '${file.webpackTo}', because it already exists`);
+
+    return;
+  }
+
+  logger.log(
+    `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
+  );
+
+  compilation.assets[targetPath] = {
+    size() {
+      return stats.size;
+    },
+    source() {
+      return content;
+    },
+  };
 }
