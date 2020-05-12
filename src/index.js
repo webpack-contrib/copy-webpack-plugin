@@ -39,33 +39,35 @@ class CopyPlugin {
 
           try {
             await Promise.all(
-              this.patterns.map(async (pattern) => {
-                const patternAfterPreProcess = await preProcessPattern(
-                  globalRef,
-                  pattern
-                );
+              this.patterns.map((pattern) =>
+                limit(async () => {
+                  const patternAfterPreProcess = await preProcessPattern(
+                    globalRef,
+                    pattern
+                  );
 
-                const files = await processPattern(
-                  globalRef,
-                  patternAfterPreProcess
-                );
+                  const files = await processPattern(
+                    globalRef,
+                    patternAfterPreProcess
+                  );
 
-                if (!files) {
-                  return Promise.resolve();
-                }
+                  if (!files) {
+                    return Promise.resolve();
+                  }
 
-                return Promise.all(
-                  files.filter(Boolean).map((file) =>
-                    limit(() => {
-                      return postProcessPattern(
-                        globalRef,
-                        patternAfterPreProcess,
-                        file
-                      );
-                    })
-                  )
-                );
-              })
+                  return Promise.all(
+                    files.filter(Boolean).map((file) =>
+                      limit(() => {
+                        return postProcessPattern(
+                          globalRef,
+                          patternAfterPreProcess,
+                          file
+                        );
+                      })
+                    )
+                  );
+                })
+              )
             );
 
             logger.debug('end to adding additionalAssets');
