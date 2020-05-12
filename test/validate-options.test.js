@@ -203,8 +203,8 @@ describe('validate options', () => {
       ],
     },
     options: {
-      success: [{}],
-      failure: [{ unknown: true }],
+      success: [{ concurrency: 50 }],
+      failure: [{ unknown: true }, { concurrency: true }],
     },
     unknown: {
       success: [],

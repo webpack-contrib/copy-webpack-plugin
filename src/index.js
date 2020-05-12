@@ -1,4 +1,5 @@
 import validateOptions from 'schema-utils';
+import pLimit from 'p-limit';
 
 import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
@@ -18,6 +19,7 @@ class CopyPlugin {
 
   apply(compiler) {
     const plugin = { name: 'CopyPlugin' };
+    const limit = pLimit(this.options.concurrency || 100);
 
     compiler.hooks.compilation.tap(plugin, (compilation) => {
       const logger = compilation.getLogger('copy-webpack-plugin');
@@ -33,7 +35,6 @@ class CopyPlugin {
             compilation,
             inputFileSystem: compiler.inputFileSystem,
             output: compiler.options.output.path,
-            concurrency: this.options.concurrency,
           };
 
           try {
@@ -54,15 +55,15 @@ class CopyPlugin {
                 }
 
                 return Promise.all(
-                  files
-                    .filter(Boolean)
-                    .map((file) =>
-                      postProcessPattern(
+                  files.filter(Boolean).map((file) =>
+                    limit(() => {
+                      return postProcessPattern(
                         globalRef,
                         patternAfterPreProcess,
                         file
-                      )
-                    )
+                      );
+                    })
+                  )
                 );
               })
             );

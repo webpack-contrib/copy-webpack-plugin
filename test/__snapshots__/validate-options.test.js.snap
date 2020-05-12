@@ -1,9 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`validate options should throw an error on the "options" option with "{"concurrency":true}" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.options.concurrency should be a number."
+`;
+
 exports[`validate options should throw an error on the "options" option with "{"unknown":true}" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.options has an unknown property 'unknown'. These properties are valid:
-   object {}"
+   object { concurrency? }"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "" value 1`] = `
