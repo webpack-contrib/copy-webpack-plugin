@@ -139,28 +139,24 @@ export default async function postProcessPattern(globalRef, pattern, file) {
 
   const targetPath = normalizePath(file.webpackTo);
 
-  const rawContent = new RawSource(content);
+  const source = new RawSource(content);
 
   const hasAssetsAPI = typeof compilation.emitAsset === 'function';
 
   // For old version webpack 4
   if (!hasAssetsAPI) {
-    compilation.assets[targetPath] = {
-      size() {
-        return stats.size;
-      },
-      source() {
-        return content;
-      },
-    };
+    compilation.assets[targetPath] = source;
 
     return;
   }
 
-  if (typeof compilation.getAsset(targetPath) !== 'undefined') {
+  if (compilation.getAsset(targetPath)) {
     if (file.force) {
-      logger.log(`force update '${file.webpackTo}'`);
-      compilation.updateAsset(targetPath, rawContent);
+      logger.log(
+        `force updating '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
+      );
+
+      compilation.updateAsset(targetPath, source);
       return;
     }
 
@@ -172,5 +168,5 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
   );
 
-  compilation.emitAsset(targetPath, rawContent);
+  compilation.emitAsset(targetPath, source);
 }
