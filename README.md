@@ -184,6 +184,168 @@ module.exports = {
 };
 ```
 
+For different variants `from` (`glob`, `file` or `dir`), `context` is defined differently.
+
+##### Examples
+
+Take for example the following file structure:
+
+```txt
+src/directory-nested/deep-nested/deepnested-file.txt
+src/directory-nested/nested-file.txt
+```
+
+###### From is a Glob
+
+Everything that you specify in `from` will be included in the result:
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/directory-nested/**/*',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+src/directory-nested/deep-nested/deepnested-file.txt,
+src/directory-nested/nested-file.txt
+```
+
+If you want only content `src/directory-nested/`, you should only indicate `glob` in `from`. The path to the folder in which the search should take place, should be moved to `context`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: '**/*',
+          context: 'src/directory-nested/',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+deep-nested/deepnested-file.txt,
+nested-file.txt
+```
+
+###### From is a Dir
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/directory-nested/',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+deep-nested/deepnested-file.txt,
+nested-file.txt
+```
+
+Technically, this is `**/*` with a predefined context equal to the specified directory.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: '**/*',
+          context: 'src/directory-nested/',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+deep-nested/deepnested-file.txt,
+nested-file.txt
+```
+
+###### From is a File
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/directory-nested/nested-file.txt',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+nested-file.txt
+```
+
+Technically, this is a filename with a predefined context equal to `path.dirname(pathToFile)`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'nested-file.txt',
+          context: 'src/directory-nested/',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+nested-file.txt
+```
+
 #### `to`
 
 Type: `String`
