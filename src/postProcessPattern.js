@@ -8,6 +8,8 @@ import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
 import normalizePath from 'normalize-path';
 
+import { RawSource } from 'webpack-sources';
+
 import { name, version } from '../package.json';
 
 import { stat, readFile } from './utils/promisify';
@@ -137,9 +139,32 @@ export default async function postProcessPattern(globalRef, pattern, file) {
 
   const targetPath = normalizePath(file.webpackTo);
 
-  if (compilation.assets[targetPath] && !file.force) {
-    logger.log(`skipping '${file.webpackTo}', because it already exists`);
+  const rawContent = new RawSource(content);
 
+  const hasAssetsAPI = typeof compilation.emitAsset === 'function';
+
+  // For old version webpack 4
+  if (!hasAssetsAPI) {
+    compilation.assets[targetPath] = {
+      size() {
+        return stats.size;
+      },
+      source() {
+        return content;
+      },
+    };
+
+    return;
+  }
+
+  if (typeof compilation.getAsset(targetPath) !== 'undefined') {
+    if (file.force) {
+      logger.log(`force update '${file.webpackTo}'`);
+      compilation.updateAsset(targetPath, rawContent);
+      return;
+    }
+
+    logger.log(`skipping '${file.webpackTo}', because it already exists`);
     return;
   }
 
@@ -147,12 +172,5 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
   );
 
-  compilation.assets[targetPath] = {
-    size() {
-      return stats.size;
-    },
-    source() {
-      return content;
-    },
-  };
+  compilation.emitAsset(targetPath, rawContent);
 }

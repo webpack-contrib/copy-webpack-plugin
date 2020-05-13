@@ -1,6 +1,7 @@
 import path from 'path';
+import zlib from 'zlib';
 
-import { runEmit } from './helpers/run';
+import { run, runEmit } from './helpers/run';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
@@ -178,6 +179,29 @@ describe('transform option', () => {
         },
       ],
     })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should be a different size for the source file and the converted file', (done) => {
+    run({
+      patterns: [
+        {
+          from: 'file.txt',
+        },
+        {
+          from: 'file.txt',
+          to: 'file.txt.gz',
+          transform: (content) => zlib.gzipSync(content),
+        },
+      ],
+    })
+      .then(({ compilation }) => {
+        expect(
+          compilation.assets['file.txt'].size() !==
+            compilation.assets['file.txt.gz'].size()
+        ).toBe(true);
+      })
       .then(done)
       .catch(done);
   });
