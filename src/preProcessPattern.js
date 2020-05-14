@@ -55,23 +55,22 @@ export default async function preProcessPattern(globalRef, pattern) {
     `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
   );
 
+  let stats;
+
   try {
-    const stats = await stat(inputFileSystem, pattern.absoluteFrom);
-
-    if (!stats) {
-      return pattern;
-    }
-
-    if (stats.isDirectory()) {
-      pattern.fromType = 'dir';
-    } else if (stats.isFile()) {
-      pattern.fromType = 'file';
-      pattern.stats = stats;
-    } else if (!pattern.fromType) {
-      logger.warn(`unrecognized file type for ${pattern.from}`);
-    }
+    stats = await stat(inputFileSystem, pattern.absoluteFrom);
   } catch (error) {
     return pattern;
+  }
+
+  if (stats.isDirectory()) {
+    pattern.fromType = 'dir';
+    return pattern;
+  }
+
+  if (stats.isFile()) {
+    pattern.fromType = 'file';
+    pattern.stats = stats;
   }
 
   return pattern;
