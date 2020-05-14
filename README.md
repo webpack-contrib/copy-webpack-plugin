@@ -97,7 +97,7 @@ Glob or path from where we сopy files.
 Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
 Glob can only be a `string`.
 
-> ⚠️ Don't use directly `\\` in `from` if `from` is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> ⚠️ Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
 > Instead please use `/`.
 
@@ -116,16 +116,11 @@ module.exports = {
         {
           from: '**/*',
         },
-        // For Windows
-        'relative/path/to/file.ext',
-        'relative/path/to/dir',
-        '**/*',
-        path.resolve(__dirname, 'src', 'file.txt'),
-        path.resolve(__dirname, 'src', 'dir'),
+        // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
         path.posix.join(
           path.resolve(__dirname, 'src').replace(/\\/g, '/'),
           '*.txt'
-        ), // If absolute path to `glob`
+        ),
       ],
     }),
   ],
@@ -159,6 +154,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
+          // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
           from: path.posix.join(
             path.resolve(__dirname, 'fixtures').replace(/\\/g, '/'),
             '*.txt'
@@ -238,17 +234,17 @@ module.exports = {
 };
 ```
 
-`context` sets the path to search for the expression specified in`from` if `from` is a relative path.
-
-`context` can be an absolute or relative path. If `context` is a relative, then it is converted to absolute based to `compiler.options.context`
+The `context` option can be an absolute or relative path. If `context` is a relative, then it is converted to absolute based to `compiler.options.context`
 
 Also, `context` indicates how to interpret the search results. Further, he is considered in this role.
 
-##### The interaction of `from` and`context` for search results.
+To determine the structure from which the found resources will be copied to the destination folder, the `context` option is used.
 
-If `from` is a file, `context` = `path.dirname(pathToFile)`.
-If `from` is a dir, `context` = `from`.
-If `from` is a glob, `context` = `context`.
+If `from` is a file, then `context` is equal to the directory in which this file is located. Accordingly, the result will be only the file name.
+
+If `from` is a directory, then `context` is the same as `from` and is equal to the directory itself. In this case, the result will be a hierarchical structure of the found folders and files relative to the specified directory.
+
+If `from` is a glob, then regardless of the `context` option, the result will be the structure specified in the `from` option
 
 More [`examples`](#examples)
 
