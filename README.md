@@ -288,8 +288,8 @@ We try to automatically determine the `type` so you most likely do not need this
 
 |       Name       |    Type    |   Default   | Description                                                                                        |
 | :--------------: | :--------: | :---------: | :------------------------------------------------------------------------------------------------- |
-|   **`'dir'`**    | `{String}` | `undefined` | If `to` has no extension or ends in `'/'`                                                          |
-|   **`'file'`**   | `{String}` | `undefined` | If `to` is not a directory and is not a template,                                                  |
+|   **`'dir'`**    | `{String}` | `undefined` | If `to` has no extension or ends on `'/'`                                                          |
+|   **`'file'`**   | `{String}` | `undefined` | If `to` is not a directory and is not a template                                                   |
 | **`'template'`** | `{String}` | `undefined` | If `to` contains [a template pattern](https://github.com/webpack-contrib/file-loader#placeholders) |
 
 ##### `'dir'`
