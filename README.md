@@ -238,6 +238,20 @@ module.exports = {
 };
 ```
 
+`context` sets the path to search for the expression specified in`from` if `from` is a relative path.
+
+`context` can be an absolute or relative path. If `context` is a relative, then it is converted to absolute based to `compiler.options.context`
+
+Also, `context` indicates how to interpret the search results. Further, he is considered in this role.
+
+##### The interaction of `from` and`context` for search results.
+
+If `from` is a file, `context` = `path.dirname(pathToFile)`.
+If `from` is a dir, `context` = `from`.
+If `from` is a glob, `context` = `context`.
+
+More [`examples`](#examples)
+
 #### `globOptions`
 
 Type: `Object`
