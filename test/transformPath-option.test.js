@@ -192,4 +192,82 @@ describe('transformPath option', () => {
       .then(done)
       .catch(done);
   });
+
+  it('should move files', (done) => {
+    runEmit({
+      expectedAssetKeys: ['txt'],
+      patterns: [
+        {
+          from: 'directory/nested/deep-nested',
+          to: '[1]',
+          transformPath(targetPath, absolutePath) {
+            const mathes = absolutePath.match(/\.([^.]*)$/);
+            const [, res] = mathes;
+            const target = targetPath.replace(/\[[1]\]/, res);
+
+            return target;
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should move files to a non-root directory with [1]', (done) => {
+    runEmit({
+      expectedAssetKeys: ['nested/txt'],
+      patterns: [
+        {
+          from: 'directory/nested/deep-nested',
+          to: 'nested/[1]',
+          transformPath(targetPath, absolutePath) {
+            const mathes = absolutePath.match(/\.([^.]*)$/);
+            const [, res] = mathes;
+            const target = targetPath.replace(/\[[1]\]/, res);
+
+            return target;
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should move files', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        'deep-nested-deepnested.txt',
+        'directoryfile.txt',
+        'nested-nestedfile.txt',
+      ],
+      patterns: [
+        {
+          from: '**/*',
+          context: 'directory',
+          transformPath(targetPath) {
+            const pathSegments = path.parse(targetPath);
+            const result = [];
+
+            if (pathSegments.root) {
+              result.push(pathSegments.root);
+            }
+
+            if (pathSegments.dir) {
+              result.push(pathSegments.dir.split(path.sep).pop());
+            }
+
+            if (pathSegments.base) {
+              result.push(pathSegments.base);
+            }
+
+            return result.join('-');
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
 });

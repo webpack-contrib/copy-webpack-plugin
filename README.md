@@ -81,7 +81,6 @@ module.exports = {
 |        [`context`](#context)        |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
 |    [`globOptions`](#globoptions)    |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
 |         [`toType`](#totype)         |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
-|           [`test`](#test)           | `{String\|RegExp}`  |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
 |          [`force`](#force)          |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
 |        [`flatten`](#flatten)        |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
 |      [`transform`](#transform)      |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
@@ -346,37 +345,6 @@ module.exports = {
           from: 'src/',
           to: 'dest/[name].[hash].[ext]',
           toType: 'template',
-        },
-      ],
-    }),
-  ],
-};
-```
-
-#### `test`
-
-Type: `string|RegExp`
-Default: `undefined`
-
-Pattern for extracting elements to be used in `to` templates.
-
-Defines a `{RegExp}` to match some parts of the file path.
-These capture groups can be reused in the name property using `[N]` placeholder.
-Note that `[0]` will be replaced by the entire path of the file,
-whereas `[1]` will contain the first capturing parenthesis of your `{RegExp}`
-and so on...
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: '*/*',
-          to: '[1]-[2].[hash].[ext]',
-          test: /([^/]+)\/(.+)\.png$/,
         },
       ],
     }),

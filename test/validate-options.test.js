@@ -53,7 +53,6 @@ describe('validate options', () => {
             to: 'dir',
             context: 'context',
             toType: 'file',
-            test: /test/,
             force: true,
             flatten: true,
             transform: () => {},
@@ -69,22 +68,6 @@ describe('validate options', () => {
             globOptions: {
               dot: false,
             },
-          },
-        ],
-        [
-          {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            test: 'test',
-          },
-        ],
-        [
-          {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            test: /test/,
           },
         ],
         [
@@ -140,14 +123,6 @@ describe('validate options', () => {
             to: 'dir',
             context: 'context',
             toType: 'foo',
-          },
-        ],
-        [
-          {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            test: true,
           },
         ],
         [

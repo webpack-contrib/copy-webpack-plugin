@@ -117,7 +117,6 @@ export default async function postProcessPattern(globalRef, pattern, file) {
       file.webpackTo,
       {
         content,
-        regExp: file.webpackToRegExp,
         context: pattern.context,
       }
     );
