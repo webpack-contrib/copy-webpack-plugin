@@ -205,4 +205,30 @@ describe('transform option', () => {
       .then(done)
       .catch(done);
   });
+
+  it('should transform file when "from" is a file', (done) => {
+    runEmit({
+      expectedAssetKeys: ['subdir/test.txt'],
+      expectedAssetContent: {
+        'subdir/test.txt': 'newchanged',
+      },
+      patterns: [
+        {
+          from: 'file.txt',
+          transform(content, absoluteFrom) {
+            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+
+            return `${content}changed`;
+          },
+          transformPath(targetPath, absoluteFrom) {
+            expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, 'file.txt'));
+
+            return targetPath.replace('file.txt', 'subdir/test.txt');
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
 });

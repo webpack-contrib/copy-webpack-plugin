@@ -247,4 +247,49 @@ describe('cache option', () => {
       .then(done)
       .catch(done);
   });
+
+  it('should cache when "from" is a file', (done) => {
+    const from = 'file.txt';
+
+    runEmit({
+      expectedAssetKeys: ['subdir/test.txt'],
+      expectedAssetContent: {
+        'subdir/test.txt': 'newchanged!',
+      },
+      patterns: [
+        {
+          from,
+          cacheTransform: true,
+          transform: function transform(content) {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+          transformPath(targetPath, absoluteFrom) {
+            expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, 'file.txt'));
+
+            return targetPath.replace('file.txt', 'subdir/test.txt');
+          },
+        },
+      ],
+    })
+      .then(() =>
+        cacache.ls(cacheDir).then((cacheEntries) => {
+          const cacheKeys = Object.keys(cacheEntries);
+
+          expect(cacheKeys).toHaveLength(1);
+
+          cacheKeys.forEach((cacheKey) => {
+            // eslint-disable-next-line no-new-func
+            const cacheEntry = new Function(
+              `'use strict'\nreturn ${cacheKey}`
+            )();
+
+            expect(cacheEntry.pattern.from).toBe(from);
+          });
+        })
+      )
+      .then(done)
+      .catch(done);
+  });
 });
