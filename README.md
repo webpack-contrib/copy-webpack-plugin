@@ -79,7 +79,7 @@ module.exports = {
 |           [`from`](#from)           |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
 |             [`to`](#to)             |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
 |        [`context`](#context)        |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|    [`globOptions`](#globoptions)    |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library, including `ignore` option        |
+|    [`globOptions`](#globoptions)    |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
 |         [`toType`](#totype)         |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
 |           [`test`](#test)           | `{String\|RegExp}`  |                   `undefined`                   | Pattern for extracting elements to be used in `to` templates.                                         |
 |          [`force`](#force)          |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
@@ -97,9 +97,9 @@ Glob or path from where we сopy files.
 Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
 Glob can only be a `string`.
 
-> ⚠️ Don't use directly `\\` in `from` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> ⚠️ Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
-> Instead please use `/` or `path` methods.
+> Instead please use `/`.
 
 **webpack.config.js**
 
@@ -109,13 +109,18 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         'relative/path/to/file.ext',
-        '/absolute/path/to/file.ext',
         'relative/path/to/dir',
-        '/absolute/path/to/dir',
+        path.resolve(__dirname, 'src', 'file.ext'),
+        path.resolve(__dirname, 'src', 'dir'),
         '**/*',
         {
           from: '**/*',
         },
+        // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
+        path.posix.join(
+          path.resolve(__dirname, 'src').replace(/\\/g, '/'),
+          '*.txt'
+        ),
       ],
     }),
   ],
@@ -124,7 +129,7 @@ module.exports = {
 
 ##### `For windows`
 
-If you define `from` as file path or folder path on `Windows`, you can use windows path segment (`\\`)
+If you define `from` as absolute file path or absolute folder path on `Windows`, you can use windows path segment (`\\`)
 
 ```js
 module.exports = {
@@ -132,7 +137,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve('__dirname', 'file.txt'),
+          from: path.resolve(__dirname, 'file.txt'),
         },
       ],
     }),
@@ -144,16 +149,16 @@ But you should always use forward-slashes in `glob` expressions
 See [fast-glob manual](https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows).
 
 ```js
-const FIXTURES_DIR_NORMALIZED = path
-  .resolve(__dirname, 'fixtures')
-  .replace(/\\/g, '/');
-
 module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
         {
-          from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'file.txt'),
+          // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
+          from: path.posix.join(
+            path.resolve(__dirname, 'fixtures').replace(/\\/g, '/'),
+            '*.txt'
+          ),
         },
       ],
     }),
@@ -161,28 +166,8 @@ module.exports = {
 };
 ```
 
-##### `For exclude files`
-
-To exclude files from the selection, you should use [globOptions.ignore option](https://github.com/mrmlnc/fast-glob#ignore)
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: '**/*',
-          globOptions: {
-            ignore: ['**/file.*', '**/ignored-directory/**'],
-          },
-        },
-      ],
-    }),
-  ],
-};
-```
+The `context` behaves differently depending on what the `from` is (`glob`, `file` or `dir`).
+More [`examples`](#examples)
 
 #### `to`
 
@@ -249,12 +234,27 @@ module.exports = {
 };
 ```
 
+The `context` option can be an absolute or relative path. If `context` is a relative, then it is converted to absolute based to `compiler.options.context`
+
+Also, `context` indicates how to interpret the search results. Further, he is considered in this role.
+
+To determine the structure from which the found resources will be copied to the destination folder, the `context` option is used.
+
+If `from` is a file, then `context` is equal to the directory in which this file is located. Accordingly, the result will be only the file name.
+
+If `from` is a directory, then `context` is the same as `from` and is equal to the directory itself. In this case, the result will be a hierarchical structure of the found folders and files relative to the specified directory.
+
+If `from` is a glob, then regardless of the `context` option, the result will be the structure specified in the `from` option
+
+More [`examples`](#examples)
+
 #### `globOptions`
 
 Type: `Object`
 Default: `undefined`
 
 Allows to configute the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
+To exclude files from the selection, you should use [globOptions.ignore option](https://github.com/mrmlnc/fast-glob#ignore)
 
 **webpack.config.js**
 
@@ -268,6 +268,7 @@ module.exports = {
           globOptions: {
             dot: true,
             gitignore: true,
+            ignore: ['**/file.*', '**/ignored-directory/**'],
           },
         },
       ],
@@ -583,6 +584,173 @@ module.exports = {
     }),
   ],
 };
+```
+
+### Examples
+
+#### Different variants `from` (`glob`, `file` or `dir`).
+
+Take for example the following file structure:
+
+```
+src/directory-nested/deep-nested/deepnested-file.txt
+src/directory-nested/nested-file.txt
+```
+
+##### From is a Glob
+
+Everything that you specify in `from` will be included in the result:
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/directory-nested/**/*',
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+src/directory-nested/deep-nested/deepnested-file.txt,
+src/directory-nested/nested-file.txt
+```
+
+If you want only content `src/directory-nested/`, you should only indicate `glob` in `from`. The path to the folder in which the search should take place, should be moved to `context`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: '**/*',
+          context: path.resolve(__dirname, 'src', 'directory-nested'),
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+deep-nested/deepnested-file.txt,
+nested-file.txt
+```
+
+##### From is a Dir
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'src', 'directory-nested'),
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+deep-nested/deepnested-file.txt,
+nested-file.txt
+```
+
+Technically, this is `**/*` with a predefined context equal to the specified directory.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: '**/*',
+          context: path.resolve(__dirname, 'src', 'directory-nested'),
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+deep-nested/deepnested-file.txt,
+nested-file.txt
+```
+
+##### From is a File
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(
+            __dirname,
+            'src',
+            'directory-nested',
+            'nested-file.txt'
+          ),
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+nested-file.txt
+```
+
+Technically, this is a filename with a predefined context equal to `path.dirname(pathToFile)`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'nested-file.txt',
+          context: path.resolve(__dirname, 'src', 'directory-nested'),
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+nested-file.txt
 ```
 
 ## Contributing
