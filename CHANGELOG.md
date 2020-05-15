@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file. See [standa
 * the `from` option now can only be a string, if you use `{ from: { glob: 'directory/**', dot: false } }` changed it to `{ from: 'directory/**', globOptions: { dot: false } }`
 * the `copyUnmodified` was removed without replacements
 * the `2` version of `webpack-dev-server` is not supported anymore
-* the `logLever` was removed in favor the `infrastructureLogging.level` option, please read the [documentation](https://webpack.js.org/configuration/other-options/#infrastructurelogginglevel)
+* the `logLevel` was removed in favor the `infrastructureLogging.level` option, please read the [documentation](https://webpack.js.org/configuration/other-options/#infrastructurelogginglevel)
 
 
 ### Features
