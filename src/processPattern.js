@@ -43,13 +43,10 @@ export default async function processPattern(globalRef, pattern) {
     logger.debug(`found ${from}`);
 
     // Change the to path to be relative for webpack
-    if (pattern.toType === 'dir') {
-      file.webpackTo = path.join(pattern.to, file.relativeFrom);
-    } else if (pattern.toType === 'file') {
-      file.webpackTo = pattern.to;
-    } else if (pattern.toType === 'template') {
-      file.webpackTo = pattern.to;
-    }
+    file.webpackTo =
+      pattern.toType === 'dir'
+        ? path.join(pattern.to, file.relativeFrom)
+        : pattern.to;
 
     if (path.isAbsolute(file.webpackTo)) {
       file.webpackTo = path.relative(output, file.webpackTo);
