@@ -35,7 +35,28 @@
               "type": "boolean"
             },
             {
-              "type": "object"
+              "type": "string"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "directory": {
+                  "type": "string",
+                  "absolutePath": true
+                },
+                "keys": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "additionalProperties": true
+                    },
+                    {
+                      "instanceof": "Function"
+                    }
+                  ]
+                }
+              }
             }
           ]
         },

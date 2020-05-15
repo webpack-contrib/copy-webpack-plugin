@@ -11,9 +11,19 @@ import { runEmit } from './helpers/run';
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('cache option', () => {
-  const cacheDir = findCacheDir({ name: 'copy-webpack-plugin' });
+  const defaultCacheDir = findCacheDir({ name: 'copy-webpack-plugin' });
+  const cacheDir1 = findCacheDir({ name: 'copy-webpack-plugin-1' });
+  const cacheDir2 = findCacheDir({ name: 'copy-webpack-plugin-2' });
+  const cacheDir3 = findCacheDir({ name: 'copy-webpack-plugin-3' });
+  const cacheDir4 = findCacheDir({ name: 'copy-webpack-plugin-4' });
 
-  beforeEach(() => cacache.rm.all(cacheDir));
+  beforeEach(() => [
+    cacache.rm.all(defaultCacheDir),
+    cacache.rm.all(cacheDir1),
+    cacache.rm.all(cacheDir2),
+    cacache.rm.all(cacheDir3),
+    cacache.rm.all(cacheDir4),
+  ]);
 
   it('should cache when "from" is a file', (done) => {
     const newContent = 'newchanged!';
@@ -37,19 +47,10 @@ describe('cache option', () => {
       ],
     })
       .then(() =>
-        cacache.ls(cacheDir).then((cacheEntries) => {
+        cacache.ls(defaultCacheDir).then((cacheEntries) => {
           const cacheKeys = Object.keys(cacheEntries);
 
           expect(cacheKeys).toHaveLength(1);
-
-          cacheKeys.forEach((cacheKey) => {
-            // eslint-disable-next-line no-new-func
-            const cacheEntry = new Function(
-              `'use strict'\nreturn ${cacheKey}`
-            )();
-
-            expect(cacheEntry.pattern.from).toBe(from);
-          });
         })
       )
       .then(done)
@@ -84,19 +85,10 @@ describe('cache option', () => {
       ],
     })
       .then(() =>
-        cacache.ls(cacheDir).then((cacheEntries) => {
+        cacache.ls(defaultCacheDir).then((cacheEntries) => {
           const cacheKeys = Object.keys(cacheEntries);
 
           expect(cacheKeys).toHaveLength(3);
-
-          cacheKeys.forEach((cacheKey) => {
-            // eslint-disable-next-line no-new-func
-            const cacheEntry = new Function(
-              `'use strict'\nreturn ${cacheKey}`
-            )();
-
-            expect(cacheEntry.pattern.from).toBe(from);
-          });
         })
       )
       .then(done)
@@ -124,27 +116,49 @@ describe('cache option', () => {
       ],
     })
       .then(() =>
-        cacache.ls(cacheDir).then((cacheEntries) => {
+        cacache.ls(defaultCacheDir).then((cacheEntries) => {
           const cacheKeys = Object.keys(cacheEntries);
 
           expect(cacheKeys).toHaveLength(1);
-
-          cacheKeys.forEach((cacheKey) => {
-            // eslint-disable-next-line no-new-func
-            const cacheEntry = new Function(
-              `'use strict'\nreturn ${cacheKey}`
-            )();
-
-            // Todo need investigate
-            expect(cacheEntry.pattern.from.replace(/\\/, '/')).toBe(from);
-          });
         })
       )
       .then(done)
       .catch(done);
   });
 
-  it('should cache file with custom cache key', (done) => {
+  it('should cache file with custom cache directory', (done) => {
+    const newContent = 'newchanged!';
+    const from = 'file.txt';
+
+    runEmit({
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': newContent,
+      },
+      patterns: [
+        {
+          from,
+          cacheTransform: cacheDir1,
+          transform: (content) => {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+        },
+      ],
+    })
+      .then(() =>
+        cacache.ls(cacheDir1).then((cacheEntries) => {
+          const cacheKeys = Object.keys(cacheEntries);
+
+          expect(cacheKeys).toHaveLength(1);
+        })
+      )
+      .then(done)
+      .catch(done);
+  });
+
+  it('should cache file with custom cache directory when "cacheTransform" is an object', (done) => {
     const newContent = 'newchanged!';
     const from = 'file.txt';
 
@@ -157,7 +171,192 @@ describe('cache option', () => {
         {
           from,
           cacheTransform: {
-            key: 'foobar',
+            directory: cacheDir2,
+          },
+          transform: (content) => {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+        },
+      ],
+    })
+      .then(() =>
+        cacache.ls(cacheDir2).then((cacheEntries) => {
+          const cacheKeys = Object.keys(cacheEntries);
+
+          expect(cacheKeys).toHaveLength(1);
+        })
+      )
+      .then(done)
+      .catch(done);
+  });
+
+  it('should cache file with custom object cache keys when "cacheTransform" is an object', (done) => {
+    const newContent = 'newchanged!';
+    const from = 'file.txt';
+
+    runEmit({
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': newContent,
+      },
+      patterns: [
+        {
+          from,
+          cacheTransform: {
+            keys: {
+              key: 'foobar',
+            },
+          },
+          transform: (content) => {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+        },
+      ],
+    })
+      .then(() =>
+        cacache.ls(defaultCacheDir).then((cacheEntries) => {
+          const cacheKeys = Object.keys(cacheEntries);
+
+          expect(cacheKeys).toHaveLength(1);
+
+          cacheKeys.forEach((cacheKey) => {
+            // eslint-disable-next-line no-new-func
+            const cacheEntry = new Function(
+              `'use strict'\nreturn (${cacheKey});`
+            )();
+
+            // expect(cacheEntry.pattern.from).toBe(from);
+            expect(cacheEntry.key).toBe('foobar');
+          });
+        })
+      )
+      .then(done)
+      .catch(done);
+  });
+
+  it('should cache file with custom function cache keys when "cacheTransform" is an object', (done) => {
+    const newContent = 'newchanged!';
+    const from = 'file.txt';
+
+    runEmit({
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': newContent,
+      },
+      patterns: [
+        {
+          from,
+          cacheTransform: {
+            keys: (defaultCacheKeys, absoluteFrom) => {
+              expect(absoluteFrom).toBeDefined();
+
+              return {
+                ...defaultCacheKeys,
+                key: 'foobar',
+              };
+            },
+          },
+          transform: (content) => {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+        },
+      ],
+    })
+      .then(() =>
+        cacache.ls(defaultCacheDir).then((cacheEntries) => {
+          const cacheKeys = Object.keys(cacheEntries);
+
+          expect(cacheKeys).toHaveLength(1);
+
+          cacheKeys.forEach((cacheKey) => {
+            // eslint-disable-next-line no-new-func
+            const cacheEntry = new Function(
+              `'use strict'\nreturn (${cacheKey});`
+            )();
+
+            // expect(cacheEntry.pattern.from).toBe(from);
+            expect(cacheEntry.key).toBe('foobar');
+          });
+        })
+      )
+      .then(done)
+      .catch(done);
+  });
+
+  it('should cache file with custom async function cache keys when "cacheTransform" is an object', (done) => {
+    const newContent = 'newchanged!';
+    const from = 'file.txt';
+
+    runEmit({
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': newContent,
+      },
+      patterns: [
+        {
+          from,
+          cacheTransform: {
+            keys: async (defaultCacheKeys, absoluteFrom) => {
+              expect(absoluteFrom).toBeDefined();
+
+              return {
+                ...defaultCacheKeys,
+                key: 'foobar',
+              };
+            },
+          },
+          transform: (content) => {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+        },
+      ],
+    })
+      .then(() =>
+        cacache.ls(defaultCacheDir).then((cacheEntries) => {
+          const cacheKeys = Object.keys(cacheEntries);
+
+          expect(cacheKeys).toHaveLength(1);
+
+          cacheKeys.forEach((cacheKey) => {
+            // eslint-disable-next-line no-new-func
+            const cacheEntry = new Function(
+              `'use strict'\nreturn (${cacheKey});`
+            )();
+
+            // expect(cacheEntry.pattern.from).toBe(from);
+            expect(cacheEntry.key).toBe('foobar');
+          });
+        })
+      )
+      .then(done)
+      .catch(done);
+  });
+
+  it('should cache file with custom object cache keys and custom cache directory when "cacheTransform" is an object', (done) => {
+    const newContent = 'newchanged!';
+    const from = 'file.txt';
+
+    runEmit({
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': newContent,
+      },
+      patterns: [
+        {
+          from,
+          cacheTransform: {
+            directory: cacheDir3,
+            keys: {
+              key: 'foobar',
+            },
           },
           transform(content) {
             return new Promise((resolve) => {
@@ -168,13 +367,59 @@ describe('cache option', () => {
       ],
     })
       .then(() =>
-        cacache.ls(cacheDir).then((cacheEntries) => {
+        cacache.ls(cacheDir3).then((cacheEntries) => {
           const cacheKeys = Object.keys(cacheEntries);
 
           expect(cacheKeys).toHaveLength(1);
 
           cacheKeys.forEach((cacheKey) => {
-            expect(cacheKey).toBe('foobar');
+            expect(cacheKey).toContain('foobar');
+          });
+        })
+      )
+      .then(done)
+      .catch(done);
+  });
+
+  it('should cache file with custom function cache keys and custom cache directory when "cacheTransform" is an object', (done) => {
+    const newContent = 'newchanged!';
+    const from = 'file.txt';
+
+    runEmit({
+      expectedAssetKeys: ['file.txt'],
+      expectedAssetContent: {
+        'file.txt': newContent,
+      },
+      patterns: [
+        {
+          from,
+          cacheTransform: {
+            directory: cacheDir4,
+            keys: (defaultCacheKeys, absoluteFrom) => {
+              expect(absoluteFrom).toBeDefined();
+
+              return {
+                ...defaultCacheKeys,
+                key: 'foobar',
+              };
+            },
+          },
+          transform(content) {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+        },
+      ],
+    })
+      .then(() =>
+        cacache.ls(cacheDir4).then((cacheEntries) => {
+          const cacheKeys = Object.keys(cacheEntries);
+
+          expect(cacheKeys).toHaveLength(1);
+
+          cacheKeys.forEach((cacheKey) => {
+            expect(cacheKey).toContain('foobar');
           });
         })
       )
@@ -229,64 +474,10 @@ describe('cache option', () => {
       ],
     })
       .then(() =>
-        cacache.ls(cacheDir).then((cacheEntries) => {
+        cacache.ls(defaultCacheDir).then((cacheEntries) => {
           const cacheKeys = Object.keys(cacheEntries);
 
           expect(cacheKeys).toHaveLength(1);
-
-          cacheKeys.forEach((cacheKey) => {
-            // eslint-disable-next-line no-new-func
-            const cacheEntry = new Function(
-              `'use strict'\nreturn ${cacheKey}`
-            )();
-
-            expect(cacheEntry.pattern.from).toBe(from);
-          });
-        })
-      )
-      .then(done)
-      .catch(done);
-  });
-
-  it('should cache when "from" is a file', (done) => {
-    const from = 'file.txt';
-
-    runEmit({
-      expectedAssetKeys: ['subdir/test.txt'],
-      expectedAssetContent: {
-        'subdir/test.txt': 'newchanged!',
-      },
-      patterns: [
-        {
-          from,
-          cacheTransform: true,
-          transform: function transform(content) {
-            return new Promise((resolve) => {
-              resolve(`${content}changed!`);
-            });
-          },
-          transformPath(targetPath, absoluteFrom) {
-            expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, 'file.txt'));
-
-            return targetPath.replace('file.txt', 'subdir/test.txt');
-          },
-        },
-      ],
-    })
-      .then(() =>
-        cacache.ls(cacheDir).then((cacheEntries) => {
-          const cacheKeys = Object.keys(cacheEntries);
-
-          expect(cacheKeys).toHaveLength(1);
-
-          cacheKeys.forEach((cacheKey) => {
-            // eslint-disable-next-line no-new-func
-            const cacheEntry = new Function(
-              `'use strict'\nreturn ${cacheKey}`
-            )();
-
-            expect(cacheEntry.pattern.from).toBe(from);
-          });
         })
       )
       .then(done)

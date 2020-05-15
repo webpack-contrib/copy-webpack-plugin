@@ -1,20 +1,8 @@
+import os from 'os';
+
+import findCacheDir from 'find-cache-dir';
+
 import CopyPlugin from '../src/index';
-
-// Todo remove after dorp node@6 support
-if (!Object.entries) {
-  Object.entries = function entries(obj) {
-    const ownProps = Object.keys(obj);
-    let i = ownProps.length;
-    const resArray = new Array(i);
-
-    // eslint-disable-next-line no-plusplus
-    while (i--) {
-      resArray[i] = [ownProps[i], obj[ownProps[i]]];
-    }
-
-    return resArray;
-  };
-}
 
 describe('validate options', () => {
   const tests = {
@@ -76,8 +64,71 @@ describe('validate options', () => {
             from: 'test.txt',
             to: 'dir',
             context: 'context',
+            cacheTransform:
+              findCacheDir({ name: 'copy-webpack-plugin-a' }) || os.tmpdir(),
+          },
+        ],
+        [
+          {
+            from: 'test.txt',
+            to: 'dir',
+            context: 'context',
             cacheTransform: {
-              foo: 'bar',
+              keys: {
+                foo: 'bar',
+              },
+            },
+          },
+        ],
+        [
+          {
+            from: 'test.txt',
+            to: 'dir',
+            context: 'context',
+            cacheTransform: {
+              keys: () => ({
+                foo: 'bar',
+              }),
+            },
+          },
+        ],
+        [
+          {
+            from: 'test.txt',
+            to: 'dir',
+            context: 'context',
+            cacheTransform: {
+              keys: async () => ({
+                foo: 'bar',
+              }),
+            },
+          },
+        ],
+        [
+          {
+            from: 'test.txt',
+            to: 'dir',
+            context: 'context',
+            cacheTransform: {
+              directory:
+                findCacheDir({ name: 'copy-webpack-plugin-b' }) || os.tmpdir(),
+              keys: {
+                foo: 'bar',
+              },
+            },
+          },
+        ],
+        [
+          {
+            from: 'test.txt',
+            to: 'dir',
+            context: 'context',
+            cacheTransform: {
+              directory:
+                findCacheDir({ name: 'copy-webpack-plugin-c' }) || os.tmpdir(),
+              keys: () => ({
+                foo: 'bar',
+              }),
             },
           },
         ],
@@ -148,6 +199,16 @@ describe('validate options', () => {
             to: 'dir',
             context: 'context',
             cacheTransform: () => {},
+          },
+        ],
+        [
+          {
+            from: 'test.txt',
+            to: 'dir',
+            context: 'context',
+            cacheTransform: {
+              foo: 'bar',
+            },
           },
         ],
         [

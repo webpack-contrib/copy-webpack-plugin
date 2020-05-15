@@ -10,7 +10,7 @@ import normalizePath from 'normalize-path';
 
 import { RawSource } from 'webpack-sources';
 
-import { name, version } from '../package.json';
+import { version } from '../package.json';
 
 import { stat, readFile } from './utils/promisify';
 
@@ -63,22 +63,33 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     logger.log(`transforming content for '${file.absoluteFrom}'`);
 
     if (pattern.cacheTransform) {
-      if (!globalRef.cacheDir) {
-        globalRef.cacheDir =
-          findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
+      const cacheDirectory = pattern.cacheTransform.directory
+        ? pattern.cacheTransform.directory
+        : typeof pattern.cacheTransform === 'string'
+        ? pattern.cacheTransform
+        : findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
+      let defaultCacheKeys = {
+        version,
+        transform: pattern.transform,
+        contentHash: crypto.createHash('md4').update(content).digest('hex'),
+      };
+
+      if (typeof pattern.cacheTransform.keys === 'function') {
+        defaultCacheKeys = await pattern.cacheTransform.keys(
+          defaultCacheKeys,
+          file.absoluteFrom
+        );
+      } else {
+        defaultCacheKeys = {
+          ...defaultCacheKeys,
+          ...pattern.cacheTransform.keys,
+        };
       }
 
-      const cacheKey = pattern.cacheTransform.key
-        ? pattern.cacheTransform.key
-        : serialize({
-            name,
-            version,
-            pattern,
-            hash: crypto.createHash('md4').update(content).digest('hex'),
-          });
+      const cacheKeys = serialize(defaultCacheKeys);
 
       try {
-        const result = await cacache.get(globalRef.cacheDir, cacheKey);
+        const result = await cacache.get(cacheDirectory, cacheKeys);
 
         logger.debug(
           `getting cached transformation for '${file.absoluteFrom}'`
@@ -91,7 +102,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
         logger.debug(`caching transformation for '${file.absoluteFrom}'`);
 
         content = await cacache
-          .put(globalRef.cacheDir, cacheKey, content)
+          .put(cacheDirectory, cacheKeys, content)
           .then(() => content);
       }
     } else {
@@ -145,7 +156,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
   }
 
   if (compilation.getAsset(targetPath)) {
-    if (file.force) {
+    if (pattern.force) {
       logger.log(
         `force updating '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
       );
