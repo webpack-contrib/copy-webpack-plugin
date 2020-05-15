@@ -149,6 +149,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
   const source = new RawSource(content);
 
   // For old version webpack 4
+  /* istanbul ignore if */
   if (typeof compilation.emitAsset !== 'function') {
     compilation.assets[targetPath] = source;
 
