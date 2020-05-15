@@ -134,6 +134,8 @@ describe('validate options', () => {
         ],
       ],
       failure: [
+        // eslint-disable-next-line no-undefined
+        undefined,
         true,
         'true',
         '',
@@ -276,7 +278,11 @@ describe('validate options', () => {
 
       try {
         // eslint-disable-next-line no-new
-        new CopyPlugin({ [key]: value });
+        new CopyPlugin(
+          key === 'options'
+            ? { patterns: [{ from: 'file.txt' }], [key]: value }
+            : { [key]: value }
+        );
       } catch (errorFromPlugin) {
         if (errorFromPlugin.name !== 'ValidationError') {
           throw errorFromPlugin;
