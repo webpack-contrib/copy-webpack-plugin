@@ -16,16 +16,6 @@
         "toType": {
           "enum": ["dir", "file", "template"]
         },
-        "test": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "instanceof": "RegExp"
-            }
-          ]
-        },
         "force": {
           "type": "boolean"
         },
