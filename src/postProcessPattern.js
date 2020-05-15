@@ -22,7 +22,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
   logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
 
   const getStats = pattern.stats
-    ? Promise.resolve().then(() => pattern.stats)
+    ? pattern.stats
     : stat(inputFileSystem, file.absoluteFrom);
 
   let stats;
@@ -31,6 +31,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     stats = await getStats;
   } catch (error) {
     compilation.errors.push(error);
+
     return;
   }
 
@@ -38,6 +39,8 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     logger.debug(
       `skipping '${file.absoluteFrom}' because it is empty directory`
     );
+
+    return;
   }
 
   // If this came from a glob, add it to the file watchlist

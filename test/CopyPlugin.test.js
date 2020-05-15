@@ -488,7 +488,7 @@ describe('CopyPlugin', () => {
   });
 
   describe('logging', () => {
-    it('should logging', (done) => {
+    it('should logging when "from" is a file', (done) => {
       const expectedAssetKeys = ['file.txt'];
 
       run({
@@ -504,12 +504,81 @@ describe('CopyPlugin', () => {
             .get('copy-webpack-plugin')
             .map((entry) =>
               entry.args[0].replace(/\\/g, '/').split(root).join('.')
-            );
+            )
+            .sort();
 
           expect(
             Array.from(Object.keys(readAssets(compiler, stats))).sort()
           ).toEqual(expectedAssetKeys);
-          expect({ result: logs }).toMatchSnapshot({ result: logs });
+          expect({ logs }).toMatchSnapshot('logs');
+        })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should logging when "from" is a directory', (done) => {
+      const expectedAssetKeys = [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ];
+
+      run({
+        patterns: [
+          {
+            from: 'directory',
+          },
+        ],
+      })
+        .then(({ compiler, stats }) => {
+          const root = path.resolve(__dirname).replace(/\\/g, '/');
+          const logs = stats.compilation.logging
+            .get('copy-webpack-plugin')
+            .map((entry) =>
+              entry.args[0].replace(/\\/g, '/').split(root).join('.')
+            )
+            .sort();
+
+          expect(
+            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+          ).toEqual(expectedAssetKeys);
+          expect({ logs }).toMatchSnapshot('logs');
+        })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should logging when "from" is a glob', (done) => {
+      const expectedAssetKeys = [
+        'directory/directoryfile.txt',
+        'directory/nested/deep-nested/deepnested.txt',
+        'directory/nested/nestedfile.txt',
+      ];
+
+      run({
+        patterns: [
+          {
+            from: 'directory/**',
+            globOptions: {
+              onlyFiles: false,
+            },
+          },
+        ],
+      })
+        .then(({ compiler, stats }) => {
+          const root = path.resolve(__dirname).replace(/\\/g, '/');
+          const logs = stats.compilation.logging
+            .get('copy-webpack-plugin')
+            .map((entry) =>
+              entry.args[0].replace(/\\/g, '/').split(root).join('.')
+            )
+            .sort();
+
+          expect(
+            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+          ).toEqual(expectedAssetKeys);
+          expect({ logs }).toMatchSnapshot('logs');
         })
         .then(done)
         .catch(done);
