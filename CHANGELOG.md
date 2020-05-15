@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.1...v6.0.0) (2020-05-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* minimum supported Node.js version is `10.13`, 
+* the plugin now accepts an object, you should change `new CopyPlugin(patterns, options)` to `new CopyPlugin({ patterns, options })`
+* migrate on `compilation.additionalAssets` hook
+* the `ignore` option was removed in favor `globOptions.ignore`
+* the `test` option was removed in favor the `transformPath` option
+* the `cache` option was renamed to the `cacheTransform` option, `cacheTransform` option should have only `directory` and `keys` properties when it is an object
+* global `context` and `ignore` options were removed in favor `patten.context` and `pattern.globOptions.ignore` options
+* the missing file error is now an error, before it was a warning
+* the `from` option now can only be a string, if you use `{ from: { glob: 'directory/**', dot: false } }` changed it to `{ from: 'directory/**', globOptions: { dot: false } }`
+* the `copyUnmodified` was removed without replacements
+* the `2` version of `webpack-dev-server` is not supported anymore
+* the `logLever` was removed in favor the `infrastructureLogging.level` option, please read the [documentation](https://webpack.js.org/configuration/other-options/#infrastructurelogginglevel)
+
+
+### Features
+
+* implement the `concurrency` option ([#466](https://github.com/webpack-contrib/copy-webpack-plugin/issues/466)) ([c176d7d](https://github.com/webpack-contrib/copy-webpack-plugin/commit/c176d7d124cf3c5ad372576d4b0f7fbf5e1d0afc))
+* implement the `directory` option for the `cacheTransform` option ([29254e3](https://github.com/webpack-contrib/copy-webpack-plugin/commit/29254e394cb695d89b477f44f3a3bf8c99c74ca7))
+* implement the `noErrorOnMissing` option ([#475](https://github.com/webpack-contrib/copy-webpack-plugin/issues/475)) ([e3803ce](https://github.com/webpack-contrib/copy-webpack-plugin/commit/e3803ceffe93361184efc9b799be4c9dfb4eb467))
+* migrate on webpack built-in logger ([#446](https://github.com/webpack-contrib/copy-webpack-plugin/issues/446)) ([5af02bc](https://github.com/webpack-contrib/copy-webpack-plugin/commit/5af02bcfc716b6bca96b569740a45221a974ae61))
+
+
+### Bug Fixes
+
+* asset size ([197b0d8](https://github.com/webpack-contrib/copy-webpack-plugin/commit/197b0d8d08e6ce976f645dade7641cfdcfc0781d))
+* persist assets between rebuilds ([57f3e61](https://github.com/webpack-contrib/copy-webpack-plugin/commit/57f3e618108c3a6c1f61f21186d69433ee51a561))
+
 ### [5.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.0...v5.1.1) (2019-12-12)
 
 
