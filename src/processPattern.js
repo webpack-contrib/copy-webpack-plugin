@@ -4,8 +4,6 @@ import globby from 'globby';
 
 import createPatternGlob from './utils/createPatternGlob';
 
-/* eslint-disable no-param-reassign */
-
 export default async function processPattern(globalRef, pattern) {
   const { logger, output, compilation } = globalRef;
 
@@ -22,20 +20,13 @@ export default async function processPattern(globalRef, pattern) {
       return Promise.resolve();
     }
 
-    const newWarning = new Error(
+    const missingError = new Error(
       `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
     );
-    const hasWarning = compilation.warnings.some(
-      // eslint-disable-next-line no-shadow
-      (warning) => warning.message === newWarning.message
-    );
 
-    // Only display the same message once
-    if (!hasWarning) {
-      logger.warn(newWarning.message);
+    logger.error(missingError.message);
 
-      compilation.warnings.push(newWarning);
-    }
+    compilation.errors.push(missingError);
 
     return Promise.resolve();
   }

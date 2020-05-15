@@ -86,7 +86,7 @@ describe('toType option', () => {
   it('should warn when file not found and stats is undefined', (done) => {
     runEmit({
       expectedAssetKeys: [],
-      expectedWarnings: [
+      expectedErrors: [
         new Error(
           `unable to locate 'nonexistent.txt' at '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
         ),

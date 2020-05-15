@@ -8,11 +8,7 @@ import { stat } from './utils/promisify';
 export default async function preProcessPattern(globalRef, pattern) {
   const { context, logger, inputFileSystem } = globalRef;
 
-  pattern =
-    typeof pattern === 'string'
-      ? { from: pattern }
-      : Object.assign({}, pattern);
-
+  pattern = typeof pattern === 'string' ? { from: pattern } : { ...pattern };
   pattern.to = pattern.to || '';
   pattern.context = pattern.context || context;
 

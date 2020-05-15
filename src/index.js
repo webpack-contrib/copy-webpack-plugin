@@ -27,7 +27,7 @@ class CopyPlugin {
       compilation.hooks.additionalAssets.tapAsync(
         'copy-webpack-plugin',
         async (callback) => {
-          logger.debug('start to adding additionalAssets');
+          logger.debug('start to adding additional assets');
 
           const globalRef = {
             context: compiler.options.context,
@@ -70,7 +70,7 @@ class CopyPlugin {
               )
             );
 
-            logger.debug('end to adding additionalAssets');
+            logger.debug('end to adding additional assets');
 
             callback();
           } catch (error) {

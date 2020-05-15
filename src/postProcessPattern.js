@@ -60,10 +60,6 @@ export default async function postProcessPattern(globalRef, pattern, file) {
   if (pattern.transform) {
     logger.log(`transforming content for '${file.absoluteFrom}'`);
 
-    // eslint-disable-next-line no-shadow
-    const transform = (content, absoluteFrom) =>
-      pattern.transform(content, absoluteFrom);
-
     if (pattern.cacheTransform) {
       if (!globalRef.cacheDir) {
         globalRef.cacheDir =
@@ -88,7 +84,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
 
         content = result.data;
       } catch (e) {
-        content = await transform(content, file.absoluteFrom);
+        content = await pattern.transform(content, file.absoluteFrom);
 
         logger.debug(`caching transformation for '${file.absoluteFrom}'`);
 
@@ -97,7 +93,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
           .then(() => content);
       }
     } else {
-      content = await transform(content, file.absoluteFrom);
+      content = await pattern.transform(content, file.absoluteFrom);
     }
   }
 
@@ -109,7 +105,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     // If it doesn't have an extension, remove it from the pattern
     // ie. [name].[ext] or [name][ext] both become [name]
     if (!path.extname(file.relativeFrom)) {
-      file.webpackTo = file.webpackTo.replace(/\.?\[ext\]/g, '');
+      file.webpackTo = file.webpackTo.replace(/\.?\[ext]/g, '');
     }
 
     file.webpackTo = loaderUtils.interpolateName(

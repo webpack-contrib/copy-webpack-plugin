@@ -6,7 +6,7 @@ import { readAssets } from './helpers';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
-describe('apply function', () => {
+describe('CopyPlugin', () => {
   describe('basic', () => {
     it('should copy a file', (done) => {
       runEmit({
@@ -221,43 +221,13 @@ describe('apply function', () => {
         .then(done)
         .catch(done);
     });
-  });
 
-  describe('difference path segment separation', () => {
     it('should work with linux path segment separation path when "from" is glob', (done) => {
       runEmit({
         expectedAssetKeys: ['directory/nested/nestedfile.txt'],
         patterns: [
           {
             from: 'directory/nested/*',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    // Windows path segment (\\) can not use as path segment in glob, but can use as dirname at linux
-    it.skip('should work with windows path segment separation path when "from" is glob', (done) => {
-      runEmit({
-        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
-        patterns: [
-          {
-            from: 'directory\\nested\\*',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    // Windows path segment (\\) can not use as path segment in glob, but can use as dirname at linux
-    it.skip('should work with mixed path segment separation path when "from" is glob', (done) => {
-      runEmit({
-        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
-        patterns: [
-          {
-            from: 'directory/nested\\*',
           },
         ],
       })
@@ -279,28 +249,6 @@ describe('apply function', () => {
         patterns: [
           {
             from: '!(directory)/**/*.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    // Windows path segment (\\) can not use as path segment in glob, but can use as dirname at linux
-    it.skip('should exclude path with windows path segment separators', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          '[!]/hello.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/nested/nestedfile.txt',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
-        ],
-        patterns: [
-          {
-            from: '!(directory)\\**\\*.txt',
           },
         ],
       })
@@ -538,33 +486,33 @@ describe('apply function', () => {
         .catch(done);
     });
   });
-});
 
-describe('logging', () => {
-  it('should logging', (done) => {
-    const expectedAssetKeys = ['file.txt'];
+  describe('logging', () => {
+    it('should logging', (done) => {
+      const expectedAssetKeys = ['file.txt'];
 
-    run({
-      patterns: [
-        {
-          from: 'file.txt',
-        },
-      ],
-    })
-      .then(({ compiler, stats }) => {
-        const root = path.resolve(__dirname).replace(/\\/g, '/');
-        const logs = stats.compilation.logging
-          .get('copy-webpack-plugin')
-          .map((entry) =>
-            entry.args[0].replace(/\\/g, '/').split(root).join('.')
-          );
-
-        expect(
-          Array.from(Object.keys(readAssets(compiler, stats))).sort()
-        ).toEqual(expectedAssetKeys);
-        expect({ result: logs }).toMatchSnapshot({ result: logs });
+      run({
+        patterns: [
+          {
+            from: 'file.txt',
+          },
+        ],
       })
-      .then(done)
-      .catch(done);
+        .then(({ compiler, stats }) => {
+          const root = path.resolve(__dirname).replace(/\\/g, '/');
+          const logs = stats.compilation.logging
+            .get('copy-webpack-plugin')
+            .map((entry) =>
+              entry.args[0].replace(/\\/g, '/').split(root).join('.')
+            );
+
+          expect(
+            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+          ).toEqual(expectedAssetKeys);
+          expect({ result: logs }).toMatchSnapshot({ result: logs });
+        })
+        .then(done)
+        .catch(done);
+    });
   });
 });

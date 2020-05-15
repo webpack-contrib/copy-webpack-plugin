@@ -62,11 +62,9 @@ function createPatternGlob(pattern, globalRef) {
       /* eslint-enable no-param-reassign */
 
       break;
-
-    default:
+    default: {
       logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
 
-      // eslint-disable-next-line no-case-declarations
       const contextDependencies = path.normalize(
         globParent(pattern.absoluteFrom)
       );
@@ -83,7 +81,8 @@ function createPatternGlob(pattern, globalRef) {
             getAbsoluteContext(pattern.context),
             pattern.fromOrigin
           );
-    /* eslint-enable no-param-reassign */
+      /* eslint-enable no-param-reassign */
+    }
   }
 
   return pattern;
