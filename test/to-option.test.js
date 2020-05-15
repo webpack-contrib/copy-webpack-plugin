@@ -329,6 +329,20 @@ describe('to option', () => {
         .then(done)
         .catch(done);
     });
+
+    it('should move a file to a new directory when "to" is empty', (done) => {
+      runEmit({
+        expectedAssetKeys: ['file.txt'],
+        patterns: [
+          {
+            from: 'file.txt',
+            to: '',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
   });
 
   describe('is a template', () => {

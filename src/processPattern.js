@@ -46,7 +46,7 @@ export default async function processPattern(globalRef, pattern) {
     if (pattern.toType === 'dir') {
       file.webpackTo = path.join(pattern.to, file.relativeFrom);
     } else if (pattern.toType === 'file') {
-      file.webpackTo = pattern.to || file.relativeFrom;
+      file.webpackTo = pattern.to;
     } else if (pattern.toType === 'template') {
       file.webpackTo = pattern.to;
     }
