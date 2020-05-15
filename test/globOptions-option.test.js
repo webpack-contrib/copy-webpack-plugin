@@ -5,7 +5,44 @@ import { runEmit } from './helpers/run';
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
 describe('from option', () => {
-  it('should move files exclude dot files', (done) => {
+  // Expected behavior from `globby`/`fast-glob`
+  it('should move files exclude dot files when "from" is a directory', (done) => {
+    runEmit({
+      expectedAssetKeys: ['.file.txt'],
+      patterns: [
+        {
+          from: '.file.txt',
+          globOptions: {
+            dot: false,
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should move files exclude dot files when "from" is a directory', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          from: 'directory',
+          globOptions: {
+            dot: false,
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should move files exclude dot files when "from" is a glob', (done) => {
     runEmit({
       expectedAssetKeys: ['file.txt'],
       patterns: [

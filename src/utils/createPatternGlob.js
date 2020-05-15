@@ -44,7 +44,6 @@ function createPatternGlob(pattern, globalRef) {
         pattern.globOptions.dot = true;
       }
       /* eslint-enable no-param-reassign */
-
       break;
     case 'file':
       logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
@@ -60,7 +59,6 @@ function createPatternGlob(pattern, globalRef) {
         pattern.globOptions.dot = true;
       }
       /* eslint-enable no-param-reassign */
-
       break;
     default: {
       logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
