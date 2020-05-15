@@ -18,11 +18,9 @@ function createPatternGlob(pattern, globalRef) {
 
   // eslint-disable-next-line no-param-reassign
   pattern.globOptions = {
-    ...{
-      cwd: pattern.context,
-      followSymbolicLinks: true,
-    },
+    ...{ followSymbolicLinks: true },
     ...(pattern.globOptions || {}),
+    ...{ cwd: pattern.context },
   };
 
   switch (pattern.fromType) {

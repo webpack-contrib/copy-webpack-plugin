@@ -4,7 +4,7 @@ import { runEmit } from './helpers/run';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
-describe('from option', () => {
+describe('globOptions option', () => {
   // Expected behavior from `globby`/`fast-glob`
   it('should move files exclude dot files when "from" is a directory', (done) => {
     runEmit({
@@ -73,9 +73,7 @@ describe('from option', () => {
       .then(done)
       .catch(done);
   });
-});
 
-describe('globOptions ignore option', () => {
   it('should ignore files when "from" is a file', (done) => {
     runEmit({
       expectedErrors: [
@@ -285,6 +283,126 @@ describe('globOptions ignore option', () => {
           from: 'file.txt',
           globOptions: {
             ignore: ['**/file.*'],
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should ignore the "cwd" option', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          from: 'directory',
+          globOptions: {
+            cwd: path.resolve(__dirname, 'fixtures/nested'),
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work with the "deep" option', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          from: 'directory',
+          globOptions: {
+            deep: 2,
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work with the "markDirectories" option', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          from: 'directory',
+          globOptions: {
+            markDirectories: true,
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work with the "objectMode" option', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          from: 'directory',
+          globOptions: {
+            objectMode: true,
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work with the "onlyDirectories" option', (done) => {
+    runEmit({
+      expectedAssetKeys: [],
+      patterns: [
+        {
+          from: 'directory',
+          globOptions: {
+            onlyDirectories: true,
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work with the "onlyFiles" option', (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ],
+      patterns: [
+        {
+          from: 'directory',
+          globOptions: {
+            onlyFiles: true,
           },
         },
       ],
