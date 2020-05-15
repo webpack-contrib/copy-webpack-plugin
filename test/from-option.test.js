@@ -67,7 +67,7 @@ describe('from option', () => {
     it('should move a file (symbolic link)', (done) => {
       runEmit({
         symlink: true,
-        expectedWarnings:
+        expectedErrors:
           process.platform === 'win32'
             ? [
                 new Error(
@@ -86,10 +86,10 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should warn when file not found', (done) => {
+    it('should throw an error on the missing file', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedWarnings: [
+        expectedErrors: [
           new Error(
             `unable to locate 'nonexistent.txt' at '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
           ),
@@ -206,7 +206,7 @@ describe('from option', () => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,
-        expectedWarnings:
+        expectedErrors:
           process.platform === 'win32'
             ? [
                 new Error(
@@ -290,10 +290,10 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should warn when directory not found', (done) => {
+    it('should throw an error on the missing directory', (done) => {
       runEmit({
         expectedAssetKeys: [],
-        expectedWarnings: [
+        expectedErrors: [
           new Error(
             `unable to locate 'nonexistent' at '${FIXTURES_DIR}${path.sep}nonexistent'`
           ),
@@ -471,7 +471,7 @@ describe('from option', () => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,
-        expectedWarnings:
+        expectedErrors:
           process.platform === 'win32'
             ? [
                 new Error(
@@ -493,6 +493,24 @@ describe('from option', () => {
         patterns: [
           {
             from: 'symlink/**/*.txt',
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should throw an error on the missing glob', (done) => {
+      runEmit({
+        expectedAssetKeys: [],
+        expectedErrors: [
+          new Error(
+            `unable to locate 'nonexistent${path.sep}**${path.sep}*' at '${FIXTURES_DIR}${path.sep}nonexistent${path.sep}**${path.sep}*'`
+          ),
+        ],
+        patterns: [
+          {
+            from: 'nonexistent/**/*',
           },
         ],
       })

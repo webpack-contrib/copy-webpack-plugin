@@ -41,7 +41,7 @@ describe('from option', () => {
 describe('globOptions ignore option', () => {
   it('should ignore files when "from" is a file', (done) => {
     runEmit({
-      expectedWarnings: [
+      expectedErrors: [
         new Error(
           `unable to locate 'file.txt' at '${FIXTURES_DIR}${path.sep}file.txt'`
         ),
@@ -218,7 +218,7 @@ describe('globOptions ignore option', () => {
 
   it('should ignores all files even if they start with a dot', (done) => {
     runEmit({
-      expectedWarnings: [
+      expectedErrors: [
         new Error(
           `unable to locate 'directory' at '${FIXTURES_DIR}${path.sep}directory${path.sep}**${path.sep}*'`
         ),
@@ -238,7 +238,7 @@ describe('globOptions ignore option', () => {
 
   it('should ignore files when "from" is a file (global ignore)', (done) => {
     runEmit({
-      expectedWarnings: [
+      expectedErrors: [
         new Error(
           `unable to locate 'file.txt' at '${FIXTURES_DIR}${path.sep}file.txt'`
         ),

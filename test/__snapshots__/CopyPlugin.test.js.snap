@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`logging should logging 1`] = `
+exports[`CopyPlugin logging should logging 1`] = `
 Object {
   "result": Array [
-    "start to adding additionalAssets",
+    "start to adding additional assets",
     "processing from: 'file.txt' to: '.'",
     "getting stats for './fixtures/file.txt' to determinate 'fromType'",
     "determined './fixtures/file.txt' is a file",
@@ -14,7 +14,7 @@ Object {
     "getting stats for './fixtures/file.txt' to write to assets",
     "reading './fixtures/file.txt' to write to assets",
     "writing 'file.txt' to compilation assets from './fixtures/file.txt'",
-    "end to adding additionalAssets",
+    "end to adding additional assets",
   ],
 }
 `;
