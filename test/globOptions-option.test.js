@@ -245,7 +245,6 @@ describe('globOptions ignore option', () => {
       ],
       patterns: [
         {
-          ignore: ['file.*'],
           from: 'file.txt',
           globOptions: {
             ignore: ['**/file.*'],

@@ -58,6 +58,7 @@ describe('validate options', () => {
             transform: () => {},
             cacheTransform: true,
             transformPath: () => {},
+            noErrorOnMissing: true,
           },
         ],
         [
@@ -173,6 +174,14 @@ describe('validate options', () => {
             },
             to: 'dir',
             context: 'context',
+          },
+        ],
+        [
+          {
+            from: '',
+            to: 'dir',
+            context: 'context',
+            noErrorOnMissing: 'true',
           },
         ],
       ],

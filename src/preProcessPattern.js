@@ -20,6 +20,8 @@ export default async function preProcessPattern(globalRef, pattern) {
     pattern.context = path.join(context, pattern.context);
   }
 
+  pattern.noErrorOnMissing = pattern.noErrorOnMissing || false;
+
   // Todo remove this in next major
   const isToDirectory =
     path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;

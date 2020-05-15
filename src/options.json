@@ -2,6 +2,7 @@
   "definitions": {
     "ObjectPattern": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "from": {
           "type": "string",
@@ -12,6 +13,9 @@
         },
         "context": {
           "type": "string"
+        },
+        "globOptions": {
+          "type": "object"
         },
         "toType": {
           "enum": ["dir", "file", "template"]
@@ -37,6 +41,9 @@
         },
         "transformPath": {
           "instanceof": "Function"
+        },
+        "noErrorOnMissing": {
+          "type": "boolean"
         }
       },
       "required": ["from"]
