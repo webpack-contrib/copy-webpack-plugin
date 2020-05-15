@@ -9,25 +9,23 @@ export default async function preProcessPattern(globalRef, pattern) {
   const { context, logger, inputFileSystem } = globalRef;
 
   pattern = typeof pattern === 'string' ? { from: pattern } : { ...pattern };
-  pattern.to = pattern.to || '';
-  pattern.context = pattern.context || context;
-
-  if (!path.isAbsolute(pattern.context)) {
-    pattern.context = path.join(context, pattern.context);
-  }
-
-  pattern.noErrorOnMissing = pattern.noErrorOnMissing || false;
-
-  // Todo remove this in next major
-  const isToDirectory =
-    path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
-
   pattern.fromOrigin = pattern.from;
   pattern.from = path.normalize(pattern.from);
-  pattern.context = path.normalize(pattern.context);
-  pattern.to = path.normalize(pattern.to);
+  pattern.to = path.normalize(
+    typeof pattern.to !== 'undefined' ? pattern.to : ''
+  );
+  pattern.context = path.normalize(
+    typeof pattern.context !== 'undefined'
+      ? !path.isAbsolute(pattern.context)
+        ? path.join(context, pattern.context)
+        : pattern.context
+      : context
+  );
 
   logger.debug(`processing from: '${pattern.from}' to: '${pattern.to}'`);
+
+  const isToDirectory =
+    path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
 
   switch (true) {
     // if toType already exists
@@ -63,10 +61,7 @@ export default async function preProcessPattern(globalRef, pattern) {
 
   if (stats.isDirectory()) {
     pattern.fromType = 'dir';
-    return pattern;
-  }
-
-  if (stats.isFile()) {
+  } else if (stats.isFile()) {
     pattern.fromType = 'file';
     pattern.stats = stats;
   }

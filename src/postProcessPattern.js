@@ -43,6 +43,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
   // If this came from a glob, add it to the file watchlist
   if (pattern.fromType === 'glob') {
     logger.debug(`add ${file.absoluteFrom} as fileDependencies`);
+
     compilation.fileDependencies.add(file.absoluteFrom);
   }
 
@@ -54,6 +55,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     content = await readFile(inputFileSystem, file.absoluteFrom);
   } catch (error) {
     compilation.errors.push(error);
+
     return;
   }
 
@@ -83,7 +85,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
         );
 
         content = result.data;
-      } catch (e) {
+      } catch (_ignoreError) {
         content = await pattern.transform(content, file.absoluteFrom);
 
         logger.debug(`caching transformation for '${file.absoluteFrom}'`);
@@ -133,13 +135,10 @@ export default async function postProcessPattern(globalRef, pattern, file) {
   }
 
   const targetPath = normalizePath(file.webpackTo);
-
   const source = new RawSource(content);
 
-  const hasAssetsAPI = typeof compilation.emitAsset === 'function';
-
   // For old version webpack 4
-  if (!hasAssetsAPI) {
+  if (typeof compilation.emitAsset !== 'function') {
     compilation.assets[targetPath] = source;
 
     return;
@@ -152,10 +151,12 @@ export default async function postProcessPattern(globalRef, pattern, file) {
       );
 
       compilation.updateAsset(targetPath, source);
+
       return;
     }
 
     logger.log(`skipping '${file.webpackTo}', because it already exists`);
+
     return;
   }
 
