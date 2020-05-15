@@ -421,7 +421,9 @@ module.exports = {
         {
           from: 'src/*.png',
           to: 'dest/',
-          transform(content, path) {
+          // The `content` argument is a [`Buffer`](https://nodejs.org/api/buffer.html) object, it could be converted to a `String` to be processed using `content.toString()`
+          // The `absoluteFrom` argument is a `String`, it is absolute path from where the file is being copied
+          transform(content, absoluteFrom) {
             return optimize(content);
           },
         },
