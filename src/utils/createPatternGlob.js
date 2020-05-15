@@ -18,11 +18,9 @@ function createPatternGlob(pattern, globalRef) {
 
   // eslint-disable-next-line no-param-reassign
   pattern.globOptions = {
-    ...{
-      cwd: pattern.context,
-      followSymbolicLinks: true,
-    },
+    ...{ followSymbolicLinks: true },
     ...(pattern.globOptions || {}),
+    ...{ cwd: pattern.context },
   };
 
   switch (pattern.fromType) {
@@ -44,7 +42,6 @@ function createPatternGlob(pattern, globalRef) {
         pattern.globOptions.dot = true;
       }
       /* eslint-enable no-param-reassign */
-
       break;
     case 'file':
       logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
@@ -60,7 +57,6 @@ function createPatternGlob(pattern, globalRef) {
         pattern.globOptions.dot = true;
       }
       /* eslint-enable no-param-reassign */
-
       break;
     default: {
       logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
