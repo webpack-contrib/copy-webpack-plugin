@@ -505,7 +505,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate 'nonexistent/**/*' at '${FIXTURES_DIR}${path.sep}nonexistent/**/*'`
+            `unable to locate 'nonexistent${path.sep}**${path.sep}*' at '${FIXTURES_DIR}${path.sep}nonexistent${path.sep}**${path.sep}*'`
           ),
         ],
         patterns: [
