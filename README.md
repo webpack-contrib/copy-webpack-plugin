@@ -74,18 +74,19 @@ module.exports = {
 
 ### Patterns
 
-|                Name                 |        Type         |                     Default                     | Description                                                                                           |
-| :---------------------------------: | :-----------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
-|           [`from`](#from)           |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
-|             [`to`](#to)             |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
-|        [`context`](#context)        |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|    [`globOptions`](#globoptions)    |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
-|         [`toType`](#totype)         |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
-|          [`force`](#force)          |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
-|        [`flatten`](#flatten)        |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
-|      [`transform`](#transform)      |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
-| [`cacheTransform`](#cacheTransform) | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
-|  [`transformPath`](#transformpath)  |    `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                    |
+|                  Name                   |        Type         |                     Default                     | Description                                                                                           |
+| :-------------------------------------: | :-----------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
+|             [`from`](#from)             |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
+|               [`to`](#to)               |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
+|          [`context`](#context)          |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
+|      [`globOptions`](#globoptions)      |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
+|           [`toType`](#totype)           |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
+|            [`force`](#force)            |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
+|          [`flatten`](#flatten)          |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
+|        [`transform`](#transform)        |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
+|   [`cacheTransform`](#cacheTransform)   | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|    [`transformPath`](#transformpath)    |    `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                    |
+| [`noErrorOnMissing`](#noerroronmissing) |     `{Boolean}`     |                     `false`                     | Doesn't generate an error on missing file(s).                                                         |
 
 #### `from`
 
@@ -526,6 +527,28 @@ module.exports = {
           transformPath(targetPath, absolutePath) {
             return Promise.resolve('newPath');
           },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+### `noErrorOnMissing`
+
+Type: `Boolean`
+Default: `false`
+
+Doesn't generate an error on missing file(s);
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, 'missing-file.txt'),
+          noErrorOnMissing: true,
         },
       ],
     }),

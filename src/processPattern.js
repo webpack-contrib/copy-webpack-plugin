@@ -8,6 +8,7 @@ import createPatternGlob from './utils/createPatternGlob';
 
 export default async function processPattern(globalRef, pattern) {
   const { logger, output, compilation } = globalRef;
+
   createPatternGlob(pattern, globalRef);
 
   logger.log(
@@ -17,6 +18,10 @@ export default async function processPattern(globalRef, pattern) {
   const paths = await globby(pattern.glob, pattern.globOptions);
 
   if (paths.length === 0) {
+    if (pattern.noErrorOnMissing) {
+      return Promise.resolve();
+    }
+
     const newWarning = new Error(
       `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
     );

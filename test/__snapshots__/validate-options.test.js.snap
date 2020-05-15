@@ -14,7 +14,7 @@ exports[`validate options should throw an error on the "options" option with "{"
 exports[`validate options should throw an error on the "patterns" option with "" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
+   [non-empty string | object { from, to?, context?, globOptions?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, noErrorOnMissing? }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[""]" value 1`] = `
@@ -25,6 +25,11 @@ exports[`validate options should throw an error on the "patterns" option with "[
 exports[`validate options should throw an error on the "patterns" option with "[]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an non-empty array."
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"","to":"dir","context":"context","noErrorOnMissing":"true"}]" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.patterns[0].noErrorOnMissing should be a boolean."
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"","to":"dir","context":"context"}]" value 1`] = `
@@ -61,7 +66,7 @@ exports[`validate options should throw an error on the "patterns" option with "[
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns[0] should be one of these:
-   non-empty string | object { from, to?, context?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, … }
+   non-empty string | object { from, to?, context?, globOptions?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, noErrorOnMissing? }
    Details:
     * options.patterns[0].cacheTransform should be one of these:
       boolean | object { … }
@@ -100,19 +105,19 @@ exports[`validate options should throw an error on the "patterns" option with "[
 exports[`validate options should throw an error on the "patterns" option with "{}" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
+   [non-empty string | object { from, to?, context?, globOptions?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, noErrorOnMissing? }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "true" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
+   [non-empty string | object { from, to?, context?, globOptions?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, noErrorOnMissing? }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "true" value 2`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns should be an array:
-   [non-empty string | object { from, to?, context?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, … }, ...] (should not have fewer than 1 item)"
+   [non-empty string | object { from, to?, context?, globOptions?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, noErrorOnMissing? }, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "unknown" option with "/test/" value 1`] = `
