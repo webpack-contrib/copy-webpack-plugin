@@ -37,6 +37,12 @@ exports[`validate options should throw an error on the "patterns" option with "[
  - options.patterns[0].from should be an non-empty string."
 `;
 
+exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","cacheTransform":{"foo":"bar"}}]" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.patterns[0].cacheTransform has an unknown property 'foo'. These properties are valid:
+   object { directory?, keys? }"
+`;
+
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","flatten":"true"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns[0].flatten should be a boolean."
@@ -69,11 +75,12 @@ exports[`validate options should throw an error on the "patterns" option with "[
    non-empty string | object { from, to?, context?, globOptions?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, noErrorOnMissing? }
    Details:
     * options.patterns[0].cacheTransform should be one of these:
-      boolean | object { … }
+      boolean | string | object { directory?, keys? }
       Details:
        * options.patterns[0].cacheTransform should be a boolean.
+       * options.patterns[0].cacheTransform should be a string.
        * options.patterns[0].cacheTransform should be an object:
-         object { … }"
+         object { directory?, keys? }"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":true}]" value 1`] = `

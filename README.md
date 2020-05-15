@@ -74,19 +74,19 @@ module.exports = {
 
 ### Patterns
 
-|                  Name                   |        Type         |                     Default                     | Description                                                                                           |
-| :-------------------------------------: | :-----------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
-|             [`from`](#from)             |     `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
-|               [`to`](#to)               |     `{String}`      |            `compiler.options.output`            | Output path.                                                                                          |
-|          [`context`](#context)          |     `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|      [`globOptions`](#globoptions)      |     `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
-|           [`toType`](#totype)           |     `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
-|            [`force`](#force)            |     `{Boolean}`     |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
-|          [`flatten`](#flatten)          |     `{Boolean}`     |                     `false`                     | Removes all directory references and only copies file names.                                          |
-|        [`transform`](#transform)        |    `{Function}`     |                   `undefined`                   | Allows to modify the file contents.                                                                   |
-|   [`cacheTransform`](#cacheTransform)   | `{Boolean\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
-|    [`transformPath`](#transformpath)    |    `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                    |
-| [`noErrorOnMissing`](#noerroronmissing) |     `{Boolean}`     |                     `false`                     | Doesn't generate an error on missing file(s).                                                         |
+|                  Name                   |            Type             |                     Default                     | Description                                                                                           |
+| :-------------------------------------: | :-------------------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
+|             [`from`](#from)             |         `{String}`          |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
+|               [`to`](#to)               |         `{String}`          |            `compiler.options.output`            | Output path.                                                                                          |
+|          [`context`](#context)          |         `{String}`          | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
+|      [`globOptions`](#globoptions)      |         `{Object}`          |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
+|           [`toType`](#totype)           |         `{String}`          |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
+|            [`force`](#force)            |         `{Boolean}`         |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
+|          [`flatten`](#flatten)          |         `{Boolean}`         |                     `false`                     | Removes all directory references and only copies file names.                                          |
+|        [`transform`](#transform)        |        `{Function}`         |                   `undefined`                   | Allows to modify the file contents.                                                                   |
+|   [`cacheTransform`](#cacheTransform)   | `{Boolean\|String\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|    [`transformPath`](#transformpath)    |        `{Function}`         |                   `undefined`                   | Allows to modify the writing path.                                                                    |
+| [`noErrorOnMissing`](#noerroronmissing) |         `{Boolean}`         |                     `false`                     | Doesn't generate an error on missing file(s).                                                         |
 
 #### `from`
 
@@ -456,11 +456,15 @@ module.exports = {
 
 #### `cacheTransform`
 
-Type: `Boolean|Object`
+Type: `Boolean|String|Object`
 Default: `false`
 
-Enable/disable `transform` caching. You can use `{ cacheTransform: { key: 'my-cache-key' } }` to invalidate the cache.
+Enable/disable and configure caching.
 Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
+
+##### `Boolean`
+
+Enables/Disable `transform` caching.
 
 **webpack.config.js**
 
@@ -476,6 +480,132 @@ module.exports = {
             return optimize(content);
           },
           cacheTransform: true,
+        },
+      ],
+    }),
+  ],
+};
+```
+
+##### `String`
+
+Enables `transform` caching and setup cache directory.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return optimize(content);
+          },
+          // Should be absolute
+          cacheTransform: path.resolve(__dirname, 'cache-directory'),
+        },
+      ],
+    }),
+  ],
+};
+```
+
+##### `Object`
+
+Enables `transform` caching and setup cache directory and invalidation keys.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return optimize(content);
+          },
+          cacheTransform: {
+            directory: path.resolve(__dirname, 'cache-directory'),
+            keys: {
+              // May be useful for invalidating cache based on external values
+              // For example, you can invalid cache based on `process.version` - { node: process.version }
+              key: 'value',
+            },
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+You can setup invalidation keys using a function.
+
+Simple function:
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return optimize(content);
+          },
+          cacheTransform: {
+            directory: path.resolve(__dirname, 'cache-directory'),
+            keys: (defaultCacheKeys, absoluteFrom) => {
+              const keys = getCustomCacheInvalidationKeysSync();
+
+              return {
+                ...defaultCacheKeys,
+                keys,
+              };
+            },
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Async function:
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: 'src/*.png',
+          to: 'dest/',
+          transform(content, path) {
+            return optimize(content);
+          },
+          cacheTransform: {
+            directory: path.resolve(__dirname, 'cache-directory'),
+            keys: async (defaultCacheKeys, absoluteFrom) => {
+              const keys = await getCustomCacheInvalidationKeysAsync();
+
+              return {
+                ...defaultCacheKeys,
+                keys,
+              };
+            },
+          },
         },
       ],
     }),

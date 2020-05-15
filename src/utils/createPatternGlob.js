@@ -17,13 +17,13 @@ function createPatternGlob(pattern, globalRef) {
   const { logger, compilation } = globalRef;
 
   // eslint-disable-next-line no-param-reassign
-  pattern.globOptions = Object.assign(
-    {
+  pattern.globOptions = {
+    ...{
       cwd: pattern.context,
       followSymbolicLinks: true,
     },
-    pattern.globOptions || {}
-  );
+    ...(pattern.globOptions || {}),
+  };
 
   switch (pattern.fromType) {
     case 'dir':

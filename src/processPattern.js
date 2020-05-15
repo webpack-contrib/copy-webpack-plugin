@@ -32,10 +32,7 @@ export default async function processPattern(globalRef, pattern) {
   }
 
   return paths.map((from) => {
-    const file = {
-      force: pattern.force,
-      absoluteFrom: path.resolve(pattern.context, from),
-    };
+    const file = { absoluteFrom: path.resolve(pattern.context, from) };
 
     file.relativeFrom = path.relative(pattern.context, file.absoluteFrom);
 
