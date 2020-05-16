@@ -128,7 +128,7 @@ describe('from option', () => {
       runEmit({
         expectedAssetKeys: [
           '.file.txt',
-          '[!]/hello.txt',
+          '[(){}[]!+@escaped-test^$]/hello.txt',
           '[special?directory]/(special-*file).txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',
@@ -158,7 +158,7 @@ describe('from option', () => {
       runEmit({
         expectedAssetKeys: [
           '.file.txt',
-          '[!]/hello.txt',
+          '[(){}[]!+@escaped-test^$]/hello.txt',
           '[special?directory]/(special-*file).txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',
@@ -339,7 +339,7 @@ describe('from option', () => {
     it('should move files using globstar', (done) => {
       runEmit({
         expectedAssetKeys: [
-          '[!]/hello.txt',
+          '[(){}[]!+@escaped-test^$]/hello.txt',
           'binextension.bin',
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
@@ -367,7 +367,7 @@ describe('from option', () => {
     it('should move files using globstar and contains an absolute path', (done) => {
       runEmit({
         expectedAssetKeys: [
-          '[!]/hello.txt',
+          '[(){}[]!+@escaped-test^$]/hello.txt',
           'file.txt',
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
@@ -392,7 +392,7 @@ describe('from option', () => {
     it('should move files in nested directory using globstar', (done) => {
       runEmit({
         expectedAssetKeys: [
-          'nested/[!]/hello-31d6cf.txt',
+          'nested/[(){}[]!+@escaped-test^$]/hello-31d6cf.txt',
           'nested/binextension-31d6cf.bin',
           'nested/dir (86)/file-31d6cf.txt',
           'nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir-31d6cf.txt',

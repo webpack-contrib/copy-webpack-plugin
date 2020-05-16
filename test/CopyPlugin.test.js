@@ -238,7 +238,7 @@ describe('CopyPlugin', () => {
     it('should exclude path with linux path segment separators', (done) => {
       runEmit({
         expectedAssetKeys: [
-          '[!]/hello.txt',
+          '[(){}[]!+@escaped-test^$]/hello.txt',
           '[special?directory]/(special-*file).txt',
           '[special?directory]/directoryfile.txt',
           '[special?directory]/nested/nestedfile.txt',

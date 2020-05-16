@@ -2,15 +2,10 @@ import path from 'path';
 
 import normalizePath from 'normalize-path';
 import globParent from 'glob-parent';
+import fastGlob from 'fast-glob';
 
 function getAbsoluteContext(context) {
-  const result = normalizePath(path.resolve(context));
-
-  return result.replace(
-    // eslint-disable-next-line no-useless-escape
-    /[\*|\?|\!|\||\@|\+|\(|\)|\[|\]|\{|\}]/g,
-    (substring) => `\\${substring}`
-  );
+  return fastGlob.escapePath(normalizePath(path.resolve(context)));
 }
 
 function createPatternGlob(pattern, globalRef) {
