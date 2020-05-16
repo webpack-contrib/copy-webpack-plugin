@@ -37,8 +37,10 @@ class CopyPlugin {
             output: compiler.options.output.path,
           };
 
+          let assets;
+
           try {
-            const assets = await Promise.all(
+            assets = await Promise.all(
               this.patterns.map((pattern) =>
                 limit(async () => {
                   const patternAfterPreProcess = await preProcessPattern(
@@ -69,62 +71,65 @@ class CopyPlugin {
                 })
               )
             );
+          } catch (error) {
+            compilation.errors.push(error);
 
-            // Avoid writing assets inside `p-limit`, because it creates concurrency.
-            // It could potentially lead to an error - "Multiple assets emit different content to the same filename"
-            assets
-              .reduce((acc, val) => acc.concat(val), [])
-              .filter(Boolean)
-              .forEach((asset) => {
-                const {
-                  absoluteFrom,
-                  targetPath,
-                  webpackTo,
-                  source,
-                  force,
-                } = asset;
+            callback();
 
-                // For old version webpack 4
-                /* istanbul ignore if */
-                if (typeof compilation.emitAsset !== 'function') {
-                  // eslint-disable-next-line no-param-reassign
-                  compilation.assets[targetPath] = source;
+            return;
+          }
 
-                  return;
-                }
+          // Avoid writing assets inside `p-limit`, because it creates concurrency.
+          // It could potentially lead to an error - "Multiple assets emit different content to the same filename"
+          assets
+            .reduce((acc, val) => acc.concat(val), [])
+            .filter(Boolean)
+            .forEach((asset) => {
+              const {
+                absoluteFrom,
+                targetPath,
+                webpackTo,
+                source,
+                force,
+              } = asset;
 
-                if (compilation.getAsset(targetPath)) {
-                  if (force) {
-                    logger.log(
-                      `force updating '${webpackTo}' to compilation assets from '${absoluteFrom}'`
-                    );
+              // For old version webpack 4
+              /* istanbul ignore if */
+              if (typeof compilation.emitAsset !== 'function') {
+                // eslint-disable-next-line no-param-reassign
+                compilation.assets[targetPath] = source;
 
-                    compilation.updateAsset(targetPath, source);
+                return;
+              }
 
-                    return;
-                  }
-
+              if (compilation.getAsset(targetPath)) {
+                if (force) {
                   logger.log(
-                    `skipping '${webpackTo}', because it already exists`
+                    `force updating '${webpackTo}' to compilation assets from '${absoluteFrom}'`
                   );
+
+                  compilation.updateAsset(targetPath, source);
 
                   return;
                 }
 
                 logger.log(
-                  `writing '${webpackTo}' to compilation assets from '${absoluteFrom}'`
+                  `skipping '${webpackTo}', because it already exists`
                 );
 
-                compilation.emitAsset(targetPath, source);
-              });
+                return;
+              }
 
-            logger.debug('end to adding additional assets');
+              logger.log(
+                `writing '${webpackTo}' to compilation assets from '${absoluteFrom}'`
+              );
 
-            callback();
-          } catch (error) {
-            compilation.errors.push(error);
-            callback();
-          }
+              compilation.emitAsset(targetPath, source);
+            });
+
+          logger.debug('end to adding additional assets');
+
+          callback();
         }
       );
     });
