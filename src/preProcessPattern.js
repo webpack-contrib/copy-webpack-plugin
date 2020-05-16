@@ -63,7 +63,6 @@ export default async function preProcessPattern(globalRef, pattern) {
     pattern.fromType = 'dir';
   } else if (stats.isFile()) {
     pattern.fromType = 'file';
-    pattern.stats = stats;
   }
 
   return pattern;

@@ -18,14 +18,6 @@ import { readFile } from './utils/promisify';
 export default async function postProcessPattern(globalRef, pattern, file) {
   const { logger, compilation, inputFileSystem } = globalRef;
 
-  if (file.stats.isDirectory()) {
-    logger.debug(
-      `skipping '${file.absoluteFrom}' because it is empty directory`
-    );
-
-    return;
-  }
-
   // If this came from a glob, add it to the file watchlist
   if (pattern.fromType === 'glob') {
     logger.debug(`add ${file.absoluteFrom} as fileDependencies`);

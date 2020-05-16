@@ -15,13 +15,8 @@ function createPatternGlob(pattern, globalRef) {
   pattern.globOptions = {
     ...{ followSymbolicLinks: true },
     ...(pattern.globOptions || {}),
-    ...{ cwd: pattern.context },
+    ...{ cwd: pattern.context, objectMode: true },
   };
-
-  if (!pattern.stats) {
-    // eslint-disable-next-line no-param-reassign
-    pattern.globOptions.stats = true;
-  }
 
   switch (pattern.fromType) {
     case 'dir':
