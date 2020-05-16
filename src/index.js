@@ -38,7 +38,7 @@ class CopyPlugin {
           };
 
           try {
-            await Promise.all(
+            const assets = await Promise.all(
               this.patterns.map((pattern) =>
                 limit(async () => {
                   const patternAfterPreProcess = await preProcessPattern(
@@ -69,6 +69,54 @@ class CopyPlugin {
                 })
               )
             );
+
+            // Avoid writing assets inside `p-limit`, because it creates concurrency.
+            // It could potentially lead to an error - "Multiple assets emit different content to the same filename"
+            assets
+              .reduce((acc, val) => acc.concat(val), [])
+              .filter(Boolean)
+              .forEach((asset) => {
+                const {
+                  absoluteFrom,
+                  targetPath,
+                  webpackTo,
+                  source,
+                  force,
+                } = asset;
+
+                // For old version webpack 4
+                /* istanbul ignore if */
+                if (typeof compilation.emitAsset !== 'function') {
+                  // eslint-disable-next-line no-param-reassign
+                  compilation.assets[targetPath] = source;
+
+                  return;
+                }
+
+                if (compilation.getAsset(targetPath)) {
+                  if (force) {
+                    logger.log(
+                      `force updating '${webpackTo}' to compilation assets from '${absoluteFrom}'`
+                    );
+
+                    compilation.updateAsset(targetPath, source);
+
+                    return;
+                  }
+
+                  logger.log(
+                    `skipping '${webpackTo}', because it already exists`
+                  );
+
+                  return;
+                }
+
+                logger.log(
+                  `writing '${webpackTo}' to compilation assets from '${absoluteFrom}'`
+                );
+
+                compilation.emitAsset(targetPath, source);
+              });
 
             logger.debug('end to adding additional assets');
 

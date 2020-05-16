@@ -7,7 +7,6 @@ import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
 import normalizePath from 'normalize-path';
-
 import { RawSource } from 'webpack-sources';
 
 import { version } from '../package.json';
@@ -148,36 +147,10 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     );
   }
 
-  const targetPath = normalizePath(file.webpackTo);
-  const source = new RawSource(content);
+  file.source = new RawSource(content);
+  file.targetPath = normalizePath(file.webpackTo);
+  file.force = pattern.force;
 
-  // For old version webpack 4
-  /* istanbul ignore if */
-  if (typeof compilation.emitAsset !== 'function') {
-    compilation.assets[targetPath] = source;
-
-    return;
-  }
-
-  if (compilation.getAsset(targetPath)) {
-    if (pattern.force) {
-      logger.log(
-        `force updating '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
-      );
-
-      compilation.updateAsset(targetPath, source);
-
-      return;
-    }
-
-    logger.log(`skipping '${file.webpackTo}', because it already exists`);
-
-    return;
-  }
-
-  logger.log(
-    `writing '${file.webpackTo}' to compilation assets from '${file.absoluteFrom}'`
-  );
-
-  compilation.emitAsset(targetPath, source);
+  // eslint-disable-next-line consistent-return
+  return file;
 }
