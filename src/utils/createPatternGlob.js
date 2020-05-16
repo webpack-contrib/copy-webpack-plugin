@@ -15,7 +15,7 @@ function createPatternGlob(pattern, globalRef) {
   pattern.globOptions = {
     ...{ followSymbolicLinks: true },
     ...(pattern.globOptions || {}),
-    ...{ cwd: pattern.context },
+    ...{ cwd: pattern.context, objectMode: true },
   };
 
   switch (pattern.fromType) {

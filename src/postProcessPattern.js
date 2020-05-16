@@ -11,36 +11,12 @@ import { RawSource } from 'webpack-sources';
 
 import { version } from '../package.json';
 
-import { stat, readFile } from './utils/promisify';
+import { readFile } from './utils/promisify';
 
 /* eslint-disable no-param-reassign */
 
 export default async function postProcessPattern(globalRef, pattern, file) {
   const { logger, compilation, inputFileSystem } = globalRef;
-
-  logger.debug(`getting stats for '${file.absoluteFrom}' to write to assets`);
-
-  const getStats = pattern.stats
-    ? pattern.stats
-    : stat(inputFileSystem, file.absoluteFrom);
-
-  let stats;
-
-  try {
-    stats = await getStats;
-  } catch (error) {
-    compilation.errors.push(error);
-
-    return;
-  }
-
-  if (stats.isDirectory()) {
-    logger.debug(
-      `skipping '${file.absoluteFrom}' because it is empty directory`
-    );
-
-    return;
-  }
 
   // If this came from a glob, add it to the file watchlist
   if (pattern.fromType === 'glob') {

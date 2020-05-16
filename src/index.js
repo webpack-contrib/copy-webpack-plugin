@@ -56,15 +56,15 @@ class CopyPlugin {
                   }
 
                   return Promise.all(
-                    files.filter(Boolean).map((file) =>
-                      limit(() => {
-                        return postProcessPattern(
+                    files
+                      .filter(Boolean)
+                      .map((file) =>
+                        postProcessPattern(
                           globalRef,
                           patternAfterPreProcess,
                           file
-                        );
-                      })
-                    )
+                        )
+                      )
                   );
                 })
               )

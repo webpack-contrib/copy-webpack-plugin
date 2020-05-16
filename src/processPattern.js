@@ -31,37 +31,38 @@ export default async function processPattern(globalRef, pattern) {
     return Promise.resolve();
   }
 
-  return paths.map((filepath) => {
-    let from;
+  return (
+    paths
+      // Exclude directories
+      .filter((item) => item.dirent.isFile())
+      .map((item) => {
+        const from = item.path;
 
-    if (typeof filepath === 'string') {
-      from = filepath;
-    } else {
-      from = filepath.path;
-    }
+        const file = { absoluteFrom: path.resolve(pattern.context, from) };
 
-    const file = { absoluteFrom: path.resolve(pattern.context, from) };
+        file.relativeFrom = path.relative(pattern.context, file.absoluteFrom);
 
-    file.relativeFrom = path.relative(pattern.context, file.absoluteFrom);
+        if (pattern.flatten) {
+          file.relativeFrom = path.basename(file.relativeFrom);
+        }
 
-    if (pattern.flatten) {
-      file.relativeFrom = path.basename(file.relativeFrom);
-    }
+        logger.debug(`found ${from}`);
 
-    logger.debug(`found ${from}`);
+        // Change the to path to be relative for webpack
+        file.webpackTo =
+          pattern.toType === 'dir'
+            ? path.join(pattern.to, file.relativeFrom)
+            : pattern.to;
 
-    // Change the to path to be relative for webpack
-    file.webpackTo =
-      pattern.toType === 'dir'
-        ? path.join(pattern.to, file.relativeFrom)
-        : pattern.to;
+        if (path.isAbsolute(file.webpackTo)) {
+          file.webpackTo = path.relative(output, file.webpackTo);
+        }
 
-    if (path.isAbsolute(file.webpackTo)) {
-      file.webpackTo = path.relative(output, file.webpackTo);
-    }
+        logger.log(
+          `determined that '${from}' should write to '${file.webpackTo}'`
+        );
 
-    logger.log(`determined that '${from}' should write to '${file.webpackTo}'`);
-
-    return file;
-  });
+        return file;
+      })
+  );
 }
