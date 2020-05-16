@@ -18,6 +18,11 @@ function createPatternGlob(pattern, globalRef) {
     ...{ cwd: pattern.context },
   };
 
+  if (!pattern.stats) {
+    // eslint-disable-next-line no-param-reassign
+    pattern.globOptions.stats = true;
+  }
+
   switch (pattern.fromType) {
     case 'dir':
       logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);

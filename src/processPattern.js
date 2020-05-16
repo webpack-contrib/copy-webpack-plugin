@@ -31,16 +31,19 @@ export default async function processPattern(globalRef, pattern) {
     return Promise.resolve();
   }
 
-  return paths.map((filepath) => {
+  return paths.map((item) => {
     let from;
 
-    if (typeof filepath === 'string') {
-      from = filepath;
+    if (typeof item === 'string') {
+      from = item;
     } else {
-      from = filepath.path;
+      from = item.path;
     }
 
-    const file = { absoluteFrom: path.resolve(pattern.context, from) };
+    const file = {
+      stats: pattern.stats ? pattern.stats : item.stats,
+      absoluteFrom: path.resolve(pattern.context, from),
+    };
 
     file.relativeFrom = path.relative(pattern.context, file.absoluteFrom);
 
