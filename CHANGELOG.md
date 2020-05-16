@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.0.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.0.0...v6.0.1) (2020-05-16)
+
+
+### Bug Fixes
+
+* concurrency writing assets ([#484](https://github.com/webpack-contrib/copy-webpack-plugin/issues/484)) ([bfc712d](https://github.com/webpack-contrib/copy-webpack-plugin/commit/bfc712d77b4ba66caf72341e31a1dd5957bfa36c))
+* escaping special characters in the `context` option ([0e62695](https://github.com/webpack-contrib/copy-webpack-plugin/commit/0e62695ee32216a133920f2ab5a1282e6a4a038b))
+
 ## [6.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.1...v6.0.0) (2020-05-15)
 
 
