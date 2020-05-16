@@ -40,16 +40,8 @@ export default async function processPattern(globalRef, pattern) {
 
         logger.debug(`found ${from}`);
 
-        // eslint-disable-next-line no-console
-        console.log(pattern.context);
-        // eslint-disable-next-line no-console
-        console.log(from);
-        // eslint-disable-next-line no-console
-        console.log(path.resolve(pattern.context, from));
-        // eslint-disable-next-line no-console
-        console.log(path.normalize(from));
-
-        const absoluteFrom = path.normalize(from);
+        // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
+        const absoluteFrom = path.resolve(pattern.context, from);
         const relativeFrom = pattern.flatten
           ? path.basename(absoluteFrom)
           : path.relative(pattern.context, absoluteFrom);
