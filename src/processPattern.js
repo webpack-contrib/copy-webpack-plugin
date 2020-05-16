@@ -36,17 +36,16 @@ export default async function processPattern(globalRef, pattern) {
       // Exclude directories
       .filter((item) => item.dirent.isFile())
       .map((item) => {
-        const from = item.path;
+        const absoluteFrom = path.normalize(item.path);
 
-        const file = { absoluteFrom: path.resolve(pattern.context, from) };
+        logger.debug(`found ${absoluteFrom}`);
 
-        file.relativeFrom = path.relative(pattern.context, file.absoluteFrom);
-
-        if (pattern.flatten) {
-          file.relativeFrom = path.basename(file.relativeFrom);
-        }
-
-        logger.debug(`found ${from}`);
+        const file = {
+          absoluteFrom,
+          relativeFrom: pattern.flatten
+            ? path.basename(absoluteFrom)
+            : path.relative(pattern.context, absoluteFrom),
+        };
 
         // Change the to path to be relative for webpack
         file.webpackTo =
@@ -58,8 +57,11 @@ export default async function processPattern(globalRef, pattern) {
           file.webpackTo = path.relative(output, file.webpackTo);
         }
 
+        // eslint-disable-next-line no-console
+        console.log(file);
+
         logger.log(
-          `determined that '${from}' should write to '${file.webpackTo}'`
+          `determined that '${absoluteFrom}' should write to '${file.webpackTo}'`
         );
 
         return file;
