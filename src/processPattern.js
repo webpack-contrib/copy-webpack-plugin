@@ -38,31 +38,25 @@ export default async function processPattern(globalRef, pattern) {
       .map((item) => {
         const from = item.path;
 
-        const file = { absoluteFrom: path.resolve(pattern.context, from) };
-
-        file.relativeFrom = path.relative(pattern.context, file.absoluteFrom);
-
-        if (pattern.flatten) {
-          file.relativeFrom = path.basename(file.relativeFrom);
-        }
-
         logger.debug(`found ${from}`);
 
-        // Change the to path to be relative for webpack
-        file.webpackTo =
+        // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
+        const absoluteFrom = path.resolve(pattern.context, from);
+        const relativeFrom = pattern.flatten
+          ? path.basename(absoluteFrom)
+          : path.relative(pattern.context, absoluteFrom);
+        let webpackTo =
           pattern.toType === 'dir'
-            ? path.join(pattern.to, file.relativeFrom)
+            ? path.join(pattern.to, relativeFrom)
             : pattern.to;
 
-        if (path.isAbsolute(file.webpackTo)) {
-          file.webpackTo = path.relative(output, file.webpackTo);
+        if (path.isAbsolute(webpackTo)) {
+          webpackTo = path.relative(output, webpackTo);
         }
 
-        logger.log(
-          `determined that '${from}' should write to '${file.webpackTo}'`
-        );
+        logger.log(`determined that '${from}' should write to '${webpackTo}'`);
 
-        return file;
+        return { absoluteFrom, relativeFrom, webpackTo };
       })
   );
 }
