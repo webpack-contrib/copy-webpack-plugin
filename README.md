@@ -876,6 +876,35 @@ Result:
 nested-file.txt
 ```
 
+#### Ignoring files
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.posix.join(
+            path.resolve(__dirname, 'src').replace(/\\/g, '/'),
+            '**/*'
+          ),
+          globOptions: {
+            ignore: [
+              // Ignore all `txt` files
+              '**/*.txt',
+              // Ignore all files in all subdirectories
+              '**/subdir/**',
+            ],
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
 ## Contributing
 
 Please take a moment to read our contributing guidelines if you haven't yet done so.
