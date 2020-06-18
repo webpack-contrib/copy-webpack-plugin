@@ -1,7 +1,7 @@
 export default class ChildCompiler {
   // eslint-disable-next-line class-methods-use-this
   apply(compiler) {
-    compiler.plugin('make', (compilation, callback) => {
+    compiler.hooks.make.tapAsync('Child Compiler', (compilation, callback) => {
       const outputOptions = {
         filename: 'output.js',
         publicPath: compilation.outputOptions.publicPath,
