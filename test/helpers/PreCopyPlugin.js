@@ -6,7 +6,7 @@ class PreCopyPlugin {
   apply(compiler) {
     const plugin = { name: 'PreCopyPlugin' };
 
-    compiler.hooks.compilation.tap(plugin, (compilation) => {
+    compiler.hooks.thisCompilation.tap(plugin, (compilation) => {
       compilation.hooks.additionalAssets.tapAsync(
         'copy-webpack-plugin',
         (callback) => {

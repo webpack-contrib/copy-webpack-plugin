@@ -4,6 +4,7 @@ import path from 'path';
 
 import CopyPlugin from '../../src';
 
+import ChildCompilerPlugin from './ChildCompiler';
 import PreCopyPlugin from './PreCopyPlugin';
 
 import removeIllegalCharacterForWindows from './removeIllegalCharacterForWindows';
@@ -47,6 +48,10 @@ function run(opts) {
     new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
       compiler
     );
+
+    if (opts.withChildCompilation) {
+      new ChildCompilerPlugin().apply(compiler);
+    }
 
     // Execute the functions in series
     return compile(compiler)
@@ -188,11 +193,7 @@ function runChange(opts) {
 
       resolve(watching);
     });
-    // eslint-disable-next-line no-unused-vars
-  }).then((watching) => {
-    // eslint-disable-next-line no-param-reassign
-    watching = null;
-
+  }).then(() => {
     fs.unlinkSync(opts.newFileLoc1);
     fs.unlinkSync(opts.newFileLoc2);
   });
