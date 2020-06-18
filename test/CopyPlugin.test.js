@@ -1,5 +1,7 @@
 import path from 'path';
 
+import CopyPlugin from '../src';
+
 import { run, runEmit, runChange } from './helpers/run';
 
 import { readAssets } from './helpers';
@@ -482,6 +484,30 @@ describe('CopyPlugin', () => {
           },
         ],
       })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should run once on child compilation', (done) => {
+      const expectedAssetKeys = ['file.txt'];
+      const spy = jest.spyOn(CopyPlugin, 'apply');
+
+      run({
+        withChildCompilation: true,
+        patterns: [
+          {
+            from: 'file.txt',
+          },
+        ],
+      })
+        .then(({ compiler, stats }) => {
+          // expect(spy).toHaveBeenCalledTimes(1);
+          expect(
+            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+          ).toEqual(expectedAssetKeys);
+
+          spy.mockRestore();
+        })
         .then(done)
         .catch(done);
     });

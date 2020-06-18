@@ -21,7 +21,7 @@ class CopyPlugin {
     const plugin = { name: 'CopyPlugin' };
     const limit = pLimit(this.options.concurrency || 100);
 
-    compiler.hooks.compilation.tap(plugin, (compilation) => {
+    compiler.hooks.thisCompilation.tap(plugin, (compilation) => {
       const logger = compilation.getLogger('copy-webpack-plugin');
 
       compilation.hooks.additionalAssets.tapAsync(
