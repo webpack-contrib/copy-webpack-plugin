@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.0.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.0.2...v6.0.3) (2020-06-30)
+
+
+### Bug Fixes
+
+* do not execute on a child compiler ([42f27c7](https://github.com/webpack-contrib/copy-webpack-plugin/commit/42f27c777cc37dc2ce4af399cb2a943e9e62172e))
+
 ### [6.0.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.0.1...v6.0.2) (2020-06-03)
 
 
