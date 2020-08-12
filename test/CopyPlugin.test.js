@@ -241,9 +241,9 @@ describe('CopyPlugin', () => {
       runEmit({
         expectedAssetKeys: [
           '[(){}[]!+@escaped-test^$]/hello.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/nested/nestedfile.txt',
+          '[special$directory]/(special-*file).txt',
+          '[special$directory]/directoryfile.txt',
+          '[special$directory]/nested/nestedfile.txt',
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
           'dir (86)/nesteddir/nestedfile.txt',

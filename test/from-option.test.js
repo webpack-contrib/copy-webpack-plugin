@@ -129,9 +129,9 @@ describe('from option', () => {
         expectedAssetKeys: [
           '.file.txt',
           '[(){}[]!+@escaped-test^$]/hello.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/nested/nestedfile.txt',
+          '[special$directory]/(special-*file).txt',
+          '[special$directory]/directoryfile.txt',
+          '[special$directory]/nested/nestedfile.txt',
           'binextension.bin',
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
@@ -159,9 +159,9 @@ describe('from option', () => {
         expectedAssetKeys: [
           '.file.txt',
           '[(){}[]!+@escaped-test^$]/hello.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/nested/nestedfile.txt',
+          '[special$directory]/(special-*file).txt',
+          '[special$directory]/directoryfile.txt',
+          '[special$directory]/nested/nestedfile.txt',
           'binextension.bin',
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
@@ -256,7 +256,7 @@ describe('from option', () => {
         patterns: [
           {
             from:
-              path.sep === '/' ? '[special?directory]' : '[specialdirectory]',
+              path.sep === '/' ? '[special$directory]' : '[specialdirectory]',
           },
         ],
       })
@@ -349,9 +349,9 @@ describe('from option', () => {
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/nested/nestedfile.txt',
+          '[special$directory]/directoryfile.txt',
+          '[special$directory]/(special-*file).txt',
+          '[special$directory]/nested/nestedfile.txt',
           'noextension',
         ],
         patterns: [
@@ -372,9 +372,9 @@ describe('from option', () => {
           'directory/directoryfile.txt',
           'directory/nested/deep-nested/deepnested.txt',
           'directory/nested/nestedfile.txt',
-          '[special?directory]/directoryfile.txt',
-          '[special?directory]/(special-*file).txt',
-          '[special?directory]/nested/nestedfile.txt',
+          '[special$directory]/directoryfile.txt',
+          '[special$directory]/(special-*file).txt',
+          '[special$directory]/nested/nestedfile.txt',
           'dir (86)/file.txt',
           'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
           'dir (86)/nesteddir/nestedfile.txt',
@@ -402,9 +402,9 @@ describe('from option', () => {
           'nested/directory/directoryfile-5d7817.txt',
           'nested/directory/nested/deep-nested/deepnested-31d6cf.txt',
           'nested/directory/nested/nestedfile-31d6cf.txt',
-          'nested/[special?directory]/(special-*file)-517cf2.txt',
-          'nested/[special?directory]/directoryfile-5d7817.txt',
-          'nested/[special?directory]/nested/nestedfile-31d6cf.txt',
+          'nested/[special$directory]/(special-*file)-517cf2.txt',
+          'nested/[special$directory]/directoryfile-5d7817.txt',
+          'nested/[special$directory]/nested/nestedfile-31d6cf.txt',
           'nested/noextension-31d6cf',
         ],
         patterns: [

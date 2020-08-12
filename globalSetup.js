@@ -9,9 +9,9 @@ const removeIllegalCharacterForWindows = require('./test/helpers/removeIllegalCh
 const baseDir = path.resolve(__dirname, 'test/fixtures');
 
 const specialFiles = {
-  '[special?directory]/nested/nestedfile.txt': '',
-  '[special?directory]/(special-*file).txt': 'special',
-  '[special?directory]/directoryfile.txt': 'new',
+  '[special$directory]/nested/nestedfile.txt': '',
+  '[special$directory]/(special-*file).txt': 'special',
+  '[special$directory]/directoryfile.txt': 'new',
 };
 
 module.exports = () => {

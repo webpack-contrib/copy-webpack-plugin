@@ -101,7 +101,7 @@ describe('context option', () => {
       patterns: [
         {
           from: 'directoryfile.txt',
-          context: '[special?directory]',
+          context: '[special$directory]',
         },
       ],
     })
@@ -120,7 +120,7 @@ describe('context option', () => {
         {
           // Todo strange behavour when you use `FIXTURES_DIR`, need investigate for next major release
           from: '.',
-          context: '[special?directory]',
+          context: '[special$directory]',
         },
       ],
     })
@@ -138,7 +138,7 @@ describe('context option', () => {
       patterns: [
         {
           from: '**/*',
-          context: '[special?directory]',
+          context: '[special$directory]',
         },
       ],
     })
@@ -152,7 +152,7 @@ describe('context option', () => {
       patterns: [
         {
           from: '\\(special-*file\\).txt',
-          context: '[special?directory]',
+          context: '[special$directory]',
         },
       ],
     })
