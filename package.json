@@ -51,7 +51,7 @@
     "normalize-path": "^3.0.0",
     "p-limit": "^2.2.1",
     "schema-utils": "^1.0.0",
-    "serialize-javascript": "^2.1.2",
+    "serialize-javascript": "^4.0.0",
     "webpack-log": "^2.0.0"
   },
   "devDependencies": {
