@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [5.1.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.1...v5.1.2) (2020-08-27)
+
+
+### Bug Fixes
+
+* **security:** update `serialize-javascript` ([#521](https://github.com/webpack-contrib/copy-webpack-plugin/issues/521)) ([a42d63f](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a42d63f1a7991545cc03d2a3e2a479c0a16051dd))
+
 ### [5.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v5.1.0...v5.1.1) (2019-12-12)
 
 
