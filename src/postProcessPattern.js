@@ -7,14 +7,12 @@ import cacache from 'cacache';
 import serialize from 'serialize-javascript';
 import findCacheDir from 'find-cache-dir';
 import normalizePath from 'normalize-path';
-import { RawSource } from 'webpack-sources';
 
 import { version } from '../package.json';
 
 import { readFile } from './utils/promisify';
 
 /* eslint-disable no-param-reassign */
-
 export default async function postProcessPattern(globalRef, pattern, file) {
   const { logger, compilation, inputFileSystem } = globalRef;
 
@@ -27,10 +25,10 @@ export default async function postProcessPattern(globalRef, pattern, file) {
 
   logger.debug(`reading '${file.absoluteFrom}' to write to assets`);
 
-  let content;
+  let data;
 
   try {
-    content = await readFile(inputFileSystem, file.absoluteFrom);
+    data = await readFile(inputFileSystem, file.absoluteFrom);
   } catch (error) {
     compilation.errors.push(error);
 
@@ -49,7 +47,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
       let defaultCacheKeys = {
         version,
         transform: pattern.transform,
-        contentHash: crypto.createHash('md4').update(content).digest('hex'),
+        contentHash: crypto.createHash('md4').update(data).digest('hex'),
       };
 
       if (typeof pattern.cacheTransform.keys === 'function') {
@@ -73,18 +71,16 @@ export default async function postProcessPattern(globalRef, pattern, file) {
           `getting cached transformation for '${file.absoluteFrom}'`
         );
 
-        content = result.data;
+        ({ data } = result);
       } catch (_ignoreError) {
-        content = await pattern.transform(content, file.absoluteFrom);
+        data = await pattern.transform(data, file.absoluteFrom);
 
         logger.debug(`caching transformation for '${file.absoluteFrom}'`);
 
-        content = await cacache
-          .put(cacheDirectory, cacheKeys, content)
-          .then(() => content);
+        await cacache.put(cacheDirectory, cacheKeys, data);
       }
     } else {
-      content = await pattern.transform(content, file.absoluteFrom);
+      data = await pattern.transform(data, file.absoluteFrom);
     }
   }
 
@@ -103,7 +99,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
       { resourcePath: file.absoluteFrom },
       file.webpackTo,
       {
-        content,
+        content: data,
         context: pattern.context,
       }
     );
@@ -123,7 +119,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
     );
   }
 
-  file.source = new RawSource(content);
+  file.data = data;
   file.targetPath = normalizePath(file.webpackTo);
   file.force = pattern.force;
 

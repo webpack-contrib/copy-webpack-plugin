@@ -1,3 +1,4 @@
+import webpack from 'webpack';
 import validateOptions from 'schema-utils';
 import pLimit from 'p-limit';
 
@@ -5,6 +6,11 @@ import schema from './options.json';
 import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
+
+// webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
+const { RawSource } =
+  // eslint-disable-next-line global-require
+  webpack.sources || require('webpack-sources');
 
 class CopyPlugin {
   constructor(options = {}) {
@@ -89,9 +95,11 @@ class CopyPlugin {
                 absoluteFrom,
                 targetPath,
                 webpackTo,
-                source,
+                data,
                 force,
               } = asset;
+
+              const source = new RawSource(data);
 
               // For old version webpack 4
               /* istanbul ignore if */
