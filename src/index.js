@@ -110,7 +110,9 @@ class CopyPlugin {
                 return;
               }
 
-              if (compilation.getAsset(targetPath)) {
+              const existingAsset = compilation.getAsset(targetPath);
+
+              if (existingAsset) {
                 if (force) {
                   logger.log(
                     `force updating '${webpackTo}' to compilation assets from '${absoluteFrom}'`
