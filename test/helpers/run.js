@@ -45,6 +45,10 @@ function run(opts) {
 
     const compiler = opts.compiler || getCompiler();
 
+    if (opts.preCopy) {
+      new PreCopyPlugin({ options: opts.preCopy }).apply(compiler);
+    }
+
     new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
       compiler
     );

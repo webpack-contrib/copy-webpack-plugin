@@ -257,6 +257,76 @@ describe('CopyPlugin', () => {
         .then(done)
         .catch(done);
     });
+
+    it('should copy files with "copied" flags', (done) => {
+      expect.assertions(5);
+
+      const expectedAssetKeys = [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ];
+
+      run({
+        preCopy: {
+          additionalAssets: [
+            { name: 'foo-bar.txt', data: 'Content', info: { custom: true } },
+            {
+              name: 'nested/nestedfile.txt',
+              data: 'Content',
+              info: { custom: true },
+            },
+          ],
+        },
+        expectedAssetKeys,
+        patterns: [
+          {
+            from: 'directory',
+            force: true,
+          },
+        ],
+      })
+        .then(({ stats }) => {
+          for (const name of expectedAssetKeys) {
+            const info = stats.compilation.assetsInfo.get(name);
+
+            expect(info.copied).toBe(true);
+
+            if (name === 'nested/nestedfile.txt') {
+              expect(info.custom).toBe(true);
+            }
+          }
+        })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files and print "copied" in the string representation ', (done) => {
+      const expectedAssetKeys = [
+        '.dottedfile',
+        'directoryfile.txt',
+        'nested/deep-nested/deepnested.txt',
+        'nested/nestedfile.txt',
+      ];
+
+      run({
+        withExistingAsset: true,
+        expectedAssetKeys,
+        patterns: [
+          {
+            from: 'directory',
+          },
+        ],
+      })
+        .then(({ stats }) => {
+          const stringStats = stats.toString();
+
+          expect(stringStats.match(/\[copied]/g).length).toBe(4);
+        })
+        .then(done)
+        .catch(done);
+    });
   });
 
   describe('watch mode', () => {

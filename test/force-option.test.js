@@ -4,7 +4,7 @@ describe('force option', () => {
   describe('is not specified', () => {
     it('should not overwrite a file already in the compilation by default when "from" is a file', (done) => {
       runForce({
-        existingAssets: ['file.txt'],
+        additionalAssets: [{ name: 'file.txt', data: 'existing' }],
         expectedAssetKeys: ['file.txt'],
         expectedAssetContent: {
           'file.txt': 'existing',
@@ -21,11 +21,11 @@ describe('force option', () => {
 
     it('should not overwrite files already in the compilation when "from" is a directory', (done) => {
       runForce({
-        existingAssets: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+        additionalAssets: [
+          { name: '.dottedfile', data: 'existing' },
+          { name: 'directoryfile.txt', data: 'existing' },
+          { name: 'nested/deep-nested/deepnested.txt', data: 'existing' },
+          { name: 'nested/nestedfile.txt', data: 'existing' },
         ],
         expectedAssetKeys: [
           '.dottedfile',
@@ -51,10 +51,13 @@ describe('force option', () => {
 
     it('should not overwrite files already in the compilation when "from" is a glob', (done) => {
       runForce({
-        existingAssets: [
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
+        additionalAssets: [
+          { name: 'directory/directoryfile.txt', data: 'existing' },
+          {
+            name: 'directory/nested/deep-nested/deepnested.txt',
+            data: 'existing',
+          },
+          { name: 'directory/nested/nestedfile.txt', data: 'existing' },
         ],
         expectedAssetKeys: [
           'directory/directoryfile.txt',
@@ -80,7 +83,7 @@ describe('force option', () => {
   describe('is "false" (Boolean)', () => {
     it('should not overwrite a file already in the compilation by default when "from" is a file', (done) => {
       runForce({
-        existingAssets: ['file.txt'],
+        additionalAssets: [{ name: 'file.txt', data: 'existing' }],
         expectedAssetKeys: ['file.txt'],
         expectedAssetContent: {
           'file.txt': 'existing',
@@ -98,11 +101,11 @@ describe('force option', () => {
 
     it('should not overwrite files already in the compilation when "from" is a directory', (done) => {
       runForce({
-        existingAssets: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+        additionalAssets: [
+          { name: '.dottedfile', data: 'existing' },
+          { name: 'directoryfile.txt', data: 'existing' },
+          { name: 'nested/deep-nested/deepnested.txt', data: 'existing' },
+          { name: 'nested/nestedfile.txt', data: 'existing' },
         ],
         expectedAssetKeys: [
           '.dottedfile',
@@ -129,10 +132,13 @@ describe('force option', () => {
 
     it('should not overwrite files already in the compilation when "from" is a glob', (done) => {
       runForce({
-        existingAssets: [
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
+        additionalAssets: [
+          { name: 'directory/directoryfile.txt', data: 'existing' },
+          {
+            name: 'directory/nested/deep-nested/deepnested.txt',
+            data: 'existing',
+          },
+          { name: 'directory/nested/nestedfile.txt', data: 'existing' },
         ],
         expectedAssetKeys: [
           'directory/directoryfile.txt',
@@ -159,7 +165,7 @@ describe('force option', () => {
   describe('is "true" (Boolean)', () => {
     it('should force overwrite a file already in the compilation when "from" is a file', (done) => {
       runForce({
-        existingAssets: ['file.txt'],
+        additionalAssets: [{ name: 'file.txt', data: 'existing' }],
         expectedAssetKeys: ['file.txt'],
         expectedAssetContent: {
           'file.txt': 'new',
@@ -177,11 +183,11 @@ describe('force option', () => {
 
     it('should force overwrite files already in the compilation when "from" is a directory', (done) => {
       runForce({
-        existingAssets: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+        additionalAssets: [
+          { name: '.dottedfile', data: 'existing' },
+          { name: 'directoryfile.txt', data: 'existing' },
+          { name: 'nested/deep-nested/deepnested.txt', data: 'existing' },
+          { name: 'nested/nestedfile.txt', data: 'existing' },
         ],
         expectedAssetKeys: [
           '.dottedfile',
@@ -208,10 +214,13 @@ describe('force option', () => {
 
     it('should force overwrite files already in the compilation when "from" is a glob', (done) => {
       runForce({
-        existingAssets: [
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
+        additionalAssets: [
+          { name: 'directory/directoryfile.txt', data: 'existing' },
+          {
+            name: 'directory/nested/deep-nested/deepnested.txt',
+            data: 'existing',
+          },
+          { name: 'directory/nested/nestedfile.txt', data: 'existing' },
         ],
         expectedAssetKeys: [
           'directory/directoryfile.txt',

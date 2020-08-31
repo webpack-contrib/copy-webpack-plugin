@@ -24,10 +24,10 @@ class CopyPlugin {
   }
 
   apply(compiler) {
-    const plugin = { name: 'CopyPlugin' };
+    const pluginName = this.constructor.name;
     const limit = pLimit(this.options.concurrency || 100);
 
-    compiler.hooks.thisCompilation.tap(plugin, (compilation) => {
+    compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       const logger = compilation.getLogger('copy-webpack-plugin');
 
       compilation.hooks.additionalAssets.tapAsync(
@@ -110,13 +110,15 @@ class CopyPlugin {
                 return;
               }
 
-              if (compilation.getAsset(targetPath)) {
+              const info = compilation.getAsset(targetPath);
+
+              if (info) {
                 if (force) {
                   logger.log(
                     `force updating '${webpackTo}' to compilation assets from '${absoluteFrom}'`
                   );
 
-                  compilation.updateAsset(targetPath, source);
+                  compilation.updateAsset(targetPath, source, { copied: true });
 
                   return;
                 }
@@ -132,7 +134,7 @@ class CopyPlugin {
                 `writing '${webpackTo}' to compilation assets from '${absoluteFrom}'`
               );
 
-              compilation.emitAsset(targetPath, source);
+              compilation.emitAsset(targetPath, source, { copied: true });
             });
 
           logger.debug('end to adding additional assets');
@@ -140,6 +142,15 @@ class CopyPlugin {
           callback();
         }
       );
+
+      compilation.hooks.statsPrinter.tap(pluginName, (stats) => {
+        stats.hooks.print
+          .for('asset.info.copied')
+          .tap('copy-webpack-plugin', (copied, { green, formatFlag }) =>
+            // eslint-disable-next-line no-undefined
+            copied ? green(formatFlag('copied')) : undefined
+          );
+      });
     });
   }
 }

@@ -1,3 +1,9 @@
+import webpack from 'webpack';
+
+const { RawSource } =
+  // eslint-disable-next-line global-require
+  webpack.sources || require('webpack-sources');
+
 class PreCopyPlugin {
   constructor(options = {}) {
     this.options = options.options || {};
@@ -8,15 +14,12 @@ class PreCopyPlugin {
 
     compiler.hooks.thisCompilation.tap(plugin, (compilation) => {
       compilation.hooks.additionalAssets.tapAsync(
-        'copy-webpack-plugin',
+        'pre-copy-webpack-plugin',
         (callback) => {
-          this.options.existingAssets.forEach((assetName) => {
-            // eslint-disable-next-line no-param-reassign
-            compilation.assets[assetName] = {
-              source() {
-                return 'existing';
-              },
-            };
+          this.options.additionalAssets.forEach(({ name, data, info }) => {
+            const source = new RawSource(data);
+
+            compilation.emitAsset(name, source, info);
           });
 
           callback();
