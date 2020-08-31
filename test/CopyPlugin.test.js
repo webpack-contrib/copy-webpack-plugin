@@ -304,6 +304,36 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
+    it('should copy files with "copied" flags', (done) => {
+      expect.assertions(4);
+
+      const expectedAssetKeys = [
+        '.dottedfile.5e294e270db6734a42f014f0dd18d9ac',
+        'directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt',
+        'nested/nestedfile.31d6cfe0d16ae931b73c59d7e0c089c0.txt',
+        'nested/deep-nested/deepnested.31d6cfe0d16ae931b73c59d7e0c089c0.txt',
+      ];
+
+      run({
+        expectedAssetKeys,
+        patterns: [
+          {
+            from: 'directory',
+            to: '[path][name].[contenthash].[ext]',
+          },
+        ],
+      })
+        .then(({ stats }) => {
+          for (const name of expectedAssetKeys) {
+            const info = stats.compilation.assetsInfo.get(name);
+
+            expect(info.immutable).toBe(true);
+          }
+        })
+        .then(done)
+        .catch(done);
+    });
+
     it('should copy files and print "copied" in the string representation ', (done) => {
       const isWebpack4 = webpack.version[0] === '4';
 
