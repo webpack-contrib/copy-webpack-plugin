@@ -110,15 +110,21 @@ class CopyPlugin {
                 return;
               }
 
-              const info = compilation.getAsset(targetPath);
+              const existingAsset = compilation.getAsset(targetPath);
 
-              if (info) {
+              if (existingAsset) {
                 if (force) {
                   logger.log(
                     `force updating '${webpackTo}' to compilation assets from '${absoluteFrom}'`
                   );
 
-                  compilation.updateAsset(targetPath, source, { copied: true });
+                  const info = { copied: true };
+
+                  if (asset.immutable) {
+                    info.immutable = true;
+                  }
+
+                  compilation.updateAsset(targetPath, source, info);
 
                   return;
                 }
@@ -134,7 +140,13 @@ class CopyPlugin {
                 `writing '${webpackTo}' to compilation assets from '${absoluteFrom}'`
               );
 
-              compilation.emitAsset(targetPath, source, { copied: true });
+              const info = { copied: true };
+
+              if (asset.immutable) {
+                info.immutable = true;
+              }
+
+              compilation.emitAsset(targetPath, source, info);
             });
 
           logger.debug('end to adding additional assets');

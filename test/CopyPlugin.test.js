@@ -304,6 +304,50 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
+    it('should copy files with "copied" flags', (done) => {
+      expect.assertions(5);
+
+      const expectedAssetKeys = [
+        'directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt',
+        '.dottedfile.5e294e270db6734a42f014f0dd18d9ac',
+        'nested/nestedfile.31d6cfe0d16ae931b73c59d7e0c089c0.txt',
+        'nested/deep-nested/deepnested.31d6cfe0d16ae931b73c59d7e0c089c0.txt',
+      ];
+
+      run({
+        preCopy: {
+          additionalAssets: [
+            {
+              name: 'directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt',
+              data: 'Content',
+              info: { custom: true },
+            },
+          ],
+        },
+        expectedAssetKeys,
+        patterns: [
+          {
+            from: 'directory',
+            to: '[path][name].[contenthash].[ext]',
+            force: true,
+          },
+        ],
+      })
+        .then(({ stats }) => {
+          for (const name of expectedAssetKeys) {
+            const info = stats.compilation.assetsInfo.get(name);
+
+            expect(info.immutable).toBe(true);
+
+            if (name === 'directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt') {
+              expect(info.immutable).toBe(true);
+            }
+          }
+        })
+        .then(done)
+        .catch(done);
+    });
+
     it('should copy files and print "copied" in the string representation ', (done) => {
       const isWebpack4 = webpack.version[0] === '4';
 

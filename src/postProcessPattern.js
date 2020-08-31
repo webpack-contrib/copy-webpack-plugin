@@ -95,6 +95,10 @@ export default async function postProcessPattern(globalRef, pattern, file) {
       file.webpackTo = file.webpackTo.replace(/\.?\[ext]/g, '');
     }
 
+    file.immutable = /\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\]/gi.test(
+      file.webpackTo
+    );
+
     file.webpackTo = loaderUtils.interpolateName(
       { resourcePath: file.absoluteFrom },
       file.webpackTo,
@@ -113,6 +117,7 @@ export default async function postProcessPattern(globalRef, pattern, file) {
       `transforming path '${file.webpackTo}' for '${file.absoluteFrom}'`
     );
 
+    file.immutable = false;
     file.webpackTo = await pattern.transformPath(
       file.webpackTo,
       file.absoluteFrom
