@@ -17,6 +17,9 @@
         "globOptions": {
           "type": "object"
         },
+        "filter": {
+          "instanceof": "Function"
+        },
         "toType": {
           "enum": ["dir", "file", "template"]
         },

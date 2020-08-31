@@ -132,6 +132,12 @@ describe('validate options', () => {
             },
           },
         ],
+        [
+          {
+            from: 'test.txt',
+            filter: () => true,
+          },
+        ],
       ],
       failure: [
         // eslint-disable-next-line no-undefined
@@ -245,6 +251,12 @@ describe('validate options', () => {
             to: 'dir',
             context: 'context',
             noErrorOnMissing: 'true',
+          },
+        ],
+        [
+          {
+            from: 'test.txt',
+            filter: 'test',
           },
         ],
       ],
