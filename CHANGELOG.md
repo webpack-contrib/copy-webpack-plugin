@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.0.4...v6.1.0) (2020-08-31)
+
+
+### Features
+
+* added `filter` option ([#524](https://github.com/webpack-contrib/copy-webpack-plugin/issues/524)) ([1496f85](https://github.com/webpack-contrib/copy-webpack-plugin/commit/1496f85d2fa5e87dccd0cda92b1343c649f3e5bd))
+* added the `copied` flag to asset info ([09b1dc9](https://github.com/webpack-contrib/copy-webpack-plugin/commit/09b1dc995e476bb7090ebb2c2cbd4b5ebedeaa79))
+* added the `immutable` flag to asset info with hash in name ([#525](https://github.com/webpack-contrib/copy-webpack-plugin/issues/525)) ([a1989d5](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a1989d59b8b0a8caf0b826016e20c82a9ac38aa1))
+* **webpack@5:** improve stats output for `copied` files
+
 ### [6.0.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.0.3...v6.0.4) (2020-08-29)
 
 
