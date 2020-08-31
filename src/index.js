@@ -143,14 +143,16 @@ class CopyPlugin {
         }
       );
 
-      compilation.hooks.statsPrinter.tap(pluginName, (stats) => {
-        stats.hooks.print
-          .for('asset.info.copied')
-          .tap('copy-webpack-plugin', (copied, { green, formatFlag }) =>
-            // eslint-disable-next-line no-undefined
-            copied ? green(formatFlag('copied')) : undefined
-          );
-      });
+      if (compilation.hooks.statsPrinter) {
+        compilation.hooks.statsPrinter.tap(pluginName, (stats) => {
+          stats.hooks.print
+            .for('asset.info.copied')
+            .tap('copy-webpack-plugin', (copied, { green, formatFlag }) =>
+              // eslint-disable-next-line no-undefined
+              copied ? green(formatFlag('copied')) : undefined
+            );
+        });
+      }
     });
   }
 }

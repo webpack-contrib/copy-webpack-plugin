@@ -1,5 +1,7 @@
 import path from 'path';
 
+import webpack from 'webpack';
+
 import CopyPlugin from '../src';
 
 import { run, runEmit, runChange } from './helpers/run';
@@ -303,6 +305,10 @@ describe('CopyPlugin', () => {
     });
 
     it('should copy files and print "copied" in the string representation ', (done) => {
+      const isWebpack4 = webpack.version[0] === '4';
+
+      expect.assertions(isWebpack4 ? 0 : 1);
+
       const expectedAssetKeys = [
         '.dottedfile',
         'directoryfile.txt',
@@ -322,7 +328,9 @@ describe('CopyPlugin', () => {
         .then(({ stats }) => {
           const stringStats = stats.toString();
 
-          expect(stringStats.match(/\[copied]/g).length).toBe(4);
+          if (!isWebpack4) {
+            expect(stringStats.match(/\[copied]/g).length).toBe(4);
+          }
         })
         .then(done)
         .catch(done);
