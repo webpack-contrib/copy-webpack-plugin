@@ -4,11 +4,13 @@ import webpack from 'webpack';
 import validateOptions from 'schema-utils';
 import pLimit from 'p-limit';
 
+import globby from 'globby';
+
 import schema from './options.json';
-import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
 import isTemplateLike from './utils/isTemplateLike';
 import { stat } from './utils/promisify';
+import createPatternGlob from './utils/createPatternGlob';
 
 // webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
 const { RawSource } =
@@ -93,11 +95,76 @@ class CopyPlugin {
       }
     }
 
-    const files = await processPattern(globalRef, pattern);
+    createPatternGlob(pattern, globalRef);
 
-    if (!files) {
+    logger.log(
+      `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
+    );
+
+    const paths = await globby(pattern.glob, pattern.globOptions);
+
+    if (paths.length === 0) {
+      if (pattern.noErrorOnMissing) {
+        return Promise.resolve();
+      }
+
+      const missingError = new Error(
+        `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
+      );
+
+      logger.error(missingError.message);
+
+      globalRef.compilation.errors.push(missingError);
+
       return Promise.resolve();
     }
+
+    const filteredPaths = (
+      await Promise.all(
+        paths.map(async (item) => {
+          // Exclude directories
+          if (!item.dirent.isFile()) {
+            return false;
+          }
+
+          if (pattern.filter) {
+            const isFiltered = await pattern.filter(item.path);
+
+            return isFiltered ? item : false;
+          }
+
+          return item;
+        })
+      )
+    ).filter((item) => item);
+
+    if (filteredPaths.length === 0) {
+      return Promise.resolve();
+    }
+
+    const files = filteredPaths.map((item) => {
+      const from = item.path;
+
+      logger.debug(`found ${from}`);
+
+      // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
+      const absoluteFrom = path.resolve(pattern.context, from);
+      const relativeFrom = pattern.flatten
+        ? path.basename(absoluteFrom)
+        : path.relative(pattern.context, absoluteFrom);
+      let webpackTo =
+        pattern.toType === 'dir'
+          ? path.join(pattern.to, relativeFrom)
+          : pattern.to;
+
+      if (path.isAbsolute(webpackTo)) {
+        webpackTo = path.relative(globalRef.output, webpackTo);
+      }
+
+      logger.log(`determined that '${from}' should write to '${webpackTo}'`);
+
+      return { absoluteFrom, relativeFrom, webpackTo };
+    });
 
     return Promise.all(
       files
