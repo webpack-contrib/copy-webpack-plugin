@@ -1,11 +1,14 @@
+import path from 'path';
+
 import webpack from 'webpack';
 import validateOptions from 'schema-utils';
 import pLimit from 'p-limit';
 
 import schema from './options.json';
-import preProcessPattern from './preProcessPattern';
 import processPattern from './processPattern';
 import postProcessPattern from './postProcessPattern';
+import isTemplateLike from './utils/isTemplateLike';
+import { stat } from './utils/promisify';
 
 // webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
 const { RawSource } =
@@ -47,17 +50,80 @@ class CopyPlugin {
 
           try {
             assets = await Promise.all(
-              this.patterns.map((pattern) =>
+              this.patterns.map((item) =>
                 limit(async () => {
-                  const patternAfterPreProcess = await preProcessPattern(
-                    globalRef,
-                    pattern
+                  const pattern =
+                    typeof item === 'string' ? { from: item } : { ...item };
+
+                  pattern.fromOrigin = pattern.from;
+                  pattern.from = path.normalize(pattern.from);
+                  pattern.to = path.normalize(
+                    typeof pattern.to !== 'undefined' ? pattern.to : ''
                   );
 
-                  const files = await processPattern(
-                    globalRef,
-                    patternAfterPreProcess
+                  pattern.context = path.normalize(
+                    typeof pattern.context !== 'undefined'
+                      ? !path.isAbsolute(pattern.context)
+                        ? path.join(compiler.options.context, pattern.context)
+                        : pattern.context
+                      : compiler.options.context
                   );
+
+                  logger.debug(
+                    `processing from: '${pattern.from}' to: '${pattern.to}'`
+                  );
+
+                  const isToDirectory =
+                    path.extname(pattern.to) === '' ||
+                    pattern.to.slice(-1) === path.sep;
+
+                  switch (true) {
+                    // if toType already exists
+                    case !!pattern.toType:
+                      break;
+                    case isTemplateLike(pattern.to):
+                      pattern.toType = 'template';
+                      break;
+                    case isToDirectory:
+                      pattern.toType = 'dir';
+                      break;
+                    default:
+                      pattern.toType = 'file';
+                  }
+
+                  if (path.isAbsolute(pattern.from)) {
+                    pattern.absoluteFrom = pattern.from;
+                  } else {
+                    pattern.absoluteFrom = path.resolve(
+                      pattern.context,
+                      pattern.from
+                    );
+                  }
+
+                  logger.debug(
+                    `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
+                  );
+
+                  let stats;
+
+                  try {
+                    stats = await stat(
+                      compiler.inputFileSystem,
+                      pattern.absoluteFrom
+                    );
+                  } catch (error) {
+                    // Nothing
+                  }
+
+                  if (stats) {
+                    if (stats.isDirectory()) {
+                      pattern.fromType = 'dir';
+                    } else if (stats.isFile()) {
+                      pattern.fromType = 'file';
+                    }
+                  }
+
+                  const files = await processPattern(globalRef, pattern);
 
                   if (!files) {
                     return Promise.resolve();
@@ -67,11 +133,7 @@ class CopyPlugin {
                     files
                       .filter(Boolean)
                       .map((file) =>
-                        postProcessPattern(
-                          globalRef,
-                          patternAfterPreProcess,
-                          file
-                        )
+                        postProcessPattern(globalRef, pattern, file)
                       )
                   );
                 })
