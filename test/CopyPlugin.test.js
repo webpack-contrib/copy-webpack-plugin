@@ -6,7 +6,7 @@ import CopyPlugin from '../src';
 
 import { run, runEmit, runChange } from './helpers/run';
 
-import { readAssets } from './helpers';
+import { readAssets, getCompiler, compile } from './helpers';
 
 const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 
@@ -632,6 +632,54 @@ describe('CopyPlugin', () => {
         })
         .then(done)
         .catch(done);
+    });
+
+    it('should work and do not emit unchanged assets', async () => {
+      const compiler = getCompiler();
+
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.resolve(__dirname, './fixtures/directory'),
+          },
+        ],
+      }).apply(compiler);
+
+      const { stats } = await compile(compiler);
+
+      if (webpack.version[0] === '4') {
+        expect(
+          Object.keys(stats.compilation.assets).filter(
+            (assetName) => stats.compilation.assets[assetName].emitted
+          ).length
+        ).toBe(5);
+      } else {
+        expect(stats.compilation.emittedAssets.size).toBe(5);
+      }
+
+      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
+      expect(stats.compilation.errors).toMatchSnapshot('errors');
+      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
+
+      await new Promise(async (resolve) => {
+        const { stats: newStats } = await compile(compiler);
+
+        if (webpack.version[0] === '4') {
+          expect(
+            Object.keys(newStats.compilation.assets).filter(
+              (assetName) => newStats.compilation.assets[assetName].emitted
+            ).length
+          ).toBe(4);
+        } else {
+          expect(newStats.compilation.emittedAssets.size).toBe(4);
+        }
+
+        expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
+        expect(newStats.compilation.errors).toMatchSnapshot('errors');
+        expect(newStats.compilation.warnings).toMatchSnapshot('warnings');
+
+        resolve();
+      });
     });
   });
 
