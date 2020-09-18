@@ -167,9 +167,7 @@ class CopyPlugin {
     });
 
     return Promise.all(
-      files
-        .filter(Boolean)
-        .map((file) => postProcessPattern(globalRef, pattern, file))
+      files.map((file) => postProcessPattern(globalRef, pattern, file))
     );
   }
 
