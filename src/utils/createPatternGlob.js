@@ -20,8 +20,8 @@ function createPatternGlob(pattern, globalRef) {
 
   switch (pattern.fromType) {
     case 'dir':
-      logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);
-      logger.debug(`add ${pattern.absoluteFrom} as contextDependencies`);
+      logger.debug(`determined "${pattern.absoluteFrom}" is a directory`);
+      logger.debug(`add "${pattern.absoluteFrom}" as a context dependency`);
 
       compilation.contextDependencies.add(pattern.absoluteFrom);
 
@@ -40,7 +40,7 @@ function createPatternGlob(pattern, globalRef) {
       break;
     case 'file':
       logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
-      logger.debug(`add ${pattern.absoluteFrom} as fileDependencies`);
+      logger.debug(`add ${pattern.absoluteFrom} as a file dependency`);
 
       compilation.fileDependencies.add(pattern.absoluteFrom);
 
@@ -54,13 +54,13 @@ function createPatternGlob(pattern, globalRef) {
       /* eslint-enable no-param-reassign */
       break;
     default: {
-      logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
+      logger.debug(`determined "${pattern.absoluteFrom}" is a glob`);
 
       const contextDependencies = path.normalize(
         globParent(pattern.absoluteFrom)
       );
 
-      logger.debug(`add ${contextDependencies} as contextDependencies`);
+      logger.debug(`add "${contextDependencies}" as a context dependency`);
 
       compilation.contextDependencies.add(contextDependencies);
 

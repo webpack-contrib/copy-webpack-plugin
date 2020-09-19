@@ -36,8 +36,7 @@ class CopyPlugin {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async runPattern(globalRef, inputPattern) {
-    const { logger } = globalRef;
+  async runPattern(compiler, compilation, logger, inputPattern) {
     const pattern =
       typeof inputPattern === 'string'
         ? { from: inputPattern }
@@ -52,12 +51,12 @@ class CopyPlugin {
     pattern.context = path.normalize(
       typeof pattern.context !== 'undefined'
         ? !path.isAbsolute(pattern.context)
-          ? path.join(globalRef.context, pattern.context)
+          ? path.join(compiler.options.context, pattern.context)
           : pattern.context
-        : globalRef.context
+        : compiler.options.context
     );
 
-    logger.debug(`processing from: '${pattern.from}' to: '${pattern.to}'`);
+    logger.debug(`processing from "${pattern.from}" to "${pattern.to}"`);
 
     const isToDirectory =
       path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
@@ -83,13 +82,13 @@ class CopyPlugin {
     }
 
     logger.debug(
-      `getting stats for '${pattern.absoluteFrom}' to determinate 'fromType'`
+      `getting stats for "${pattern.absoluteFrom}" to determinate "fromType"`
     );
 
     let stats;
 
     try {
-      stats = await stat(globalRef.inputFileSystem, pattern.absoluteFrom);
+      stats = await stat(compiler.inputFileSystem, pattern.absoluteFrom);
     } catch (error) {
       // Nothing
     }
@@ -102,10 +101,10 @@ class CopyPlugin {
       }
     }
 
-    createPatternGlob(pattern, globalRef);
+    createPatternGlob(pattern, { logger, compilation });
 
     logger.log(
-      `begin globbing '${pattern.glob}' with a context of '${pattern.context}'`
+      `begin globbing "${pattern.glob}" with a context of "${pattern.context}"`
     );
 
     const paths = await globby(pattern.glob, pattern.globOptions);
@@ -116,12 +115,12 @@ class CopyPlugin {
       }
 
       const missingError = new Error(
-        `unable to locate '${pattern.from}' at '${pattern.absoluteFrom}'`
+        `unable to locate "${pattern.from}" at "${pattern.absoluteFrom}"`
       );
 
       logger.error(missingError.message);
 
-      globalRef.compilation.errors.push(missingError);
+      compilation.errors.push(missingError);
 
       return Promise.resolve();
     }
@@ -152,7 +151,7 @@ class CopyPlugin {
     const files = filteredPaths.map((item) => {
       const from = item.path;
 
-      logger.debug(`found ${from}`);
+      logger.debug(`found "${from}"`);
 
       // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
       const absoluteFrom = path.resolve(pattern.context, from);
@@ -165,10 +164,10 @@ class CopyPlugin {
           : pattern.to;
 
       if (path.isAbsolute(webpackTo)) {
-        webpackTo = path.relative(globalRef.output, webpackTo);
+        webpackTo = path.relative(compiler.options.output.path, webpackTo);
       }
 
-      logger.log(`determined that '${from}' should write to '${webpackTo}'`);
+      logger.log(`determined that "${from}" should write to "${webpackTo}"`);
 
       return { absoluteFrom, relativeFrom, webpackTo };
     });
@@ -179,23 +178,23 @@ class CopyPlugin {
         if (pattern.fromType === 'glob') {
           logger.debug(`add ${file.absoluteFrom} as fileDependencies`);
 
-          globalRef.compilation.fileDependencies.add(file.absoluteFrom);
+          compilation.fileDependencies.add(file.absoluteFrom);
         }
 
-        logger.debug(`reading '${file.absoluteFrom}' to write to assets`);
+        logger.debug(`reading "${file.absoluteFrom}" to write to assets`);
 
         let data;
 
         try {
-          data = await readFile(globalRef.inputFileSystem, file.absoluteFrom);
+          data = await readFile(compiler.inputFileSystem, file.absoluteFrom);
         } catch (error) {
-          globalRef.compilation.errors.push(error);
+          compilation.errors.push(error);
 
           return;
         }
 
         if (pattern.transform) {
-          logger.log(`transforming content for '${file.absoluteFrom}'`);
+          logger.log(`transforming content for "${file.absoluteFrom}"`);
 
           if (pattern.cacheTransform) {
             const cacheDirectory = pattern.cacheTransform.directory
@@ -227,14 +226,14 @@ class CopyPlugin {
               const result = await cacache.get(cacheDirectory, cacheKeys);
 
               logger.debug(
-                `getting cached transformation for '${file.absoluteFrom}'`
+                `getting cached transformation for "${file.absoluteFrom}"`
               );
 
               ({ data } = result);
             } catch (_ignoreError) {
               data = await pattern.transform(data, file.absoluteFrom);
 
-              logger.debug(`caching transformation for '${file.absoluteFrom}'`);
+              logger.debug(`caching transformation for "${file.absoluteFrom}"`);
 
               await cacache.put(cacheDirectory, cacheKeys, data);
             }
@@ -245,7 +244,7 @@ class CopyPlugin {
 
         if (pattern.toType === 'template') {
           logger.log(
-            `interpolating template '${file.webpackTo}' for '${file.relativeFrom}'`
+            `interpolating template "${file.webpackTo}" for "${file.relativeFrom}"`
           );
 
           // If it doesn't have an extension, remove it from the pattern
@@ -277,7 +276,7 @@ class CopyPlugin {
 
         if (pattern.transformPath) {
           logger.log(
-            `transforming path '${file.webpackTo}' for '${file.absoluteFrom}'`
+            `transforming path "${file.webpackTo}" for "${file.absoluteFrom}"`
           );
 
           // eslint-disable-next-line no-param-reassign
@@ -314,20 +313,14 @@ class CopyPlugin {
         async (callback) => {
           logger.debug('start to adding additional assets');
 
-          const globalRef = {
-            context: compiler.options.context,
-            logger,
-            compilation,
-            inputFileSystem: compiler.inputFileSystem,
-            output: compiler.options.output.path,
-          };
-
           let assets;
 
           try {
             assets = await Promise.all(
               this.patterns.map((item) =>
-                limit(async () => this.runPattern(globalRef, item))
+                limit(async () =>
+                  this.runPattern(compiler, compilation, logger, item)
+                )
               )
             );
           } catch (error) {
@@ -368,7 +361,7 @@ class CopyPlugin {
               if (existingAsset) {
                 if (force) {
                   logger.log(
-                    `force updating '${webpackTo}' to compilation assets from '${absoluteFrom}'`
+                    `force updating "${webpackTo}" to compilation assets from "${absoluteFrom}"`
                   );
 
                   const info = { copied: true };
@@ -383,14 +376,14 @@ class CopyPlugin {
                 }
 
                 logger.log(
-                  `skipping '${webpackTo}', because it already exists`
+                  `skipping "${webpackTo}", because it already exists`
                 );
 
                 return;
               }
 
               logger.log(
-                `writing '${webpackTo}' to compilation assets from '${absoluteFrom}'`
+                `writing "${webpackTo}" to compilation assets from "${absoluteFrom}"`
               );
 
               const info = { copied: true };
