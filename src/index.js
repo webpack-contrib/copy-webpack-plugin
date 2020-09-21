@@ -15,7 +15,6 @@ import normalizePath from 'normalize-path';
 import { version } from '../package.json';
 
 import schema from './options.json';
-import isTemplateLike from './utils/isTemplateLike';
 import { readFile, stat } from './utils/promisify';
 import createPatternGlob from './utils/createPatternGlob';
 
@@ -23,6 +22,8 @@ import createPatternGlob from './utils/createPatternGlob';
 const { RawSource } =
   // eslint-disable-next-line global-require
   webpack.sources || require('webpack-sources');
+
+const template = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(?::(\d+))?\])|(\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\])|(\[\d+\])/;
 
 class CopyPlugin {
   constructor(options = {}) {
@@ -65,7 +66,7 @@ class CopyPlugin {
       // if toType already exists
       case !!pattern.toType:
         break;
-      case isTemplateLike(pattern.to):
+      case template.test(pattern.to):
         pattern.toType = 'template';
         break;
       case isToDirectory:
