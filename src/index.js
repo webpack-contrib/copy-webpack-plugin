@@ -11,12 +11,13 @@ import serialize from 'serialize-javascript';
 import cacache from 'cacache';
 import loaderUtils from 'loader-utils';
 import normalizePath from 'normalize-path';
+import globParent from 'glob-parent';
+import fastGlob from 'fast-glob';
 
 import { version } from '../package.json';
 
 import schema from './options.json';
 import { readFile, stat } from './utils/promisify';
-import createPatternGlob from './utils/createPatternGlob';
 
 // webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
 const { RawSource } =
@@ -102,7 +103,76 @@ class CopyPlugin {
       }
     }
 
-    createPatternGlob(pattern, { logger, compilation });
+    // eslint-disable-next-line no-param-reassign
+    pattern.globOptions = {
+      ...{ followSymbolicLinks: true },
+      ...(pattern.globOptions || {}),
+      ...{ cwd: pattern.context, objectMode: true },
+    };
+
+    switch (pattern.fromType) {
+      case 'dir':
+        logger.debug(`determined "${pattern.absoluteFrom}" is a directory`);
+
+        compilation.contextDependencies.add(pattern.absoluteFrom);
+
+        logger.debug(`add "${pattern.absoluteFrom}" as a context dependency`);
+
+        /* eslint-disable no-param-reassign */
+        pattern.context = pattern.absoluteFrom;
+        pattern.glob = path.posix.join(
+          fastGlob.escapePath(
+            normalizePath(path.resolve(pattern.absoluteFrom))
+          ),
+          '**/*'
+        );
+        pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
+
+        if (typeof pattern.globOptions.dot === 'undefined') {
+          pattern.globOptions.dot = true;
+        }
+        /* eslint-enable no-param-reassign */
+        break;
+      case 'file':
+        logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
+
+        compilation.fileDependencies.add(pattern.absoluteFrom);
+
+        logger.debug(`add ${pattern.absoluteFrom} as a file dependency`);
+
+        /* eslint-disable no-param-reassign */
+        pattern.context = path.dirname(pattern.absoluteFrom);
+        pattern.glob = fastGlob.escapePath(
+          normalizePath(path.resolve(pattern.absoluteFrom))
+        );
+
+        if (typeof pattern.globOptions.dot === 'undefined') {
+          pattern.globOptions.dot = true;
+        }
+        /* eslint-enable no-param-reassign */
+        break;
+      default: {
+        logger.debug(`determined "${pattern.absoluteFrom}" is a glob`);
+
+        const contextDependencies = path.normalize(
+          globParent(pattern.absoluteFrom)
+        );
+
+        compilation.contextDependencies.add(contextDependencies);
+
+        logger.debug(`add "${contextDependencies}" as a context dependency`);
+
+        /* eslint-disable no-param-reassign */
+        pattern.fromType = 'glob';
+        pattern.glob = path.isAbsolute(pattern.fromOrigin)
+          ? pattern.fromOrigin
+          : path.posix.join(
+              fastGlob.escapePath(normalizePath(path.resolve(pattern.context))),
+              pattern.fromOrigin
+            );
+        /* eslint-enable no-param-reassign */
+      }
+    }
 
     logger.log(
       `begin globbing "${pattern.glob}" with a context of "${pattern.context}"`
