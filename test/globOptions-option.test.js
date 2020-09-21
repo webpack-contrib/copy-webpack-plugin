@@ -78,7 +78,7 @@ describe('globOptions option', () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate 'file.txt' at '${FIXTURES_DIR}${path.sep}file.txt'`
+          `unable to locate "file.txt" at "${FIXTURES_DIR}${path.sep}file.txt"`
         ),
       ],
       patterns: [
@@ -255,7 +255,7 @@ describe('globOptions option', () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate 'directory' at '${FIXTURES_DIR}${path.sep}directory${path.sep}**${path.sep}*'`
+          `unable to locate "directory" at "${FIXTURES_DIR}${path.sep}directory${path.sep}**${path.sep}*"`
         ),
       ],
       patterns: [
@@ -275,7 +275,7 @@ describe('globOptions option', () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate 'file.txt' at '${FIXTURES_DIR}${path.sep}file.txt'`
+          `unable to locate "file.txt" at "${FIXTURES_DIR}${path.sep}file.txt"`
         ),
       ],
       patterns: [
