@@ -210,7 +210,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate "symlink${path.sep}directory-ln' at '${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln\\**\\*"`
+                  `unable to locate "symlink${path.sep}directory-ln" at '${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln\\**\\*"`
                 ),
               ]
             : [],

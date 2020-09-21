@@ -134,11 +134,11 @@ class CopyPlugin {
         /* eslint-enable no-param-reassign */
         break;
       case 'file':
-        logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
+        logger.debug(`determined "${pattern.absoluteFrom}" is a file`);
 
         compilation.fileDependencies.add(pattern.absoluteFrom);
 
-        logger.debug(`add ${pattern.absoluteFrom} as a file dependency`);
+        logger.debug(`add "${pattern.absoluteFrom}" as a file dependency`);
 
         /* eslint-disable no-param-reassign */
         pattern.context = path.dirname(pattern.absoluteFrom);

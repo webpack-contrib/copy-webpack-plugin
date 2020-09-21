@@ -33,9 +33,9 @@ Object {
 exports[`CopyPlugin logging should logging when "from" is a file: logs 1`] = `
 Object {
   "logs": Array [
-    "add ./fixtures/file.txt as a file dependency",
+    "add \\"./fixtures/file.txt\\" as a file dependency",
     "begin globbing \\"./fixtures/file.txt\\" with a context of \\"./fixtures\\"",
-    "determined './fixtures/file.txt' is a file",
+    "determined \\"./fixtures/file.txt\\" is a file",
     "determined that \\"./fixtures/file.txt\\" should write to \\"file.txt\\"",
     "end to adding additional assets",
     "found \\"./fixtures/file.txt\\"",
