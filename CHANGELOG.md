@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.2.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.1.1...v6.2.0) (2020-10-02)
+
+
+### Features
+
+* use webpack input filesystem (only webpack@5) ([#531](https://github.com/webpack-contrib/copy-webpack-plugin/issues/531)) ([6f2f455](https://github.com/webpack-contrib/copy-webpack-plugin/commit/6f2f455b9411ac69ef6aa3b953474f1d7fa23808))
+
 ### [6.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.1.0...v6.1.1) (2020-09-18)
 
 ### Chore
