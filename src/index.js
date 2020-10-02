@@ -87,10 +87,12 @@ class CopyPlugin {
       `getting stats for "${pattern.absoluteFrom}" to determinate "fromType"`
     );
 
+    const { inputFileSystem } = compiler;
+
     let stats;
 
     try {
-      stats = await stat(compiler.inputFileSystem, pattern.absoluteFrom);
+      stats = await stat(inputFileSystem, pattern.absoluteFrom);
     } catch (error) {
       // Nothing
     }
@@ -109,6 +111,18 @@ class CopyPlugin {
       ...(pattern.globOptions || {}),
       ...{ cwd: pattern.context, objectMode: true },
     };
+
+    // TODO remove after drop webpack@4
+    if (
+      inputFileSystem.lstat &&
+      inputFileSystem.stat &&
+      inputFileSystem.lstatSync &&
+      inputFileSystem.statSync &&
+      inputFileSystem.readdir &&
+      inputFileSystem.readdirSync
+    ) {
+      pattern.globOptions.fs = inputFileSystem;
+    }
 
     switch (pattern.fromType) {
       case 'dir':
@@ -257,7 +271,7 @@ class CopyPlugin {
         let data;
 
         try {
-          data = await readFile(compiler.inputFileSystem, file.absoluteFrom);
+          data = await readFile(inputFileSystem, file.absoluteFrom);
         } catch (error) {
           compilation.errors.push(error);
 
