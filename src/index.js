@@ -3,7 +3,7 @@ import os from 'os';
 import crypto from 'crypto';
 
 import webpack from 'webpack';
-import validateOptions from 'schema-utils';
+import { validate } from 'schema-utils';
 import pLimit from 'p-limit';
 import globby from 'globby';
 import findCacheDir from 'find-cache-dir';
@@ -28,7 +28,7 @@ const template = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(?::(\d+)
 
 class CopyPlugin {
   constructor(options = {}) {
-    validateOptions(schema, options, {
+    validate(schema, options, {
       name: 'Copy Plugin',
       baseDataPath: 'options',
     });
