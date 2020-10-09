@@ -63,7 +63,7 @@ All notable changes to this project will be documented in this file. See [standa
 * minimum supported Node.js version is `10.13`, 
 * the plugin now accepts an object, you should change `new CopyPlugin(patterns, options)` to `new CopyPlugin({ patterns, options })`
 * migrate on `compilation.additionalAssets` hook
-* the `ignore` option was removed in favor `globOptions.ignore`
+* the `ignore` option (which accepted [micromatch](https://github.com/micromatch/micromatch) syntax) was removed in favor `globOptions.ignore` (which accepts [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax))
 * the `test` option was removed in favor the `transformPath` option
 * the `cache` option was renamed to the `cacheTransform` option, `cacheTransform` option should have only `directory` and `keys` properties when it is an object
 * global `context` and `ignore` options were removed in favor `patten.context` and `pattern.globOptions.ignore` options
