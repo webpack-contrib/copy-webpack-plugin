@@ -424,6 +424,7 @@ class CopyPlugin {
             .forEach((asset) => {
               const {
                 absoluteFrom,
+                relativeFrom,
                 targetPath,
                 webpackTo,
                 data,
@@ -449,7 +450,7 @@ class CopyPlugin {
                     `force updating "${webpackTo}" to compilation assets from "${absoluteFrom}"`
                   );
 
-                  const info = { copied: true };
+                  const info = { copied: true, absoluteFrom, relativeFrom };
 
                   if (asset.immutable) {
                     info.immutable = true;
@@ -471,7 +472,7 @@ class CopyPlugin {
                 `writing "${webpackTo}" to compilation assets from "${absoluteFrom}"`
               );
 
-              const info = { copied: true };
+              const info = { copied: true, absoluteFrom, relativeFrom };
 
               if (asset.immutable) {
                 info.immutable = true;

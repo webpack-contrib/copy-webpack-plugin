@@ -780,4 +780,27 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
   });
+
+  it('should include the relativeFrom and absoluteFrom path in info', (done) => {
+    const expectedAssetKeys = ['file.txt'];
+
+    run({
+      expectedAssetKeys,
+      patterns: [
+        {
+          from: path.join(FIXTURES_DIR, 'file.txt'),
+        },
+      ],
+    })
+      .then(({ stats }) => {
+        for (const name of expectedAssetKeys) {
+          const info = stats.compilation.assetsInfo.get(name);
+          expect(info.relativeFrom).toBe(name);
+          expect(info.absoluteFrom).toBe(path.resolve(FIXTURES_DIR, name));
+          expect(info.copied).toBe(true);
+        }
+      })
+      .then(done)
+      .catch(done);
+  });
 });
