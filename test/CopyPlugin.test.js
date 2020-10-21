@@ -634,8 +634,12 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should work and do not emit unchanged assets', async () => {
-      const compiler = getCompiler();
+    it.only('should work and do not emit unchanged assets', async () => {
+      const compiler = getCompiler({
+        cache: {
+          type: 'memory',
+        },
+      });
 
       new CopyPlugin({
         patterns: [
@@ -671,7 +675,7 @@ describe('CopyPlugin', () => {
             ).length
           ).toBe(4);
         } else {
-          expect(newStats.compilation.emittedAssets.size).toBe(4);
+          expect(newStats.compilation.emittedAssets.size).toBe(0);
         }
 
         expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
