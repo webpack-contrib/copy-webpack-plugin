@@ -634,7 +634,7 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it.only('should work and do not emit unchanged assets', async () => {
+    it('should work and do not emit unchanged assets', async () => {
       const compiler = getCompiler({
         cache: {
           type: 'memory',
