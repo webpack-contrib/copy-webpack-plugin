@@ -319,19 +319,44 @@ class CopyPlugin {
 
         // TODO logger
         if (cache) {
-          const snapshot = await CopyPlugin.createSnapshot(
-            compilation,
-            file.absoluteFrom
-          );
-          const isValidSnapshot = await CopyPlugin.checkSnapshotValid(
-            compilation,
-            snapshot
-          );
+          let snapshot;
 
-          itemCache = cache.getItemCache(file.relativeFrom, null);
+          try {
+            snapshot = await CopyPlugin.createSnapshot(
+              compilation,
+              file.absoluteFrom
+            );
+          } catch (error) {
+            compilation.errors.push(error);
 
-          if (isValidSnapshot) {
-            source = await itemCache.getPromise();
+            return;
+          }
+
+          if (snapshot) {
+            let isValidSnapshot;
+
+            try {
+              isValidSnapshot = await CopyPlugin.checkSnapshotValid(
+                compilation,
+                snapshot
+              );
+            } catch (error) {
+              compilation.errors.push(error);
+
+              return;
+            }
+
+            itemCache = cache.getItemCache(file.relativeFrom, null);
+
+            if (isValidSnapshot) {
+              try {
+                source = await itemCache.getPromise();
+              } catch (error) {
+                compilation.errors.push(error);
+
+                return;
+              }
+            }
           }
         }
 
@@ -405,7 +430,13 @@ class CopyPlugin {
           source = new RawSource(data);
 
           if (itemCache) {
-            await itemCache.storePromise(source);
+            try {
+              await itemCache.storePromise(source);
+            } catch (error) {
+              compilation.errors.push(error);
+
+              return;
+            }
           }
         }
 
