@@ -834,6 +834,9 @@ describe('CopyPlugin', () => {
 
       const assetsInfo = [];
 
+      // eslint-disable-next-line no-console
+      console.log(stats.compilation.assetsInfo);
+
       for (const [name, info] of stats.compilation.assetsInfo.entries()) {
         assetsInfo.push({
           name,
