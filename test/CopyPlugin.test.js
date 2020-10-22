@@ -755,7 +755,7 @@ describe('CopyPlugin', () => {
     });
 
     it('should work with the "filesystem" cache', async () => {
-      const cacheDirectory = path.resolve(__dirname, './outputs/.cache');
+      const cacheDirectory = path.resolve(__dirname, './outputs/.cache/simple');
 
       await del(cacheDirectory);
 
@@ -806,6 +806,123 @@ describe('CopyPlugin', () => {
         expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
         expect(newStats.compilation.errors).toMatchSnapshot('errors');
         expect(newStats.compilation.warnings).toMatchSnapshot('warnings');
+
+        resolve();
+      });
+    });
+
+    it('should work with the "filesystem" cache and multi compiler mode', async () => {
+      const cacheDirectoryA = path.resolve(
+        __dirname,
+        './outputs/.cache/multi-compiler/a'
+      );
+      const cacheDirectoryB = path.resolve(
+        __dirname,
+        './outputs/.cache/multi-compiler/b'
+      );
+
+      await del([cacheDirectoryA, cacheDirectoryB]);
+
+      const compiler = webpack([
+        {
+          mode: 'development',
+          context: path.resolve(__dirname, './fixtures'),
+          entry: path.resolve(__dirname, './helpers/enter.js'),
+          output: {
+            path: path.resolve(__dirname, './outputs/multi-compiler/dist/a'),
+          },
+          stats: {
+            source: true,
+          },
+          cache: {
+            type: 'filesystem',
+            cacheDirectory: cacheDirectoryA,
+          },
+          plugins: [
+            new CopyPlugin({
+              patterns: [
+                {
+                  from: path.resolve(__dirname, './fixtures/directory'),
+                },
+              ],
+            }),
+          ],
+        },
+        {
+          mode: 'development',
+          entry: path.resolve(__dirname, './helpers/enter.js'),
+          output: {
+            path: path.resolve(__dirname, './outputs/multi-compiler/dist/b'),
+          },
+          stats: {
+            source: true,
+          },
+          cache: {
+            type: 'filesystem',
+            cacheDirectory: cacheDirectoryB,
+          },
+          plugins: [
+            new CopyPlugin({
+              patterns: [
+                {
+                  context: path.resolve(__dirname, './fixtures'),
+                  from: path.resolve(__dirname, './fixtures/directory'),
+                },
+              ],
+            }),
+          ],
+        },
+      ]);
+
+      compiler.compilers.forEach((item) => {
+        const outputFileSystem = createFsFromVolume(new Volume());
+        // Todo remove when we drop webpack@4 support
+        outputFileSystem.join = path.join.bind(path);
+
+        // eslint-disable-next-line no-param-reassign
+        item.outputFileSystem = outputFileSystem;
+      });
+
+      const { stats } = await compile(compiler);
+
+      stats.stats.forEach((item, index) => {
+        if (webpack.version[0] === '4') {
+          expect(
+            Object.keys(item.compilation.assets).filter(
+              (assetName) => item.compilation.assets[assetName].emitted
+            ).length
+          ).toBe(5);
+        } else {
+          expect(item.compilation.emittedAssets.size).toBe(5);
+        }
+
+        expect(item.compilation.errors).toMatchSnapshot('errors');
+        expect(item.compilation.warnings).toMatchSnapshot('warnings');
+        expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
+          'assets'
+        );
+      });
+
+      await new Promise(async (resolve) => {
+        const { stats: newStats } = await compile(compiler);
+
+        newStats.stats.forEach((item, index) => {
+          if (webpack.version[0] === '4') {
+            expect(
+              Object.keys(item.compilation.assets).filter(
+                (assetName) => item.compilation.assets[assetName].emitted
+              ).length
+            ).toBe(4);
+          } else {
+            expect(item.compilation.emittedAssets.size).toBe(0);
+          }
+
+          expect(item.compilation.errors).toMatchSnapshot('errors');
+          expect(item.compilation.warnings).toMatchSnapshot('warnings');
+          expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
+            'assets'
+          );
+        });
 
         resolve();
       });

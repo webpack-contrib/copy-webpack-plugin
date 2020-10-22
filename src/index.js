@@ -289,41 +289,41 @@ class CopyPlugin {
       logger.debug(`found "${from}"`);
 
       // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-      const absoluteFrom = path.resolve(pattern.context, from);
+      const absoluteFilename = path.resolve(pattern.context, from);
       const relativeFrom = pattern.flatten
-        ? path.basename(absoluteFrom)
-        : path.relative(pattern.context, absoluteFrom);
-      let webpackTo =
+        ? path.basename(absoluteFilename)
+        : path.relative(pattern.context, absoluteFilename);
+      let filename =
         pattern.toType === 'dir'
           ? path.join(pattern.to, relativeFrom)
           : pattern.to;
 
-      if (path.isAbsolute(webpackTo)) {
-        webpackTo = path.relative(compiler.options.output.path, webpackTo);
+      if (path.isAbsolute(filename)) {
+        filename = path.relative(compiler.options.output.path, filename);
       }
 
-      logger.log(`determined that "${from}" should write to "${webpackTo}"`);
+      logger.log(`determined that "${from}" should write to "${filename}"`);
 
       const sourceFilename = normalizePath(
-        path.relative(pattern.compilerContext, absoluteFrom)
+        path.relative(pattern.compilerContext, absoluteFilename)
       );
 
-      return { absoluteFrom, sourceFilename, relativeFrom, webpackTo };
+      return { absoluteFilename, sourceFilename, filename };
     });
 
     return Promise.all(
       files.map(async (file) => {
         // If this came from a glob, add it to the file watchlist
         if (pattern.fromType === 'glob') {
-          logger.debug(`add ${file.absoluteFrom} as fileDependencies`);
+          logger.debug(`add ${file.absoluteFilename} as fileDependencies`);
 
-          compilation.fileDependencies.add(file.absoluteFrom);
+          compilation.fileDependencies.add(file.absoluteFilename);
         }
 
         let source;
 
         if (cache) {
-          const cacheEntry = await cache.getPromise(file.relativeFrom, null);
+          const cacheEntry = await cache.getPromise(file.sourceFilename, null);
 
           if (cacheEntry) {
             const isValidSnapshot = await CopyPlugin.checkSnapshotValid(
@@ -344,12 +344,12 @@ class CopyPlugin {
             startTime = Date.now();
           }
 
-          logger.debug(`reading "${file.absoluteFrom}" to write to assets`);
+          logger.debug(`reading "${file.absoluteFilename}" to write to assets`);
 
           let data;
 
           try {
-            data = await readFile(inputFileSystem, file.absoluteFrom);
+            data = await readFile(inputFileSystem, file.absoluteFilename);
           } catch (error) {
             compilation.errors.push(error);
 
@@ -357,7 +357,7 @@ class CopyPlugin {
           }
 
           if (pattern.transform) {
-            logger.log(`transforming content for "${file.absoluteFrom}"`);
+            logger.log(`transforming content for "${file.absoluteFilename}"`);
 
             if (pattern.cacheTransform) {
               const cacheDirectory = pattern.cacheTransform.directory
@@ -377,7 +377,7 @@ class CopyPlugin {
               if (typeof pattern.cacheTransform.keys === 'function') {
                 defaultCacheKeys = await pattern.cacheTransform.keys(
                   defaultCacheKeys,
-                  file.absoluteFrom
+                  file.absoluteFilename
                 );
               } else {
                 defaultCacheKeys = {
@@ -392,21 +392,21 @@ class CopyPlugin {
                 const result = await cacache.get(cacheDirectory, cacheKeys);
 
                 logger.debug(
-                  `getting cached transformation for "${file.absoluteFrom}"`
+                  `getting cached transformation for "${file.absoluteFilename}"`
                 );
 
                 ({ data } = result);
               } catch (_ignoreError) {
-                data = await pattern.transform(data, file.absoluteFrom);
+                data = await pattern.transform(data, file.absoluteFilename);
 
                 logger.debug(
-                  `caching transformation for "${file.absoluteFrom}"`
+                  `caching transformation for "${file.absoluteFilename}"`
                 );
 
                 await cacache.put(cacheDirectory, cacheKeys, data);
               }
             } else {
-              data = await pattern.transform(data, file.absoluteFrom);
+              data = await pattern.transform(data, file.absoluteFilename);
             }
           }
 
@@ -416,10 +416,10 @@ class CopyPlugin {
             const snapshot = await CopyPlugin.createSnapshot(
               compilation,
               startTime,
-              file.relativeFrom
+              file.sourceFilename
             );
 
-            await cache.storePromise(file.relativeFrom, null, {
+            await cache.storePromise(file.sourceFilename, null, {
               source,
               snapshot,
             });
@@ -428,25 +428,25 @@ class CopyPlugin {
 
         if (pattern.toType === 'template') {
           logger.log(
-            `interpolating template "${file.webpackTo}" for "${file.relativeFrom}"`
+            `interpolating template "${file.filename}" for "${file.sourceFilename}"`
           );
 
           // If it doesn't have an extension, remove it from the pattern
           // ie. [name].[ext] or [name][ext] both become [name]
-          if (!path.extname(file.relativeFrom)) {
+          if (!path.extname(file.absoluteFilename)) {
             // eslint-disable-next-line no-param-reassign
-            file.webpackTo = file.webpackTo.replace(/\.?\[ext]/g, '');
+            file.filename = file.filename.replace(/\.?\[ext]/g, '');
           }
 
           // eslint-disable-next-line no-param-reassign
           file.immutable = /\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\]/gi.test(
-            file.webpackTo
+            file.filename
           );
 
           // eslint-disable-next-line no-param-reassign
-          file.webpackTo = loaderUtils.interpolateName(
-            { resourcePath: file.absoluteFrom },
-            file.webpackTo,
+          file.filename = loaderUtils.interpolateName(
+            { resourcePath: file.absoluteFilename },
+            file.filename,
             {
               content: source.source(),
               context: pattern.context,
@@ -455,27 +455,27 @@ class CopyPlugin {
 
           // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
           // eslint-disable-next-line no-param-reassign
-          file.webpackTo = path.normalize(file.webpackTo);
+          file.filename = path.normalize(file.filename);
         }
 
         if (pattern.transformPath) {
           logger.log(
-            `transforming path "${file.webpackTo}" for "${file.absoluteFrom}"`
+            `transforming path "${file.filename}" for "${file.absoluteFilename}"`
           );
 
           // eslint-disable-next-line no-param-reassign
           file.immutable = false;
           // eslint-disable-next-line no-param-reassign
-          file.webpackTo = await pattern.transformPath(
-            file.webpackTo,
-            file.absoluteFrom
+          file.filename = await pattern.transformPath(
+            file.filename,
+            file.absoluteFilename
           );
         }
 
         // eslint-disable-next-line no-param-reassign
         file.source = source;
         // eslint-disable-next-line no-param-reassign
-        file.targetPath = normalizePath(file.webpackTo);
+        file.filename = normalizePath(file.filename);
         // eslint-disable-next-line no-param-reassign
         file.force = pattern.force;
 
@@ -532,10 +532,9 @@ class CopyPlugin {
             .filter(Boolean)
             .forEach((asset) => {
               const {
+                absoluteFilename,
                 sourceFilename,
-                absoluteFrom,
-                targetPath,
-                webpackTo,
+                filename,
                 source,
                 force,
               } = asset;
@@ -544,17 +543,17 @@ class CopyPlugin {
               /* istanbul ignore if */
               if (typeof compilation.emitAsset !== 'function') {
                 // eslint-disable-next-line no-param-reassign
-                compilation.assets[targetPath] = source;
+                compilation.assets[filename] = source;
 
                 return;
               }
 
-              const existingAsset = compilation.getAsset(targetPath);
+              const existingAsset = compilation.getAsset(filename);
 
               if (existingAsset) {
                 if (force) {
                   logger.log(
-                    `force updating "${webpackTo}" to compilation assets from "${absoluteFrom}"`
+                    `force updating "${filename}" to compilation assets from "${absoluteFilename}"`
                   );
 
                   const info = { copied: true, sourceFilename };
@@ -563,20 +562,18 @@ class CopyPlugin {
                     info.immutable = true;
                   }
 
-                  compilation.updateAsset(targetPath, source, info);
+                  compilation.updateAsset(filename, source, info);
 
                   return;
                 }
 
-                logger.log(
-                  `skipping "${webpackTo}", because it already exists`
-                );
+                logger.log(`skipping "${filename}", because it already exists`);
 
                 return;
               }
 
               logger.log(
-                `writing "${webpackTo}" to compilation assets from "${absoluteFrom}"`
+                `writing "${filename}" to compilation assets from "${absoluteFilename}"`
               );
 
               const info = { copied: true, sourceFilename };
@@ -585,7 +582,7 @@ class CopyPlugin {
                 info.immutable = true;
               }
 
-              compilation.emitAsset(targetPath, source, info);
+              compilation.emitAsset(filename, source, info);
             });
 
           logger.debug('end to adding additional assets');
