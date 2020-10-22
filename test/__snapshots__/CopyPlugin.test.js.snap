@@ -1,5 +1,89 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`CopyPlugin basic should work with multi compiler mode: assets 1`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin basic should work with multi compiler mode: assets 2`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin basic should work with multi compiler mode: errors 1`] = `Array []`;
+
+exports[`CopyPlugin basic should work with multi compiler mode: errors 2`] = `Array []`;
+
+exports[`CopyPlugin basic should work with multi compiler mode: warnings 1`] = `Array []`;
+
+exports[`CopyPlugin basic should work with multi compiler mode: warnings 2`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 1`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 2`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 3`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 4`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 1`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 2`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 3`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 4`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 1`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 2`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 3`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 4`] = `Array []`;
+
 exports[`CopyPlugin cache should work with the "filesystem" cache: assets 1`] = `
 Object {
   ".dottedfile": "dottedfile contents
@@ -20,781 +104,249 @@ Object {
 }
 `;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache: errors 1`] = `
-Array [
-  [ModuleNotFoundError: Module not found: Error: Can't resolve './foo/bar/baz' in '/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/helpers'],
-]
-`;
+exports[`CopyPlugin cache should work with the "filesystem" cache: errors 1`] = `Array []`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache: errors 2`] = `
-Array [
-  [ModuleNotFoundError: Module not found: Error: Can't resolve './foo/bar/baz' in '/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/helpers'],
-]
-`;
-
-exports[`CopyPlugin cache should work with the "filesystem" cache: logs 1`] = `
-Map {
-  "webpack.Compiler" => Array [
-    Object {
-      "args": Array [
-        "make hook",
-        0,
-        33987920,
-      ],
-      "time": 1603382565685,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "finish make hook",
-        0,
-        60755,
-      ],
-      "time": 1603382565685,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "finish compilation",
-        0,
-        1436351,
-      ],
-      "time": 1603382565686,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "seal compilation",
-        0,
-        25416618,
-      ],
-      "time": 1603382565712,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "afterCompile hook",
-        0,
-        47349,
-      ],
-      "time": 1603382565712,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "emitAssets",
-        0,
-        3997485,
-      ],
-      "time": 1603382565716,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "emitRecords",
-        0,
-        115086,
-      ],
-      "time": 1603382565716,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "done hook",
-        0,
-        113062,
-      ],
-      "time": 1603382565716,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "beginIdle",
-        0,
-        122831,
-      ],
-      "time": 1603382565716,
-      "trace": undefined,
-      "type": "time",
-    },
-  ],
-  "webpack.ResolverCachePlugin" => Array [
-    Object {
-      "args": Array [
-        "67% really resolved (2 real resolves with 0 cached but invalid, 1 cached valid, 0 concurrent)",
-      ],
-      "time": 1603382565685,
-      "trace": undefined,
-      "type": "log",
-    },
-  ],
-  "webpack.FlagDependencyExportsPlugin" => Array [
-    Object {
-      "args": Array [
-        "restore cached provided exports",
-        0,
-        369875,
-      ],
-      "time": 1603382565686,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "figure out provided exports",
-        0,
-        199314,
-      ],
-      "time": 1603382565686,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "100% of exports of modules have been determined (1 not cached, 0 flagged uncacheable, 0 from cache, 0 additional calculations due to dependencies)",
-      ],
-      "time": 1603382565686,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "store provided exports into cache",
-        0,
-        138911,
-      ],
-      "time": 1603382565686,
-      "trace": undefined,
-      "type": "time",
-    },
-  ],
-  "webpack.Compilation" => Array [
-    Object {
-      "args": Array [
-        "finish modules",
-        0,
-        1265859,
-      ],
-      "time": 1603382565686,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "report dependency errors and warnings",
-        0,
-        86683,
-      ],
-      "time": 1603382565686,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "optimize dependencies",
-        0,
-        246013,
-      ],
-      "time": 1603382565687,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "create chunks",
-        0,
-        2046637,
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "optimize",
-        0,
-        3996573,
-      ],
-      "time": 1603382565693,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "1 modules hashed (1 variants per module in average)",
-      ],
-      "time": 1603382565694,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "module hashing",
-        0,
-        648740,
-      ],
-      "time": 1603382565694,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "100% code generated (1 generated, 0 from cache)",
-      ],
-      "time": 1603382565696,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "code generation",
-        0,
-        2095850,
-      ],
-      "time": 1603382565696,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "runtime requirements",
-        0,
-        2014717,
-      ],
-      "time": 1603382565698,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing: initialize hash",
-        0,
-        4419,
-      ],
-      "time": 1603382565698,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing: hash errors",
-        0,
-        4379,
-      ],
-      "time": 1603382565698,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing: sort chunks",
-        0,
-        122119,
-      ],
-      "time": 1603382565698,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing: hash runtime modules",
-        0,
-        374625,
-      ],
-      "time": 1603382565700,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing: hash chunks",
-        0,
-        1641546,
-      ],
-      "time": 1603382565700,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing: hash digest",
-        0,
-        51657,
-      ],
-      "time": 1603382565700,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing: process full hash modules",
-        0,
-        2265,
-      ],
-      "time": 1603382565700,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "hashing",
-        0,
-        2652617,
-      ],
-      "time": 1603382565700,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "record hash",
-        0,
-        23113,
-      ],
-      "time": 1603382565700,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "module assets",
-        0,
-        123031,
-      ],
-      "time": 1603382565701,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "create chunk assets",
-        0,
-        4009427,
-      ],
-      "time": 1603382565705,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "process assets",
-        0,
-        6359885,
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "time",
-    },
-  ],
-  "webpack.SideEffectsFlagPlugin" => Array [
-    Object {
-      "args": Array [
-        "update dependencies",
-        0,
-        81463,
-      ],
-      "time": 1603382565687,
-      "trace": undefined,
-      "type": "time",
-    },
-  ],
-  "webpack.buildChunkGraph" => Array [
-    Object {
-      "args": Array [
-        "visitModules: prepare",
-        0,
-        231124,
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "visitModules: visiting",
-        0,
-        304393,
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "2 queue items processed (1 blocks)",
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "0 chunk groups connected",
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "0 chunk groups processed for merging (0 module sets, 0 forked, 0 + 0 modules forked, 0 + 0 modules merged into fork, 0 resulting modules)",
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "0 chunk group info updated (0 already connected chunk groups reconnected)",
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "visitModules",
-        0,
-        1226415,
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "connectChunkGroups",
-        0,
-        87956,
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "cleanup",
-        0,
-        49944,
-      ],
-      "time": 1603382565689,
-      "trace": undefined,
-      "type": "time",
-    },
-  ],
-  "webpack.SplitChunksPlugin" => Array [
-    Object {
-      "args": Array [
-        "prepare",
-        0,
-        22462,
-      ],
-      "time": 1603382565691,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "modules",
-        0,
-        872080,
-      ],
-      "time": 1603382565691,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "queue",
-        0,
-        2334,
-      ],
-      "time": 1603382565691,
-      "trace": undefined,
-      "type": "time",
-    },
-    Object {
-      "args": Array [
-        "maxSize",
-        0,
-        47970,
-      ],
-      "time": 1603382565692,
-      "trace": undefined,
-      "type": "time",
-    },
-  ],
-  "copy-webpack-plugin" => Array [
-    Object {
-      "args": Array [
-        "start to adding additional assets",
-      ],
-      "time": 1603382565705,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "processing from \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory\\" to \\".\\"",
-      ],
-      "time": 1603382565705,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "getting stats for \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory\\" to determinate \\"fromType\\"",
-      ],
-      "time": 1603382565706,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "determined \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory\\" is a directory",
-      ],
-      "time": 1603382565706,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "add \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory\\" as a context dependency",
-      ],
-      "time": 1603382565706,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "begin globbing \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/**/*\\" with a context of \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory\\"",
-      ],
-      "time": 1603382565706,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "found \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/.dottedfile\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "determined that \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/.dottedfile\\" should write to \\".dottedfile\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "found \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/directoryfile.txt\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "determined that \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/directoryfile.txt\\" should write to \\"directoryfile.txt\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "found \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/nestedfile.txt\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "determined that \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/nestedfile.txt\\" should write to \\"nested/nestedfile.txt\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "found \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/deep-nested/deepnested.txt\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "determined that \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/deep-nested/deepnested.txt\\" should write to \\"nested/deep-nested/deepnested.txt\\"",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "reading \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/.dottedfile\\" to write to assets",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "reading \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/directoryfile.txt\\" to write to assets",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "reading \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/nestedfile.txt\\" to write to assets",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "reading \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/deep-nested/deepnested.txt\\" to write to assets",
-      ],
-      "time": 1603382565710,
-      "trace": undefined,
-      "type": "debug",
-    },
-    Object {
-      "args": Array [
-        "writing \\".dottedfile\\" to compilation assets from \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/.dottedfile\\"",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "writing \\"directoryfile.txt\\" to compilation assets from \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/directoryfile.txt\\"",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "writing \\"nested/nestedfile.txt\\" to compilation assets from \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/nestedfile.txt\\"",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "writing \\"nested/deep-nested/deepnested.txt\\" to compilation assets from \\"/home/evilebottnawi/IdeaProjects/copy-webpack-plugin/test/fixtures/directory/nested/deep-nested/deepnested.txt\\"",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "end to adding additional assets",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "debug",
-    },
-  ],
-  "webpack.FileSystemInfo" => Array [
-    Object {
-      "args": Array [
-        "7 new snapshots created",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "0% root snapshot uncached (0 / 1)",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "0% children snapshot uncached (0 / 0)",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "0 entries tested",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "File info in cache: 32 timestamps 0 hashes 0 timestamp hash combinations",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "File timestamp snapshot optimization: 0% (0/15) entries shared via 0 shared snapshots (0 times referenced)",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "Directory info in cache: 0 timestamps 0 hashes 0 timestamp hash combinations",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "Missing items snapshot optimization: 0% (0/21) entries shared via 0 shared snapshots (0 times referenced)",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-    Object {
-      "args": Array [
-        "Managed items info in cache: 0 items",
-      ],
-      "time": 1603382565711,
-      "trace": undefined,
-      "type": "log",
-    },
-  ],
-}
-`;
+exports[`CopyPlugin cache should work with the "filesystem" cache: errors 2`] = `Array []`;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache: warnings 1`] = `Array []`;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache: warnings 2`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "memory" cache: assets 1`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "memory" cache: assets 2`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "memory" cache: errors 1`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "memory" cache: errors 2`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "memory" cache: warnings 1`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "memory" cache: warnings 2`] = `Array []`;
+
+exports[`CopyPlugin logging should logging when "from" is a directory: logs 1`] = `
+Object {
+  "logs": Array [
+    "added './fixtures/directory' as a context dependency",
+    "begin globbing './fixtures/directory/**/*'...",
+    "created snapshot for './fixtures/directory/.dottedfile'",
+    "created snapshot for './fixtures/directory/directoryfile.txt'",
+    "created snapshot for './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "created snapshot for './fixtures/directory/nested/nestedfile.txt'",
+    "creating snapshot for './fixtures/directory/.dottedfile'...",
+    "creating snapshot for './fixtures/directory/directoryfile.txt'...",
+    "creating snapshot for './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "creating snapshot for './fixtures/directory/nested/nestedfile.txt'...",
+    "determined './fixtures/directory' is a directory",
+    "determined that './fixtures/directory/.dottedfile' should write to '.dottedfile'",
+    "determined that './fixtures/directory/directoryfile.txt' should write to 'directoryfile.txt'",
+    "determined that './fixtures/directory/nested/deep-nested/deepnested.txt' should write to 'nested/deep-nested/deepnested.txt'",
+    "determined that './fixtures/directory/nested/nestedfile.txt' should write to 'nested/nestedfile.txt'",
+    "finished to adding additional assets",
+    "finished to process a pattern from 'directory' using './fixtures/directory' context to '.'",
+    "found './fixtures/directory/.dottedfile'",
+    "found './fixtures/directory/directoryfile.txt'",
+    "found './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "found './fixtures/directory/nested/nestedfile.txt'",
+    "getting cache for './fixtures/directory/.dottedfile'...",
+    "getting cache for './fixtures/directory/directoryfile.txt'...",
+    "getting cache for './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "getting cache for './fixtures/directory/nested/nestedfile.txt'...",
+    "getting stats for './fixtures/directory'...",
+    "missed cache for './fixtures/directory/.dottedfile'",
+    "missed cache for './fixtures/directory/directoryfile.txt'",
+    "missed cache for './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "missed cache for './fixtures/directory/nested/nestedfile.txt'",
+    "read './fixtures/directory/.dottedfile'",
+    "read './fixtures/directory/directoryfile.txt'",
+    "read './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "read './fixtures/directory/nested/nestedfile.txt'",
+    "reading './fixtures/directory/.dottedfile'...",
+    "reading './fixtures/directory/directoryfile.txt'...",
+    "reading './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "reading './fixtures/directory/nested/nestedfile.txt'...",
+    "starting to add additional assets...",
+    "starting to process a pattern from 'directory' using './fixtures' context to '.'...",
+    "stored cache for './fixtures/directory/.dottedfile'",
+    "stored cache for './fixtures/directory/directoryfile.txt'",
+    "stored cache for './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "stored cache for './fixtures/directory/nested/nestedfile.txt'",
+    "storing cache for './fixtures/directory/.dottedfile'...",
+    "storing cache for './fixtures/directory/directoryfile.txt'...",
+    "storing cache for './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "storing cache for './fixtures/directory/nested/nestedfile.txt'...",
+    "writing '.dottedfile' from './fixtures/directory/.dottedfile' to compilation assets...",
+    "writing 'directoryfile.txt' from './fixtures/directory/directoryfile.txt' to compilation assets...",
+    "writing 'nested/deep-nested/deepnested.txt' from './fixtures/directory/nested/deep-nested/deepnested.txt' to compilation assets...",
+    "writing 'nested/nestedfile.txt' from './fixtures/directory/nested/nestedfile.txt' to compilation assets...",
+    "written '.dottedfile' from './fixtures/directory/.dottedfile' to compilation assets",
+    "written 'directoryfile.txt' from './fixtures/directory/directoryfile.txt' to compilation assets",
+    "written 'nested/deep-nested/deepnested.txt' from './fixtures/directory/nested/deep-nested/deepnested.txt' to compilation assets",
+    "written 'nested/nestedfile.txt' from './fixtures/directory/nested/nestedfile.txt' to compilation assets",
+  ],
+}
+`;
+
+exports[`CopyPlugin logging should logging when "from" is a file: logs 1`] = `
+Object {
+  "logs": Array [
+    "added './fixtures/file.txt' as a file dependency",
+    "begin globbing './fixtures/file.txt'...",
+    "created snapshot for './fixtures/file.txt'",
+    "creating snapshot for './fixtures/file.txt'...",
+    "determined './fixtures/file.txt' is a file",
+    "determined that './fixtures/file.txt' should write to 'file.txt'",
+    "finished to adding additional assets",
+    "finished to process a pattern from 'file.txt' using './fixtures' context to '.'",
+    "found './fixtures/file.txt'",
+    "getting cache for './fixtures/file.txt'...",
+    "getting stats for './fixtures/file.txt'...",
+    "missed cache for './fixtures/file.txt'",
+    "read './fixtures/file.txt'",
+    "reading './fixtures/file.txt'...",
+    "starting to add additional assets...",
+    "starting to process a pattern from 'file.txt' using './fixtures' context to '.'...",
+    "stored cache for './fixtures/file.txt'",
+    "storing cache for './fixtures/file.txt'...",
+    "writing 'file.txt' from './fixtures/file.txt' to compilation assets...",
+    "written 'file.txt' from './fixtures/file.txt' to compilation assets",
+  ],
+}
+`;
+
+exports[`CopyPlugin logging should logging when "from" is a glob: logs 1`] = `
+Object {
+  "logs": Array [
+    "added './fixtures/directory' as a context dependency",
+    "added './fixtures/directory/directoryfile.txt' as a file dependency",
+    "added './fixtures/directory/nested/deep-nested/deepnested.txt' as a file dependency",
+    "added './fixtures/directory/nested/nestedfile.txt' as a file dependency",
+    "begin globbing './fixtures/directory/**'...",
+    "created snapshot for './fixtures/directory/directoryfile.txt'",
+    "created snapshot for './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "created snapshot for './fixtures/directory/nested/nestedfile.txt'",
+    "creating snapshot for './fixtures/directory/directoryfile.txt'...",
+    "creating snapshot for './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "creating snapshot for './fixtures/directory/nested/nestedfile.txt'...",
+    "determined that './fixtures/directory/directoryfile.txt' should write to 'directory/directoryfile.txt'",
+    "determined that './fixtures/directory/nested/deep-nested/deepnested.txt' should write to 'directory/nested/deep-nested/deepnested.txt'",
+    "determined that './fixtures/directory/nested/nestedfile.txt' should write to 'directory/nested/nestedfile.txt'",
+    "finished to adding additional assets",
+    "finished to process a pattern from 'directory/**' using './fixtures' context to '.'",
+    "found './fixtures/directory/directoryfile.txt'",
+    "found './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "found './fixtures/directory/nested/nestedfile.txt'",
+    "getting cache for './fixtures/directory/directoryfile.txt'...",
+    "getting cache for './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "getting cache for './fixtures/directory/nested/nestedfile.txt'...",
+    "getting stats for './fixtures/directory/**'...",
+    "missed cache for './fixtures/directory/directoryfile.txt'",
+    "missed cache for './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "missed cache for './fixtures/directory/nested/nestedfile.txt'",
+    "read './fixtures/directory/directoryfile.txt'",
+    "read './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "read './fixtures/directory/nested/nestedfile.txt'",
+    "reading './fixtures/directory/directoryfile.txt'...",
+    "reading './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "reading './fixtures/directory/nested/nestedfile.txt'...",
+    "starting to add additional assets...",
+    "starting to process a pattern from 'directory/**' using './fixtures' context to '.'...",
+    "stored cache for './fixtures/directory/directoryfile.txt'",
+    "stored cache for './fixtures/directory/nested/deep-nested/deepnested.txt'",
+    "stored cache for './fixtures/directory/nested/nestedfile.txt'",
+    "storing cache for './fixtures/directory/directoryfile.txt'...",
+    "storing cache for './fixtures/directory/nested/deep-nested/deepnested.txt'...",
+    "storing cache for './fixtures/directory/nested/nestedfile.txt'...",
+    "writing 'directory/directoryfile.txt' from './fixtures/directory/directoryfile.txt' to compilation assets...",
+    "writing 'directory/nested/deep-nested/deepnested.txt' from './fixtures/directory/nested/deep-nested/deepnested.txt' to compilation assets...",
+    "writing 'directory/nested/nestedfile.txt' from './fixtures/directory/nested/nestedfile.txt' to compilation assets...",
+    "written 'directory/directoryfile.txt' from './fixtures/directory/directoryfile.txt' to compilation assets",
+    "written 'directory/nested/deep-nested/deepnested.txt' from './fixtures/directory/nested/deep-nested/deepnested.txt' to compilation assets",
+    "written 'directory/nested/nestedfile.txt' from './fixtures/directory/nested/nestedfile.txt' to compilation assets",
+  ],
+}
+`;
+
+exports[`CopyPlugin stats should work have assets info: assets 1`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "asset-modules/deepnested.txt": "",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin stats should work have assets info: assets info 1`] = `
+Array [
+  Object {
+    "info": Object {
+      "copied": true,
+      "immutable": undefined,
+      "sourceFilename": "directory/.dottedfile",
+    },
+    "name": ".dottedfile",
+  },
+  Object {
+    "info": Object {
+      "copied": undefined,
+      "immutable": undefined,
+      "sourceFilename": undefined,
+    },
+    "name": "asset-modules/deepnested.txt",
+  },
+  Object {
+    "info": Object {
+      "copied": true,
+      "immutable": undefined,
+      "sourceFilename": "directory/directoryfile.txt",
+    },
+    "name": "directoryfile.txt",
+  },
+  Object {
+    "info": Object {
+      "copied": undefined,
+      "immutable": undefined,
+      "sourceFilename": undefined,
+    },
+    "name": "main.js",
+  },
+  Object {
+    "info": Object {
+      "copied": true,
+      "immutable": undefined,
+      "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
+    },
+    "name": "nested/deep-nested/deepnested.txt",
+  },
+  Object {
+    "info": Object {
+      "copied": true,
+      "immutable": undefined,
+      "sourceFilename": "directory/nested/nestedfile.txt",
+    },
+    "name": "nested/nestedfile.txt",
+  },
+]
+`;
+
+exports[`CopyPlugin stats should work have assets info: errors 1`] = `Array []`;
+
+exports[`CopyPlugin stats should work have assets info: warnings 1`] = `Array []`;
