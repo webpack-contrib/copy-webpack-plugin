@@ -9,6 +9,7 @@ npm-debug.log*
 /reports
 /node_modules
 /test/fixtures/\[special\$directory\]
+/test/outputs
 
 .DS_Store
 Thumbs.db

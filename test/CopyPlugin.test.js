@@ -1,6 +1,7 @@
 import path from 'path';
 
 import webpack from 'webpack';
+import del from 'del';
 
 import CopyPlugin from '../src';
 
@@ -633,9 +634,15 @@ describe('CopyPlugin', () => {
         .then(done)
         .catch(done);
     });
+  });
 
-    it('should work and do not emit unchanged assets', async () => {
-      const compiler = getCompiler();
+  describe('cache', () => {
+    it('should work with the "memory" cache', async () => {
+      const compiler = getCompiler({
+        cache: {
+          type: 'memory',
+        },
+      });
 
       new CopyPlugin({
         patterns: [
@@ -671,7 +678,64 @@ describe('CopyPlugin', () => {
             ).length
           ).toBe(4);
         } else {
-          expect(newStats.compilation.emittedAssets.size).toBe(4);
+          expect(newStats.compilation.emittedAssets.size).toBe(0);
+        }
+
+        expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
+        expect(newStats.compilation.errors).toMatchSnapshot('errors');
+        expect(newStats.compilation.warnings).toMatchSnapshot('warnings');
+
+        resolve();
+      });
+    });
+
+    it('should work with the "filesystem" cache', async () => {
+      const cacheDirectory = path.resolve(__dirname, './outputs/.cache');
+
+      await del(cacheDirectory);
+
+      const compiler = getCompiler({
+        cache: {
+          type: 'filesystem',
+          cacheDirectory,
+        },
+      });
+
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.resolve(__dirname, './fixtures/directory'),
+          },
+        ],
+      }).apply(compiler);
+
+      const { stats } = await compile(compiler);
+
+      if (webpack.version[0] === '4') {
+        expect(
+          Object.keys(stats.compilation.assets).filter(
+            (assetName) => stats.compilation.assets[assetName].emitted
+          ).length
+        ).toBe(5);
+      } else {
+        expect(stats.compilation.emittedAssets.size).toBe(5);
+      }
+
+      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
+      expect(stats.compilation.errors).toMatchSnapshot('errors');
+      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
+
+      await new Promise(async (resolve) => {
+        const { stats: newStats } = await compile(compiler);
+
+        if (webpack.version[0] === '4') {
+          expect(
+            Object.keys(newStats.compilation.assets).filter(
+              (assetName) => newStats.compilation.assets[assetName].emitted
+            ).length
+          ).toBe(4);
+        } else {
+          expect(newStats.compilation.emittedAssets.size).toBe(0);
         }
 
         expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');

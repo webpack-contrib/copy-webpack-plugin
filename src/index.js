@@ -37,8 +37,58 @@ class CopyPlugin {
     this.options = options.options || {};
   }
 
+  static async createSnapshot(compilation, startTime, dependency) {
+    if (!compilation.fileSystemInfo) {
+      return;
+    }
+
+    // eslint-disable-next-line consistent-return
+    return new Promise((resolve, reject) => {
+      compilation.fileSystemInfo.createSnapshot(
+        startTime,
+        [dependency],
+        // eslint-disable-next-line no-undefined
+        undefined,
+        // eslint-disable-next-line no-undefined
+        undefined,
+        null,
+        (error, snapshot) => {
+          if (error) {
+            reject(error);
+
+            return;
+          }
+
+          resolve(snapshot);
+        }
+      );
+    });
+  }
+
+  static async checkSnapshotValid(compilation, snapshot) {
+    if (!compilation.fileSystemInfo) {
+      return;
+    }
+
+    // eslint-disable-next-line consistent-return
+    return new Promise((resolve, reject) => {
+      compilation.fileSystemInfo.checkSnapshotValid(
+        snapshot,
+        (error, isValid) => {
+          if (error) {
+            reject(error);
+
+            return;
+          }
+
+          resolve(isValid);
+        }
+      );
+    });
+  }
+
   // eslint-disable-next-line class-methods-use-this
-  async runPattern(compiler, compilation, logger, inputPattern) {
+  static async runPattern(compiler, compilation, logger, cache, inputPattern) {
     const pattern =
       typeof inputPattern === 'string'
         ? { from: inputPattern }
@@ -49,7 +99,6 @@ class CopyPlugin {
     pattern.to = path.normalize(
       typeof pattern.to !== 'undefined' ? pattern.to : ''
     );
-
     pattern.context = path.normalize(
       typeof pattern.context !== 'undefined'
         ? !path.isAbsolute(pattern.context)
@@ -266,64 +315,109 @@ class CopyPlugin {
           compilation.fileDependencies.add(file.absoluteFrom);
         }
 
-        logger.debug(`reading "${file.absoluteFrom}" to write to assets`);
+        let source;
 
-        let data;
+        if (cache) {
+          const cacheEntry = await cache.getPromise(file.relativeFrom, null);
 
-        try {
-          data = await readFile(inputFileSystem, file.absoluteFrom);
-        } catch (error) {
-          compilation.errors.push(error);
+          if (cacheEntry) {
+            const isValidSnapshot = await CopyPlugin.checkSnapshotValid(
+              compilation,
+              cacheEntry.snapshot
+            );
 
-          return;
+            if (isValidSnapshot) {
+              ({ source } = cacheEntry);
+            }
+          }
         }
 
-        if (pattern.transform) {
-          logger.log(`transforming content for "${file.absoluteFrom}"`);
+        if (!source) {
+          let startTime;
 
-          if (pattern.cacheTransform) {
-            const cacheDirectory = pattern.cacheTransform.directory
-              ? pattern.cacheTransform.directory
-              : typeof pattern.cacheTransform === 'string'
-              ? pattern.cacheTransform
-              : findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
-            let defaultCacheKeys = {
-              version,
-              transform: pattern.transform,
-              contentHash: crypto.createHash('md4').update(data).digest('hex'),
-            };
+          if (cache) {
+            startTime = Date.now();
+          }
 
-            if (typeof pattern.cacheTransform.keys === 'function') {
-              defaultCacheKeys = await pattern.cacheTransform.keys(
-                defaultCacheKeys,
-                file.absoluteFrom
-              );
-            } else {
-              defaultCacheKeys = {
-                ...defaultCacheKeys,
-                ...pattern.cacheTransform.keys,
+          logger.debug(`reading "${file.absoluteFrom}" to write to assets`);
+
+          let data;
+
+          try {
+            data = await readFile(inputFileSystem, file.absoluteFrom);
+          } catch (error) {
+            compilation.errors.push(error);
+
+            return;
+          }
+
+          if (pattern.transform) {
+            logger.log(`transforming content for "${file.absoluteFrom}"`);
+
+            if (pattern.cacheTransform) {
+              const cacheDirectory = pattern.cacheTransform.directory
+                ? pattern.cacheTransform.directory
+                : typeof pattern.cacheTransform === 'string'
+                ? pattern.cacheTransform
+                : findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
+              let defaultCacheKeys = {
+                version,
+                transform: pattern.transform,
+                contentHash: crypto
+                  .createHash('md4')
+                  .update(data)
+                  .digest('hex'),
               };
-            }
 
-            const cacheKeys = serialize(defaultCacheKeys);
+              if (typeof pattern.cacheTransform.keys === 'function') {
+                defaultCacheKeys = await pattern.cacheTransform.keys(
+                  defaultCacheKeys,
+                  file.absoluteFrom
+                );
+              } else {
+                defaultCacheKeys = {
+                  ...defaultCacheKeys,
+                  ...pattern.cacheTransform.keys,
+                };
+              }
 
-            try {
-              const result = await cacache.get(cacheDirectory, cacheKeys);
+              const cacheKeys = serialize(defaultCacheKeys);
 
-              logger.debug(
-                `getting cached transformation for "${file.absoluteFrom}"`
-              );
+              try {
+                const result = await cacache.get(cacheDirectory, cacheKeys);
 
-              ({ data } = result);
-            } catch (_ignoreError) {
+                logger.debug(
+                  `getting cached transformation for "${file.absoluteFrom}"`
+                );
+
+                ({ data } = result);
+              } catch (_ignoreError) {
+                data = await pattern.transform(data, file.absoluteFrom);
+
+                logger.debug(
+                  `caching transformation for "${file.absoluteFrom}"`
+                );
+
+                await cacache.put(cacheDirectory, cacheKeys, data);
+              }
+            } else {
               data = await pattern.transform(data, file.absoluteFrom);
-
-              logger.debug(`caching transformation for "${file.absoluteFrom}"`);
-
-              await cacache.put(cacheDirectory, cacheKeys, data);
             }
-          } else {
-            data = await pattern.transform(data, file.absoluteFrom);
+          }
+
+          source = new RawSource(data);
+
+          if (cache) {
+            const snapshot = await CopyPlugin.createSnapshot(
+              compilation,
+              startTime,
+              file.relativeFrom
+            );
+
+            await cache.storePromise(file.relativeFrom, null, {
+              source,
+              snapshot,
+            });
           }
         }
 
@@ -349,7 +443,7 @@ class CopyPlugin {
             { resourcePath: file.absoluteFrom },
             file.webpackTo,
             {
-              content: data,
+              content: source.source(),
               context: pattern.context,
             }
           );
@@ -374,7 +468,7 @@ class CopyPlugin {
         }
 
         // eslint-disable-next-line no-param-reassign
-        file.data = data;
+        file.source = source;
         // eslint-disable-next-line no-param-reassign
         file.targetPath = normalizePath(file.webpackTo);
         // eslint-disable-next-line no-param-reassign
@@ -392,6 +486,10 @@ class CopyPlugin {
 
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       const logger = compilation.getLogger('copy-webpack-plugin');
+      const cache = compilation.getCache
+        ? compilation.getCache('CopyWebpackPlugin')
+        : // eslint-disable-next-line no-undefined
+          undefined;
 
       compilation.hooks.additionalAssets.tapAsync(
         'copy-webpack-plugin',
@@ -404,7 +502,13 @@ class CopyPlugin {
             assets = await Promise.all(
               this.patterns.map((item) =>
                 limit(async () =>
-                  this.runPattern(compiler, compilation, logger, item)
+                  CopyPlugin.runPattern(
+                    compiler,
+                    compilation,
+                    logger,
+                    cache,
+                    item
+                  )
                 )
               )
             );
@@ -426,11 +530,9 @@ class CopyPlugin {
                 absoluteFrom,
                 targetPath,
                 webpackTo,
-                data,
+                source,
                 force,
               } = asset;
-
-              const source = new RawSource(data);
 
               // For old version webpack 4
               /* istanbul ignore if */
