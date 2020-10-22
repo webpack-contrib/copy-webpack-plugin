@@ -2,7 +2,9 @@ import path from 'path';
 
 import { runEmit } from './helpers/run';
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+const FIXTURES_DIR_NORMALIZED = path
+  .join(__dirname, 'fixtures')
+  .replace(/\\/g, '/');
 
 describe('globOptions option', () => {
   // Expected behavior from `globby`/`fast-glob`
@@ -77,7 +79,9 @@ describe('globOptions option', () => {
   it('should ignore files when "from" is a file', (done) => {
     runEmit({
       expectedErrors: [
-        new Error(`unable to locate '${FIXTURES_DIR}${path.sep}file.txt' glob`),
+        new Error(
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}file.txt' glob`
+        ),
       ],
       patterns: [
         {
@@ -253,7 +257,7 @@ describe('globOptions option', () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate '${FIXTURES_DIR}${path.sep}directory${path.sep}**${path.sep}*' glob`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}directory${path.sep}**${path.sep}*' glob`
         ),
       ],
       patterns: [
@@ -272,7 +276,9 @@ describe('globOptions option', () => {
   it('should ignore files when "from" is a file (global ignore)', (done) => {
     runEmit({
       expectedErrors: [
-        new Error(`unable to locate '${FIXTURES_DIR}${path.sep}file.txt' glob`),
+        new Error(
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}file.txt' glob`
+        ),
       ],
       patterns: [
         {
