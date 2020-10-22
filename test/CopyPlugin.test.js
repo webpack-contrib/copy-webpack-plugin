@@ -754,7 +754,7 @@ describe('CopyPlugin', () => {
       });
     });
 
-    it('should work with the "filesystem" cache', async () => {
+    it.only('should work with the "filesystem" cache', async () => {
       const cacheDirectory = path.resolve(__dirname, './outputs/.cache/simple');
 
       await del(cacheDirectory);
@@ -763,6 +763,9 @@ describe('CopyPlugin', () => {
         cache: {
           type: 'filesystem',
           cacheDirectory,
+        },
+        infrastructureLogging: {
+          level: 'verbose',
         },
       });
 
@@ -775,6 +778,8 @@ describe('CopyPlugin', () => {
       }).apply(compiler);
 
       const { stats } = await compile(compiler);
+
+      expect(stats.compilation.logging).toMatchSnapshot('logs');
 
       if (webpack.version[0] === '4') {
         expect(
