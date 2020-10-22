@@ -88,7 +88,7 @@ describe('toType option', () => {
       expectedAssetKeys: [],
       expectedErrors: [
         new Error(
-          `unable to locate "nonexistent.txt" at "${FIXTURES_DIR}${path.sep}nonexistent.txt"`
+          `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
         ),
       ],
       patterns: [

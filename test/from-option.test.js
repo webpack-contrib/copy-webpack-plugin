@@ -71,7 +71,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate "symlink${path.sep}file-ln.txt" at "${FIXTURES_DIR}${path.sep}symlink${path.sep}file-ln.txt"`
+                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink${path.sep}file-ln.txt'`
                 ),
               ]
             : [],
@@ -91,7 +91,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate "nonexistent.txt" at "${FIXTURES_DIR}${path.sep}nonexistent.txt"`
+            `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
           ),
         ],
         patterns: [
@@ -210,7 +210,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate "symlink${path.sep}directory-ln" at "${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln\\**\\*"`
+                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln\\**\\*'`
                 ),
               ]
             : [],
@@ -294,9 +294,7 @@ describe('from option', () => {
       runEmit({
         expectedAssetKeys: [],
         expectedErrors: [
-          new Error(
-            `unable to locate "nonexistent" at "${FIXTURES_DIR}${path.sep}nonexistent"`
-          ),
+          new Error(`unable to locate '${FIXTURES_DIR}${path.sep}nonexistent'`),
         ],
         patterns: [
           {
@@ -475,7 +473,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate "symlink\\**\\*.txt" at "${FIXTURES_DIR}${path.sep}symlink\\**\\*.txt"`
+                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink\\**\\*.txt'`
                 ),
               ]
             : [],
@@ -505,7 +503,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate "nonexistent${path.sep}**${path.sep}*" at "${FIXTURES_DIR}${path.sep}nonexistent${path.sep}**${path.sep}*"`
+            `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent${path.sep}**${path.sep}*'`
           ),
         ],
         patterns: [
