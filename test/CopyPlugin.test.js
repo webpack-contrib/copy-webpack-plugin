@@ -998,6 +998,16 @@ describe('CopyPlugin', () => {
             .map((entry) =>
               entry.args[0].replace(/\\/g, '/').split(root).join('.')
             )
+            // TODO remove after drop webpack@4
+            .filter(
+              (item) =>
+                !item.startsWith('created snapshot') &&
+                !item.startsWith('creating snapshot') &&
+                !item.startsWith('getting cache') &&
+                !item.startsWith('missed cache') &&
+                !item.startsWith('stored cache') &&
+                !item.startsWith('storing cache')
+            )
             .sort();
 
           expect(
@@ -1030,6 +1040,16 @@ describe('CopyPlugin', () => {
             .get('copy-webpack-plugin')
             .map((entry) =>
               entry.args[0].replace(/\\/g, '/').split(root).join('.')
+            )
+            // TODO remove after drop webpack@4
+            .filter(
+              (item) =>
+                !item.startsWith('created snapshot') &&
+                !item.startsWith('creating snapshot') &&
+                !item.startsWith('getting cache') &&
+                !item.startsWith('missed cache') &&
+                !item.startsWith('stored cache') &&
+                !item.startsWith('storing cache')
             )
             .sort();
 
@@ -1065,6 +1085,16 @@ describe('CopyPlugin', () => {
             .get('copy-webpack-plugin')
             .map((entry) =>
               entry.args[0].replace(/\\/g, '/').split(root).join('.')
+            )
+            // TODO remove after drop webpack@4
+            .filter(
+              (item) =>
+                !item.startsWith('created snapshot') &&
+                !item.startsWith('creating snapshot') &&
+                !item.startsWith('getting cache') &&
+                !item.startsWith('missed cache') &&
+                !item.startsWith('stored cache') &&
+                !item.startsWith('storing cache')
             )
             .sort();
 
