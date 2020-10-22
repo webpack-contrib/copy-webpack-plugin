@@ -834,9 +834,6 @@ describe('CopyPlugin', () => {
 
       const assetsInfo = [];
 
-      // eslint-disable-next-line no-console
-      console.log(stats.compilation.assetsInfo);
-
       for (const [name, info] of stats.compilation.assetsInfo.entries()) {
         assetsInfo.push({
           name,
@@ -848,7 +845,19 @@ describe('CopyPlugin', () => {
         });
       }
 
-      expect(assetsInfo).toMatchSnapshot('assets info');
+      expect(
+        assetsInfo.sort((a, b) => {
+          if (a.name < b.name) {
+            return -1;
+          }
+
+          if (a.name > b.name) {
+            return 1;
+          }
+
+          return 0;
+        })
+      ).toMatchSnapshot('assets info');
     });
   });
 

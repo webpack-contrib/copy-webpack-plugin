@@ -13,18 +13,22 @@ export default (config = {}) => {
     },
     module: {
       rules: [
-        {
-          test: /\.txt/,
-          type: 'asset/resource',
-        },
+        webpack.version[0] === '5'
+          ? {
+              test: /\.txt/,
+              type: 'asset/resource',
+            }
+          : {
+              test: /\.txt/,
+              loader: 'file-loader',
+              options: {
+                name: 'assets/[name].[ext]',
+              },
+            },
       ],
     },
     ...config,
   };
-
-  if (webpack.version[0] === 5) {
-    fullConfig.stats.source = true;
-  }
 
   const compiler = webpack(fullConfig);
 

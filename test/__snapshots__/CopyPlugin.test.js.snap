@@ -165,7 +165,7 @@ exports[`CopyPlugin stats should work have assets info: assets 1`] = `
 Object {
   ".dottedfile": "dottedfile contents
 ",
-  "31d6cfe0d16ae931b73c.txt": "",
+  "assets/deepnested.txt": "",
   "directoryfile.txt": "new",
   "nested/deep-nested/deepnested.txt": "",
   "nested/nestedfile.txt": "",
@@ -176,27 +176,19 @@ exports[`CopyPlugin stats should work have assets info: assets info 1`] = `
 Array [
   Object {
     "info": Object {
-      "copied": undefined,
-      "immutable": undefined,
-      "sourceFilename": undefined,
-    },
-    "name": "main.js",
-  },
-  Object {
-    "info": Object {
-      "copied": undefined,
-      "immutable": true,
-      "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
-    },
-    "name": "31d6cfe0d16ae931b73c.txt",
-  },
-  Object {
-    "info": Object {
       "copied": true,
       "immutable": undefined,
       "sourceFilename": "directory/.dottedfile",
     },
     "name": ".dottedfile",
+  },
+  Object {
+    "info": Object {
+      "copied": undefined,
+      "immutable": false,
+      "sourceFilename": undefined,
+    },
+    "name": "assets/deepnested.txt",
   },
   Object {
     "info": Object {
@@ -208,11 +200,11 @@ Array [
   },
   Object {
     "info": Object {
-      "copied": true,
+      "copied": undefined,
       "immutable": undefined,
-      "sourceFilename": "directory/nested/nestedfile.txt",
+      "sourceFilename": undefined,
     },
-    "name": "nested/nestedfile.txt",
+    "name": "main.js",
   },
   Object {
     "info": Object {
@@ -221,6 +213,14 @@ Array [
       "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
     },
     "name": "nested/deep-nested/deepnested.txt",
+  },
+  Object {
+    "info": Object {
+      "copied": true,
+      "immutable": undefined,
+      "sourceFilename": "directory/nested/nestedfile.txt",
+    },
+    "name": "nested/nestedfile.txt",
   },
 ]
 `;
