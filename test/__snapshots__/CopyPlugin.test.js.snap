@@ -186,7 +186,7 @@ Array [
     "info": Object {
       "copied": undefined,
       "immutable": undefined,
-      "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
+      "sourceFilename": undefined,
     },
     "name": "asset-modules/deepnested.txt",
   },
