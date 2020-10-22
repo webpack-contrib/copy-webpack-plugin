@@ -99,12 +99,13 @@ class CopyPlugin {
     pattern.to = path.normalize(
       typeof pattern.to !== 'undefined' ? pattern.to : ''
     );
+    pattern.compilerContext = compiler.context;
     pattern.context = path.normalize(
       typeof pattern.context !== 'undefined'
         ? !path.isAbsolute(pattern.context)
-          ? path.join(compiler.options.context, pattern.context)
+          ? path.join(pattern.compilerContext, pattern.context)
           : pattern.context
-        : compiler.options.context
+        : pattern.compilerContext
     );
 
     logger.debug(`processing from "${pattern.from}" to "${pattern.to}"`);
@@ -303,7 +304,12 @@ class CopyPlugin {
 
       logger.log(`determined that "${from}" should write to "${webpackTo}"`);
 
-      return { absoluteFrom, relativeFrom, webpackTo };
+      const sourceFilename = path.relative(
+        pattern.compilerContext,
+        absoluteFrom
+      );
+
+      return { absoluteFrom, sourceFilename, relativeFrom, webpackTo };
     });
 
     return Promise.all(
@@ -527,6 +533,7 @@ class CopyPlugin {
             .filter(Boolean)
             .forEach((asset) => {
               const {
+                sourceFilename,
                 absoluteFrom,
                 targetPath,
                 webpackTo,
@@ -551,7 +558,7 @@ class CopyPlugin {
                     `force updating "${webpackTo}" to compilation assets from "${absoluteFrom}"`
                   );
 
-                  const info = { copied: true };
+                  const info = { copied: true, sourceFilename };
 
                   if (asset.immutable) {
                     info.immutable = true;
@@ -573,7 +580,7 @@ class CopyPlugin {
                 `writing "${webpackTo}" to compilation assets from "${absoluteFrom}"`
               );
 
-              const info = { copied: true };
+              const info = { copied: true, sourceFilename };
 
               if (asset.immutable) {
                 info.immutable = true;

@@ -2,6 +2,7 @@ import path from 'path';
 
 import webpack from 'webpack';
 import del from 'del';
+import { createFsFromVolume, Volume } from 'memfs';
 
 import CopyPlugin from '../src';
 
@@ -380,6 +381,70 @@ describe('CopyPlugin', () => {
         .then(done)
         .catch(done);
     });
+
+    it('should work with multi compiler mode', async () => {
+      const compiler = webpack([
+        {
+          mode: 'development',
+          context: path.resolve(__dirname, './fixtures'),
+          entry: path.resolve(__dirname, './helpers/enter.js'),
+          output: {
+            path: path.resolve(__dirname, './outputs/multi-compiler/dist/a'),
+          },
+          stats: {
+            source: true,
+          },
+          plugins: [
+            new CopyPlugin({
+              patterns: [
+                {
+                  from: path.resolve(__dirname, './fixtures/directory'),
+                },
+              ],
+            }),
+          ],
+        },
+        {
+          mode: 'development',
+          entry: path.resolve(__dirname, './helpers/enter.js'),
+          output: {
+            path: path.resolve(__dirname, './outputs/multi-compiler/dist/b'),
+          },
+          stats: {
+            source: true,
+          },
+          plugins: [
+            new CopyPlugin({
+              patterns: [
+                {
+                  context: path.resolve(__dirname, './fixtures'),
+                  from: path.resolve(__dirname, './fixtures/directory'),
+                },
+              ],
+            }),
+          ],
+        },
+      ]);
+
+      compiler.compilers.forEach((item) => {
+        const outputFileSystem = createFsFromVolume(new Volume());
+        // Todo remove when we drop webpack@4 support
+        outputFileSystem.join = path.join.bind(path);
+
+        // eslint-disable-next-line no-param-reassign
+        item.outputFileSystem = outputFileSystem;
+      });
+
+      const { stats } = await compile(compiler);
+
+      stats.stats.forEach((item, index) => {
+        expect(item.compilation.errors).toMatchSnapshot('errors');
+        expect(item.compilation.warnings).toMatchSnapshot('warnings');
+        expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
+          'assets'
+        );
+      });
+    });
   });
 
   describe('watch mode', () => {
@@ -744,6 +809,41 @@ describe('CopyPlugin', () => {
 
         resolve();
       });
+    });
+  });
+
+  describe('stats', () => {
+    it('should work have assets info', async () => {
+      const compiler = getCompiler();
+
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.resolve(__dirname, './fixtures/directory'),
+          },
+        ],
+      }).apply(compiler);
+
+      const { stats } = await compile(compiler);
+
+      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
+      expect(stats.compilation.errors).toMatchSnapshot('errors');
+      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
+
+      const assetsInfo = [];
+
+      for (const [name, info] of stats.compilation.assetsInfo.entries()) {
+        assetsInfo.push({
+          name,
+          info: {
+            immutable: info.immutable,
+            copied: info.copied,
+            sourceFilename: info.sourceFilename,
+          },
+        });
+      }
+
+      expect(assetsInfo).toMatchSnapshot('assets info');
     });
   });
 
