@@ -37,7 +37,7 @@ class CopyPlugin {
     this.options = options.options || {};
   }
 
-  static async createSnapshot(compilation, dependency) {
+  static async createSnapshot(compilation, startTime, dependency) {
     if (!compilation.fileSystemInfo) {
       return;
     }
@@ -45,11 +45,12 @@ class CopyPlugin {
     // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
       compilation.fileSystemInfo.createSnapshot(
+        startTime,
+        [dependency],
         // eslint-disable-next-line no-undefined
         undefined,
-        [dependency],
-        [],
-        [],
+        // eslint-disable-next-line no-undefined
+        undefined,
         null,
         (error, snapshot) => {
           if (error) {
@@ -314,53 +315,31 @@ class CopyPlugin {
           compilation.fileDependencies.add(file.absoluteFrom);
         }
 
-        let itemCache;
         let source;
+        let cacheEntry;
 
-        // TODO logger
         if (cache) {
-          let snapshot;
+          cacheEntry = await cache.getPromise(file.relativeFrom, null);
 
-          try {
-            snapshot = await CopyPlugin.createSnapshot(
+          if (cacheEntry) {
+            const isValidSnapshot = await CopyPlugin.checkSnapshotValid(
               compilation,
-              file.absoluteFrom
+              cacheEntry.snapshot
             );
-          } catch (error) {
-            compilation.errors.push(error);
-
-            return;
-          }
-
-          if (snapshot) {
-            let isValidSnapshot;
-
-            try {
-              isValidSnapshot = await CopyPlugin.checkSnapshotValid(
-                compilation,
-                snapshot
-              );
-            } catch (error) {
-              compilation.errors.push(error);
-
-              return;
-            }
-
-            itemCache = cache.getItemCache(file.relativeFrom, null);
 
             if (isValidSnapshot) {
-              try {
-                source = await itemCache.getPromise();
-              } catch (error) {
-                compilation.errors.push(error);
-
-                return;
-              }
+              ({ source } = cacheEntry);
             }
           }
         }
 
         if (!source) {
+          let startTime;
+
+          if (cache) {
+            startTime = Date.now();
+          }
+
           logger.debug(`reading "${file.absoluteFrom}" to write to assets`);
 
           let data;
@@ -429,14 +408,17 @@ class CopyPlugin {
 
           source = new RawSource(data);
 
-          if (itemCache) {
-            try {
-              await itemCache.storePromise(source);
-            } catch (error) {
-              compilation.errors.push(error);
+          if (cache) {
+            const snapshot = await CopyPlugin.createSnapshot(
+              compilation,
+              startTime,
+              file.relativeFrom
+            );
 
-              return;
-            }
+            await cache.storePromise(file.relativeFrom, null, {
+              source,
+              snapshot,
+            });
           }
         }
 
@@ -505,10 +487,10 @@ class CopyPlugin {
 
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       const logger = compilation.getLogger('copy-webpack-plugin');
-      // eslint-disable-next-line no-undefined
       const cache = compilation.getCache
         ? compilation.getCache('CopyWebpackPlugin')
-        : undefined;
+        : // eslint-disable-next-line no-undefined
+          undefined;
 
       compilation.hooks.additionalAssets.tapAsync(
         'copy-webpack-plugin',
