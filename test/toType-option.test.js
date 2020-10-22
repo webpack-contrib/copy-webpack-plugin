@@ -87,9 +87,7 @@ describe('toType option', () => {
     runEmit({
       expectedAssetKeys: [],
       expectedErrors: [
-        new Error(
-          `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
-        ),
+        new Error(`unable to locate '${FIXTURES_DIR}/nonexistent.txt' glob`),
       ],
       patterns: [
         {

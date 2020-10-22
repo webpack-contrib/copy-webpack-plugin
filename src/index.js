@@ -256,7 +256,7 @@ class CopyPlugin {
         return;
       }
 
-      const missingError = new Error(`unable to locate '${pattern.glob}'`);
+      const missingError = new Error(`unable to locate '${pattern.glob}' glob`);
 
       compilation.errors.push(missingError);
 

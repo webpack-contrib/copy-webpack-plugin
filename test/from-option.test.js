@@ -71,7 +71,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink${path.sep}file-ln.txt'`
+                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink${path.sep}file-ln.txt' glob`
                 ),
               ]
             : [],
@@ -91,7 +91,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent.txt'`
+            `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent.txt' glob`
           ),
         ],
         patterns: [
@@ -210,7 +210,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln\\**\\*'`
+                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln\\**\\*' glob`
                 ),
               ]
             : [],
@@ -294,7 +294,9 @@ describe('from option', () => {
       runEmit({
         expectedAssetKeys: [],
         expectedErrors: [
-          new Error(`unable to locate '${FIXTURES_DIR}${path.sep}nonexistent'`),
+          new Error(
+            `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent' glob`
+          ),
         ],
         patterns: [
           {
@@ -473,7 +475,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink\\**\\*.txt'`
+                  `unable to locate '${FIXTURES_DIR}${path.sep}symlink\\**\\*.txt' glob`
                 ),
               ]
             : [],
@@ -503,7 +505,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent${path.sep}**${path.sep}*'`
+            `unable to locate '${FIXTURES_DIR}${path.sep}nonexistent${path.sep}**${path.sep}*' glob`
           ),
         ],
         patterns: [
