@@ -28,6 +28,62 @@ exports[`CopyPlugin basic should work with multi compiler mode: warnings 1`] = `
 
 exports[`CopyPlugin basic should work with multi compiler mode: warnings 2`] = `Array []`;
 
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 1`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 2`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 3`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 4`] = `
+Object {
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 1`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 2`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 3`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 4`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 1`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 2`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 3`] = `Array []`;
+
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 4`] = `Array []`;
+
 exports[`CopyPlugin cache should work with the "filesystem" cache: assets 1`] = `
 Object {
   ".dottedfile": "dottedfile contents
