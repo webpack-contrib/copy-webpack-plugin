@@ -11,12 +11,27 @@ export default (config = {}) => {
     output: {
       path: path.resolve(__dirname, '../build'),
     },
+    module: {
+      rules: [
+        webpack.version[0] === '5'
+          ? {
+              test: /\.txt/,
+              type: 'asset/resource',
+              generator: {
+                filename: 'asset-modules/[name][ext]',
+              },
+            }
+          : {
+              test: /\.txt/,
+              loader: 'file-loader',
+              options: {
+                name: 'asset-modules/[name].[ext]',
+              },
+            },
+      ],
+    },
     ...config,
   };
-
-  if (webpack.version[0] === 5) {
-    fullConfig.stats.source = true;
-  }
 
   const compiler = webpack(fullConfig);
 
