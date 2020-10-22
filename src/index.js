@@ -316,10 +316,9 @@ class CopyPlugin {
         }
 
         let source;
-        let cacheEntry;
 
         if (cache) {
-          cacheEntry = await cache.getPromise(file.relativeFrom, null);
+          const cacheEntry = await cache.getPromise(file.relativeFrom, null);
 
           if (cacheEntry) {
             const isValidSnapshot = await CopyPlugin.checkSnapshotValid(
