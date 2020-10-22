@@ -838,7 +838,9 @@ describe('CopyPlugin', () => {
         assetsInfo.push({
           name,
           info: {
-            immutable: info.immutable,
+            // Workaround for `file-loader`
+            // eslint-disable-next-line no-undefined
+            immutable: info.immutable === false ? undefined : info.immutable,
             copied: info.copied,
             sourceFilename: info.sourceFilename,
           },
