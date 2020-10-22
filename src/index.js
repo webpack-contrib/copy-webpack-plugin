@@ -242,11 +242,19 @@ class CopyPlugin {
       `begin globbing "${pattern.glob}" with a context of "${pattern.context}"`
     );
 
-    const paths = await globby(pattern.glob, pattern.globOptions);
+    let paths;
+
+    try {
+      paths = await globby(pattern.glob, pattern.globOptions);
+    } catch (error) {
+      compilation.errors.push(error);
+
+      return;
+    }
 
     if (paths.length === 0) {
       if (pattern.noErrorOnMissing) {
-        return Promise.resolve();
+        return;
       }
 
       const missingError = new Error(
@@ -257,7 +265,7 @@ class CopyPlugin {
 
       compilation.errors.push(missingError);
 
-      return Promise.resolve();
+      return;
     }
 
     const filteredPaths = (
@@ -269,7 +277,15 @@ class CopyPlugin {
           }
 
           if (pattern.filter) {
-            const isFiltered = await pattern.filter(item.path);
+            let isFiltered;
+
+            try {
+              isFiltered = await pattern.filter(item.path);
+            } catch (error) {
+              compilation.errors.push(error);
+
+              return false;
+            }
 
             return isFiltered ? item : false;
           }
@@ -280,7 +296,7 @@ class CopyPlugin {
     ).filter((item) => item);
 
     if (filteredPaths.length === 0) {
-      return Promise.resolve();
+      return;
     }
 
     const files = filteredPaths.map((item) => {
@@ -311,6 +327,7 @@ class CopyPlugin {
       return { absoluteFilename, sourceFilename, filename };
     });
 
+    // eslint-disable-next-line consistent-return
     return Promise.all(
       files.map(async (file) => {
         // If this came from a glob, add it to the file watchlist
@@ -323,13 +340,29 @@ class CopyPlugin {
         let source;
 
         if (cache) {
-          const cacheEntry = await cache.getPromise(file.sourceFilename, null);
+          let cacheEntry;
+
+          try {
+            cacheEntry = await cache.getPromise(file.sourceFilename, null);
+          } catch (error) {
+            compilation.errors.push(error);
+
+            return;
+          }
 
           if (cacheEntry) {
-            const isValidSnapshot = await CopyPlugin.checkSnapshotValid(
-              compilation,
-              cacheEntry.snapshot
-            );
+            let isValidSnapshot;
+
+            try {
+              isValidSnapshot = await CopyPlugin.checkSnapshotValid(
+                compilation,
+                cacheEntry.snapshot
+              );
+            } catch (error) {
+              compilation.errors.push(error);
+
+              return;
+            }
 
             if (isValidSnapshot) {
               ({ source } = cacheEntry);
@@ -374,17 +407,16 @@ class CopyPlugin {
                   .digest('hex'),
               };
 
-              if (typeof pattern.cacheTransform.keys === 'function') {
-                defaultCacheKeys = await pattern.cacheTransform.keys(
-                  defaultCacheKeys,
-                  file.absoluteFilename
-                );
-              } else {
-                defaultCacheKeys = {
-                  ...defaultCacheKeys,
-                  ...pattern.cacheTransform.keys,
-                };
-              }
+              defaultCacheKeys =
+                typeof pattern.cacheTransform.keys === 'function'
+                  ? await pattern.cacheTransform.keys(
+                      defaultCacheKeys,
+                      file.absoluteFilename
+                    )
+                  : {
+                      ...defaultCacheKeys,
+                      ...pattern.cacheTransform.keys,
+                    };
 
               const cacheKeys = serialize(defaultCacheKeys);
 
@@ -413,16 +445,32 @@ class CopyPlugin {
           source = new RawSource(data);
 
           if (cache) {
-            const snapshot = await CopyPlugin.createSnapshot(
-              compilation,
-              startTime,
-              file.sourceFilename
-            );
+            let snapshot;
 
-            await cache.storePromise(file.sourceFilename, null, {
-              source,
-              snapshot,
-            });
+            try {
+              snapshot = await CopyPlugin.createSnapshot(
+                compilation,
+                startTime,
+                file.sourceFilename
+              );
+            } catch (error) {
+              compilation.errors.push(error);
+
+              return;
+            }
+
+            if (snapshot) {
+              try {
+                await cache.storePromise(file.sourceFilename, null, {
+                  source,
+                  snapshot,
+                });
+              } catch (error) {
+                compilation.errors.push(error);
+
+                return;
+              }
+            }
           }
         }
 
