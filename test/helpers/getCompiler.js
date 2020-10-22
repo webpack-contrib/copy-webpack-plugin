@@ -17,12 +17,15 @@ export default (config = {}) => {
           ? {
               test: /\.txt/,
               type: 'asset/resource',
+              generator: {
+                filename: 'asset-modules/[name][ext]',
+              },
             }
           : {
               test: /\.txt/,
               loader: 'file-loader',
               options: {
-                name: 'assets/[name].[ext]',
+                name: 'asset-modules/[name].[ext]',
               },
             },
       ],
