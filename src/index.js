@@ -304,9 +304,8 @@ class CopyPlugin {
 
       logger.log(`determined that "${from}" should write to "${webpackTo}"`);
 
-      const sourceFilename = path.relative(
-        pattern.compilerContext,
-        absoluteFrom
+      const sourceFilename = normalizePath(
+        path.relative(pattern.compilerContext, absoluteFrom)
       );
 
       return { absoluteFrom, sourceFilename, relativeFrom, webpackTo };
