@@ -912,7 +912,7 @@ describe('CopyPlugin', () => {
               Object.keys(item.compilation.assets).filter(
                 (assetName) => item.compilation.assets[assetName].emitted
               ).length
-            ).toBe(5);
+            ).toBe(4);
           } else {
             expect(item.compilation.emittedAssets.size).toBe(0);
           }
