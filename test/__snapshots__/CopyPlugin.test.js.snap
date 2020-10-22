@@ -165,6 +165,7 @@ exports[`CopyPlugin stats should work have assets info: assets 1`] = `
 Object {
   ".dottedfile": "dottedfile contents
 ",
+  "31d6cfe0d16ae931b73c.txt": "",
   "directoryfile.txt": "new",
   "nested/deep-nested/deepnested.txt": "",
   "nested/nestedfile.txt": "",
@@ -180,6 +181,14 @@ Array [
       "sourceFilename": undefined,
     },
     "name": "main.js",
+  },
+  Object {
+    "info": Object {
+      "copied": undefined,
+      "immutable": true,
+      "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
+    },
+    "name": "31d6cfe0d16ae931b73c.txt",
   },
   Object {
     "info": Object {

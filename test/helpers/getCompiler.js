@@ -11,6 +11,14 @@ export default (config = {}) => {
     output: {
       path: path.resolve(__dirname, '../build'),
     },
+    module: {
+      rules: [
+        {
+          test: /\.txt/,
+          type: 'asset/resource',
+        },
+      ],
+    },
     ...config,
   };
 

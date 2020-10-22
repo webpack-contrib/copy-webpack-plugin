@@ -814,7 +814,9 @@ describe('CopyPlugin', () => {
 
   describe('stats', () => {
     it('should work have assets info', async () => {
-      const compiler = getCompiler();
+      const compiler = getCompiler({
+        entry: path.resolve(__dirname, './helpers/enter-with-asset-modules.js'),
+      });
 
       new CopyPlugin({
         patterns: [
