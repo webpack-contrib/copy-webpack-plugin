@@ -2,7 +2,9 @@ import path from 'path';
 
 import { runEmit } from './helpers/run';
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+const FIXTURES_DIR_NORMALIZED = path
+  .join(__dirname, 'fixtures')
+  .replace(/\\/g, '/');
 
 describe('toType option', () => {
   it('should move a file to a new file', (done) => {
@@ -88,7 +90,7 @@ describe('toType option', () => {
       expectedAssetKeys: [],
       expectedErrors: [
         new Error(
-          `unable to locate "nonexistent.txt" at "${FIXTURES_DIR}${path.sep}nonexistent.txt"`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent.txt' glob`
         ),
       ],
       patterns: [

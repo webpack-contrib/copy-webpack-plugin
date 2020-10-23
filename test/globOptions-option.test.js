@@ -2,7 +2,9 @@ import path from 'path';
 
 import { runEmit } from './helpers/run';
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+const FIXTURES_DIR_NORMALIZED = path
+  .join(__dirname, 'fixtures')
+  .replace(/\\/g, '/');
 
 describe('globOptions option', () => {
   // Expected behavior from `globby`/`fast-glob`
@@ -78,7 +80,7 @@ describe('globOptions option', () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate "file.txt" at "${FIXTURES_DIR}${path.sep}file.txt"`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/file.txt' glob`
         ),
       ],
       patterns: [
@@ -255,7 +257,7 @@ describe('globOptions option', () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate "directory" at "${FIXTURES_DIR}${path.sep}directory${path.sep}**${path.sep}*"`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/directory/**/*' glob`
         ),
       ],
       patterns: [
@@ -275,7 +277,7 @@ describe('globOptions option', () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate "file.txt" at "${FIXTURES_DIR}${path.sep}file.txt"`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/file.txt' glob`
         ),
       ],
       patterns: [

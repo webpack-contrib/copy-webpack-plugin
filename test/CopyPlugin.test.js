@@ -955,11 +955,12 @@ describe('CopyPlugin', () => {
         assetsInfo.push({
           name,
           info: {
-            // Workaround for `file-loader`
+            // TODO Workaround for `file-loader`, remove after update
             // eslint-disable-next-line no-undefined
             immutable: info.immutable === false ? undefined : info.immutable,
             copied: info.copied,
-            sourceFilename: info.sourceFilename,
+            // TODO Workaround for `file-loader`, remove after update
+            // sourceFilename: info.sourceFilename,
           },
         });
       }
@@ -998,6 +999,16 @@ describe('CopyPlugin', () => {
             .map((entry) =>
               entry.args[0].replace(/\\/g, '/').split(root).join('.')
             )
+            // TODO remove after drop webpack@4
+            .filter(
+              (item) =>
+                !item.startsWith('created snapshot') &&
+                !item.startsWith('creating snapshot') &&
+                !item.startsWith('getting cache') &&
+                !item.startsWith('missed cache') &&
+                !item.startsWith('stored cache') &&
+                !item.startsWith('storing cache')
+            )
             .sort();
 
           expect(
@@ -1030,6 +1041,16 @@ describe('CopyPlugin', () => {
             .get('copy-webpack-plugin')
             .map((entry) =>
               entry.args[0].replace(/\\/g, '/').split(root).join('.')
+            )
+            // TODO remove after drop webpack@4
+            .filter(
+              (item) =>
+                !item.startsWith('created snapshot') &&
+                !item.startsWith('creating snapshot') &&
+                !item.startsWith('getting cache') &&
+                !item.startsWith('missed cache') &&
+                !item.startsWith('stored cache') &&
+                !item.startsWith('storing cache')
             )
             .sort();
 
@@ -1065,6 +1086,16 @@ describe('CopyPlugin', () => {
             .get('copy-webpack-plugin')
             .map((entry) =>
               entry.args[0].replace(/\\/g, '/').split(root).join('.')
+            )
+            // TODO remove after drop webpack@4
+            .filter(
+              (item) =>
+                !item.startsWith('created snapshot') &&
+                !item.startsWith('creating snapshot') &&
+                !item.startsWith('getting cache') &&
+                !item.startsWith('missed cache') &&
+                !item.startsWith('stored cache') &&
+                !item.startsWith('storing cache')
             )
             .sort();
 

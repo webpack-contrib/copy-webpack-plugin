@@ -2,7 +2,6 @@ import path from 'path';
 
 import { runEmit } from './helpers/run';
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
 const FIXTURES_DIR_NORMALIZED = path
   .join(__dirname, 'fixtures')
   .replace(/\\/g, '/');
@@ -71,7 +70,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate "symlink${path.sep}file-ln.txt" at "${FIXTURES_DIR}${path.sep}symlink${path.sep}file-ln.txt"`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/file-ln.txt' glob`
                 ),
               ]
             : [],
@@ -91,7 +90,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate "nonexistent.txt" at "${FIXTURES_DIR}${path.sep}nonexistent.txt"`
+            `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent.txt' glob`
           ),
         ],
         patterns: [
@@ -210,7 +209,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate "symlink${path.sep}directory-ln" at "${FIXTURES_DIR}${path.sep}symlink${path.sep}directory-ln\\**\\*"`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/directory-ln/**/*' glob`
                 ),
               ]
             : [],
@@ -295,7 +294,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate "nonexistent" at "${FIXTURES_DIR}${path.sep}nonexistent"`
+            `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent' glob`
           ),
         ],
         patterns: [
@@ -475,7 +474,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate "symlink\\**\\*.txt" at "${FIXTURES_DIR}${path.sep}symlink\\**\\*.txt"`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/**/*.txt' glob`
                 ),
               ]
             : [],
@@ -505,7 +504,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate "nonexistent${path.sep}**${path.sep}*" at "${FIXTURES_DIR}${path.sep}nonexistent${path.sep}**${path.sep}*"`
+            `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent/**/*' glob`
           ),
         ],
         patterns: [
