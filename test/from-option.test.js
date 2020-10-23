@@ -70,7 +70,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}symlink${path.sep}file-ln.txt' glob`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/file-ln.txt' glob`
                 ),
               ]
             : [],
@@ -90,7 +90,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}nonexistent.txt' glob`
+            `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent.txt' glob`
           ),
         ],
         patterns: [
@@ -209,7 +209,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}symlink${path.sep}directory-ln\\**\\*' glob`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/directory-ln\\**\\*' glob`
                 ),
               ]
             : [],
@@ -294,7 +294,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}nonexistent' glob`
+            `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent' glob`
           ),
         ],
         patterns: [
@@ -474,7 +474,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}symlink\\**\\*.txt' glob`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink\\**\\*.txt' glob`
                 ),
               ]
             : [],
@@ -504,7 +504,7 @@ describe('from option', () => {
         expectedAssetKeys: [],
         expectedErrors: [
           new Error(
-            `unable to locate '${FIXTURES_DIR_NORMALIZED}${path.sep}nonexistent${path.sep}**${path.sep}*' glob`
+            `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent/**/*' glob`
           ),
         ],
         patterns: [
