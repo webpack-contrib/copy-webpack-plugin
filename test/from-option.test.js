@@ -209,7 +209,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/directory-ln\\**\\*' glob`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/directory-ln/**/*' glob`
                 ),
               ]
             : [],
@@ -474,7 +474,7 @@ describe('from option', () => {
           process.platform === 'win32'
             ? [
                 new Error(
-                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink\\**\\*.txt' glob`
+                  `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/**/*.txt' glob`
                 ),
               ]
             : [],
