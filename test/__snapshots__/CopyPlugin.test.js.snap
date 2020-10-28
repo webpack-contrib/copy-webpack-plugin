@@ -252,6 +252,7 @@ Array [
     "info": Object {
       "copied": true,
       "immutable": undefined,
+      "sourceFilename": "directory/.dottedfile",
     },
     "name": ".dottedfile",
   },
@@ -259,6 +260,7 @@ Array [
     "info": Object {
       "copied": undefined,
       "immutable": undefined,
+      "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
     },
     "name": "asset-modules/deepnested.txt",
   },
@@ -266,6 +268,7 @@ Array [
     "info": Object {
       "copied": true,
       "immutable": undefined,
+      "sourceFilename": "directory/directoryfile.txt",
     },
     "name": "directoryfile.txt",
   },
@@ -273,6 +276,7 @@ Array [
     "info": Object {
       "copied": undefined,
       "immutable": undefined,
+      "sourceFilename": undefined,
     },
     "name": "main.js",
   },
@@ -280,6 +284,7 @@ Array [
     "info": Object {
       "copied": true,
       "immutable": undefined,
+      "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
     },
     "name": "nested/deep-nested/deepnested.txt",
   },
@@ -287,6 +292,7 @@ Array [
     "info": Object {
       "copied": true,
       "immutable": undefined,
+      "sourceFilename": "directory/nested/nestedfile.txt",
     },
     "name": "nested/nestedfile.txt",
   },

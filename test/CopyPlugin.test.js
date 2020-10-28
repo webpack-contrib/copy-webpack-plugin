@@ -955,12 +955,9 @@ describe('CopyPlugin', () => {
         assetsInfo.push({
           name,
           info: {
-            // TODO Workaround for `file-loader`, remove after update
-            // eslint-disable-next-line no-undefined
-            immutable: info.immutable === false ? undefined : info.immutable,
+            immutable: info.immutable,
             copied: info.copied,
-            // TODO Workaround for `file-loader`, remove after update
-            // sourceFilename: info.sourceFilename,
+            sourceFilename: info.sourceFilename,
           },
         });
       }
