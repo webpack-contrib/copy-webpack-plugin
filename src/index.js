@@ -417,71 +417,6 @@ class CopyPlugin {
 
             logger.debug(`read '${absoluteFilename}'`);
 
-            if (pattern.transform) {
-              logger.log(`transforming content for '${absoluteFilename}'...`);
-
-              if (pattern.cacheTransform) {
-                const cacheDirectory = pattern.cacheTransform.directory
-                  ? pattern.cacheTransform.directory
-                  : typeof pattern.cacheTransform === 'string'
-                  ? pattern.cacheTransform
-                  : findCacheDir({ name: 'copy-webpack-plugin' }) ||
-                    os.tmpdir();
-                let defaultCacheKeys = {
-                  version,
-                  transform: pattern.transform,
-                  contentHash: crypto
-                    .createHash('md4')
-                    .update(data)
-                    .digest('hex'),
-                };
-
-                defaultCacheKeys =
-                  typeof pattern.cacheTransform.keys === 'function'
-                    ? await pattern.cacheTransform.keys(
-                        defaultCacheKeys,
-                        absoluteFilename
-                      )
-                    : {
-                        ...defaultCacheKeys,
-                        ...pattern.cacheTransform.keys,
-                      };
-
-                const cacheKeys = serialize(defaultCacheKeys);
-
-                try {
-                  logger.debug(
-                    `getting transformation cache for '${absoluteFilename}'...`
-                  );
-
-                  const cachedResult = await cacache.get(
-                    cacheDirectory,
-                    cacheKeys
-                  );
-
-                  ({ data } = cachedResult);
-                } catch (_ignoreError) {
-                  logger.debug(
-                    `no transformation cache for '${absoluteFilename}'...`
-                  );
-
-                  data = await pattern.transform(data, absoluteFilename);
-
-                  logger.debug(
-                    `caching transformation for '${absoluteFilename}'`
-                  );
-
-                  await cacache.put(cacheDirectory, cacheKeys, data);
-
-                  logger.debug(
-                    `cached transformation for '${absoluteFilename}'`
-                  );
-                }
-              } else {
-                data = await pattern.transform(data, absoluteFilename);
-              }
-            }
-
             result.source = new RawSource(data);
 
             if (cache) {
@@ -518,6 +453,76 @@ class CopyPlugin {
 
                 logger.debug(`stored cache for '${absoluteFilename}'`);
               }
+            }
+          }
+
+          if (pattern.transform) {
+            logger.log(`transforming content for '${absoluteFilename}'...`);
+
+            if (pattern.cacheTransform) {
+              const buffer = result.source.source();
+              const cacheDirectory = pattern.cacheTransform.directory
+                ? pattern.cacheTransform.directory
+                : typeof pattern.cacheTransform === 'string'
+                ? pattern.cacheTransform
+                : findCacheDir({ name: 'copy-webpack-plugin' }) || os.tmpdir();
+              let defaultCacheKeys = {
+                version,
+                transform: pattern.transform,
+                contentHash: crypto
+                  .createHash('md4')
+                  .update(buffer)
+                  .digest('hex'),
+              };
+
+              defaultCacheKeys =
+                typeof pattern.cacheTransform.keys === 'function'
+                  ? await pattern.cacheTransform.keys(
+                      defaultCacheKeys,
+                      absoluteFilename
+                    )
+                  : { ...defaultCacheKeys, ...pattern.cacheTransform.keys };
+
+              const cacheKeys = serialize(defaultCacheKeys);
+
+              try {
+                logger.debug(
+                  `getting transformation cache for '${absoluteFilename}'...`
+                );
+
+                const cachedResult = await cacache.get(
+                  cacheDirectory,
+                  cacheKeys
+                );
+
+                result.source = new RawSource(cachedResult.data);
+              } catch (_ignoreError) {
+                logger.debug(
+                  `no transformation cache for '${absoluteFilename}'...`
+                );
+
+                const transformedData = await pattern.transform(
+                  buffer,
+                  absoluteFilename
+                );
+
+                logger.debug(
+                  `caching transformation for '${absoluteFilename}'`
+                );
+
+                await cacache.put(cacheDirectory, cacheKeys, transformedData);
+
+                result.source = new RawSource(transformedData);
+
+                logger.debug(`cached transformation for '${absoluteFilename}'`);
+              }
+            } else {
+              result.source = new RawSource(
+                await pattern.transform(
+                  result.source.source(),
+                  absoluteFilename
+                )
+              );
             }
           }
 
