@@ -90,7 +90,7 @@ if (webpack.version[0] === '4') {
           cacache.ls(defaultCacheDir).then((cacheEntries) => {
             const cacheKeys = Object.keys(cacheEntries);
 
-            expect(cacheKeys).toHaveLength(3);
+            expect(cacheKeys).toHaveLength(4);
           })
         )
         .then(done)
@@ -228,7 +228,7 @@ if (webpack.version[0] === '4') {
             cacheKeys.forEach((cacheKey) => {
               // eslint-disable-next-line no-new-func
               const cacheEntry = new Function(
-                `'use strict'\nreturn (${cacheKey});`
+                `'use strict'\nreturn (${cacheKey.replace('transform|', '')});`
               )();
 
               // expect(cacheEntry.pattern.from).toBe(from);
@@ -279,7 +279,7 @@ if (webpack.version[0] === '4') {
             cacheKeys.forEach((cacheKey) => {
               // eslint-disable-next-line no-new-func
               const cacheEntry = new Function(
-                `'use strict'\nreturn (${cacheKey});`
+                `'use strict'\nreturn (${cacheKey.replace('transform|', '')});`
               )();
 
               // expect(cacheEntry.pattern.from).toBe(from);
@@ -330,7 +330,7 @@ if (webpack.version[0] === '4') {
             cacheKeys.forEach((cacheKey) => {
               // eslint-disable-next-line no-new-func
               const cacheEntry = new Function(
-                `'use strict'\nreturn (${cacheKey});`
+                `'use strict'\nreturn (${cacheKey.replace('transform|', '')});`
               )();
 
               // expect(cacheEntry.pattern.from).toBe(from);
