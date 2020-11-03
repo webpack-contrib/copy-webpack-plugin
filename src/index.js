@@ -87,7 +87,14 @@ class CopyPlugin {
     });
   }
 
-  static async runPattern(compiler, compilation, logger, cache, inputPattern) {
+  static async runPattern(
+    compiler,
+    compilation,
+    logger,
+    cache,
+    inputPattern,
+    index
+  ) {
     const pattern =
       typeof inputPattern === 'string'
         ? { from: inputPattern }
@@ -357,7 +364,10 @@ class CopyPlugin {
             logger.debug(`getting cache for '${absoluteFilename}'...`);
 
             try {
-              cacheEntry = await cache.getPromise(sourceFilename, null);
+              cacheEntry = await cache.getPromise(
+                `${sourceFilename}|${index}`,
+                null
+              );
             } catch (error) {
               compilation.errors.push(error);
 
@@ -417,71 +427,6 @@ class CopyPlugin {
 
             logger.debug(`read '${absoluteFilename}'`);
 
-            if (pattern.transform) {
-              logger.log(`transforming content for '${absoluteFilename}'...`);
-
-              if (pattern.cacheTransform) {
-                const cacheDirectory = pattern.cacheTransform.directory
-                  ? pattern.cacheTransform.directory
-                  : typeof pattern.cacheTransform === 'string'
-                  ? pattern.cacheTransform
-                  : findCacheDir({ name: 'copy-webpack-plugin' }) ||
-                    os.tmpdir();
-                let defaultCacheKeys = {
-                  version,
-                  transform: pattern.transform,
-                  contentHash: crypto
-                    .createHash('md4')
-                    .update(data)
-                    .digest('hex'),
-                };
-
-                defaultCacheKeys =
-                  typeof pattern.cacheTransform.keys === 'function'
-                    ? await pattern.cacheTransform.keys(
-                        defaultCacheKeys,
-                        absoluteFilename
-                      )
-                    : {
-                        ...defaultCacheKeys,
-                        ...pattern.cacheTransform.keys,
-                      };
-
-                const cacheKeys = serialize(defaultCacheKeys);
-
-                try {
-                  logger.debug(
-                    `getting transformation cache for '${absoluteFilename}'...`
-                  );
-
-                  const cachedResult = await cacache.get(
-                    cacheDirectory,
-                    cacheKeys
-                  );
-
-                  ({ data } = cachedResult);
-                } catch (_ignoreError) {
-                  logger.debug(
-                    `no transformation cache for '${absoluteFilename}'...`
-                  );
-
-                  data = await pattern.transform(data, absoluteFilename);
-
-                  logger.debug(
-                    `caching transformation for '${absoluteFilename}'`
-                  );
-
-                  await cacache.put(cacheDirectory, cacheKeys, data);
-
-                  logger.debug(
-                    `cached transformation for '${absoluteFilename}'`
-                  );
-                }
-              } else {
-                data = await pattern.transform(data, absoluteFilename);
-              }
-            }
-
             result.source = new RawSource(data);
 
             if (cache) {
@@ -506,7 +451,7 @@ class CopyPlugin {
                 logger.debug(`storing cache for '${absoluteFilename}'...`);
 
                 try {
-                  await cache.storePromise(sourceFilename, null, {
+                  await cache.storePromise(`${sourceFilename}|${index}`, null, {
                     source: result.source,
                     snapshot,
                   });
@@ -518,6 +463,108 @@ class CopyPlugin {
 
                 logger.debug(`stored cache for '${absoluteFilename}'`);
               }
+            }
+          }
+
+          if (pattern.transform) {
+            logger.log(`transforming content for '${absoluteFilename}'...`);
+
+            const buffer = result.source.source();
+
+            if (pattern.cacheTransform) {
+              const defaultCacheKeys = {
+                version,
+                sourceFilename,
+                transform: pattern.transform,
+                contentHash: crypto
+                  .createHash('md4')
+                  .update(buffer)
+                  .digest('hex'),
+                index,
+              };
+              const cacheKeys = `transform|${serialize(
+                typeof pattern.cacheTransform.keys === 'function'
+                  ? await pattern.cacheTransform.keys(
+                      defaultCacheKeys,
+                      absoluteFilename
+                    )
+                  : { ...defaultCacheKeys, ...pattern.cacheTransform.keys }
+              )}`;
+
+              let cacheItem;
+              let cacheDirectory;
+
+              logger.debug(
+                `getting transformation cache for '${absoluteFilename}'...`
+              );
+
+              // webpack@5 API
+              if (cache) {
+                cacheItem = cache.getItemCache(
+                  cacheKeys,
+                  cache.getLazyHashedEtag(result.source)
+                );
+
+                result.source = await cacheItem.getPromise();
+              } else {
+                cacheDirectory = pattern.cacheTransform.directory
+                  ? pattern.cacheTransform.directory
+                  : typeof pattern.cacheTransform === 'string'
+                  ? pattern.cacheTransform
+                  : findCacheDir({ name: 'copy-webpack-plugin' }) ||
+                    os.tmpdir();
+
+                let cached;
+
+                try {
+                  cached = await cacache.get(cacheDirectory, cacheKeys);
+                } catch (error) {
+                  logger.debug(
+                    `no transformation cache for '${absoluteFilename}'...`
+                  );
+                }
+
+                // eslint-disable-next-line no-undefined
+                result.source = cached ? new RawSource(cached.data) : undefined;
+              }
+
+              logger.debug(
+                result.source
+                  ? `found transformation cache for '${absoluteFilename}'`
+                  : `no transformation cache for '${absoluteFilename}'`
+              );
+
+              if (!result.source) {
+                const transformed = await pattern.transform(
+                  buffer,
+                  absoluteFilename
+                );
+
+                result.source = new RawSource(transformed);
+
+                logger.debug(
+                  `caching transformation for '${absoluteFilename}'...`
+                );
+
+                // webpack@5 API
+                if (cache) {
+                  await cacheItem.storePromise(result.source);
+                } else {
+                  try {
+                    await cacache.put(cacheDirectory, cacheKeys, transformed);
+                  } catch (error) {
+                    compilation.errors.push(error);
+
+                    return;
+                  }
+                }
+
+                logger.debug(`cached transformation for '${absoluteFilename}'`);
+              }
+            } else {
+              result.source = new RawSource(
+                await pattern.transform(buffer, absoluteFilename)
+              );
             }
           }
 
@@ -615,14 +662,15 @@ class CopyPlugin {
 
           try {
             assets = await Promise.all(
-              this.patterns.map((item) =>
+              this.patterns.map((item, index) =>
                 limit(async () =>
                   CopyPlugin.runPattern(
                     compiler,
                     compilation,
                     logger,
                     cache,
-                    item
+                    item,
+                    index
                   )
                 )
               )

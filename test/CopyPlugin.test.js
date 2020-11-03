@@ -927,6 +927,148 @@ describe('CopyPlugin', () => {
         resolve();
       });
     });
+
+    it('should work with the "transform" option', async () => {
+      const cacheDirectory = path.resolve(__dirname, './outputs/.cache/simple');
+
+      await del([
+        cacheDirectory,
+        path.resolve(__dirname, '../node_modules/.cache/copy-webpack-plugin'),
+      ]);
+
+      const compiler = getCompiler({
+        cache: {
+          type: 'filesystem',
+          cacheDirectory,
+        },
+      });
+
+      const getMyVar = () => {
+        return 'baz';
+      };
+
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
+            to: 'new0.txt',
+          },
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
+            to: 'new1.txt',
+            transform: (content) => {
+              return `${content.toString()}added1`;
+            },
+            cacheTransform: true,
+          },
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
+            to: 'new1-2.txt',
+            transform: (content) => {
+              return `${content.toString()}added1`;
+            },
+            cacheTransform: true,
+          },
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
+            to: 'new2.txt',
+            transform: (content) => {
+              return `${content.toString()}added2`;
+            },
+            cacheTransform: false,
+          },
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
+            to: 'new3.txt',
+            transform: (content) => {
+              return `${content.toString()}added3`;
+            },
+            cacheTransform: true,
+          },
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
+            to: 'new4.txt',
+            transform: (content) => {
+              return `${content.toString()}${getMyVar()}`;
+            },
+            cacheTransform: {
+              keys: {
+                foo: 'bar',
+              },
+            },
+          },
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
+            to: 'new5.txt',
+            transform: (content) => {
+              return `${content.toString()}${getMyVar()}`;
+            },
+            cacheTransform: {
+              keys: {
+                foo: 'baz',
+              },
+            },
+          },
+        ],
+      }).apply(compiler);
+
+      const { stats } = await compile(compiler);
+
+      if (webpack.version[0] === '4') {
+        expect(
+          Object.keys(stats.compilation.assets).filter(
+            (assetName) => stats.compilation.assets[assetName].emitted
+          ).length
+        ).toBe(8);
+      } else {
+        expect(stats.compilation.emittedAssets.size).toBe(8);
+      }
+
+      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
+      expect(stats.compilation.errors).toMatchSnapshot('errors');
+      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
+
+      await new Promise(async (resolve) => {
+        const { stats: newStats } = await compile(compiler);
+
+        if (webpack.version[0] === '4') {
+          expect(
+            Object.keys(newStats.compilation.assets).filter(
+              (assetName) => newStats.compilation.assets[assetName].emitted
+            ).length
+          ).toBe(7);
+        } else {
+          expect(newStats.compilation.emittedAssets.size).toBe(1);
+        }
+
+        expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
+        expect(newStats.compilation.errors).toMatchSnapshot('errors');
+        expect(newStats.compilation.warnings).toMatchSnapshot('warnings');
+
+        resolve();
+      });
+    });
   });
 
   describe('stats', () => {
