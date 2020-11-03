@@ -143,6 +143,7 @@ exports[`CopyPlugin cache should work with the "memory" cache: warnings 2`] = `A
 exports[`CopyPlugin cache should work with the "transform" option: assets 1`] = `
 Object {
   "new0.txt": "new",
+  "new1-2.txt": "newadded1",
   "new1.txt": "newadded1",
   "new2.txt": "newadded2",
   "new3.txt": "newadded3",
@@ -154,6 +155,7 @@ Object {
 exports[`CopyPlugin cache should work with the "transform" option: assets 2`] = `
 Object {
   "new0.txt": "new",
+  "new1-2.txt": "newadded1",
   "new1.txt": "newadded1",
   "new2.txt": "newadded2",
   "new3.txt": "newadded3",

@@ -972,6 +972,17 @@ describe('CopyPlugin', () => {
               __dirname,
               './fixtures/directory/directoryfile.txt'
             ),
+            to: 'new1-2.txt',
+            transform: (content) => {
+              return `${content.toString()}added1`;
+            },
+            cacheTransform: true,
+          },
+          {
+            from: path.resolve(
+              __dirname,
+              './fixtures/directory/directoryfile.txt'
+            ),
             to: 'new2.txt',
             transform: (content) => {
               return `${content.toString()}added2`;
@@ -1029,9 +1040,9 @@ describe('CopyPlugin', () => {
           Object.keys(stats.compilation.assets).filter(
             (assetName) => stats.compilation.assets[assetName].emitted
           ).length
-        ).toBe(7);
+        ).toBe(8);
       } else {
-        expect(stats.compilation.emittedAssets.size).toBe(7);
+        expect(stats.compilation.emittedAssets.size).toBe(8);
       }
 
       expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
@@ -1046,9 +1057,9 @@ describe('CopyPlugin', () => {
             Object.keys(newStats.compilation.assets).filter(
               (assetName) => newStats.compilation.assets[assetName].emitted
             ).length
-          ).toBe(6);
+          ).toBe(8);
         } else {
-          expect(newStats.compilation.emittedAssets.size).toBe(6);
+          expect(newStats.compilation.emittedAssets.size).toBe(1);
         }
 
         expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
