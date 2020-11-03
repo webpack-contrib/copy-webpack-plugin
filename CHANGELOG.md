@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.3.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.2.1...v6.3.0) (2020-11-03)
+
+
+### Features
+
+* added the `sourceFilename` info (original source filename) to assets info ([#542](https://github.com/webpack-contrib/copy-webpack-plugin/issues/542)) ([db2e3bf](https://github.com/webpack-contrib/copy-webpack-plugin/commit/db2e3bfae9322592c3a9af1e45d25df165b6b4e0))
+* persistent cache between compilations (webpack@5 only) ([#541](https://github.com/webpack-contrib/copy-webpack-plugin/issues/541)) ([c892451](https://github.com/webpack-contrib/copy-webpack-plugin/commit/c8924512a34391ce92715a2b61fc4b0b91a9e10f))
+
 ### [6.2.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.2.0...v6.2.1) (2020-10-09)
 
 ### Chore
