@@ -1046,7 +1046,7 @@ describe('CopyPlugin', () => {
             Object.keys(newStats.compilation.assets).filter(
               (assetName) => newStats.compilation.assets[assetName].emitted
             ).length
-          ).toBe(7);
+          ).toBe(6);
         } else {
           expect(newStats.compilation.emittedAssets.size).toBe(6);
         }
