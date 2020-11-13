@@ -1,25 +1,25 @@
 // Ideally we pass in patterns and confirm the resulting assets
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-import CopyPlugin from '../../src';
+import CopyPlugin from "../../src";
 
-import ChildCompilerPlugin from './ChildCompiler';
-import PreCopyPlugin from './PreCopyPlugin';
+import ChildCompilerPlugin from "./ChildCompiler";
+import PreCopyPlugin from "./PreCopyPlugin";
 
-import removeIllegalCharacterForWindows from './removeIllegalCharacterForWindows';
+import removeIllegalCharacterForWindows from "./removeIllegalCharacterForWindows";
 
-import { compile, getCompiler, readAssets } from './';
+import { compile, getCompiler, readAssets } from "./";
 
 /* eslint-disable no-param-reassign */
 
-const isWin = process.platform === 'win32';
+const isWin = process.platform === "win32";
 
 const ignore = [
-  '**/symlink/**/*',
-  '**/file-ln.txt',
-  '**/directory-ln',
-  '**/watch/**/*',
+  "**/symlink/**/*",
+  "**/file-ln.txt",
+  "**/directory-ln",
+  "**/watch/**/*",
 ];
 
 function run(opts) {
@@ -31,7 +31,7 @@ function run(opts) {
           pattern.context = removeIllegalCharacterForWindows(pattern.context);
         }
 
-        if (typeof pattern !== 'string') {
+        if (typeof pattern !== "string") {
           if (!opts.symlink || isWin) {
             pattern.globOptions = pattern.globOptions || {};
             pattern.globOptions.ignore = [
@@ -74,7 +74,7 @@ function run(opts) {
           throw compilation.warnings[0];
         }
 
-        const enryPoint = path.resolve(__dirname, 'enter.js');
+        const enryPoint = path.resolve(__dirname, "enter.js");
 
         if (compilation.fileDependencies.has(enryPoint)) {
           compilation.fileDependencies.delete(enryPoint);
@@ -95,14 +95,14 @@ function runEmit(opts) {
     if (opts.expectedAssetKeys && opts.expectedAssetKeys.length > 0) {
       expect(
         Object.keys(compilation.assets)
-          .filter((a) => a !== 'main.js')
+          .filter((a) => a !== "main.js")
           .sort()
       ).toEqual(
         opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
       );
     } else {
       // eslint-disable-next-line no-param-reassign
-      delete compilation.assets['main.js'];
+      delete compilation.assets["main.js"];
       expect(compilation.assets).toEqual({});
     }
 
@@ -150,8 +150,8 @@ function runChange(opts) {
     );
 
     // Create two test files
-    fs.writeFileSync(opts.newFileLoc1, 'file1contents');
-    fs.writeFileSync(opts.newFileLoc2, 'file2contents');
+    fs.writeFileSync(opts.newFileLoc1, "file1contents");
+    fs.writeFileSync(opts.newFileLoc2, "file2contents");
 
     const arrayOfStats = [];
 
@@ -165,7 +165,7 @@ function runChange(opts) {
 
     await delay(500);
 
-    fs.appendFileSync(opts.newFileLoc1, 'extra');
+    fs.appendFileSync(opts.newFileLoc1, "extra");
 
     await delay(500);
 

@@ -1,25 +1,25 @@
-import path from 'path';
+import path from "path";
 
-import webpack from 'webpack';
-import del from 'del';
-import { createFsFromVolume, Volume } from 'memfs';
+import webpack from "webpack";
+import del from "del";
+import { createFsFromVolume, Volume } from "memfs";
 
-import CopyPlugin from '../src';
+import CopyPlugin from "../src";
 
-import { run, runEmit, runChange } from './helpers/run';
+import { run, runEmit, runChange } from "./helpers/run";
 
-import { readAssets, getCompiler, compile } from './helpers';
+import { readAssets, getCompiler, compile } from "./helpers";
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+const FIXTURES_DIR = path.join(__dirname, "fixtures");
 
-describe('CopyPlugin', () => {
-  describe('basic', () => {
-    it('should copy a file', (done) => {
+describe("CopyPlugin", () => {
+  describe("basic", () => {
+    it("should copy a file", (done) => {
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         patterns: [
           {
-            from: 'file.txt',
+            from: "file.txt",
           },
         ],
       })
@@ -27,17 +27,17 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy files', (done) => {
+    it("should copy files", (done) => {
       runEmit({
         expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+          ".dottedfile",
+          "directoryfile.txt",
+          "nested/deep-nested/deepnested.txt",
+          "nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'directory',
+            from: "directory",
           },
         ],
       })
@@ -45,18 +45,18 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy files to new directory', (done) => {
+    it("should copy files to new directory", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'newdirectory/.dottedfile',
-          'newdirectory/directoryfile.txt',
-          'newdirectory/nested/deep-nested/deepnested.txt',
-          'newdirectory/nested/nestedfile.txt',
+          "newdirectory/.dottedfile",
+          "newdirectory/directoryfile.txt",
+          "newdirectory/nested/deep-nested/deepnested.txt",
+          "newdirectory/nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'directory',
-            to: 'newdirectory',
+            from: "directory",
+            to: "newdirectory",
           },
         ],
       })
@@ -64,17 +64,17 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy files to new directory with context', (done) => {
+    it("should copy files to new directory with context", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'newdirectory/deep-nested/deepnested.txt',
-          'newdirectory/nestedfile.txt',
+          "newdirectory/deep-nested/deepnested.txt",
+          "newdirectory/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'nested',
-            context: 'directory',
-            to: 'newdirectory',
+            from: "nested",
+            context: "directory",
+            to: "newdirectory",
           },
         ],
       })
@@ -82,16 +82,16 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy files using glob', (done) => {
+    it("should copy files using glob", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
+          "directory/directoryfile.txt",
+          "directory/nested/deep-nested/deepnested.txt",
+          "directory/nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'directory/**/*',
+            from: "directory/**/*",
           },
         ],
       })
@@ -99,17 +99,17 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy files using glob to new directory', (done) => {
+    it("should copy files using glob to new directory", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'newdirectory/directory/directoryfile.txt',
-          'newdirectory/directory/nested/deep-nested/deepnested.txt',
-          'newdirectory/directory/nested/nestedfile.txt',
+          "newdirectory/directory/directoryfile.txt",
+          "newdirectory/directory/nested/deep-nested/deepnested.txt",
+          "newdirectory/directory/nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'directory/**/*',
-            to: 'newdirectory',
+            from: "directory/**/*",
+            to: "newdirectory",
           },
         ],
       })
@@ -117,17 +117,17 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy files using glob to new directory with context', (done) => {
+    it("should copy files using glob to new directory with context", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'newdirectory/nested/deep-nested/deepnested.txt',
-          'newdirectory/nested/nestedfile.txt',
+          "newdirectory/nested/deep-nested/deepnested.txt",
+          "newdirectory/nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'nested/**/*',
-            context: 'directory',
-            to: 'newdirectory',
+            from: "nested/**/*",
+            context: "directory",
+            to: "newdirectory",
           },
         ],
       })
@@ -135,13 +135,13 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy a file to a new file', (done) => {
+    it("should copy a file to a new file", (done) => {
       runEmit({
-        expectedAssetKeys: ['newfile.txt'],
+        expectedAssetKeys: ["newfile.txt"],
         patterns: [
           {
-            from: 'file.txt',
-            to: 'newfile.txt',
+            from: "file.txt",
+            to: "newfile.txt",
           },
         ],
       })
@@ -149,14 +149,14 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should copy a file to a new file with context', (done) => {
+    it("should copy a file to a new file with context", (done) => {
       runEmit({
-        expectedAssetKeys: ['newfile.txt'],
+        expectedAssetKeys: ["newfile.txt"],
         patterns: [
           {
-            from: 'directoryfile.txt',
-            context: 'directory',
-            to: 'newfile.txt',
+            from: "directoryfile.txt",
+            context: "directory",
+            to: "newfile.txt",
           },
         ],
       })
@@ -164,17 +164,17 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should multiple files to a new file', (done) => {
+    it("should multiple files to a new file", (done) => {
       runEmit({
-        expectedAssetKeys: ['newfile.txt', 'newbinextension.bin'],
+        expectedAssetKeys: ["newfile.txt", "newbinextension.bin"],
         patterns: [
           {
-            from: 'file.txt',
-            to: 'newfile.txt',
+            from: "file.txt",
+            to: "newfile.txt",
           },
           {
-            from: 'binextension.bin',
-            to: 'newbinextension.bin',
+            from: "binextension.bin",
+            to: "newbinextension.bin",
           },
         ],
       })
@@ -184,15 +184,15 @@ describe('CopyPlugin', () => {
 
     it('should copy multiple files with same "from"', (done) => {
       runEmit({
-        expectedAssetKeys: ['first/file.txt', 'second/file.txt'],
+        expectedAssetKeys: ["first/file.txt", "second/file.txt"],
         patterns: [
           {
-            from: 'file.txt',
-            to: 'first/file.txt',
+            from: "file.txt",
+            to: "first/file.txt",
           },
           {
-            from: 'file.txt',
-            to: 'second/file.txt',
+            from: "file.txt",
+            to: "second/file.txt",
           },
         ],
       })
@@ -200,27 +200,27 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should works with multiple patterns as String', (done) => {
+    it("should works with multiple patterns as String", (done) => {
       runEmit({
-        expectedAssetKeys: ['binextension.bin', 'file.txt', 'noextension'],
-        patterns: ['binextension.bin', 'file.txt', 'noextension'],
+        expectedAssetKeys: ["binextension.bin", "file.txt", "noextension"],
+        patterns: ["binextension.bin", "file.txt", "noextension"],
       })
         .then(done)
         .catch(done);
     });
 
-    it('should works with multiple patterns as Object', (done) => {
+    it("should works with multiple patterns as Object", (done) => {
       runEmit({
-        expectedAssetKeys: ['binextension.bin', 'file.txt', 'noextension'],
+        expectedAssetKeys: ["binextension.bin", "file.txt", "noextension"],
         patterns: [
           {
-            from: 'binextension.bin',
+            from: "binextension.bin",
           },
           {
-            from: 'file.txt',
+            from: "file.txt",
           },
           {
-            from: 'noextension',
+            from: "noextension",
           },
         ],
       })
@@ -230,10 +230,10 @@ describe('CopyPlugin', () => {
 
     it('should work with linux path segment separation path when "from" is glob', (done) => {
       runEmit({
-        expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+        expectedAssetKeys: ["directory/nested/nestedfile.txt"],
         patterns: [
           {
-            from: 'directory/nested/*',
+            from: "directory/nested/*",
           },
         ],
       })
@@ -241,20 +241,20 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should exclude path with linux path segment separators', (done) => {
+    it("should exclude path with linux path segment separators", (done) => {
       runEmit({
         expectedAssetKeys: [
-          '[(){}[]!+@escaped-test^$]/hello.txt',
-          '[special$directory]/(special-*file).txt',
-          '[special$directory]/directoryfile.txt',
-          '[special$directory]/nested/nestedfile.txt',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
+          "[(){}[]!+@escaped-test^$]/hello.txt",
+          "[special$directory]/(special-*file).txt",
+          "[special$directory]/directoryfile.txt",
+          "[special$directory]/nested/nestedfile.txt",
+          "dir (86)/file.txt",
+          "dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt",
+          "dir (86)/nesteddir/nestedfile.txt",
         ],
         patterns: [
           {
-            from: '!(directory)/**/*.txt',
+            from: "!(directory)/**/*.txt",
           },
         ],
       })
@@ -266,19 +266,19 @@ describe('CopyPlugin', () => {
       expect.assertions(5);
 
       const expectedAssetKeys = [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ];
 
       run({
         preCopy: {
           additionalAssets: [
-            { name: 'foo-bar.txt', data: 'Content', info: { custom: true } },
+            { name: "foo-bar.txt", data: "Content", info: { custom: true } },
             {
-              name: 'nested/nestedfile.txt',
-              data: 'Content',
+              name: "nested/nestedfile.txt",
+              data: "Content",
               info: { custom: true },
             },
           ],
@@ -286,7 +286,7 @@ describe('CopyPlugin', () => {
         expectedAssetKeys,
         patterns: [
           {
-            from: 'directory',
+            from: "directory",
             force: true,
           },
         ],
@@ -297,7 +297,7 @@ describe('CopyPlugin', () => {
 
             expect(info.copied).toBe(true);
 
-            if (name === 'nested/nestedfile.txt') {
+            if (name === "nested/nestedfile.txt") {
               expect(info.custom).toBe(true);
             }
           }
@@ -310,18 +310,18 @@ describe('CopyPlugin', () => {
       expect.assertions(5);
 
       const expectedAssetKeys = [
-        'directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt',
-        '.dottedfile.5e294e270db6734a42f014f0dd18d9ac',
-        'nested/nestedfile.31d6cfe0d16ae931b73c59d7e0c089c0.txt',
-        'nested/deep-nested/deepnested.31d6cfe0d16ae931b73c59d7e0c089c0.txt',
+        "directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt",
+        ".dottedfile.5e294e270db6734a42f014f0dd18d9ac",
+        "nested/nestedfile.31d6cfe0d16ae931b73c59d7e0c089c0.txt",
+        "nested/deep-nested/deepnested.31d6cfe0d16ae931b73c59d7e0c089c0.txt",
       ];
 
       run({
         preCopy: {
           additionalAssets: [
             {
-              name: 'directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt',
-              data: 'Content',
+              name: "directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt",
+              data: "Content",
               info: { custom: true },
             },
           ],
@@ -329,8 +329,8 @@ describe('CopyPlugin', () => {
         expectedAssetKeys,
         patterns: [
           {
-            from: 'directory',
-            to: '[path][name].[contenthash].[ext]',
+            from: "directory",
+            to: "[path][name].[contenthash].[ext]",
             force: true,
           },
         ],
@@ -341,7 +341,7 @@ describe('CopyPlugin', () => {
 
             expect(info.immutable).toBe(true);
 
-            if (name === 'directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt') {
+            if (name === "directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt") {
               expect(info.immutable).toBe(true);
             }
           }
@@ -351,15 +351,15 @@ describe('CopyPlugin', () => {
     });
 
     it('should copy files and print "copied" in the string representation ', (done) => {
-      const isWebpack4 = webpack.version[0] === '4';
+      const isWebpack4 = webpack.version[0] === "4";
 
       expect.assertions(isWebpack4 ? 0 : 1);
 
       const expectedAssetKeys = [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ];
 
       run({
@@ -367,7 +367,7 @@ describe('CopyPlugin', () => {
         expectedAssetKeys,
         patterns: [
           {
-            from: 'directory',
+            from: "directory",
           },
         ],
       })
@@ -382,14 +382,14 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should work with multi compiler mode', async () => {
+    it("should work with multi compiler mode", async () => {
       const compiler = webpack([
         {
-          mode: 'development',
-          context: path.resolve(__dirname, './fixtures'),
-          entry: path.resolve(__dirname, './helpers/enter.js'),
+          mode: "development",
+          context: path.resolve(__dirname, "./fixtures"),
+          entry: path.resolve(__dirname, "./helpers/enter.js"),
           output: {
-            path: path.resolve(__dirname, './outputs/multi-compiler/dist/a'),
+            path: path.resolve(__dirname, "./outputs/multi-compiler/dist/a"),
           },
           stats: {
             source: true,
@@ -398,17 +398,17 @@ describe('CopyPlugin', () => {
             new CopyPlugin({
               patterns: [
                 {
-                  from: path.resolve(__dirname, './fixtures/directory'),
+                  from: path.resolve(__dirname, "./fixtures/directory"),
                 },
               ],
             }),
           ],
         },
         {
-          mode: 'development',
-          entry: path.resolve(__dirname, './helpers/enter.js'),
+          mode: "development",
+          entry: path.resolve(__dirname, "./helpers/enter.js"),
           output: {
-            path: path.resolve(__dirname, './outputs/multi-compiler/dist/b'),
+            path: path.resolve(__dirname, "./outputs/multi-compiler/dist/b"),
           },
           stats: {
             source: true,
@@ -417,8 +417,8 @@ describe('CopyPlugin', () => {
             new CopyPlugin({
               patterns: [
                 {
-                  context: path.resolve(__dirname, './fixtures'),
-                  from: path.resolve(__dirname, './fixtures/directory'),
+                  context: path.resolve(__dirname, "./fixtures"),
+                  from: path.resolve(__dirname, "./fixtures/directory"),
                 },
               ],
             }),
@@ -438,23 +438,23 @@ describe('CopyPlugin', () => {
       const { stats } = await compile(compiler);
 
       stats.stats.forEach((item, index) => {
-        expect(item.compilation.errors).toMatchSnapshot('errors');
-        expect(item.compilation.warnings).toMatchSnapshot('warnings');
+        expect(item.compilation.errors).toMatchSnapshot("errors");
+        expect(item.compilation.warnings).toMatchSnapshot("warnings");
         expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-          'assets'
+          "assets"
         );
       });
     });
   });
 
-  describe('watch mode', () => {
+  describe("watch mode", () => {
     it('should add the file to the watch list when "from" is a file', (done) => {
-      const expectedAssetKeys = ['file.txt'];
+      const expectedAssetKeys = ["file.txt"];
 
       run({
         patterns: [
           {
-            from: 'file.txt',
+            from: "file.txt",
           },
         ],
       })
@@ -471,14 +471,14 @@ describe('CopyPlugin', () => {
       run({
         patterns: [
           {
-            from: 'directory',
+            from: "directory",
           },
         ],
       })
         .then(({ stats }) => {
           const { contextDependencies } = stats.compilation;
           const isIncludeDependency = contextDependencies.has(
-            path.join(FIXTURES_DIR, 'directory')
+            path.join(FIXTURES_DIR, "directory")
           );
 
           expect(isIncludeDependency).toBe(true);
@@ -491,14 +491,14 @@ describe('CopyPlugin', () => {
       run({
         patterns: [
           {
-            from: 'directory/**/*',
+            from: "directory/**/*",
           },
         ],
       })
         .then(({ stats }) => {
           const { contextDependencies } = stats.compilation;
           const isIncludeDependency = contextDependencies.has(
-            path.join(FIXTURES_DIR, 'directory')
+            path.join(FIXTURES_DIR, "directory")
           );
 
           expect(isIncludeDependency).toBe(true);
@@ -507,13 +507,13 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should not add the directory to the watch list when glob is a file', (done) => {
-      const expectedAssetKeys = ['directoryfile.txt'];
+    it("should not add the directory to the watch list when glob is a file", (done) => {
+      const expectedAssetKeys = ["directoryfile.txt"];
 
       run({
         patterns: [
           {
-            from: 'directory/directoryfile.txt',
+            from: "directory/directoryfile.txt",
           },
         ],
       })
@@ -526,19 +526,19 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should include files that have changed when `from` is a file', (done) => {
+    it("should include files that have changed when `from` is a file", (done) => {
       runChange({
-        expectedAssetKeys: ['tempfile1.txt', 'tempfile2.txt'],
-        newFileLoc1: path.join(FIXTURES_DIR, 'watch', '_t5', 'tempfile1.txt'),
-        newFileLoc2: path.join(FIXTURES_DIR, 'watch', '_t5', 'tempfile2.txt'),
+        expectedAssetKeys: ["tempfile1.txt", "tempfile2.txt"],
+        newFileLoc1: path.join(FIXTURES_DIR, "watch", "_t5", "tempfile1.txt"),
+        newFileLoc2: path.join(FIXTURES_DIR, "watch", "_t5", "tempfile2.txt"),
         patterns: [
           {
-            from: 'tempfile1.txt',
-            context: 'watch/_t5',
+            from: "tempfile1.txt",
+            context: "watch/_t5",
           },
           {
-            from: 'tempfile2.txt',
-            context: 'watch/_t5',
+            from: "tempfile2.txt",
+            context: "watch/_t5",
           },
         ],
       })
@@ -546,26 +546,26 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should include all files when `from` is a directory', (done) => {
+    it("should include all files when `from` is a directory", (done) => {
       runChange({
-        expectedAssetKeys: ['.gitkeep', 'tempfile1.txt', 'tempfile2.txt'],
+        expectedAssetKeys: [".gitkeep", "tempfile1.txt", "tempfile2.txt"],
         newFileLoc1: path.join(
           FIXTURES_DIR,
-          'watch',
-          '_t4',
-          'directory',
-          'tempfile1.txt'
+          "watch",
+          "_t4",
+          "directory",
+          "tempfile1.txt"
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
-          'watch',
-          '_t4',
-          'directory',
-          'tempfile2.txt'
+          "watch",
+          "_t4",
+          "directory",
+          "tempfile2.txt"
         ),
         patterns: [
           {
-            from: 'watch/_t4/directory',
+            from: "watch/_t4/directory",
           },
         ],
       })
@@ -573,31 +573,31 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should include all files when `from` is a glob', (done) => {
+    it("should include all files when `from` is a glob", (done) => {
       runChange({
         expectedAssetKeys: [
-          '_t3/dest1/tempfile1.txt',
-          '_t3/dest1/tempfile2.txt',
+          "_t3/dest1/tempfile1.txt",
+          "_t3/dest1/tempfile2.txt",
         ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
-          'watch',
-          '_t3',
-          'directory',
-          'tempfile1.txt'
+          "watch",
+          "_t3",
+          "directory",
+          "tempfile1.txt"
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
-          'watch',
-          '_t3',
-          'directory',
-          'tempfile2.txt'
+          "watch",
+          "_t3",
+          "directory",
+          "tempfile2.txt"
         ),
         patterns: [
           {
-            context: 'watch/_t3/directory',
-            from: '**/*.txt',
-            to: '_t3/dest1',
+            context: "watch/_t3/directory",
+            from: "**/*.txt",
+            to: "_t3/dest1",
           },
         ],
       })
@@ -605,38 +605,38 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should include all files when multiple patterns used', (done) => {
+    it("should include all files when multiple patterns used", (done) => {
       runChange({
         expectedAssetKeys: [
-          '_t2/dest1/tempfile1.txt',
-          '_t2/dest1/tempfile2.txt',
-          '_t2/dest2/tempfile1.txt',
-          '_t2/dest2/tempfile2.txt',
+          "_t2/dest1/tempfile1.txt",
+          "_t2/dest1/tempfile2.txt",
+          "_t2/dest2/tempfile1.txt",
+          "_t2/dest2/tempfile2.txt",
         ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
-          'watch',
-          '_t2',
-          'directory',
-          'tempfile1.txt'
+          "watch",
+          "_t2",
+          "directory",
+          "tempfile1.txt"
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
-          'watch',
-          '_t2',
-          'directory',
-          'tempfile2.txt'
+          "watch",
+          "_t2",
+          "directory",
+          "tempfile2.txt"
         ),
         patterns: [
           {
-            context: 'watch/_t2/directory',
-            from: '**/*.txt',
-            to: '_t2/dest1',
+            context: "watch/_t2/directory",
+            from: "**/*.txt",
+            to: "_t2/dest1",
           },
           {
-            context: 'watch/_t2/directory',
-            from: '**/*.txt',
-            to: '_t2/dest2',
+            context: "watch/_t2/directory",
+            from: "**/*.txt",
+            to: "_t2/dest2",
           },
         ],
       })
@@ -644,31 +644,31 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should include all files when multiple patterns with difference contexts', (done) => {
+    it("should include all files when multiple patterns with difference contexts", (done) => {
       runChange({
         expectedAssetKeys: [
-          '_t1/dest1/tempfile1.txt',
-          '_t1/dest2/directory/tempfile1.txt',
-          '_t1/dest2/tempfile2.txt',
+          "_t1/dest1/tempfile1.txt",
+          "_t1/dest2/directory/tempfile1.txt",
+          "_t1/dest2/tempfile2.txt",
         ],
         newFileLoc1: path.join(
           FIXTURES_DIR,
-          'watch',
-          '_t1',
-          'directory',
-          'tempfile1.txt'
+          "watch",
+          "_t1",
+          "directory",
+          "tempfile1.txt"
         ),
-        newFileLoc2: path.join(FIXTURES_DIR, 'watch', '_t1', 'tempfile2.txt'),
+        newFileLoc2: path.join(FIXTURES_DIR, "watch", "_t1", "tempfile2.txt"),
         patterns: [
           {
-            context: 'watch/_t1/directory',
-            from: '**/*.txt',
-            to: '_t1/dest1',
+            context: "watch/_t1/directory",
+            from: "**/*.txt",
+            to: "_t1/dest1",
           },
           {
-            context: 'watch/_t1',
-            from: '**/*.txt',
-            to: '_t1/dest2',
+            context: "watch/_t1",
+            from: "**/*.txt",
+            to: "_t1/dest2",
           },
         ],
       })
@@ -676,15 +676,15 @@ describe('CopyPlugin', () => {
         .catch(done);
     });
 
-    it('should run once on child compilation', (done) => {
-      const expectedAssetKeys = ['file.txt'];
-      const spy = jest.spyOn(CopyPlugin, 'apply');
+    it("should run once on child compilation", (done) => {
+      const expectedAssetKeys = ["file.txt"];
+      const spy = jest.spyOn(CopyPlugin, "apply");
 
       run({
         withChildCompilation: true,
         patterns: [
           {
-            from: 'file.txt',
+            from: "file.txt",
           },
         ],
       })
@@ -701,25 +701,25 @@ describe('CopyPlugin', () => {
     });
   });
 
-  describe('cache', () => {
+  describe("cache", () => {
     it('should work with the "memory" cache', async () => {
       const compiler = getCompiler({
         cache: {
-          type: 'memory',
+          type: "memory",
         },
       });
 
       new CopyPlugin({
         patterns: [
           {
-            from: path.resolve(__dirname, './fixtures/directory'),
+            from: path.resolve(__dirname, "./fixtures/directory"),
           },
         ],
       }).apply(compiler);
 
       const { stats } = await compile(compiler);
 
-      if (webpack.version[0] === '4') {
+      if (webpack.version[0] === "4") {
         expect(
           Object.keys(stats.compilation.assets).filter(
             (assetName) => stats.compilation.assets[assetName].emitted
@@ -729,14 +729,14 @@ describe('CopyPlugin', () => {
         expect(stats.compilation.emittedAssets.size).toBe(5);
       }
 
-      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
-      expect(stats.compilation.errors).toMatchSnapshot('errors');
-      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
+      expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
+      expect(stats.compilation.errors).toMatchSnapshot("errors");
+      expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
       await new Promise(async (resolve) => {
         const { stats: newStats } = await compile(compiler);
 
-        if (webpack.version[0] === '4') {
+        if (webpack.version[0] === "4") {
           expect(
             Object.keys(newStats.compilation.assets).filter(
               (assetName) => newStats.compilation.assets[assetName].emitted
@@ -746,22 +746,22 @@ describe('CopyPlugin', () => {
           expect(newStats.compilation.emittedAssets.size).toBe(0);
         }
 
-        expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
-        expect(newStats.compilation.errors).toMatchSnapshot('errors');
-        expect(newStats.compilation.warnings).toMatchSnapshot('warnings');
+        expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+        expect(newStats.compilation.errors).toMatchSnapshot("errors");
+        expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
 
         resolve();
       });
     });
 
     it('should work with the "filesystem" cache', async () => {
-      const cacheDirectory = path.resolve(__dirname, './outputs/.cache/simple');
+      const cacheDirectory = path.resolve(__dirname, "./outputs/.cache/simple");
 
       await del(cacheDirectory);
 
       const compiler = getCompiler({
         cache: {
-          type: 'filesystem',
+          type: "filesystem",
           cacheDirectory,
         },
       });
@@ -769,14 +769,14 @@ describe('CopyPlugin', () => {
       new CopyPlugin({
         patterns: [
           {
-            from: path.resolve(__dirname, './fixtures/directory'),
+            from: path.resolve(__dirname, "./fixtures/directory"),
           },
         ],
       }).apply(compiler);
 
       const { stats } = await compile(compiler);
 
-      if (webpack.version[0] === '4') {
+      if (webpack.version[0] === "4") {
         expect(
           Object.keys(stats.compilation.assets).filter(
             (assetName) => stats.compilation.assets[assetName].emitted
@@ -786,14 +786,14 @@ describe('CopyPlugin', () => {
         expect(stats.compilation.emittedAssets.size).toBe(5);
       }
 
-      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
-      expect(stats.compilation.errors).toMatchSnapshot('errors');
-      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
+      expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
+      expect(stats.compilation.errors).toMatchSnapshot("errors");
+      expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
       await new Promise(async (resolve) => {
         const { stats: newStats } = await compile(compiler);
 
-        if (webpack.version[0] === '4') {
+        if (webpack.version[0] === "4") {
           expect(
             Object.keys(newStats.compilation.assets).filter(
               (assetName) => newStats.compilation.assets[assetName].emitted
@@ -803,9 +803,9 @@ describe('CopyPlugin', () => {
           expect(newStats.compilation.emittedAssets.size).toBe(0);
         }
 
-        expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
-        expect(newStats.compilation.errors).toMatchSnapshot('errors');
-        expect(newStats.compilation.warnings).toMatchSnapshot('warnings');
+        expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+        expect(newStats.compilation.errors).toMatchSnapshot("errors");
+        expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
 
         resolve();
       });
@@ -814,59 +814,59 @@ describe('CopyPlugin', () => {
     it('should work with the "filesystem" cache and multi compiler mode', async () => {
       const cacheDirectoryA = path.resolve(
         __dirname,
-        './outputs/.cache/multi-compiler/a'
+        "./outputs/.cache/multi-compiler/a"
       );
       const cacheDirectoryB = path.resolve(
         __dirname,
-        './outputs/.cache/multi-compiler/b'
+        "./outputs/.cache/multi-compiler/b"
       );
 
       await del([cacheDirectoryA, cacheDirectoryB]);
 
       const compiler = webpack([
         {
-          mode: 'development',
-          context: path.resolve(__dirname, './fixtures'),
-          entry: path.resolve(__dirname, './helpers/enter.js'),
+          mode: "development",
+          context: path.resolve(__dirname, "./fixtures"),
+          entry: path.resolve(__dirname, "./helpers/enter.js"),
           output: {
-            path: path.resolve(__dirname, './outputs/multi-compiler/dist/a'),
+            path: path.resolve(__dirname, "./outputs/multi-compiler/dist/a"),
           },
           stats: {
             source: true,
           },
           cache: {
-            type: 'filesystem',
+            type: "filesystem",
             cacheDirectory: cacheDirectoryA,
           },
           plugins: [
             new CopyPlugin({
               patterns: [
                 {
-                  from: path.resolve(__dirname, './fixtures/directory'),
+                  from: path.resolve(__dirname, "./fixtures/directory"),
                 },
               ],
             }),
           ],
         },
         {
-          mode: 'development',
-          entry: path.resolve(__dirname, './helpers/enter.js'),
+          mode: "development",
+          entry: path.resolve(__dirname, "./helpers/enter.js"),
           output: {
-            path: path.resolve(__dirname, './outputs/multi-compiler/dist/b'),
+            path: path.resolve(__dirname, "./outputs/multi-compiler/dist/b"),
           },
           stats: {
             source: true,
           },
           cache: {
-            type: 'filesystem',
+            type: "filesystem",
             cacheDirectory: cacheDirectoryB,
           },
           plugins: [
             new CopyPlugin({
               patterns: [
                 {
-                  context: path.resolve(__dirname, './fixtures'),
-                  from: path.resolve(__dirname, './fixtures/directory'),
+                  context: path.resolve(__dirname, "./fixtures"),
+                  from: path.resolve(__dirname, "./fixtures/directory"),
                 },
               ],
             }),
@@ -886,7 +886,7 @@ describe('CopyPlugin', () => {
       const { stats } = await compile(compiler);
 
       stats.stats.forEach((item, index) => {
-        if (webpack.version[0] === '4') {
+        if (webpack.version[0] === "4") {
           expect(
             Object.keys(item.compilation.assets).filter(
               (assetName) => item.compilation.assets[assetName].emitted
@@ -896,10 +896,10 @@ describe('CopyPlugin', () => {
           expect(item.compilation.emittedAssets.size).toBe(5);
         }
 
-        expect(item.compilation.errors).toMatchSnapshot('errors');
-        expect(item.compilation.warnings).toMatchSnapshot('warnings');
+        expect(item.compilation.errors).toMatchSnapshot("errors");
+        expect(item.compilation.warnings).toMatchSnapshot("warnings");
         expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-          'assets'
+          "assets"
         );
       });
 
@@ -907,7 +907,7 @@ describe('CopyPlugin', () => {
         const { stats: newStats } = await compile(compiler);
 
         newStats.stats.forEach((item, index) => {
-          if (webpack.version[0] === '4') {
+          if (webpack.version[0] === "4") {
             expect(
               Object.keys(item.compilation.assets).filter(
                 (assetName) => item.compilation.assets[assetName].emitted
@@ -917,10 +917,10 @@ describe('CopyPlugin', () => {
             expect(item.compilation.emittedAssets.size).toBe(0);
           }
 
-          expect(item.compilation.errors).toMatchSnapshot('errors');
-          expect(item.compilation.warnings).toMatchSnapshot('warnings');
+          expect(item.compilation.errors).toMatchSnapshot("errors");
+          expect(item.compilation.warnings).toMatchSnapshot("warnings");
           expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-            'assets'
+            "assets"
           );
         });
 
@@ -929,22 +929,22 @@ describe('CopyPlugin', () => {
     });
 
     it('should work with the "transform" option', async () => {
-      const cacheDirectory = path.resolve(__dirname, './outputs/.cache/simple');
+      const cacheDirectory = path.resolve(__dirname, "./outputs/.cache/simple");
 
       await del([
         cacheDirectory,
-        path.resolve(__dirname, '../node_modules/.cache/copy-webpack-plugin'),
+        path.resolve(__dirname, "../node_modules/.cache/copy-webpack-plugin"),
       ]);
 
       const compiler = getCompiler({
         cache: {
-          type: 'filesystem',
+          type: "filesystem",
           cacheDirectory,
         },
       });
 
       const getMyVar = () => {
-        return 'baz';
+        return "baz";
       };
 
       new CopyPlugin({
@@ -952,16 +952,16 @@ describe('CopyPlugin', () => {
           {
             from: path.resolve(
               __dirname,
-              './fixtures/directory/directoryfile.txt'
+              "./fixtures/directory/directoryfile.txt"
             ),
-            to: 'new0.txt',
+            to: "new0.txt",
           },
           {
             from: path.resolve(
               __dirname,
-              './fixtures/directory/directoryfile.txt'
+              "./fixtures/directory/directoryfile.txt"
             ),
-            to: 'new1.txt',
+            to: "new1.txt",
             transform: (content) => {
               return `${content.toString()}added1`;
             },
@@ -970,9 +970,9 @@ describe('CopyPlugin', () => {
           {
             from: path.resolve(
               __dirname,
-              './fixtures/directory/directoryfile.txt'
+              "./fixtures/directory/directoryfile.txt"
             ),
-            to: 'new1-2.txt',
+            to: "new1-2.txt",
             transform: (content) => {
               return `${content.toString()}added1`;
             },
@@ -981,9 +981,9 @@ describe('CopyPlugin', () => {
           {
             from: path.resolve(
               __dirname,
-              './fixtures/directory/directoryfile.txt'
+              "./fixtures/directory/directoryfile.txt"
             ),
-            to: 'new2.txt',
+            to: "new2.txt",
             transform: (content) => {
               return `${content.toString()}added2`;
             },
@@ -992,9 +992,9 @@ describe('CopyPlugin', () => {
           {
             from: path.resolve(
               __dirname,
-              './fixtures/directory/directoryfile.txt'
+              "./fixtures/directory/directoryfile.txt"
             ),
-            to: 'new3.txt',
+            to: "new3.txt",
             transform: (content) => {
               return `${content.toString()}added3`;
             },
@@ -1003,30 +1003,30 @@ describe('CopyPlugin', () => {
           {
             from: path.resolve(
               __dirname,
-              './fixtures/directory/directoryfile.txt'
+              "./fixtures/directory/directoryfile.txt"
             ),
-            to: 'new4.txt',
+            to: "new4.txt",
             transform: (content) => {
               return `${content.toString()}${getMyVar()}`;
             },
             cacheTransform: {
               keys: {
-                foo: 'bar',
+                foo: "bar",
               },
             },
           },
           {
             from: path.resolve(
               __dirname,
-              './fixtures/directory/directoryfile.txt'
+              "./fixtures/directory/directoryfile.txt"
             ),
-            to: 'new5.txt',
+            to: "new5.txt",
             transform: (content) => {
               return `${content.toString()}${getMyVar()}`;
             },
             cacheTransform: {
               keys: {
-                foo: 'baz',
+                foo: "baz",
               },
             },
           },
@@ -1035,7 +1035,7 @@ describe('CopyPlugin', () => {
 
       const { stats } = await compile(compiler);
 
-      if (webpack.version[0] === '4') {
+      if (webpack.version[0] === "4") {
         expect(
           Object.keys(stats.compilation.assets).filter(
             (assetName) => stats.compilation.assets[assetName].emitted
@@ -1045,14 +1045,14 @@ describe('CopyPlugin', () => {
         expect(stats.compilation.emittedAssets.size).toBe(8);
       }
 
-      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
-      expect(stats.compilation.errors).toMatchSnapshot('errors');
-      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
+      expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
+      expect(stats.compilation.errors).toMatchSnapshot("errors");
+      expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
       await new Promise(async (resolve) => {
         const { stats: newStats } = await compile(compiler);
 
-        if (webpack.version[0] === '4') {
+        if (webpack.version[0] === "4") {
           expect(
             Object.keys(newStats.compilation.assets).filter(
               (assetName) => newStats.compilation.assets[assetName].emitted
@@ -1062,34 +1062,34 @@ describe('CopyPlugin', () => {
           expect(newStats.compilation.emittedAssets.size).toBe(1);
         }
 
-        expect(readAssets(compiler, newStats)).toMatchSnapshot('assets');
-        expect(newStats.compilation.errors).toMatchSnapshot('errors');
-        expect(newStats.compilation.warnings).toMatchSnapshot('warnings');
+        expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+        expect(newStats.compilation.errors).toMatchSnapshot("errors");
+        expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
 
         resolve();
       });
     });
   });
 
-  describe('stats', () => {
-    it('should work have assets info', async () => {
+  describe("stats", () => {
+    it("should work have assets info", async () => {
       const compiler = getCompiler({
-        entry: path.resolve(__dirname, './helpers/enter-with-asset-modules.js'),
+        entry: path.resolve(__dirname, "./helpers/enter-with-asset-modules.js"),
       });
 
       new CopyPlugin({
         patterns: [
           {
-            from: path.resolve(__dirname, './fixtures/directory'),
+            from: path.resolve(__dirname, "./fixtures/directory"),
           },
         ],
       }).apply(compiler);
 
       const { stats } = await compile(compiler);
 
-      expect(stats.compilation.warnings).toMatchSnapshot('warnings');
-      expect(stats.compilation.errors).toMatchSnapshot('errors');
-      expect(readAssets(compiler, stats)).toMatchSnapshot('assets');
+      expect(stats.compilation.warnings).toMatchSnapshot("warnings");
+      expect(stats.compilation.errors).toMatchSnapshot("errors");
+      expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
 
       const assetsInfo = [];
 
@@ -1116,44 +1116,44 @@ describe('CopyPlugin', () => {
 
           return 0;
         })
-      ).toMatchSnapshot('assets info');
+      ).toMatchSnapshot("assets info");
     });
   });
 
-  describe('logging', () => {
+  describe("logging", () => {
     it('should logging when "from" is a file', (done) => {
-      const expectedAssetKeys = ['file.txt'];
+      const expectedAssetKeys = ["file.txt"];
 
       run({
         patterns: [
           {
-            from: 'file.txt',
+            from: "file.txt",
           },
         ],
       })
         .then(({ compiler, stats }) => {
-          const root = path.resolve(__dirname).replace(/\\/g, '/');
+          const root = path.resolve(__dirname).replace(/\\/g, "/");
           const logs = stats.compilation.logging
-            .get('copy-webpack-plugin')
+            .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, '/').split(root).join('.')
+              entry.args[0].replace(/\\/g, "/").split(root).join(".")
             )
             // TODO remove after drop webpack@4
             .filter(
               (item) =>
-                !item.startsWith('created snapshot') &&
-                !item.startsWith('creating snapshot') &&
-                !item.startsWith('getting cache') &&
-                !item.startsWith('missed cache') &&
-                !item.startsWith('stored cache') &&
-                !item.startsWith('storing cache')
+                !item.startsWith("created snapshot") &&
+                !item.startsWith("creating snapshot") &&
+                !item.startsWith("getting cache") &&
+                !item.startsWith("missed cache") &&
+                !item.startsWith("stored cache") &&
+                !item.startsWith("storing cache")
             )
             .sort();
 
           expect(
             Array.from(Object.keys(readAssets(compiler, stats))).sort()
           ).toEqual(expectedAssetKeys);
-          expect({ logs }).toMatchSnapshot('logs');
+          expect({ logs }).toMatchSnapshot("logs");
         })
         .then(done)
         .catch(done);
@@ -1161,42 +1161,42 @@ describe('CopyPlugin', () => {
 
     it('should logging when "from" is a directory', (done) => {
       const expectedAssetKeys = [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ];
 
       run({
         patterns: [
           {
-            from: 'directory',
+            from: "directory",
           },
         ],
       })
         .then(({ compiler, stats }) => {
-          const root = path.resolve(__dirname).replace(/\\/g, '/');
+          const root = path.resolve(__dirname).replace(/\\/g, "/");
           const logs = stats.compilation.logging
-            .get('copy-webpack-plugin')
+            .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, '/').split(root).join('.')
+              entry.args[0].replace(/\\/g, "/").split(root).join(".")
             )
             // TODO remove after drop webpack@4
             .filter(
               (item) =>
-                !item.startsWith('created snapshot') &&
-                !item.startsWith('creating snapshot') &&
-                !item.startsWith('getting cache') &&
-                !item.startsWith('missed cache') &&
-                !item.startsWith('stored cache') &&
-                !item.startsWith('storing cache')
+                !item.startsWith("created snapshot") &&
+                !item.startsWith("creating snapshot") &&
+                !item.startsWith("getting cache") &&
+                !item.startsWith("missed cache") &&
+                !item.startsWith("stored cache") &&
+                !item.startsWith("storing cache")
             )
             .sort();
 
           expect(
             Array.from(Object.keys(readAssets(compiler, stats))).sort()
           ).toEqual(expectedAssetKeys);
-          expect({ logs }).toMatchSnapshot('logs');
+          expect({ logs }).toMatchSnapshot("logs");
         })
         .then(done)
         .catch(done);
@@ -1204,15 +1204,15 @@ describe('CopyPlugin', () => {
 
     it('should logging when "from" is a glob', (done) => {
       const expectedAssetKeys = [
-        'directory/directoryfile.txt',
-        'directory/nested/deep-nested/deepnested.txt',
-        'directory/nested/nestedfile.txt',
+        "directory/directoryfile.txt",
+        "directory/nested/deep-nested/deepnested.txt",
+        "directory/nested/nestedfile.txt",
       ];
 
       run({
         patterns: [
           {
-            from: 'directory/**',
+            from: "directory/**",
             globOptions: {
               onlyFiles: false,
             },
@@ -1220,28 +1220,28 @@ describe('CopyPlugin', () => {
         ],
       })
         .then(({ compiler, stats }) => {
-          const root = path.resolve(__dirname).replace(/\\/g, '/');
+          const root = path.resolve(__dirname).replace(/\\/g, "/");
           const logs = stats.compilation.logging
-            .get('copy-webpack-plugin')
+            .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, '/').split(root).join('.')
+              entry.args[0].replace(/\\/g, "/").split(root).join(".")
             )
             // TODO remove after drop webpack@4
             .filter(
               (item) =>
-                !item.startsWith('created snapshot') &&
-                !item.startsWith('creating snapshot') &&
-                !item.startsWith('getting cache') &&
-                !item.startsWith('missed cache') &&
-                !item.startsWith('stored cache') &&
-                !item.startsWith('storing cache')
+                !item.startsWith("created snapshot") &&
+                !item.startsWith("creating snapshot") &&
+                !item.startsWith("getting cache") &&
+                !item.startsWith("missed cache") &&
+                !item.startsWith("stored cache") &&
+                !item.startsWith("storing cache")
             )
             .sort();
 
           expect(
             Array.from(Object.keys(readAssets(compiler, stats))).sort()
           ).toEqual(expectedAssetKeys);
-          expect({ logs }).toMatchSnapshot('logs');
+          expect({ logs }).toMatchSnapshot("logs");
         })
         .then(done)
         .catch(done);

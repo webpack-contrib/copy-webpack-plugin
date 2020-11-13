@@ -1,46 +1,46 @@
-import os from 'os';
+import os from "os";
 
-import findCacheDir from 'find-cache-dir';
+import findCacheDir from "find-cache-dir";
 
-import CopyPlugin from '../src/index';
+import CopyPlugin from "../src/index";
 
-describe('validate options', () => {
+describe("validate options", () => {
   const tests = {
     patterns: {
       success: [
-        ['test.txt'],
-        ['test.txt', 'test-other.txt'],
+        ["test.txt"],
+        ["test.txt", "test-other.txt"],
         [
-          'test.txt',
+          "test.txt",
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
           },
         ],
         [
           {
-            from: 'test.txt',
+            from: "test.txt",
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
+            from: "test.txt",
+            to: "dir",
           },
         ],
         [
           {
-            from: 'test.txt',
-            context: 'context',
+            from: "test.txt",
+            context: "context",
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            toType: 'file',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
+            toType: "file",
             force: true,
             flatten: true,
             transform: () => {},
@@ -51,9 +51,9 @@ describe('validate options', () => {
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             globOptions: {
               dot: false,
             },
@@ -61,80 +61,80 @@ describe('validate options', () => {
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform:
-              findCacheDir({ name: 'copy-webpack-plugin-a' }) || os.tmpdir(),
+              findCacheDir({ name: "copy-webpack-plugin-a" }) || os.tmpdir(),
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform: {
               keys: {
-                foo: 'bar',
+                foo: "bar",
               },
             },
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform: {
               keys: () => ({
-                foo: 'bar',
+                foo: "bar",
               }),
             },
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform: {
               keys: async () => ({
-                foo: 'bar',
+                foo: "bar",
               }),
             },
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform: {
               directory:
-                findCacheDir({ name: 'copy-webpack-plugin-b' }) || os.tmpdir(),
+                findCacheDir({ name: "copy-webpack-plugin-b" }) || os.tmpdir(),
               keys: {
-                foo: 'bar',
+                foo: "bar",
               },
             },
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform: {
               directory:
-                findCacheDir({ name: 'copy-webpack-plugin-c' }) || os.tmpdir(),
+                findCacheDir({ name: "copy-webpack-plugin-c" }) || os.tmpdir(),
               keys: () => ({
-                foo: 'bar',
+                foo: "bar",
               }),
             },
           },
         ],
         [
           {
-            from: 'test.txt',
+            from: "test.txt",
             filter: () => true,
           },
         ],
@@ -143,120 +143,120 @@ describe('validate options', () => {
         // eslint-disable-next-line no-undefined
         undefined,
         true,
-        'true',
-        '',
+        "true",
+        "",
         {},
         [],
-        [''],
+        [""],
         [{}],
         [
           {
-            from: '',
-            to: 'dir',
-            context: 'context',
+            from: "",
+            to: "dir",
+            context: "context",
           },
         ],
         [
           {
             from: true,
-            to: 'dir',
-            context: 'context',
+            to: "dir",
+            context: "context",
           },
         ],
         [
           {
-            from: 'test.txt',
+            from: "test.txt",
             to: true,
-            context: 'context',
+            context: "context",
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
+            from: "test.txt",
+            to: "dir",
             context: true,
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            toType: 'foo',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
+            toType: "foo",
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            force: 'true',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
+            force: "true",
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
-            flatten: 'true',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
+            flatten: "true",
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform: () => {},
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             cacheTransform: {
-              foo: 'bar',
+              foo: "bar",
             },
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             transform: true,
           },
         ],
         [
           {
-            from: 'test.txt',
-            to: 'dir',
-            context: 'context',
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             transformPath: true,
           },
         ],
         [
           {
             from: {
-              glob: '**/*',
+              glob: "**/*",
               dot: false,
             },
-            to: 'dir',
-            context: 'context',
+            to: "dir",
+            context: "context",
           },
         ],
         [
           {
-            from: '',
-            to: 'dir',
-            context: 'context',
-            noErrorOnMissing: 'true',
+            from: "",
+            to: "dir",
+            context: "context",
+            noErrorOnMissing: "true",
           },
         ],
         [
           {
-            from: 'test.txt',
-            filter: 'test',
+            from: "test.txt",
+            filter: "test",
           },
         ],
       ],
@@ -267,14 +267,14 @@ describe('validate options', () => {
     },
     unknown: {
       success: [],
-      failure: [1, true, false, 'test', /test/, [], {}, { foo: 'bar' }],
+      failure: [1, true, false, "test", /test/, [], {}, { foo: "bar" }],
     },
   };
 
   function stringifyValue(value) {
     if (
       Array.isArray(value) ||
-      (value && typeof value === 'object' && value.constructor === Object)
+      (value && typeof value === "object" && value.constructor === Object)
     ) {
       return JSON.stringify(value);
     }
@@ -284,27 +284,27 @@ describe('validate options', () => {
 
   async function createTestCase(key, value, type) {
     it(`should ${
-      type === 'success' ? 'successfully validate' : 'throw an error on'
+      type === "success" ? "successfully validate" : "throw an error on"
     } the "${key}" option with "${stringifyValue(value)}" value`, async () => {
       let error;
 
       try {
         // eslint-disable-next-line no-new
         new CopyPlugin(
-          key === 'options'
-            ? { patterns: [{ from: 'file.txt' }], [key]: value }
+          key === "options"
+            ? { patterns: [{ from: "file.txt" }], [key]: value }
             : { [key]: value }
         );
       } catch (errorFromPlugin) {
-        if (errorFromPlugin.name !== 'ValidationError') {
+        if (errorFromPlugin.name !== "ValidationError") {
           throw errorFromPlugin;
         }
 
         error = errorFromPlugin;
       } finally {
-        if (type === 'success') {
+        if (type === "success") {
           expect(error).toBeUndefined();
-        } else if (type === 'failure') {
+        } else if (type === "failure") {
           expect(() => {
             throw error;
           }).toThrowErrorMatchingSnapshot();
