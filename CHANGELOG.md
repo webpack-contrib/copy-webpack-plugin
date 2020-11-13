@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.3.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.3.0...v6.3.1) (2020-11-13)
+
+
+### Bug Fixes
+
+* watching ([#555](https://github.com/webpack-contrib/copy-webpack-plugin/issues/555)) ([b996923](https://github.com/webpack-contrib/copy-webpack-plugin/commit/b9969230321df68ed235ed1861729837f234750e))
+
 ## [6.3.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.2.1...v6.3.0) (2020-11-03)
 
 
