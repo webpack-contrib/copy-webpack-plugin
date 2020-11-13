@@ -1,13 +1,13 @@
-import { runEmit } from './helpers/run';
+import { runEmit } from "./helpers/run";
 
-describe('noErrorOnMissing option', () => {
-  describe('is a file', () => {
-    it('should work', (done) => {
+describe("noErrorOnMissing option", () => {
+  describe("is a file", () => {
+    it("should work", (done) => {
       runEmit({
         expectedAssetKeys: [],
         patterns: [
           {
-            from: 'unknown.unknown',
+            from: "unknown.unknown",
             noErrorOnMissing: true,
           },
         ],
@@ -17,13 +17,13 @@ describe('noErrorOnMissing option', () => {
     });
   });
 
-  describe('is a directory', () => {
-    it('should work', (done) => {
+  describe("is a directory", () => {
+    it("should work", (done) => {
       runEmit({
         expectedAssetKeys: [],
         patterns: [
           {
-            from: 'unknown',
+            from: "unknown",
             noErrorOnMissing: true,
           },
         ],
@@ -33,13 +33,13 @@ describe('noErrorOnMissing option', () => {
     });
   });
 
-  describe('is a glob', () => {
-    it('should work', (done) => {
+  describe("is a glob", () => {
+    it("should work", (done) => {
       runEmit({
         expectedAssetKeys: [],
         patterns: [
           {
-            from: '*.unknown',
+            from: "*.unknown",
             noErrorOnMissing: true,
           },
         ],

@@ -1,13 +1,13 @@
-import { runEmit } from './helpers/run';
+import { runEmit } from "./helpers/run";
 
-describe('flatten option', () => {
+describe("flatten option", () => {
   it('should flatten a directory\'s files to a root directory when "from" is a file', (done) => {
     runEmit({
-      expectedAssetKeys: ['directoryfile.txt'],
+      expectedAssetKeys: ["directoryfile.txt"],
       patterns: [
         {
           flatten: true,
-          from: 'directory/directoryfile.txt',
+          from: "directory/directoryfile.txt",
         },
       ],
     })
@@ -17,12 +17,12 @@ describe('flatten option', () => {
 
   it('should flatten a directory\'s files to a new directory when "from" is a file', (done) => {
     runEmit({
-      expectedAssetKeys: ['nested/directoryfile.txt'],
+      expectedAssetKeys: ["nested/directoryfile.txt"],
       patterns: [
         {
           flatten: true,
-          from: 'directory/directoryfile.txt',
-          to: 'nested',
+          from: "directory/directoryfile.txt",
+          to: "nested",
         },
       ],
     })
@@ -33,15 +33,15 @@ describe('flatten option', () => {
   it('should flatten a directory\'s files to a root directory when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '.dottedfile',
-        'deepnested.txt',
-        'directoryfile.txt',
-        'nestedfile.txt',
+        ".dottedfile",
+        "deepnested.txt",
+        "directoryfile.txt",
+        "nestedfile.txt",
       ],
       patterns: [
         {
           flatten: true,
-          from: 'directory',
+          from: "directory",
         },
       ],
     })
@@ -52,16 +52,16 @@ describe('flatten option', () => {
   it('should flatten a directory\'s files to new directory when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'newdirectory/.dottedfile',
-        'newdirectory/deepnested.txt',
-        'newdirectory/directoryfile.txt',
-        'newdirectory/nestedfile.txt',
+        "newdirectory/.dottedfile",
+        "newdirectory/deepnested.txt",
+        "newdirectory/directoryfile.txt",
+        "newdirectory/nestedfile.txt",
       ],
       patterns: [
         {
           flatten: true,
-          from: 'directory',
-          to: 'newdirectory',
+          from: "directory",
+          to: "newdirectory",
         },
       ],
     })
@@ -72,14 +72,14 @@ describe('flatten option', () => {
   it('should flatten a directory\'s files to a root directory when "from" is a glob', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'deepnested.txt',
-        'directoryfile.txt',
-        'nestedfile.txt',
+        "deepnested.txt",
+        "directoryfile.txt",
+        "nestedfile.txt",
       ],
       patterns: [
         {
           flatten: true,
-          from: 'directory/**/*',
+          from: "directory/**/*",
         },
       ],
     })
@@ -90,15 +90,15 @@ describe('flatten option', () => {
   it('should flatten a directory\'s files to a new directory when "from" is a glob', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'nested/deepnested.txt',
-        'nested/directoryfile.txt',
-        'nested/nestedfile.txt',
+        "nested/deepnested.txt",
+        "nested/directoryfile.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
           flatten: true,
-          from: 'directory/**/*',
-          to: 'nested',
+          from: "directory/**/*",
+          to: "nested",
         },
       ],
     })
@@ -109,15 +109,15 @@ describe('flatten option', () => {
   it('should flatten files in a relative context to a root directory when "from" is a glob', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'deepnested.txt',
-        'directoryfile.txt',
-        'nestedfile.txt',
+        "deepnested.txt",
+        "directoryfile.txt",
+        "nestedfile.txt",
       ],
       patterns: [
         {
-          context: 'directory',
+          context: "directory",
           flatten: true,
-          from: '**/*',
+          from: "**/*",
         },
       ],
     })
@@ -128,16 +128,16 @@ describe('flatten option', () => {
   it('should flatten files in a relative context to a non-root directory when "from" is a glob', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'nested/deepnested.txt',
-        'nested/directoryfile.txt',
-        'nested/nestedfile.txt',
+        "nested/deepnested.txt",
+        "nested/directoryfile.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          context: 'directory',
+          context: "directory",
           flatten: true,
-          from: '**/*',
-          to: 'nested',
+          from: "**/*",
+          to: "nested",
         },
       ],
     })

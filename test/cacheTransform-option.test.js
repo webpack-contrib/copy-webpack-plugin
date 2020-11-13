@@ -1,23 +1,23 @@
-import fs from 'fs';
-import path from 'path';
-import zlib from 'zlib';
+import fs from "fs";
+import path from "path";
+import zlib from "zlib";
 
-import webpack from 'webpack';
-import cacache from 'cacache';
-import findCacheDir from 'find-cache-dir';
-import isGzip from 'is-gzip';
+import webpack from "webpack";
+import cacache from "cacache";
+import findCacheDir from "find-cache-dir";
+import isGzip from "is-gzip";
 
-import { runEmit } from './helpers/run';
+import { runEmit } from "./helpers/run";
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures');
+const FIXTURES_DIR = path.join(__dirname, "fixtures");
 
-if (webpack.version[0] === '4') {
-  describe('cache option', () => {
-    const defaultCacheDir = findCacheDir({ name: 'copy-webpack-plugin' });
-    const cacheDir1 = findCacheDir({ name: 'copy-webpack-plugin-1' });
-    const cacheDir2 = findCacheDir({ name: 'copy-webpack-plugin-2' });
-    const cacheDir3 = findCacheDir({ name: 'copy-webpack-plugin-3' });
-    const cacheDir4 = findCacheDir({ name: 'copy-webpack-plugin-4' });
+if (webpack.version[0] === "4") {
+  describe("cache option", () => {
+    const defaultCacheDir = findCacheDir({ name: "copy-webpack-plugin" });
+    const cacheDir1 = findCacheDir({ name: "copy-webpack-plugin-1" });
+    const cacheDir2 = findCacheDir({ name: "copy-webpack-plugin-2" });
+    const cacheDir3 = findCacheDir({ name: "copy-webpack-plugin-3" });
+    const cacheDir4 = findCacheDir({ name: "copy-webpack-plugin-4" });
 
     beforeEach(() => [
       cacache.rm.all(defaultCacheDir),
@@ -28,13 +28,13 @@ if (webpack.version[0] === '4') {
     ]);
 
     it('should cache when "from" is a file', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
@@ -60,19 +60,19 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache files when "from" is a directory', (done) => {
-      const from = 'directory';
+      const from = "directory";
 
       runEmit({
         expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+          ".dottedfile",
+          "directoryfile.txt",
+          "nested/deep-nested/deepnested.txt",
+          "nested/nestedfile.txt",
         ],
         expectedAssetContent: {
-          '.dottedfile': 'dottedfile contents\nchanged!',
-          'directoryfile.txt': 'newchanged!',
-          'nested/nestedfile.txt': 'changed!',
+          ".dottedfile": "dottedfile contents\nchanged!",
+          "directoryfile.txt": "newchanged!",
+          "nested/nestedfile.txt": "changed!",
         },
         patterns: [
           {
@@ -98,12 +98,12 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache when "from" is a glob', (done) => {
-      const from = 'directory/*.txt';
+      const from = "directory/*.txt";
 
       runEmit({
-        expectedAssetKeys: ['directory/directoryfile.txt'],
+        expectedAssetKeys: ["directory/directoryfile.txt"],
         expectedAssetContent: {
-          'directory/directoryfile.txt': 'newchanged!',
+          "directory/directoryfile.txt": "newchanged!",
         },
         patterns: [
           {
@@ -128,14 +128,14 @@ if (webpack.version[0] === '4') {
         .catch(done);
     });
 
-    it('should cache file with custom cache directory', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+    it("should cache file with custom cache directory", (done) => {
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
@@ -161,13 +161,13 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache file with custom cache directory when "cacheTransform" is an object', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
@@ -195,20 +195,20 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache file with custom object cache keys when "cacheTransform" is an object', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
             from,
             cacheTransform: {
               keys: {
-                key: 'foobar',
+                key: "foobar",
               },
             },
             transform: (content) => {
@@ -228,11 +228,11 @@ if (webpack.version[0] === '4') {
             cacheKeys.forEach((cacheKey) => {
               // eslint-disable-next-line no-new-func
               const cacheEntry = new Function(
-                `'use strict'\nreturn (${cacheKey.replace('transform|', '')});`
+                `'use strict'\nreturn (${cacheKey.replace("transform|", "")});`
               )();
 
               // expect(cacheEntry.pattern.from).toBe(from);
-              expect(cacheEntry.key).toBe('foobar');
+              expect(cacheEntry.key).toBe("foobar");
             });
           })
         )
@@ -241,13 +241,13 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache file with custom function cache keys when "cacheTransform" is an object', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
@@ -258,7 +258,7 @@ if (webpack.version[0] === '4') {
 
                 return {
                   ...defaultCacheKeys,
-                  key: 'foobar',
+                  key: "foobar",
                 };
               },
             },
@@ -279,11 +279,11 @@ if (webpack.version[0] === '4') {
             cacheKeys.forEach((cacheKey) => {
               // eslint-disable-next-line no-new-func
               const cacheEntry = new Function(
-                `'use strict'\nreturn (${cacheKey.replace('transform|', '')});`
+                `'use strict'\nreturn (${cacheKey.replace("transform|", "")});`
               )();
 
               // expect(cacheEntry.pattern.from).toBe(from);
-              expect(cacheEntry.key).toBe('foobar');
+              expect(cacheEntry.key).toBe("foobar");
             });
           })
         )
@@ -292,13 +292,13 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache file with custom async function cache keys when "cacheTransform" is an object', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
@@ -309,7 +309,7 @@ if (webpack.version[0] === '4') {
 
                 return {
                   ...defaultCacheKeys,
-                  key: 'foobar',
+                  key: "foobar",
                 };
               },
             },
@@ -330,11 +330,11 @@ if (webpack.version[0] === '4') {
             cacheKeys.forEach((cacheKey) => {
               // eslint-disable-next-line no-new-func
               const cacheEntry = new Function(
-                `'use strict'\nreturn (${cacheKey.replace('transform|', '')});`
+                `'use strict'\nreturn (${cacheKey.replace("transform|", "")});`
               )();
 
               // expect(cacheEntry.pattern.from).toBe(from);
-              expect(cacheEntry.key).toBe('foobar');
+              expect(cacheEntry.key).toBe("foobar");
             });
           })
         )
@@ -343,13 +343,13 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache file with custom object cache keys and custom cache directory when "cacheTransform" is an object', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
@@ -357,7 +357,7 @@ if (webpack.version[0] === '4') {
             cacheTransform: {
               directory: cacheDir3,
               keys: {
-                key: 'foobar',
+                key: "foobar",
               },
             },
             transform(content) {
@@ -375,7 +375,7 @@ if (webpack.version[0] === '4') {
             expect(cacheKeys).toHaveLength(1);
 
             cacheKeys.forEach((cacheKey) => {
-              expect(cacheKey).toContain('foobar');
+              expect(cacheKey).toContain("foobar");
             });
           })
         )
@@ -384,13 +384,13 @@ if (webpack.version[0] === '4') {
     });
 
     it('should cache file with custom function cache keys and custom cache directory when "cacheTransform" is an object', (done) => {
-      const newContent = 'newchanged!';
-      const from = 'file.txt';
+      const newContent = "newchanged!";
+      const from = "file.txt";
 
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         expectedAssetContent: {
-          'file.txt': newContent,
+          "file.txt": newContent,
         },
         patterns: [
           {
@@ -402,7 +402,7 @@ if (webpack.version[0] === '4') {
 
                 return {
                   ...defaultCacheKeys,
-                  key: 'foobar',
+                  key: "foobar",
                 };
               },
             },
@@ -421,7 +421,7 @@ if (webpack.version[0] === '4') {
             expect(cacheKeys).toHaveLength(1);
 
             cacheKeys.forEach((cacheKey) => {
-              expect(cacheKey).toContain('foobar');
+              expect(cacheKey).toContain("foobar");
             });
           })
         )
@@ -429,18 +429,18 @@ if (webpack.version[0] === '4') {
         .catch(done);
     });
 
-    it('should cache binary file', (done) => {
-      const from = 'file.txt.gz';
+    it("should cache binary file", (done) => {
+      const from = "file.txt.gz";
       const content = fs.readFileSync(path.join(FIXTURES_DIR, from));
-      const expectedNewContent = zlib.gzipSync('newchanged!');
+      const expectedNewContent = zlib.gzipSync("newchanged!");
 
       expect(isGzip(content)).toBe(true);
       expect(isGzip(expectedNewContent)).toBe(true);
 
       runEmit({
-        expectedAssetKeys: ['file.txt.gz'],
+        expectedAssetKeys: ["file.txt.gz"],
         expectedAssetContent: {
-          'file.txt.gz': expectedNewContent,
+          "file.txt.gz": expectedNewContent,
         },
         patterns: [
           {
@@ -487,8 +487,8 @@ if (webpack.version[0] === '4') {
     });
   });
 } else {
-  describe('cache option', () => {
-    it('skip', () => {
+  describe("cache option", () => {
+    it("skip", () => {
       expect(true).toBe(true);
     });
   });

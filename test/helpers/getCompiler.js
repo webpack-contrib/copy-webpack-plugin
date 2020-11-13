@@ -1,31 +1,31 @@
-import path from 'path';
+import path from "path";
 
-import webpack from 'webpack';
-import { createFsFromVolume, Volume } from 'memfs';
+import webpack from "webpack";
+import { createFsFromVolume, Volume } from "memfs";
 
 export default (config = {}) => {
   const fullConfig = {
-    mode: 'development',
-    context: path.resolve(__dirname, '../fixtures'),
-    entry: path.resolve(__dirname, '../helpers/enter.js'),
+    mode: "development",
+    context: path.resolve(__dirname, "../fixtures"),
+    entry: path.resolve(__dirname, "../helpers/enter.js"),
     output: {
-      path: path.resolve(__dirname, '../build'),
+      path: path.resolve(__dirname, "../build"),
     },
     module: {
       rules: [
-        webpack.version[0] === '5'
+        webpack.version[0] === "5"
           ? {
               test: /\.txt/,
-              type: 'asset/resource',
+              type: "asset/resource",
               generator: {
-                filename: 'asset-modules/[name][ext]',
+                filename: "asset-modules/[name][ext]",
               },
             }
           : {
               test: /\.txt/,
-              loader: 'file-loader',
+              loader: "file-loader",
               options: {
-                name: 'asset-modules/[name].[ext]',
+                name: "asset-modules/[name].[ext]",
               },
             },
       ],

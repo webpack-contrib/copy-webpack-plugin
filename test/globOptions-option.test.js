@@ -1,19 +1,19 @@
-import path from 'path';
+import path from "path";
 
-import { runEmit } from './helpers/run';
+import { runEmit } from "./helpers/run";
 
 const FIXTURES_DIR_NORMALIZED = path
-  .join(__dirname, 'fixtures')
-  .replace(/\\/g, '/');
+  .join(__dirname, "fixtures")
+  .replace(/\\/g, "/");
 
-describe('globOptions option', () => {
+describe("globOptions option", () => {
   // Expected behavior from `globby`/`fast-glob`
   it('should move files exclude dot files when "from" is a directory', (done) => {
     runEmit({
-      expectedAssetKeys: ['.file.txt'],
+      expectedAssetKeys: [".file.txt"],
       patterns: [
         {
-          from: '.file.txt',
+          from: ".file.txt",
           globOptions: {
             dot: false,
           },
@@ -27,13 +27,13 @@ describe('globOptions option', () => {
   it('should move files exclude dot files when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
             dot: false,
           },
@@ -46,10 +46,10 @@ describe('globOptions option', () => {
 
   it('should move files exclude dot files when "from" is a glob', (done) => {
     runEmit({
-      expectedAssetKeys: ['file.txt'],
+      expectedAssetKeys: ["file.txt"],
       patterns: [
         {
-          from: '*.txt',
+          from: "*.txt",
           globOptions: {
             dot: false,
           },
@@ -60,12 +60,12 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should move files include dot files', (done) => {
+  it("should move files include dot files", (done) => {
     runEmit({
-      expectedAssetKeys: ['.file.txt', 'file.txt'],
+      expectedAssetKeys: [".file.txt", "file.txt"],
       patterns: [
         {
-          from: '*.txt',
+          from: "*.txt",
           globOptions: {
             dot: true,
           },
@@ -85,9 +85,9 @@ describe('globOptions option', () => {
       ],
       patterns: [
         {
-          from: 'file.txt',
+          from: "file.txt",
           globOptions: {
-            ignore: ['**/file.*'],
+            ignore: ["**/file.*"],
           },
         },
       ],
@@ -99,15 +99,15 @@ describe('globOptions option', () => {
   it('should files when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
-            ignore: ['**/nestedfile.*'],
+            ignore: ["**/nestedfile.*"],
           },
         },
       ],
@@ -118,12 +118,12 @@ describe('globOptions option', () => {
 
   it('should files in nested directory when "from" is a directory', (done) => {
     runEmit({
-      expectedAssetKeys: ['.dottedfile', 'directoryfile.txt'],
+      expectedAssetKeys: [".dottedfile", "directoryfile.txt"],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
-            ignore: ['**/nested/**'],
+            ignore: ["**/nested/**"],
           },
         },
       ],
@@ -132,17 +132,17 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should files when from is a glob', (done) => {
+  it("should files when from is a glob", (done) => {
     runEmit({
       expectedAssetKeys: [
-        'directory/directoryfile.txt',
-        'directory/nested/deep-nested/deepnested.txt',
+        "directory/directoryfile.txt",
+        "directory/nested/deep-nested/deepnested.txt",
       ],
       patterns: [
         {
-          from: 'directory/**/*',
+          from: "directory/**/*",
           globOptions: {
-            ignore: ['**/nestedfile.*'],
+            ignore: ["**/nestedfile.*"],
           },
         },
       ],
@@ -151,14 +151,14 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should files in nested directory when from is a glob', (done) => {
+  it("should files in nested directory when from is a glob", (done) => {
     runEmit({
-      expectedAssetKeys: ['directory/directoryfile.txt'],
+      expectedAssetKeys: ["directory/directoryfile.txt"],
       patterns: [
         {
-          from: 'directory/**/*',
+          from: "directory/**/*",
           globOptions: {
-            ignore: ['**/nested/**'],
+            ignore: ["**/nested/**"],
           },
         },
       ],
@@ -167,14 +167,14 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should ignore files with a certain extension', (done) => {
+  it("should ignore files with a certain extension", (done) => {
     runEmit({
-      expectedAssetKeys: ['.dottedfile'],
+      expectedAssetKeys: [".dottedfile"],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
-            ignore: ['**/*.txt'],
+            ignore: ["**/*.txt"],
           },
         },
       ],
@@ -183,14 +183,14 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should ignore files with multiple ignore patterns', (done) => {
+  it("should ignore files with multiple ignore patterns", (done) => {
     runEmit({
-      expectedAssetKeys: ['directory/nested/nestedfile.txt'],
+      expectedAssetKeys: ["directory/nested/nestedfile.txt"],
       patterns: [
         {
-          from: 'directory/**/*',
+          from: "directory/**/*",
           globOptions: {
-            ignore: ['**/directoryfile.*', '**/deep-nested/**'],
+            ignore: ["**/directoryfile.*", "**/deep-nested/**"],
           },
         },
       ],
@@ -199,16 +199,16 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should ignore files with flatten true', (done) => {
+  it("should ignore files with flatten true", (done) => {
     runEmit({
-      expectedAssetKeys: ['img/.dottedfile', 'img/nestedfile.txt'],
+      expectedAssetKeys: ["img/.dottedfile", "img/nestedfile.txt"],
       patterns: [
         {
-          from: 'directory/',
-          to: 'img/',
+          from: "directory/",
+          to: "img/",
           flatten: true,
           globOptions: {
-            ignore: ['**/directoryfile.*', '**/deep-nested/**'],
+            ignore: ["**/directoryfile.*", "**/deep-nested/**"],
           },
         },
       ],
@@ -217,14 +217,14 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should ignore files except those with dots', (done) => {
+  it("should ignore files except those with dots", (done) => {
     runEmit({
-      expectedAssetKeys: ['.dottedfile'],
+      expectedAssetKeys: [".dottedfile"],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
-            ignore: ['!(**/.*)'],
+            ignore: ["!(**/.*)"],
           },
         },
       ],
@@ -233,18 +233,18 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should ignore files that start with a dot', (done) => {
+  it("should ignore files that start with a dot", (done) => {
     runEmit({
       expectedAssetKeys: [
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
-            ignore: ['**/.*'],
+            ignore: ["**/.*"],
           },
         },
       ],
@@ -253,7 +253,7 @@ describe('globOptions option', () => {
       .catch(done);
   });
 
-  it('should ignores all files even if they start with a dot', (done) => {
+  it("should ignores all files even if they start with a dot", (done) => {
     runEmit({
       expectedErrors: [
         new Error(
@@ -262,9 +262,9 @@ describe('globOptions option', () => {
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
-            ignore: ['**/*'],
+            ignore: ["**/*"],
           },
         },
       ],
@@ -282,9 +282,9 @@ describe('globOptions option', () => {
       ],
       patterns: [
         {
-          from: 'file.txt',
+          from: "file.txt",
           globOptions: {
-            ignore: ['**/file.*'],
+            ignore: ["**/file.*"],
           },
         },
       ],
@@ -296,16 +296,16 @@ describe('globOptions option', () => {
   it('should ignore the "cwd" option', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
-            cwd: path.resolve(__dirname, 'fixtures/nested'),
+            cwd: path.resolve(__dirname, "fixtures/nested"),
           },
         },
       ],
@@ -317,13 +317,13 @@ describe('globOptions option', () => {
   it('should work with the "deep" option', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
             deep: 2,
           },
@@ -337,14 +337,14 @@ describe('globOptions option', () => {
   it('should work with the "markDirectories" option', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
             markDirectories: true,
           },
@@ -358,14 +358,14 @@ describe('globOptions option', () => {
   it('should work with the "objectMode" option', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
             objectMode: true,
           },
@@ -381,7 +381,7 @@ describe('globOptions option', () => {
       expectedAssetKeys: [],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
             onlyDirectories: true,
           },
@@ -395,14 +395,14 @@ describe('globOptions option', () => {
   it('should work with the "onlyFiles" option', (done) => {
     runEmit({
       expectedAssetKeys: [
-        '.dottedfile',
-        'directoryfile.txt',
-        'nested/deep-nested/deepnested.txt',
-        'nested/nestedfile.txt',
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+        "nested/nestedfile.txt",
       ],
       patterns: [
         {
-          from: 'directory',
+          from: "directory",
           globOptions: {
             onlyFiles: true,
           },

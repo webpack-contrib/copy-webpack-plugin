@@ -1,19 +1,19 @@
-import path from 'path';
+import path from "path";
 
-import { runEmit } from './helpers/run';
+import { runEmit } from "./helpers/run";
 
 const FIXTURES_DIR_NORMALIZED = path
-  .join(__dirname, 'fixtures')
-  .replace(/\\/g, '/');
+  .join(__dirname, "fixtures")
+  .replace(/\\/g, "/");
 
-describe('from option', () => {
-  describe('is a file', () => {
-    it('should move a file', (done) => {
+describe("from option", () => {
+  describe("is a file", () => {
+    it("should move a file", (done) => {
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         patterns: [
           {
-            from: 'file.txt',
+            from: "file.txt",
           },
         ],
       })
@@ -23,10 +23,10 @@ describe('from option', () => {
 
     it('should move a file when "from" an absolute path', (done) => {
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         patterns: [
           {
-            from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'file.txt'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, "file.txt"),
           },
         ],
       })
@@ -34,12 +34,12 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move a file from nesting directory', (done) => {
+    it("should move a file from nesting directory", (done) => {
       runEmit({
-        expectedAssetKeys: ['directoryfile.txt'],
+        expectedAssetKeys: ["directoryfile.txt"],
         patterns: [
           {
-            from: 'directory/directoryfile.txt',
+            from: "directory/directoryfile.txt",
           },
         ],
       })
@@ -49,12 +49,12 @@ describe('from option', () => {
 
     it('should move a file from nesting directory when "from" an absolute path', (done) => {
       runEmit({
-        expectedAssetKeys: ['directoryfile.txt'],
+        expectedAssetKeys: ["directoryfile.txt"],
         patterns: [
           {
             from: path.posix.join(
               FIXTURES_DIR_NORMALIZED,
-              'directory/directoryfile.txt'
+              "directory/directoryfile.txt"
             ),
           },
         ],
@@ -63,21 +63,21 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move a file (symbolic link)', (done) => {
+    it("should move a file (symbolic link)", (done) => {
       runEmit({
         symlink: true,
         expectedErrors:
-          process.platform === 'win32'
+          process.platform === "win32"
             ? [
                 new Error(
                   `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/file-ln.txt' glob`
                 ),
               ]
             : [],
-        expectedAssetKeys: process.platform === 'win32' ? [] : ['file-ln.txt'],
+        expectedAssetKeys: process.platform === "win32" ? [] : ["file-ln.txt"],
         patterns: [
           {
-            from: 'symlink/file-ln.txt',
+            from: "symlink/file-ln.txt",
           },
         ],
       })
@@ -85,7 +85,7 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should throw an error on the missing file', (done) => {
+    it("should throw an error on the missing file", (done) => {
       runEmit({
         expectedAssetKeys: [],
         expectedErrors: [
@@ -95,7 +95,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: 'nonexistent.txt',
+            from: "nonexistent.txt",
           },
         ],
       })
@@ -104,18 +104,18 @@ describe('from option', () => {
     });
   });
 
-  describe('is a directory', () => {
-    it('should move files', (done) => {
+  describe("is a directory", () => {
+    it("should move files", (done) => {
       runEmit({
         expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+          ".dottedfile",
+          "directoryfile.txt",
+          "nested/deep-nested/deepnested.txt",
+          "nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'directory',
+            from: "directory",
           },
         ],
       })
@@ -126,26 +126,26 @@ describe('from option', () => {
     it('should move files when "from" is current directory', (done) => {
       runEmit({
         expectedAssetKeys: [
-          '.file.txt',
-          '[(){}[]!+@escaped-test^$]/hello.txt',
-          '[special$directory]/(special-*file).txt',
-          '[special$directory]/directoryfile.txt',
-          '[special$directory]/nested/nestedfile.txt',
-          'binextension.bin',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
-          'directory/.dottedfile',
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
-          'file.txt',
-          'file.txt.gz',
-          'noextension',
+          ".file.txt",
+          "[(){}[]!+@escaped-test^$]/hello.txt",
+          "[special$directory]/(special-*file).txt",
+          "[special$directory]/directoryfile.txt",
+          "[special$directory]/nested/nestedfile.txt",
+          "binextension.bin",
+          "dir (86)/file.txt",
+          "dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt",
+          "dir (86)/nesteddir/nestedfile.txt",
+          "directory/.dottedfile",
+          "directory/directoryfile.txt",
+          "directory/nested/deep-nested/deepnested.txt",
+          "directory/nested/nestedfile.txt",
+          "file.txt",
+          "file.txt.gz",
+          "noextension",
         ],
         patterns: [
           {
-            from: '.',
+            from: ".",
           },
         ],
       })
@@ -156,26 +156,26 @@ describe('from option', () => {
     it('should move files when "from" is relative path to context', (done) => {
       runEmit({
         expectedAssetKeys: [
-          '.file.txt',
-          '[(){}[]!+@escaped-test^$]/hello.txt',
-          '[special$directory]/(special-*file).txt',
-          '[special$directory]/directoryfile.txt',
-          '[special$directory]/nested/nestedfile.txt',
-          'binextension.bin',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
-          'directory/.dottedfile',
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
-          'file.txt',
-          'file.txt.gz',
-          'noextension',
+          ".file.txt",
+          "[(){}[]!+@escaped-test^$]/hello.txt",
+          "[special$directory]/(special-*file).txt",
+          "[special$directory]/directoryfile.txt",
+          "[special$directory]/nested/nestedfile.txt",
+          "binextension.bin",
+          "dir (86)/file.txt",
+          "dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt",
+          "dir (86)/nesteddir/nestedfile.txt",
+          "directory/.dottedfile",
+          "directory/directoryfile.txt",
+          "directory/nested/deep-nested/deepnested.txt",
+          "directory/nested/nestedfile.txt",
+          "file.txt",
+          "file.txt.gz",
+          "noextension",
         ],
         patterns: [
           {
-            from: '../fixtures',
+            from: "../fixtures",
           },
         ],
       })
@@ -183,17 +183,17 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files with a forward slash', (done) => {
+    it("should move files with a forward slash", (done) => {
       runEmit({
         expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+          ".dottedfile",
+          "directoryfile.txt",
+          "nested/deep-nested/deepnested.txt",
+          "nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: 'directory/',
+            from: "directory/",
           },
         ],
       })
@@ -201,12 +201,12 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files from symbolic link', (done) => {
+    it("should move files from symbolic link", (done) => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,
         expectedErrors:
-          process.platform === 'win32'
+          process.platform === "win32"
             ? [
                 new Error(
                   `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/directory-ln/**/*' glob`
@@ -214,12 +214,12 @@ describe('from option', () => {
               ]
             : [],
         expectedAssetKeys:
-          process.platform === 'win32'
+          process.platform === "win32"
             ? []
-            : ['file.txt', 'nested-directory/file-in-nested-directory.txt'],
+            : ["file.txt", "nested-directory/file-in-nested-directory.txt"],
         patterns: [
           {
-            from: 'symlink/directory-ln',
+            from: "symlink/directory-ln",
           },
         ],
       })
@@ -230,14 +230,14 @@ describe('from option', () => {
     it("should move files when 'from' is a absolute path", (done) => {
       runEmit({
         expectedAssetKeys: [
-          '.dottedfile',
-          'directoryfile.txt',
-          'nested/deep-nested/deepnested.txt',
-          'nested/nestedfile.txt',
+          ".dottedfile",
+          "directoryfile.txt",
+          "nested/deep-nested/deepnested.txt",
+          "nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'directory'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, "directory"),
           },
         ],
       })
@@ -248,14 +248,14 @@ describe('from option', () => {
     it("should move files when 'from' with special characters", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'directoryfile.txt',
-          '(special-*file).txt',
-          'nested/nestedfile.txt',
+          "directoryfile.txt",
+          "(special-*file).txt",
+          "nested/nestedfile.txt",
         ],
         patterns: [
           {
             from:
-              path.sep === '/' ? '[special$directory]' : '[special$directory]',
+              path.sep === "/" ? "[special$directory]" : "[special$directory]",
           },
         ],
       })
@@ -263,12 +263,12 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files from nested directory', (done) => {
+    it("should move files from nested directory", (done) => {
       runEmit({
-        expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
+        expectedAssetKeys: ["deep-nested/deepnested.txt", "nestedfile.txt"],
         patterns: [
           {
-            from: 'directory/nested',
+            from: "directory/nested",
           },
         ],
       })
@@ -276,12 +276,12 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files from nested directory with an absolute path', (done) => {
+    it("should move files from nested directory with an absolute path", (done) => {
       runEmit({
-        expectedAssetKeys: ['deep-nested/deepnested.txt', 'nestedfile.txt'],
+        expectedAssetKeys: ["deep-nested/deepnested.txt", "nestedfile.txt"],
         patterns: [
           {
-            from: path.posix.join(FIXTURES_DIR_NORMALIZED, 'directory/nested'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, "directory/nested"),
           },
         ],
       })
@@ -289,7 +289,7 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should throw an error on the missing directory', (done) => {
+    it("should throw an error on the missing directory", (done) => {
       runEmit({
         expectedAssetKeys: [],
         expectedErrors: [
@@ -299,7 +299,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: 'nonexistent',
+            from: "nonexistent",
           },
         ],
       })
@@ -308,13 +308,13 @@ describe('from option', () => {
     });
   });
 
-  describe('is a glob', () => {
-    it('should move files', (done) => {
+  describe("is a glob", () => {
+    it("should move files", (done) => {
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         patterns: [
           {
-            from: '*.txt',
+            from: "*.txt",
           },
         ],
       })
@@ -322,12 +322,12 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files when a glob contains absolute path', (done) => {
+    it("should move files when a glob contains absolute path", (done) => {
       runEmit({
-        expectedAssetKeys: ['file.txt'],
+        expectedAssetKeys: ["file.txt"],
         patterns: [
           {
-            from: path.posix.join(FIXTURES_DIR_NORMALIZED, '*.txt'),
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, "*.txt"),
           },
         ],
       })
@@ -335,52 +335,27 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files using globstar', (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          '[(){}[]!+@escaped-test^$]/hello.txt',
-          'binextension.bin',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
-          'file.txt',
-          'file.txt.gz',
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
-          '[special$directory]/directoryfile.txt',
-          '[special$directory]/(special-*file).txt',
-          '[special$directory]/nested/nestedfile.txt',
-          'noextension',
-        ],
-        patterns: [
-          {
-            from: '**/*',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should move files using globstar and contains an absolute path', (done) => {
+    it("should move files using globstar", (done) => {
       runEmit({
         expectedAssetKeys: [
-          '[(){}[]!+@escaped-test^$]/hello.txt',
-          'file.txt',
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
-          '[special$directory]/directoryfile.txt',
-          '[special$directory]/(special-*file).txt',
-          '[special$directory]/nested/nestedfile.txt',
-          'dir (86)/file.txt',
-          'dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt',
-          'dir (86)/nesteddir/nestedfile.txt',
+          "[(){}[]!+@escaped-test^$]/hello.txt",
+          "binextension.bin",
+          "dir (86)/file.txt",
+          "dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt",
+          "dir (86)/nesteddir/nestedfile.txt",
+          "file.txt",
+          "file.txt.gz",
+          "directory/directoryfile.txt",
+          "directory/nested/deep-nested/deepnested.txt",
+          "directory/nested/nestedfile.txt",
+          "[special$directory]/directoryfile.txt",
+          "[special$directory]/(special-*file).txt",
+          "[special$directory]/nested/nestedfile.txt",
+          "noextension",
         ],
         patterns: [
           {
-            from: path.posix.join(FIXTURES_DIR_NORMALIZED, '**/*.txt'),
+            from: "**/*",
           },
         ],
       })
@@ -388,28 +363,24 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files in nested directory using globstar', (done) => {
+    it("should move files using globstar and contains an absolute path", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'nested/[(){}[]!+@escaped-test^$]/hello-31d6cf.txt',
-          'nested/binextension-31d6cf.bin',
-          'nested/dir (86)/file-31d6cf.txt',
-          'nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir-31d6cf.txt',
-          'nested/dir (86)/nesteddir/nestedfile-31d6cf.txt',
-          'nested/file-5d7817.txt',
-          'nested/file.txt-f18c8d.gz',
-          'nested/directory/directoryfile-5d7817.txt',
-          'nested/directory/nested/deep-nested/deepnested-31d6cf.txt',
-          'nested/directory/nested/nestedfile-31d6cf.txt',
-          'nested/[special$directory]/(special-*file)-517cf2.txt',
-          'nested/[special$directory]/directoryfile-5d7817.txt',
-          'nested/[special$directory]/nested/nestedfile-31d6cf.txt',
-          'nested/noextension-31d6cf',
+          "[(){}[]!+@escaped-test^$]/hello.txt",
+          "file.txt",
+          "directory/directoryfile.txt",
+          "directory/nested/deep-nested/deepnested.txt",
+          "directory/nested/nestedfile.txt",
+          "[special$directory]/directoryfile.txt",
+          "[special$directory]/(special-*file).txt",
+          "[special$directory]/nested/nestedfile.txt",
+          "dir (86)/file.txt",
+          "dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt",
+          "dir (86)/nesteddir/nestedfile.txt",
         ],
         patterns: [
           {
-            from: '**/*',
-            to: 'nested/[path][name]-[hash:6].[ext]',
+            from: path.posix.join(FIXTURES_DIR_NORMALIZED, "**/*.txt"),
           },
         ],
       })
@@ -417,29 +388,28 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files from nested directory', (done) => {
-      runEmit({
-        expectedAssetKeys: ['directory/directoryfile.txt'],
-        patterns: [
-          {
-            from: 'directory/directory*.txt',
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should move files from nested directory #2', (done) => {
+    it("should move files in nested directory using globstar", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
+          "nested/[(){}[]!+@escaped-test^$]/hello-31d6cf.txt",
+          "nested/binextension-31d6cf.bin",
+          "nested/dir (86)/file-31d6cf.txt",
+          "nested/dir (86)/nesteddir/deepnesteddir/deepnesteddir-31d6cf.txt",
+          "nested/dir (86)/nesteddir/nestedfile-31d6cf.txt",
+          "nested/file-5d7817.txt",
+          "nested/file.txt-f18c8d.gz",
+          "nested/directory/directoryfile-5d7817.txt",
+          "nested/directory/nested/deep-nested/deepnested-31d6cf.txt",
+          "nested/directory/nested/nestedfile-31d6cf.txt",
+          "nested/[special$directory]/(special-*file)-517cf2.txt",
+          "nested/[special$directory]/directoryfile-5d7817.txt",
+          "nested/[special$directory]/nested/nestedfile-31d6cf.txt",
+          "nested/noextension-31d6cf",
         ],
         patterns: [
           {
-            from: 'directory/**/*.txt',
+            from: "**/*",
+            to: "nested/[path][name]-[hash:6].[ext]",
           },
         ],
       })
@@ -447,18 +417,29 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files using bracketed glob', (done) => {
+    it("should move files from nested directory", (done) => {
+      runEmit({
+        expectedAssetKeys: ["directory/directoryfile.txt"],
+        patterns: [
+          {
+            from: "directory/directory*.txt",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it("should move files from nested directory #2", (done) => {
       runEmit({
         expectedAssetKeys: [
-          'directory/directoryfile.txt',
-          'directory/nested/deep-nested/deepnested.txt',
-          'directory/nested/nestedfile.txt',
-          'file.txt',
-          'noextension',
+          "directory/directoryfile.txt",
+          "directory/nested/deep-nested/deepnested.txt",
+          "directory/nested/nestedfile.txt",
         ],
         patterns: [
           {
-            from: '{file.txt,noextension,directory/**/*}',
+            from: "directory/**/*.txt",
           },
         ],
       })
@@ -466,12 +447,31 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should move files (symbolic link)', (done) => {
+    it("should move files using bracketed glob", (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          "directory/directoryfile.txt",
+          "directory/nested/deep-nested/deepnested.txt",
+          "directory/nested/nestedfile.txt",
+          "file.txt",
+          "noextension",
+        ],
+        patterns: [
+          {
+            from: "{file.txt,noextension,directory/**/*}",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it("should move files (symbolic link)", (done) => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,
         expectedErrors:
-          process.platform === 'win32'
+          process.platform === "win32"
             ? [
                 new Error(
                   `unable to locate '${FIXTURES_DIR_NORMALIZED}/symlink/**/*.txt' glob`
@@ -479,19 +479,19 @@ describe('from option', () => {
               ]
             : [],
         expectedAssetKeys:
-          process.platform === 'win32'
+          process.platform === "win32"
             ? []
             : [
-                'symlink/directory-ln/file.txt',
-                'symlink/directory-ln/nested-directory/file-in-nested-directory.txt',
-                'symlink/directory/file.txt',
-                'symlink/directory/nested-directory/file-in-nested-directory.txt',
-                'symlink/file-ln.txt',
-                'symlink/file.txt',
+                "symlink/directory-ln/file.txt",
+                "symlink/directory-ln/nested-directory/file-in-nested-directory.txt",
+                "symlink/directory/file.txt",
+                "symlink/directory/nested-directory/file-in-nested-directory.txt",
+                "symlink/file-ln.txt",
+                "symlink/file.txt",
               ],
         patterns: [
           {
-            from: 'symlink/**/*.txt',
+            from: "symlink/**/*.txt",
           },
         ],
       })
@@ -499,7 +499,7 @@ describe('from option', () => {
         .catch(done);
     });
 
-    it('should throw an error on the missing glob', (done) => {
+    it("should throw an error on the missing glob", (done) => {
       runEmit({
         expectedAssetKeys: [],
         expectedErrors: [
@@ -509,7 +509,7 @@ describe('from option', () => {
         ],
         patterns: [
           {
-            from: 'nonexistent/**/*',
+            from: "nonexistent/**/*",
           },
         ],
       })

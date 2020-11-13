@@ -1,36 +1,36 @@
-import path from 'path';
-import os from 'os';
-import crypto from 'crypto';
+import path from "path";
+import os from "os";
+import crypto from "crypto";
 
-import webpack from 'webpack';
-import { validate } from 'schema-utils';
-import pLimit from 'p-limit';
-import globby from 'globby';
-import findCacheDir from 'find-cache-dir';
-import serialize from 'serialize-javascript';
-import cacache from 'cacache';
-import loaderUtils from 'loader-utils';
-import normalizePath from 'normalize-path';
-import globParent from 'glob-parent';
-import fastGlob from 'fast-glob';
+import webpack from "webpack";
+import { validate } from "schema-utils";
+import pLimit from "p-limit";
+import globby from "globby";
+import findCacheDir from "find-cache-dir";
+import serialize from "serialize-javascript";
+import cacache from "cacache";
+import loaderUtils from "loader-utils";
+import normalizePath from "normalize-path";
+import globParent from "glob-parent";
+import fastGlob from "fast-glob";
 
-import { version } from '../package.json';
+import { version } from "../package.json";
 
-import schema from './options.json';
-import { readFile, stat } from './utils/promisify';
+import schema from "./options.json";
+import { readFile, stat } from "./utils/promisify";
 
 // webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
 const { RawSource } =
   // eslint-disable-next-line global-require
-  webpack.sources || require('webpack-sources');
+  webpack.sources || require("webpack-sources");
 
 const template = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(?::(\d+))?\])|(\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\])|(\[\d+\])/;
 
 class CopyPlugin {
   constructor(options = {}) {
     validate(schema, options, {
-      name: 'Copy Plugin',
-      baseDataPath: 'options',
+      name: "Copy Plugin",
+      baseDataPath: "options",
     });
 
     this.patterns = options.patterns;
@@ -96,18 +96,18 @@ class CopyPlugin {
     index
   ) {
     const pattern =
-      typeof inputPattern === 'string'
+      typeof inputPattern === "string"
         ? { from: inputPattern }
         : { ...inputPattern };
 
     pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
     pattern.to = path.normalize(
-      typeof pattern.to !== 'undefined' ? pattern.to : ''
+      typeof pattern.to !== "undefined" ? pattern.to : ""
     );
     pattern.compilerContext = compiler.context;
     pattern.context = path.normalize(
-      typeof pattern.context !== 'undefined'
+      typeof pattern.context !== "undefined"
         ? !path.isAbsolute(pattern.context)
           ? path.join(pattern.compilerContext, pattern.context)
           : pattern.context
@@ -119,20 +119,20 @@ class CopyPlugin {
     );
 
     const isToDirectory =
-      path.extname(pattern.to) === '' || pattern.to.slice(-1) === path.sep;
+      path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep;
 
     switch (true) {
       // if toType already exists
       case !!pattern.toType:
         break;
       case template.test(pattern.to):
-        pattern.toType = 'template';
+        pattern.toType = "template";
         break;
       case isToDirectory:
-        pattern.toType = 'dir';
+        pattern.toType = "dir";
         break;
       default:
-        pattern.toType = 'file';
+        pattern.toType = "file";
     }
 
     if (path.isAbsolute(pattern.from)) {
@@ -155,10 +155,10 @@ class CopyPlugin {
 
     if (stats) {
       if (stats.isDirectory()) {
-        pattern.fromType = 'dir';
+        pattern.fromType = "dir";
         logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);
       } else if (stats.isFile()) {
-        pattern.fromType = 'file';
+        pattern.fromType = "file";
         logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
       } else {
         logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
@@ -185,7 +185,7 @@ class CopyPlugin {
     }
 
     switch (pattern.fromType) {
-      case 'dir':
+      case "dir":
         compilation.contextDependencies.add(pattern.absoluteFrom);
 
         logger.debug(`added '${pattern.absoluteFrom}' as a context dependency`);
@@ -196,16 +196,16 @@ class CopyPlugin {
           fastGlob.escapePath(
             normalizePath(path.resolve(pattern.absoluteFrom))
           ),
-          '**/*'
+          "**/*"
         );
-        pattern.absoluteFrom = path.join(pattern.absoluteFrom, '**/*');
+        pattern.absoluteFrom = path.join(pattern.absoluteFrom, "**/*");
 
-        if (typeof pattern.globOptions.dot === 'undefined') {
+        if (typeof pattern.globOptions.dot === "undefined") {
           pattern.globOptions.dot = true;
         }
         /* eslint-enable no-param-reassign */
         break;
-      case 'file':
+      case "file":
         compilation.fileDependencies.add(pattern.absoluteFrom);
 
         logger.debug(`added '${pattern.absoluteFrom}' as a file dependency`);
@@ -216,7 +216,7 @@ class CopyPlugin {
           normalizePath(path.resolve(pattern.absoluteFrom))
         );
 
-        if (typeof pattern.globOptions.dot === 'undefined') {
+        if (typeof pattern.globOptions.dot === "undefined") {
           pattern.globOptions.dot = true;
         }
         /* eslint-enable no-param-reassign */
@@ -231,7 +231,7 @@ class CopyPlugin {
         logger.debug(`added '${contextDependencies}' as a context dependency`);
 
         /* eslint-disable no-param-reassign */
-        pattern.fromType = 'glob';
+        pattern.fromType = "glob";
         pattern.glob = path.isAbsolute(pattern.fromOrigin)
           ? pattern.fromOrigin
           : path.posix.join(
@@ -321,7 +321,7 @@ class CopyPlugin {
         ? path.basename(absoluteFilename)
         : path.relative(pattern.context, absoluteFilename);
       let filename =
-        pattern.toType === 'dir'
+        pattern.toType === "dir"
           ? path.join(pattern.to, relativeFrom)
           : pattern.to;
 
@@ -352,7 +352,7 @@ class CopyPlugin {
           };
 
           // If this came from a glob, add it to the file dependencies
-          if (pattern.fromType === 'glob') {
+          if (pattern.fromType === "glob") {
             compilation.fileDependencies.add(absoluteFilename);
 
             logger.debug(`added '${absoluteFilename}' as a file dependency`);
@@ -477,13 +477,13 @@ class CopyPlugin {
                 sourceFilename,
                 transform: pattern.transform,
                 contentHash: crypto
-                  .createHash('md4')
+                  .createHash("md4")
                   .update(buffer)
-                  .digest('hex'),
+                  .digest("hex"),
                 index,
               };
               const cacheKeys = `transform|${serialize(
-                typeof pattern.cacheTransform.keys === 'function'
+                typeof pattern.cacheTransform.keys === "function"
                   ? await pattern.cacheTransform.keys(
                       defaultCacheKeys,
                       absoluteFilename
@@ -509,9 +509,9 @@ class CopyPlugin {
               } else {
                 cacheDirectory = pattern.cacheTransform.directory
                   ? pattern.cacheTransform.directory
-                  : typeof pattern.cacheTransform === 'string'
+                  : typeof pattern.cacheTransform === "string"
                   ? pattern.cacheTransform
-                  : findCacheDir({ name: 'copy-webpack-plugin' }) ||
+                  : findCacheDir({ name: "copy-webpack-plugin" }) ||
                     os.tmpdir();
 
                 let cached;
@@ -568,7 +568,7 @@ class CopyPlugin {
             }
           }
 
-          if (pattern.toType === 'template') {
+          if (pattern.toType === "template") {
             logger.log(
               `interpolating template '${filename}' for '${sourceFilename}'...`
             );
@@ -577,7 +577,7 @@ class CopyPlugin {
             // ie. [name].[ext] or [name][ext] both become [name]
             if (!path.extname(absoluteFilename)) {
               // eslint-disable-next-line no-param-reassign
-              result.filename = result.filename.replace(/\.?\[ext]/g, '');
+              result.filename = result.filename.replace(/\.?\[ext]/g, "");
             }
 
             // eslint-disable-next-line no-param-reassign
@@ -647,16 +647,16 @@ class CopyPlugin {
     const limit = pLimit(this.options.concurrency || 100);
 
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
-      const logger = compilation.getLogger('copy-webpack-plugin');
+      const logger = compilation.getLogger("copy-webpack-plugin");
       const cache = compilation.getCache
-        ? compilation.getCache('CopyWebpackPlugin')
+        ? compilation.getCache("CopyWebpackPlugin")
         : // eslint-disable-next-line no-undefined
           undefined;
 
       compilation.hooks.additionalAssets.tapAsync(
-        'copy-webpack-plugin',
+        "copy-webpack-plugin",
         async (callback) => {
-          logger.log('starting to add additional assets...');
+          logger.log("starting to add additional assets...");
 
           let assets;
 
@@ -699,7 +699,7 @@ class CopyPlugin {
 
               // For old version webpack 4
               /* istanbul ignore if */
-              if (typeof compilation.emitAsset !== 'function') {
+              if (typeof compilation.emitAsset !== "function") {
                 // eslint-disable-next-line no-param-reassign
                 compilation.assets[filename] = source;
 
@@ -753,7 +753,7 @@ class CopyPlugin {
               );
             });
 
-          logger.log('finished to adding additional assets');
+          logger.log("finished to adding additional assets");
 
           callback();
         }
@@ -762,10 +762,10 @@ class CopyPlugin {
       if (compilation.hooks.statsPrinter) {
         compilation.hooks.statsPrinter.tap(pluginName, (stats) => {
           stats.hooks.print
-            .for('asset.info.copied')
-            .tap('copy-webpack-plugin', (copied, { green, formatFlag }) =>
+            .for("asset.info.copied")
+            .tap("copy-webpack-plugin", (copied, { green, formatFlag }) =>
               // eslint-disable-next-line no-undefined
-              copied ? green(formatFlag('copied')) : undefined
+              copied ? green(formatFlag("copied")) : undefined
             );
         });
       }

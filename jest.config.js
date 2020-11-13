@@ -1,4 +1,4 @@
 module.exports = {
-  testEnvironment: 'node',
-  globalSetup: '<rootDir>/globalSetup.js',
+  testEnvironment: "node",
+  globalSetup: "<rootDir>/globalSetup.js",
 };

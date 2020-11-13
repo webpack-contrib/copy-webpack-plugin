@@ -1,17 +1,17 @@
-const path = require('path');
-const fs = require('fs');
+const path = require("path");
+const fs = require("fs");
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const mkdirp = require('mkdirp');
+const mkdirp = require("mkdirp");
 
-const removeIllegalCharacterForWindows = require('./test/helpers/removeIllegalCharacterForWindows');
+const removeIllegalCharacterForWindows = require("./test/helpers/removeIllegalCharacterForWindows");
 
-const baseDir = path.resolve(__dirname, 'test/fixtures');
+const baseDir = path.resolve(__dirname, "test/fixtures");
 
 const specialFiles = {
-  '[special$directory]/nested/nestedfile.txt': '',
-  '[special$directory]/(special-*file).txt': 'special',
-  '[special$directory]/directoryfile.txt': 'new',
+  "[special$directory]/nested/nestedfile.txt": "",
+  "[special$directory]/(special-*file).txt": "special",
+  "[special$directory]/directoryfile.txt": "new",
 };
 
 module.exports = () => {
