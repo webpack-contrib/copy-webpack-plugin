@@ -438,7 +438,7 @@ class CopyPlugin {
                 snapshot = await CopyPlugin.createSnapshot(
                   compilation,
                   startTime,
-                  sourceFilename
+                  absoluteFilename
                 );
               } catch (error) {
                 compilation.errors.push(error);
