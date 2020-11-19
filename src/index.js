@@ -351,8 +351,8 @@ class CopyPlugin {
             force: pattern.force,
           };
 
-          // If this came from a glob, add it to the file dependencies
-          if (pattern.fromType === "glob") {
+          // If this came from a glob or dir, add it to the file dependencies
+          if (pattern.fromType === "dir" || pattern.fromType === "glob") {
             compilation.fileDependencies.add(absoluteFilename);
 
             logger.debug(`added '${absoluteFilename}' as a file dependency`);
