@@ -176,6 +176,10 @@ exports[`CopyPlugin logging should logging when "from" is a directory: logs 1`] 
 Object {
   "logs": Array [
     "added './fixtures/directory' as a context dependency",
+    "added './fixtures/directory/.dottedfile' as a file dependency",
+    "added './fixtures/directory/directoryfile.txt' as a file dependency",
+    "added './fixtures/directory/nested/deep-nested/deepnested.txt' as a file dependency",
+    "added './fixtures/directory/nested/nestedfile.txt' as a file dependency",
     "begin globbing './fixtures/directory/**/*'...",
     "determined './fixtures/directory' is a directory",
     "determined that './fixtures/directory/.dottedfile' should write to '.dottedfile'",
