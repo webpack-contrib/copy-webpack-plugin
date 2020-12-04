@@ -32,6 +32,12 @@ describe("validate options", () => {
         [
           {
             from: "test.txt",
+            to: () => {},
+          },
+        ],
+        [
+          {
+            from: "test.txt",
             context: "context",
           },
         ],
@@ -45,7 +51,6 @@ describe("validate options", () => {
             flatten: true,
             transform: () => {},
             cacheTransform: true,
-            transformPath: () => {},
             noErrorOnMissing: true,
           },
         ],

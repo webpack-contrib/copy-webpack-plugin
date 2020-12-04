@@ -11,8 +11,10 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "file.txt",
-          transformPath(targetPath, absoluteFrom) {
+          to(context, absoluteFrom) {
             expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, "file.txt"));
+
+            const targetPath = path.relative(context, absoluteFrom);
 
             return targetPath.replace("file.txt", "subdir/test.txt");
           },
@@ -34,10 +36,12 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "directory",
-          transformPath(targetPath, absoluteFrom) {
+          to(context, absoluteFrom) {
             expect(
               absoluteFrom.includes(path.join(FIXTURES_DIR, "directory"))
             ).toBe(true);
+
+            const targetPath = path.relative(context, absoluteFrom);
 
             return `/some/path/${path.basename(targetPath)}`;
           },
@@ -58,8 +62,10 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "directory/**/*",
-          transformPath(targetPath, absoluteFrom) {
+          to(context, absoluteFrom) {
             expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+
+            const targetPath = path.relative(context, absoluteFrom);
 
             return `/some/path/${path.basename(targetPath)}.tst`;
           },
@@ -76,8 +82,10 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "file.txt",
-          transformPath(targetPath, absoluteFrom) {
+          to(context, absoluteFrom) {
             expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+
+            const targetPath = path.relative(context, absoluteFrom);
 
             return new Promise((resolve) => {
               resolve(`/some/path/${path.basename(targetPath)}`);
@@ -96,8 +104,10 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "file.txt",
-          async transformPath(targetPath, absoluteFrom) {
+          async to(context, absoluteFrom) {
             expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+
+            const targetPath = path.relative(context, absoluteFrom);
 
             const newPath = await new Promise((resolve) => {
               resolve(`/some/path/${path.basename(targetPath)}`);
@@ -119,7 +129,7 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "file.txt",
-          transformPath() {
+          to() {
             throw new Error("a failure happened");
           },
         },
@@ -136,7 +146,7 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "file.txt",
-          transformPath() {
+          to() {
             return new Promise((resolve, reject) => {
               return reject(new Error("a failure happened"));
             });
@@ -155,7 +165,7 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "file.txt",
-          async transformPath() {
+          async to() {
             await new Promise((resolve, reject) => {
               reject(new Error("a failure happened"));
             });
@@ -177,14 +187,10 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "directory/**/*",
-          to: "nested/[path][name]-[hash:6].[ext]",
-          transformPath(targetPath, absoluteFrom) {
+          to(context, absoluteFrom) {
             expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
-            return targetPath.replace(
-              `nested${path.sep}`,
-              `transformed${path.sep}`
-            );
+            return "transformed/[path][name]-[hash:6].[ext]";
           },
         },
       ],
@@ -199,11 +205,10 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "directory/nested/deep-nested",
-          to: "[1]",
-          transformPath(targetPath, absolutePath) {
+          to(context, absolutePath) {
             const mathes = absolutePath.match(/\.([^.]*)$/);
             const [, res] = mathes;
-            const target = targetPath.replace(/\[[1]\]/, res);
+            const target = res;
 
             return target;
           },
@@ -220,11 +225,10 @@ describe("transformPath option", () => {
       patterns: [
         {
           from: "directory/nested/deep-nested",
-          to: "nested/[1]",
-          transformPath(targetPath, absolutePath) {
+          to(context, absolutePath) {
             const mathes = absolutePath.match(/\.([^.]*)$/);
             const [, res] = mathes;
-            const target = targetPath.replace(/\[[1]\]/, res);
+            const target = `nested/${res}`;
 
             return target;
           },
@@ -246,7 +250,8 @@ describe("transformPath option", () => {
         {
           from: "**/*",
           context: "directory",
-          transformPath(targetPath) {
+          to(context, absolutePath) {
+            const targetPath = path.relative(context, absolutePath);
             const pathSegments = path.parse(targetPath);
             const result = [];
 

@@ -102,9 +102,10 @@ class CopyPlugin {
 
     pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
-    pattern.to = path.normalize(
-      typeof pattern.to !== "undefined" ? pattern.to : ""
-    );
+    pattern.to =
+      typeof pattern.to !== "function"
+        ? path.normalize(typeof pattern.to !== "undefined" ? pattern.to : "")
+        : pattern.to;
     pattern.compilerContext = compiler.context;
     pattern.context = path.normalize(
       typeof pattern.context !== "undefined"
@@ -119,11 +120,15 @@ class CopyPlugin {
     );
 
     const isToDirectory =
-      path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep;
+      typeof pattern.to !== "function" &&
+      (path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep);
 
     switch (true) {
       // if toType already exists
       case !!pattern.toType:
+        break;
+      case typeof pattern.to === "function":
+        pattern.toType = "function";
         break;
       case template.test(pattern.to):
         pattern.toType = "template";
@@ -323,9 +328,11 @@ class CopyPlugin {
       let filename =
         pattern.toType === "dir"
           ? path.join(pattern.to, relativeFrom)
+          : pattern.toType === "function"
+          ? pattern.to(pattern.context, absoluteFilename)
           : pattern.to;
 
-      if (path.isAbsolute(filename)) {
+      if (pattern.toType !== "function" && path.isAbsolute(filename)) {
         filename = path.relative(compiler.options.output.path, filename);
       }
 
@@ -343,7 +350,11 @@ class CopyPlugin {
     try {
       assets = await Promise.all(
         files.map(async (file) => {
-          const { absoluteFilename, sourceFilename, filename } = file;
+          const { absoluteFilename, sourceFilename } = file;
+          let { filename } = file;
+
+          filename = await Promise.resolve(filename);
+
           const result = {
             absoluteFilename,
             sourceFilename,
@@ -568,7 +579,7 @@ class CopyPlugin {
             }
           }
 
-          if (pattern.toType === "template") {
+          if (pattern.toType === "template" || pattern.toType === "function") {
             logger.log(
               `interpolating template '${filename}' for '${sourceFilename}'...`
             );
@@ -601,23 +612,6 @@ class CopyPlugin {
 
             logger.log(
               `interpolated template '${filename}' for '${sourceFilename}'`
-            );
-          }
-
-          if (pattern.transformPath) {
-            logger.log(
-              `transforming '${result.filename}' for '${absoluteFilename}'...`
-            );
-
-            // eslint-disable-next-line no-param-reassign
-            result.immutable = false;
-            // eslint-disable-next-line no-param-reassign
-            result.filename = await pattern.transformPath(
-              result.filename,
-              absoluteFilename
-            );
-            logger.log(
-              `transformed new '${result.filename}' for '${absoluteFilename}'...`
             );
           }
 

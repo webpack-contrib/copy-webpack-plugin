@@ -220,8 +220,10 @@ describe("transform option", () => {
 
             return `${content}changed`;
           },
-          transformPath(targetPath, absoluteFrom) {
+          to(context, absoluteFrom) {
             expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, "file.txt"));
+
+            const targetPath = path.relative(context, absoluteFrom);
 
             return targetPath.replace("file.txt", "subdir/test.txt");
           },
