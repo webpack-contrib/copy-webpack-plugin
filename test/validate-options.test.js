@@ -32,6 +32,12 @@ describe("validate options", () => {
         [
           {
             from: "test.txt",
+            to: () => {},
+          },
+        ],
+        [
+          {
+            from: "test.txt",
             context: "context",
           },
         ],

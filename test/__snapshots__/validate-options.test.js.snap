@@ -95,7 +95,14 @@ exports[`validate options should throw an error on the "patterns" option with "[
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":true,"context":"context"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0].to should be a string."
+ - options.patterns[0] should be one of these:
+   non-empty string | object { from, to?, context?, globOptions?, filter?, toType?, force?, flatten?, transform?, cacheTransform?, transformPath?, noErrorOnMissing? }
+   Details:
+    * options.patterns[0].to should be one of these:
+      string | function
+      Details:
+       * options.patterns[0].to should be a string.
+       * options.patterns[0].to should be an instance of function."
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":{"glob":"**/*","dot":false},"to":"dir","context":"context"}]" value 1`] = `
