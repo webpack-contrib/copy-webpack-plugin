@@ -102,10 +102,6 @@ class CopyPlugin {
 
     pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
-    pattern.to =
-      typeof pattern.to !== "function"
-        ? path.normalize(typeof pattern.to !== "undefined" ? pattern.to : "")
-        : pattern.to;
     pattern.compilerContext = compiler.context;
     pattern.context = path.normalize(
       typeof pattern.context !== "undefined"
@@ -116,7 +112,7 @@ class CopyPlugin {
     );
 
     logger.log(
-      `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'...`
+      `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context`
     );
 
     if (path.isAbsolute(pattern.from)) {
@@ -304,9 +300,11 @@ class CopyPlugin {
         const absoluteFilename = path.resolve(pattern.context, from);
 
         pattern.to =
-          typeof pattern.to === "function"
-            ? await pattern.to(pattern.context, absoluteFilename)
-            : pattern.to;
+          typeof pattern.to !== "function"
+            ? path.normalize(
+                typeof pattern.to !== "undefined" ? pattern.to : ""
+              )
+            : await pattern.to(pattern.context, absoluteFilename);
 
         const isToDirectory =
           path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep;
@@ -324,6 +322,10 @@ class CopyPlugin {
           default:
             pattern.toType = "file";
         }
+
+        logger.log(
+          `'to' option '${pattern.to}' determinated as '${pattern.toType}'`
+        );
 
         const relativeFrom = pattern.flatten
           ? path.basename(absoluteFilename)

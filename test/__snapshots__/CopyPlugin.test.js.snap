@@ -175,6 +175,10 @@ exports[`CopyPlugin cache should work with the "transform" option: warnings 2`] 
 exports[`CopyPlugin logging should logging when "from" is a directory: logs 1`] = `
 Object {
   "logs": Array [
+    "'to' option '.' determinated as 'dir'",
+    "'to' option '.' determinated as 'dir'",
+    "'to' option '.' determinated as 'dir'",
+    "'to' option '.' determinated as 'dir'",
     "added './fixtures/directory' as a context dependency",
     "added './fixtures/directory/.dottedfile' as a file dependency",
     "added './fixtures/directory/directoryfile.txt' as a file dependency",
@@ -202,7 +206,7 @@ Object {
     "reading './fixtures/directory/nested/deep-nested/deepnested.txt'...",
     "reading './fixtures/directory/nested/nestedfile.txt'...",
     "starting to add additional assets...",
-    "starting to process a pattern from 'directory' using './fixtures' context to '.'...",
+    "starting to process a pattern from 'directory' using './fixtures' context",
     "writing '.dottedfile' from './fixtures/directory/.dottedfile' to compilation assets...",
     "writing 'directoryfile.txt' from './fixtures/directory/directoryfile.txt' to compilation assets...",
     "writing 'nested/deep-nested/deepnested.txt' from './fixtures/directory/nested/deep-nested/deepnested.txt' to compilation assets...",
@@ -218,6 +222,7 @@ Object {
 exports[`CopyPlugin logging should logging when "from" is a file: logs 1`] = `
 Object {
   "logs": Array [
+    "'to' option '.' determinated as 'dir'",
     "added './fixtures/file.txt' as a file dependency",
     "begin globbing './fixtures/file.txt'...",
     "determined './fixtures/file.txt' is a file",
@@ -229,7 +234,7 @@ Object {
     "read './fixtures/file.txt'",
     "reading './fixtures/file.txt'...",
     "starting to add additional assets...",
-    "starting to process a pattern from 'file.txt' using './fixtures' context to '.'...",
+    "starting to process a pattern from 'file.txt' using './fixtures' context",
     "writing 'file.txt' from './fixtures/file.txt' to compilation assets...",
     "written 'file.txt' from './fixtures/file.txt' to compilation assets",
   ],
@@ -239,6 +244,9 @@ Object {
 exports[`CopyPlugin logging should logging when "from" is a glob: logs 1`] = `
 Object {
   "logs": Array [
+    "'to' option '.' determinated as 'dir'",
+    "'to' option '.' determinated as 'dir'",
+    "'to' option '.' determinated as 'dir'",
     "added './fixtures/directory' as a context dependency",
     "added './fixtures/directory/directoryfile.txt' as a file dependency",
     "added './fixtures/directory/nested/deep-nested/deepnested.txt' as a file dependency",
@@ -260,13 +268,35 @@ Object {
     "reading './fixtures/directory/nested/deep-nested/deepnested.txt'...",
     "reading './fixtures/directory/nested/nestedfile.txt'...",
     "starting to add additional assets...",
-    "starting to process a pattern from 'directory/**' using './fixtures' context to '.'...",
+    "starting to process a pattern from 'directory/**' using './fixtures' context",
     "writing 'directory/directoryfile.txt' from './fixtures/directory/directoryfile.txt' to compilation assets...",
     "writing 'directory/nested/deep-nested/deepnested.txt' from './fixtures/directory/nested/deep-nested/deepnested.txt' to compilation assets...",
     "writing 'directory/nested/nestedfile.txt' from './fixtures/directory/nested/nestedfile.txt' to compilation assets...",
     "written 'directory/directoryfile.txt' from './fixtures/directory/directoryfile.txt' to compilation assets",
     "written 'directory/nested/deep-nested/deepnested.txt' from './fixtures/directory/nested/deep-nested/deepnested.txt' to compilation assets",
     "written 'directory/nested/nestedfile.txt' from './fixtures/directory/nested/nestedfile.txt' to compilation assets",
+  ],
+}
+`;
+
+exports[`CopyPlugin logging should logging when 'to' is a function: logs 1`] = `
+Object {
+  "logs": Array [
+    "'to' option 'newFile.txt' determinated as 'file'",
+    "added './fixtures/file.txt' as a file dependency",
+    "begin globbing './fixtures/file.txt'...",
+    "determined './fixtures/file.txt' is a file",
+    "determined that './fixtures/file.txt' should write to 'newFile.txt'",
+    "finished to adding additional assets",
+    "finished to process a pattern from 'file.txt' using './fixtures' context to 'newFile.txt'",
+    "found './fixtures/file.txt'",
+    "getting stats for './fixtures/file.txt'...",
+    "read './fixtures/file.txt'",
+    "reading './fixtures/file.txt'...",
+    "starting to add additional assets...",
+    "starting to process a pattern from 'file.txt' using './fixtures' context",
+    "writing 'newFile.txt' from './fixtures/file.txt' to compilation assets...",
+    "written 'newFile.txt' from './fixtures/file.txt' to compilation assets",
   ],
 }
 `;

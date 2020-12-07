@@ -1246,5 +1246,46 @@ describe("CopyPlugin", () => {
         .then(done)
         .catch(done);
     });
+
+    it("should logging when 'to' is a function", (done) => {
+      const expectedAssetKeys = ["newFile.txt"];
+
+      run({
+        patterns: [
+          {
+            from: "file.txt",
+            to() {
+              return "newFile.txt";
+            },
+          },
+        ],
+      })
+        .then(({ compiler, stats }) => {
+          const root = path.resolve(__dirname).replace(/\\/g, "/");
+          const logs = stats.compilation.logging
+            .get("copy-webpack-plugin")
+            .map((entry) =>
+              entry.args[0].replace(/\\/g, "/").split(root).join(".")
+            )
+            // TODO remove after drop webpack@4
+            .filter(
+              (item) =>
+                !item.startsWith("created snapshot") &&
+                !item.startsWith("creating snapshot") &&
+                !item.startsWith("getting cache") &&
+                !item.startsWith("missed cache") &&
+                !item.startsWith("stored cache") &&
+                !item.startsWith("storing cache")
+            )
+            .sort();
+
+          expect(
+            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+          ).toEqual(expectedAssetKeys);
+          expect({ logs }).toMatchSnapshot("logs");
+        })
+        .then(done)
+        .catch(done);
+    });
   });
 });
