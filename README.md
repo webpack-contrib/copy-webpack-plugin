@@ -79,7 +79,7 @@ module.exports = {
 |                  Name                   |            Type             |                     Default                     | Description                                                                                           |
 | :-------------------------------------: | :-------------------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
 |             [`from`](#from)             |         `{String}`          |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
-|               [`to`](#to)               |         `{String}`          |            `compiler.options.output`            | Output path.                                                                                          |
+|               [`to`](#to)               |    `{String\|Function}`     |            `compiler.options.output`            | Output path.                                                                                          |
 |          [`context`](#context)          |         `{String}`          | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
 |      [`globOptions`](#globoptions)      |         `{Object}`          |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
 |           [`filter`](#filter)           |        `{Function}`         |                   `undefined`                   | Allows to filter copied assets.                                                                       |
@@ -174,8 +174,10 @@ More [`examples`](#examples)
 
 #### `to`
 
-Type: `String`
+Type: `String|Function`
 Default: `compiler.options.output`
+
+##### String
 
 Output path.
 
@@ -201,6 +203,53 @@ module.exports = {
         {
           from: "**/*",
           to: "[path][name].[contenthash].[ext]",
+        },
+      ],
+    }),
+  ],
+};
+```
+
+##### Function
+
+Allows to modify the writing path.
+
+> ⚠️ Don't return directly `\\` in `to` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> On Windows, the forward slash and the backward slash are both separators.
+> Instead please use `/` or `path` methods.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/*.png",
+          to(rootContext, absolutePath) {
+            return "dest/newPath";
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/*.png",
+          to: "dest/",
+          to(rootContext, absolutePath) {
+            return Promise.resolve("dest/newPath");
+          },
         },
       ],
     }),

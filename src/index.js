@@ -102,9 +102,10 @@ class CopyPlugin {
 
     pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
-    pattern.to = path.normalize(
-      typeof pattern.to !== "undefined" ? pattern.to : ""
-    );
+    pattern.to =
+      typeof pattern.to !== "function"
+        ? path.normalize(typeof pattern.to !== "undefined" ? pattern.to : "")
+        : pattern.to;
     pattern.compilerContext = compiler.context;
     pattern.context = path.normalize(
       typeof pattern.context !== "undefined"
@@ -117,23 +118,6 @@ class CopyPlugin {
     logger.log(
       `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'...`
     );
-
-    const isToDirectory =
-      path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep;
-
-    switch (true) {
-      // if toType already exists
-      case !!pattern.toType:
-        break;
-      case template.test(pattern.to):
-        pattern.toType = "template";
-        break;
-      case isToDirectory:
-        pattern.toType = "dir";
-        break;
-      default:
-        pattern.toType = "file";
-    }
 
     if (path.isAbsolute(pattern.from)) {
       pattern.absoluteFrom = pattern.from;
@@ -310,33 +294,58 @@ class CopyPlugin {
       return;
     }
 
-    const files = filteredPaths.map((item) => {
-      const from = item.path;
+    const files = await Promise.all(
+      filteredPaths.map(async (item) => {
+        const from = item.path;
 
-      logger.debug(`found '${from}'`);
+        logger.debug(`found '${from}'`);
 
-      // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-      const absoluteFilename = path.resolve(pattern.context, from);
-      const relativeFrom = pattern.flatten
-        ? path.basename(absoluteFilename)
-        : path.relative(pattern.context, absoluteFilename);
-      let filename =
-        pattern.toType === "dir"
-          ? path.join(pattern.to, relativeFrom)
-          : pattern.to;
+        // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
+        const absoluteFilename = path.resolve(pattern.context, from);
 
-      if (path.isAbsolute(filename)) {
-        filename = path.relative(compiler.options.output.path, filename);
-      }
+        pattern.to =
+          typeof pattern.to === "function"
+            ? await pattern.to(pattern.context, absoluteFilename)
+            : pattern.to;
 
-      logger.log(`determined that '${from}' should write to '${filename}'`);
+        const isToDirectory =
+          path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep;
 
-      const sourceFilename = normalizePath(
-        path.relative(pattern.compilerContext, absoluteFilename)
-      );
+        switch (true) {
+          // if toType already exists
+          case !!pattern.toType:
+            break;
+          case template.test(pattern.to):
+            pattern.toType = "template";
+            break;
+          case isToDirectory:
+            pattern.toType = "dir";
+            break;
+          default:
+            pattern.toType = "file";
+        }
 
-      return { absoluteFilename, sourceFilename, filename };
-    });
+        const relativeFrom = pattern.flatten
+          ? path.basename(absoluteFilename)
+          : path.relative(pattern.context, absoluteFilename);
+        let filename =
+          pattern.toType === "dir"
+            ? path.join(pattern.to, relativeFrom)
+            : pattern.to;
+
+        if (path.isAbsolute(filename)) {
+          filename = path.relative(compiler.options.output.path, filename);
+        }
+
+        logger.log(`determined that '${from}' should write to '${filename}'`);
+
+        const sourceFilename = normalizePath(
+          path.relative(pattern.compilerContext, absoluteFilename)
+        );
+
+        return { absoluteFilename, sourceFilename, filename };
+      })
+    );
 
     let assets;
 

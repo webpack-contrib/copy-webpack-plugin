@@ -9,7 +9,14 @@
           "minLength": 1
         },
         "to": {
-          "type": "string"
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
         },
         "context": {
           "type": "string"
