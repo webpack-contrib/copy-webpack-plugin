@@ -33,6 +33,16 @@
         "force": {
           "type": "boolean"
         },
+        "info": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
+        },
         "flatten": {
           "type": "boolean"
         },

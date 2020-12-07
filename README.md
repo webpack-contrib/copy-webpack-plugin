@@ -90,6 +90,7 @@ module.exports = {
 |   [`cacheTransform`](#cacheTransform)   | `{Boolean\|String\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
 |    [`transformPath`](#transformpath)    |        `{Function}`         |                   `undefined`                   | Allows to modify the writing path.                                                                    |
 | [`noErrorOnMissing`](#noerroronmissing) |         `{Boolean}`         |                     `false`                     | Doesn't generate an error on missing file(s).                                                         |
+|             [`info`](#info)             |    `{Object\|Function}`     |                   `undefined`                   | Allows to add assets info.                                                                            |
 
 #### `from`
 
@@ -766,6 +767,51 @@ module.exports = {
         {
           from: path.resolve(__dirname, "missing-file.txt"),
           noErrorOnMissing: true,
+        },
+      ],
+    }),
+  ],
+};
+```
+
+#### `info`
+
+Type: `Object|Function<Object>`
+Default: `undefined`
+
+Allows to add assets info.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        "relative/path/to/file.ext",
+        {
+          from: "**/*",
+          // Terser skip this file for minimization
+          info: { minimized: true },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        "relative/path/to/file.ext",
+        {
+          from: "**/*",
+          // Terser skip this file for minimization
+          info: (file) => ({ minimized: true }),
         },
       ],
     }),

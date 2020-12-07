@@ -144,6 +144,16 @@ describe("validate options", () => {
             filter: () => true,
           },
         ],
+        [
+          {
+            from: "test.txt",
+            info: { custom: true },
+          },
+          {
+            from: "test.txt",
+            info: () => ({ custom: true }),
+          },
+        ],
       ],
       failure: [
         // eslint-disable-next-line no-undefined
@@ -155,6 +165,18 @@ describe("validate options", () => {
         [],
         [""],
         [{}],
+        [
+          {
+            from: "dir",
+            info: "string",
+          },
+        ],
+        [
+          {
+            from: "dir",
+            info: true,
+          },
+        ],
         [
           {
             from: "",
