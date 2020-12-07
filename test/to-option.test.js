@@ -759,4 +759,167 @@ describe("to option", () => {
         .catch(done);
     });
   });
+
+  describe("settings for to option for flatten copy", () => {
+    it('should flatten a directory\'s files to a root directory when "from" is a file', (done) => {
+      runEmit({
+        expectedAssetKeys: ["directoryfile.txt"],
+        patterns: [
+          {
+            to: ".",
+            from: "directory/directoryfile.txt",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should flatten a directory\'s files to a new directory when "from" is a file', (done) => {
+      runEmit({
+        expectedAssetKeys: ["nested/directoryfile.txt"],
+        patterns: [
+          {
+            toType: "file",
+            to({ absoluteFilename }) {
+              return `nested/${path.basename(absoluteFilename)}`;
+            },
+            from: "directory/directoryfile.txt",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should flatten a directory\'s files to a root directory when "from" is a directory', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          ".dottedfile",
+          "deepnested.txt",
+          "directoryfile.txt",
+          "nestedfile.txt",
+        ],
+        patterns: [
+          {
+            toType: "file",
+            to({ absoluteFilename }) {
+              return path.basename(absoluteFilename);
+            },
+            from: "directory",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should flatten a directory\'s files to new directory when "from" is a directory', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          "newdirectory/.dottedfile",
+          "newdirectory/deepnested.txt",
+          "newdirectory/directoryfile.txt",
+          "newdirectory/nestedfile.txt",
+        ],
+        patterns: [
+          {
+            toType: "file",
+            to({ absoluteFilename }) {
+              return `newdirectory/${path.basename(absoluteFilename)}`;
+            },
+            from: "directory",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should flatten a directory\'s files to a root directory when "from" is a glob', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          "deepnested.txt",
+          "directoryfile.txt",
+          "nestedfile.txt",
+        ],
+        patterns: [
+          {
+            toType: "file",
+            to({ absoluteFilename }) {
+              return path.basename(absoluteFilename);
+            },
+            from: "directory/**/*",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should flatten a directory\'s files to a new directory when "from" is a glob', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          "nested/deepnested.txt",
+          "nested/directoryfile.txt",
+          "nested/nestedfile.txt",
+        ],
+        patterns: [
+          {
+            toType: "file",
+            to({ absoluteFilename }) {
+              return `nested/${path.basename(absoluteFilename)}`;
+            },
+            from: "directory/**/*",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should flatten files in a relative context to a root directory when "from" is a glob', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          "deepnested.txt",
+          "directoryfile.txt",
+          "nestedfile.txt",
+        ],
+        patterns: [
+          {
+            context: "directory",
+            from: "**/*",
+            toType: "file",
+            to({ absoluteFilename }) {
+              return path.basename(absoluteFilename);
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should flatten files in a relative context to a non-root directory when "from" is a glob', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          "nested/deepnested.txt",
+          "nested/directoryfile.txt",
+          "nested/nestedfile.txt",
+        ],
+        patterns: [
+          {
+            context: "directory",
+            from: "**/*",
+            toType: "file",
+            to({ absoluteFilename }) {
+              return `nested/${path.basename(absoluteFilename)}`;
+            },
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+  });
 });

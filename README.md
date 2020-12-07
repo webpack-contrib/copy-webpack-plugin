@@ -85,7 +85,6 @@ module.exports = {
 |           [`filter`](#filter)           |        `{Function}`         |                   `undefined`                   | Allows to filter copied assets.                                                                       |
 |           [`toType`](#totype)           |         `{String}`          |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
 |            [`force`](#force)            |         `{Boolean}`         |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
-|          [`flatten`](#flatten)          |         `{Boolean}`         |                     `false`                     | Removes all directory references and only copies file names.                                          |
 |        [`transform`](#transform)        |        `{Function}`         |                   `undefined`                   | Allows to modify the file contents.                                                                   |
 |   [`cacheTransform`](#cacheTransform)   | `{Boolean\|String\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
 |    [`transformPath`](#transformpath)    |        `{Function}`         |                   `undefined`                   | Allows to modify the writing path.                                                                    |
@@ -459,33 +458,6 @@ module.exports = {
           from: "src/**/*",
           to: "dest/",
           force: true,
-        },
-      ],
-    }),
-  ],
-};
-```
-
-#### `flatten`
-
-Type: `Boolean`
-Default: `false`
-
-Removes all directory references and only copies file names.
-
-> ⚠️ If files have the same name, the result is non-deterministic.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "src/**/*",
-          to: "dest/",
-          flatten: true,
         },
       ],
     }),
@@ -1036,6 +1008,40 @@ module.exports = {
     }),
   ],
 };
+```
+
+#### Flatten copy
+
+Removes all directory references and only copies file names.
+
+> ⚠️ If files have the same name, the result is non-deterministic.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/**/*",
+          toType: "file",
+          to({ absoluteFilename }) {
+            return path.basename(absoluteFilename);
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+file-1.txt
+file-2.txt
+nested-file.txt
 ```
 
 ## Contributing

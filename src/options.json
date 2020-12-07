@@ -43,9 +43,6 @@
             }
           ]
         },
-        "flatten": {
-          "type": "boolean"
-        },
         "transform": {
           "instanceof": "Function"
         },

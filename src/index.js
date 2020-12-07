@@ -327,9 +327,7 @@ class CopyPlugin {
           `'to' option '${pattern.to}' determinated as '${pattern.toType}'`
         );
 
-        const relativeFrom = pattern.flatten
-          ? path.basename(absoluteFilename)
-          : path.relative(pattern.context, absoluteFilename);
+        const relativeFrom = path.relative(pattern.context, absoluteFilename);
         let filename =
           pattern.toType === "dir"
             ? path.join(pattern.to, relativeFrom)

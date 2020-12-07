@@ -48,7 +48,6 @@ describe("validate options", () => {
             context: "context",
             toType: "file",
             force: true,
-            flatten: true,
             transform: () => {},
             cacheTransform: true,
             transformPath: () => {},
@@ -219,14 +218,6 @@ describe("validate options", () => {
             to: "dir",
             context: "context",
             force: "true",
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            flatten: "true",
           },
         ],
         [
