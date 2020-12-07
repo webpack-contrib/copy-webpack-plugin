@@ -359,6 +359,7 @@ class CopyPlugin {
             absoluteFilename,
             sourceFilename,
             filename,
+            info: pattern.info,
             force: pattern.force,
           };
 
@@ -756,8 +757,8 @@ class CopyPlugin {
               if (asset.immutable) {
                 info.immutable = true;
               }
-
-              compilation.emitAsset(filename, source, info);
+              console.log(asset)
+              compilation.emitAsset(filename, source, {...info, ...{test: 123}});
 
               logger.log(
                 `written '${filename}' from '${absoluteFilename}' to compilation assets`
