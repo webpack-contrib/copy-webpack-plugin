@@ -791,7 +791,8 @@ module.exports = {
         "relative/path/to/file.ext",
         {
           from: "**/*",
-          info: { compressed: true },
+          // Terser skip this file for minimization
+          info: { minimized: true },
         },
       ],
     }),
@@ -809,7 +810,8 @@ module.exports = {
         "relative/path/to/file.ext",
         {
           from: "**/*",
-          info: (file) => ({ compressed: true }),
+          // Terser skip this file for minimization
+          info: (file) => ({ minimized: true }),
         },
       ],
     }),
