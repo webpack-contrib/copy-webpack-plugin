@@ -503,10 +503,10 @@ describe("to option", () => {
     it('should transform target path of every when "from" is a directory', (done) => {
       runEmit({
         expectedAssetKeys: [
-          "../../../../../../some/path/.dottedfile",
-          "../../../../../../some/path/deepnested.txt",
-          "../../../../../../some/path/directoryfile.txt",
-          "../../../../../../some/path/nestedfile.txt",
+          "../.dottedfile",
+          "../deepnested.txt",
+          "../directoryfile.txt",
+          "../nestedfile.txt",
         ],
         patterns: [
           {
@@ -519,7 +519,7 @@ describe("to option", () => {
 
               const targetPath = path.relative(context, absoluteFrom);
 
-              return `/some/path/${path.basename(targetPath)}`;
+              return path.resolve(__dirname, path.basename(targetPath));
             },
           },
         ],
@@ -531,9 +531,9 @@ describe("to option", () => {
     it('should transform target path of every file when "from" is a glob', (done) => {
       runEmit({
         expectedAssetKeys: [
-          "../../../../../../some/path/deepnested.txt.tst",
-          "../../../../../../some/path/directoryfile.txt.tst",
-          "../../../../../../some/path/nestedfile.txt.tst",
+          "../deepnested.txt.tst",
+          "../directoryfile.txt.tst",
+          "../nestedfile.txt.tst",
         ],
         patterns: [
           {
@@ -543,7 +543,10 @@ describe("to option", () => {
 
               const targetPath = path.relative(context, absoluteFrom);
 
-              return `/some/path/${path.basename(targetPath)}.tst`;
+              return path.resolve(
+                __dirname,
+                `${path.basename(targetPath)}.tst`
+              );
             },
           },
         ],
@@ -554,7 +557,7 @@ describe("to option", () => {
 
     it("should transform target path when function return Promise", (done) => {
       runEmit({
-        expectedAssetKeys: ["../../../../../../some/path/file.txt"],
+        expectedAssetKeys: ["../file.txt"],
         patterns: [
           {
             from: "file.txt",
@@ -564,7 +567,7 @@ describe("to option", () => {
               const targetPath = path.relative(context, absoluteFrom);
 
               return new Promise((resolve) => {
-                resolve(`/some/path/${path.basename(targetPath)}`);
+                resolve(path.resolve(__dirname, path.basename(targetPath)));
               });
             },
           },
@@ -576,7 +579,7 @@ describe("to option", () => {
 
     it("should transform target path when async function used", (done) => {
       runEmit({
-        expectedAssetKeys: ["../../../../../../some/path/file.txt"],
+        expectedAssetKeys: ["../file.txt"],
         patterns: [
           {
             from: "file.txt",
@@ -586,7 +589,7 @@ describe("to option", () => {
               const targetPath = path.relative(context, absoluteFrom);
 
               const newPath = await new Promise((resolve) => {
-                resolve(`/some/path/${path.basename(targetPath)}`);
+                resolve(path.resolve(__dirname, path.basename(targetPath)));
               });
 
               return newPath;
