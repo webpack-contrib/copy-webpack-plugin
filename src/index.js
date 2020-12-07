@@ -361,11 +361,9 @@ class CopyPlugin {
             filename,
             force: pattern.force,
             info:
-              typeof pattern.info !== "undefined"
-                ? typeof pattern.info === "function"
-                  ? pattern.info(file) || {}
-                  : pattern.info
-                : {},
+              typeof pattern.info === "function"
+                ? pattern.info(file) || {}
+                : pattern.info || {},
           };
 
           // If this came from a glob or dir, add it to the file dependencies
@@ -727,11 +725,7 @@ class CopyPlugin {
 
               if (existingAsset) {
                 if (force) {
-                  const info = {
-                    copied: true,
-                    sourceFilename,
-                    ...asset.info,
-                  };
+                  const info = { copied: true, sourceFilename };
 
                   if (asset.immutable) {
                     info.immutable = true;
@@ -741,7 +735,10 @@ class CopyPlugin {
                     `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`
                   );
 
-                  compilation.updateAsset(filename, source, info);
+                  compilation.updateAsset(filename, source, {
+                    ...info,
+                    ...asset.info,
+                  });
 
                   logger.log(
                     `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`
@@ -757,15 +754,15 @@ class CopyPlugin {
                 return;
               }
 
-              logger.log(
-                `writing '${filename}' from '${absoluteFilename}' to compilation assets...`
-              );
-
               const info = { copied: true, sourceFilename };
 
               if (asset.immutable) {
                 info.immutable = true;
               }
+
+              logger.log(
+                `writing '${filename}' from '${absoluteFilename}' to compilation assets...`
+              );
 
               compilation.emitAsset(filename, source, {
                 ...info,
