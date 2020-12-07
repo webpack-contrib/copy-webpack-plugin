@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [6.4.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.3.2...v6.4.0) (2020-12-07)
+
+
+### Features
+
+* added the `info` option ([db53937](https://github.com/webpack-contrib/copy-webpack-plugin/commit/db53937016b7dbf494bc728f00242cd26541f6a3))
+* added type `Function` for the `to` option ([#563](https://github.com/webpack-contrib/copy-webpack-plugin/issues/563)) ([9bc5416](https://github.com/webpack-contrib/copy-webpack-plugin/commit/9bc541694c0d0975c59586cedfea4a51d11f5278))
+
 ### [6.3.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.3.1...v6.3.2) (2020-11-19)
 
 
