@@ -227,7 +227,7 @@ module.exports = {
       patterns: [
         {
           from: "src/*.png",
-          to(rootContext, absolutePath) {
+          to({ context, absoluteFilename }) {
             return "dest/newPath";
           },
         },
@@ -247,7 +247,7 @@ module.exports = {
         {
           from: "src/*.png",
           to: "dest/",
-          to(rootContext, absolutePath) {
+          to({ context, absoluteFilename }) {
             return Promise.resolve("dest/newPath");
           },
         },

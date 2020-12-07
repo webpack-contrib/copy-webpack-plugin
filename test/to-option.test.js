@@ -486,10 +486,12 @@ describe("to option", () => {
         patterns: [
           {
             from: "file.txt",
-            to(context, absoluteFrom) {
-              expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, "file.txt"));
+            to({ context, absoluteFilename }) {
+              expect(absoluteFilename).toBe(
+                path.join(FIXTURES_DIR, "file.txt")
+              );
 
-              const targetPath = path.relative(context, absoluteFrom);
+              const targetPath = path.relative(context, absoluteFilename);
 
               return targetPath.replace("file.txt", "subdir/test.txt");
             },
@@ -512,12 +514,12 @@ describe("to option", () => {
           {
             from: "directory",
             toType: "file",
-            to(context, absoluteFrom) {
+            to({ context, absoluteFilename }) {
               expect(
-                absoluteFrom.includes(path.join(FIXTURES_DIR, "directory"))
+                absoluteFilename.includes(path.join(FIXTURES_DIR, "directory"))
               ).toBe(true);
 
-              const targetPath = path.relative(context, absoluteFrom);
+              const targetPath = path.relative(context, absoluteFilename);
 
               return path.resolve(__dirname, path.basename(targetPath));
             },
@@ -538,10 +540,10 @@ describe("to option", () => {
         patterns: [
           {
             from: "directory/**/*",
-            to(context, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+            to({ context, absoluteFilename }) {
+              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
 
-              const targetPath = path.relative(context, absoluteFrom);
+              const targetPath = path.relative(context, absoluteFilename);
 
               return path.resolve(
                 __dirname,
@@ -561,10 +563,10 @@ describe("to option", () => {
         patterns: [
           {
             from: "file.txt",
-            to(context, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+            to({ context, absoluteFilename }) {
+              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
 
-              const targetPath = path.relative(context, absoluteFrom);
+              const targetPath = path.relative(context, absoluteFilename);
 
               return new Promise((resolve) => {
                 resolve(path.resolve(__dirname, path.basename(targetPath)));
@@ -583,10 +585,10 @@ describe("to option", () => {
         patterns: [
           {
             from: "file.txt",
-            async to(context, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+            async to({ context, absoluteFilename }) {
+              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
 
-              const targetPath = path.relative(context, absoluteFrom);
+              const targetPath = path.relative(context, absoluteFilename);
 
               const newPath = await new Promise((resolve) => {
                 resolve(path.resolve(__dirname, path.basename(targetPath)));
@@ -666,8 +668,8 @@ describe("to option", () => {
         patterns: [
           {
             from: "directory/**/*",
-            to(context, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+            to({ absoluteFilename }) {
+              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
 
               return "transformed/[path][name]-[hash:6].[ext]";
             },
@@ -685,8 +687,8 @@ describe("to option", () => {
           {
             from: "directory/nested/deep-nested",
             toType: "file",
-            to(context, absolutePath) {
-              const mathes = absolutePath.match(/\.([^.]*)$/);
+            to({ absoluteFilename }) {
+              const mathes = absoluteFilename.match(/\.([^.]*)$/);
               const [, res] = mathes;
               const target = res;
 
@@ -706,8 +708,8 @@ describe("to option", () => {
           {
             from: "directory/nested/deep-nested",
             toType: "file",
-            to(context, absolutePath) {
-              const mathes = absolutePath.match(/\.([^.]*)$/);
+            to({ absoluteFilename }) {
+              const mathes = absoluteFilename.match(/\.([^.]*)$/);
               const [, res] = mathes;
               const target = `nested/${res}`;
 
@@ -731,8 +733,8 @@ describe("to option", () => {
           {
             from: "**/*",
             context: "directory",
-            to(context, absolutePath) {
-              const targetPath = path.relative(context, absolutePath);
+            to({ context, absoluteFilename }) {
+              const targetPath = path.relative(context, absoluteFilename);
               const pathSegments = path.parse(targetPath);
               const result = [];
 

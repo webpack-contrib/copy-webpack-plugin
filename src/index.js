@@ -304,7 +304,7 @@ class CopyPlugin {
             ? path.normalize(
                 typeof pattern.to !== "undefined" ? pattern.to : ""
               )
-            : await pattern.to(pattern.context, absoluteFilename);
+            : await pattern.to({ context: pattern.context, absoluteFilename });
 
         const isToDirectory =
           path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep;
