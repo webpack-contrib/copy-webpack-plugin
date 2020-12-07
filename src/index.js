@@ -359,8 +359,13 @@ class CopyPlugin {
             absoluteFilename,
             sourceFilename,
             filename,
-            info: pattern.info,
             force: pattern.force,
+            info:
+              typeof pattern.info !== "undefined"
+                ? typeof pattern.info === "function"
+                  ? pattern.info(file) || {}
+                  : pattern.info
+                : {},
           };
 
           // If this came from a glob or dir, add it to the file dependencies
@@ -722,7 +727,11 @@ class CopyPlugin {
 
               if (existingAsset) {
                 if (force) {
-                  const info = { copied: true, sourceFilename };
+                  const info = {
+                    copied: true,
+                    sourceFilename,
+                    ...asset.info,
+                  };
 
                   if (asset.immutable) {
                     info.immutable = true;
@@ -757,8 +766,11 @@ class CopyPlugin {
               if (asset.immutable) {
                 info.immutable = true;
               }
-              console.log(asset)
-              compilation.emitAsset(filename, source, {...info, ...{test: 123}});
+
+              compilation.emitAsset(filename, source, {
+                ...info,
+                ...asset.info,
+              });
 
               logger.log(
                 `written '${filename}' from '${absoluteFilename}' to compilation assets`

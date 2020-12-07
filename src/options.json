@@ -34,7 +34,14 @@
           "type": "boolean"
         },
         "info": {
-          "type": "object"
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "instanceof": "Function"
+            }
+          ]
         },
         "flatten": {
           "type": "boolean"
