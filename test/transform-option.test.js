@@ -15,10 +15,12 @@ describe("transform option", () => {
       patterns: [
         {
           from: "file.txt",
-          transform(content, absoluteFrom) {
-            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+          transform: {
+            transformer(content, absoluteFrom) {
+              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
-            return `${content}changed`;
+              return `${content}changed`;
+            },
           },
         },
       ],
@@ -44,10 +46,12 @@ describe("transform option", () => {
       patterns: [
         {
           from: "directory",
-          transform(content, absoluteFrom) {
-            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+          transform: {
+            transformer(content, absoluteFrom) {
+              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
-            return `${content}changed`;
+              return `${content}changed`;
+            },
           },
         },
       ],
@@ -71,10 +75,12 @@ describe("transform option", () => {
       patterns: [
         {
           from: "directory/**/*",
-          transform(content, absoluteFrom) {
-            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+          transform: {
+            transformer(content, absoluteFrom) {
+              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
-            return `${content}changed`;
+              return `${content}changed`;
+            },
           },
         },
       ],
@@ -92,10 +98,12 @@ describe("transform option", () => {
       patterns: [
         {
           from: "file.txt",
-          transform(content) {
-            return new Promise((resolve) => {
-              resolve(`${content}changed!`);
-            });
+          transform: {
+            transformer(content) {
+              return new Promise((resolve) => {
+                resolve(`${content}changed!`);
+              });
+            },
           },
         },
       ],
@@ -113,12 +121,14 @@ describe("transform option", () => {
       patterns: [
         {
           from: "file.txt",
-          async transform(content) {
-            const newPath = await new Promise((resolve) => {
-              resolve(`${content}changed!`);
-            });
+          transform: {
+            async transformer(content) {
+              const newPath = await new Promise((resolve) => {
+                resolve(`${content}changed!`);
+              });
 
-            return newPath;
+              return newPath;
+            },
           },
         },
       ],
@@ -134,9 +144,11 @@ describe("transform option", () => {
       patterns: [
         {
           from: "file.txt",
-          transform() {
-            // eslint-disable-next-line no-throw-literal
-            throw new Error("a failure happened");
+          transform: {
+            transformer() {
+              // eslint-disable-next-line no-throw-literal
+              throw new Error("a failure happened");
+            },
           },
         },
       ],
@@ -152,10 +164,12 @@ describe("transform option", () => {
       patterns: [
         {
           from: "file.txt",
-          transform() {
-            return new Promise((resolve, reject) => {
-              return reject(new Error("a failure happened"));
-            });
+          transform: {
+            transformer() {
+              return new Promise((resolve, reject) => {
+                return reject(new Error("a failure happened"));
+              });
+            },
           },
         },
       ],
@@ -171,10 +185,12 @@ describe("transform option", () => {
       patterns: [
         {
           from: "file.txt",
-          async transform() {
-            await new Promise((resolve, reject) => {
-              reject(new Error("a failure happened"));
-            });
+          transform: {
+            async transformer() {
+              await new Promise((resolve, reject) => {
+                reject(new Error("a failure happened"));
+              });
+            },
           },
         },
       ],
@@ -192,7 +208,9 @@ describe("transform option", () => {
         {
           from: "file.txt",
           to: "file.txt.gz",
-          transform: (content) => zlib.gzipSync(content),
+          transform: {
+            transformer: (content) => zlib.gzipSync(content),
+          },
         },
       ],
     })
@@ -215,10 +233,12 @@ describe("transform option", () => {
       patterns: [
         {
           from: "file.txt",
-          transform(content, absoluteFrom) {
-            expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+          transform: {
+            transformer(content, absoluteFrom) {
+              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
 
-            return `${content}changed`;
+              return `${content}changed`;
+            },
           },
           transformPath(targetPath, absoluteFrom) {
             expect(absoluteFrom).toBe(path.join(FIXTURES_DIR, "file.txt"));

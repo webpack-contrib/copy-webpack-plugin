@@ -1,5 +1,3 @@
-import os from "os";
-
 import CopyPlugin from "../src/index";
 
 describe("validate options", () => {
@@ -46,8 +44,10 @@ describe("validate options", () => {
             context: "context",
             toType: "file",
             force: true,
-            transform: () => {},
-            cacheTransform: true,
+            transform: {
+              transformer: () => {},
+              cache: true,
+            },
             transformPath: () => {},
             noErrorOnMissing: true,
           },
@@ -67,17 +67,11 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform: os.tmpdir(),
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: {
-              keys: {
-                foo: "bar",
+            transform: {
+              cache: {
+                keys: {
+                  foo: "bar",
+                },
               },
             },
           },
@@ -87,34 +81,11 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform: {
-              keys: () => ({
-                foo: "bar",
-              }),
-            },
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: {
-              keys: async () => ({
-                foo: "bar",
-              }),
-            },
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: {
-              directory: os.tmpdir(),
-              keys: {
-                foo: "bar",
+            transform: {
+              cache: {
+                keys: () => ({
+                  foo: "bar",
+                }),
               },
             },
           },
@@ -124,11 +95,12 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform: {
-              directory: os.tmpdir(),
-              keys: () => ({
-                foo: "bar",
-              }),
+            transform: {
+              cache: {
+                keys: async () => ({
+                  foo: "bar",
+                }),
+              },
             },
           },
         ],
@@ -220,7 +192,7 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform: () => {},
+            transform: () => {},
           },
         ],
         [
@@ -228,7 +200,7 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform: {
+            transform: {
               foo: "bar",
             },
           },

@@ -102,6 +102,8 @@ class CopyPlugin {
           : pattern.context
         : pattern.compilerContext
     );
+    pattern.transform =
+      typeof pattern.transform !== "undefined" ? pattern.transform : {};
 
     logger.log(
       `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context`
@@ -459,16 +461,16 @@ class CopyPlugin {
             }
           }
 
-          if (pattern.transform) {
+          if (pattern.transform.transformer) {
             logger.log(`transforming content for '${absoluteFilename}'...`);
 
             const buffer = result.source.source();
 
-            if (pattern.cacheTransform) {
+            if (pattern.transform.cache) {
               const defaultCacheKeys = {
                 version,
                 sourceFilename,
-                transform: pattern.transform,
+                transform: pattern.transform.transformer,
                 contentHash: crypto
                   .createHash("md4")
                   .update(buffer)
@@ -476,12 +478,12 @@ class CopyPlugin {
                 index,
               };
               const cacheKeys = `transform|${serialize(
-                typeof pattern.cacheTransform.keys === "function"
-                  ? await pattern.cacheTransform.keys(
+                typeof pattern.transform.cache.keys === "function"
+                  ? await pattern.transform.cache.keys(
                       defaultCacheKeys,
                       absoluteFilename
                     )
-                  : { ...defaultCacheKeys, ...pattern.cacheTransform.keys }
+                  : { ...defaultCacheKeys, ...pattern.transform.cache.keys }
               )}`;
 
               logger.debug(
@@ -502,7 +504,7 @@ class CopyPlugin {
               );
 
               if (!result.source) {
-                const transformed = await pattern.transform(
+                const transformed = await pattern.transform.transformer(
                   buffer,
                   absoluteFilename
                 );
@@ -519,7 +521,7 @@ class CopyPlugin {
               }
             } else {
               result.source = new RawSource(
-                await pattern.transform(buffer, absoluteFilename)
+                await pattern.transform.transformer(buffer, absoluteFilename)
               );
             }
           }

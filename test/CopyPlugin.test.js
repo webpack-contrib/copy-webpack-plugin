@@ -896,10 +896,12 @@ describe("CopyPlugin", () => {
               "./fixtures/directory/directoryfile.txt"
             ),
             to: "new1.txt",
-            transform: (content) => {
-              return `${content.toString()}added1`;
+            transform: {
+              transformer: (content) => {
+                return `${content.toString()}added1`;
+              },
+              cache: true,
             },
-            cacheTransform: true,
           },
           {
             from: path.resolve(
@@ -907,10 +909,12 @@ describe("CopyPlugin", () => {
               "./fixtures/directory/directoryfile.txt"
             ),
             to: "new1-2.txt",
-            transform: (content) => {
-              return `${content.toString()}added1`;
+            transform: {
+              transformer: (content) => {
+                return `${content.toString()}added1`;
+              },
+              cache: true,
             },
-            cacheTransform: true,
           },
           {
             from: path.resolve(
@@ -918,10 +922,12 @@ describe("CopyPlugin", () => {
               "./fixtures/directory/directoryfile.txt"
             ),
             to: "new2.txt",
-            transform: (content) => {
-              return `${content.toString()}added2`;
+            transform: {
+              transformer: (content) => {
+                return `${content.toString()}added2`;
+              },
+              cache: false,
             },
-            cacheTransform: false,
           },
           {
             from: path.resolve(
@@ -929,10 +935,12 @@ describe("CopyPlugin", () => {
               "./fixtures/directory/directoryfile.txt"
             ),
             to: "new3.txt",
-            transform: (content) => {
-              return `${content.toString()}added3`;
+            transform: {
+              transformer: (content) => {
+                return `${content.toString()}added3`;
+              },
+              cache: true,
             },
-            cacheTransform: true,
           },
           {
             from: path.resolve(
@@ -940,12 +948,14 @@ describe("CopyPlugin", () => {
               "./fixtures/directory/directoryfile.txt"
             ),
             to: "new4.txt",
-            transform: (content) => {
-              return `${content.toString()}${getMyVar()}`;
-            },
-            cacheTransform: {
-              keys: {
-                foo: "bar",
+            transform: {
+              transformer: (content) => {
+                return `${content.toString()}${getMyVar()}`;
+              },
+              cache: {
+                keys: {
+                  foo: "bar",
+                },
               },
             },
           },
@@ -955,12 +965,14 @@ describe("CopyPlugin", () => {
               "./fixtures/directory/directoryfile.txt"
             ),
             to: "new5.txt",
-            transform: (content) => {
-              return `${content.toString()}${getMyVar()}`;
-            },
-            cacheTransform: {
-              keys: {
-                foo: "baz",
+            transform: {
+              transformer: (content) => {
+                return `${content.toString()}${getMyVar()}`;
+              },
+              cache: {
+                keys: {
+                  foo: "baz",
+                },
               },
             },
           },

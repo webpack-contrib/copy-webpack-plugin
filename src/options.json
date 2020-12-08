@@ -44,38 +44,37 @@
           ]
         },
         "transform": {
-          "instanceof": "Function"
-        },
-        "cacheTransform": {
-          "anyOf": [
-            {
-              "type": "boolean"
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "transformer": {
+              "instanceof": "Function"
             },
-            {
-              "type": "string"
-            },
-            {
-              "type": "object",
-              "additionalProperties": false,
-              "properties": {
-                "directory": {
-                  "type": "string",
-                  "absolutePath": true
+            "cache": {
+              "anyOf": [
+                {
+                  "type": "boolean"
                 },
-                "keys": {
-                  "anyOf": [
-                    {
-                      "type": "object",
-                      "additionalProperties": true
-                    },
-                    {
-                      "instanceof": "Function"
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "keys": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": true
+                        },
+                        {
+                          "instanceof": "Function"
+                        }
+                      ]
                     }
-                  ]
+                  }
                 }
-              }
+              ]
             }
-          ]
+          }
         },
         "transformPath": {
           "instanceof": "Function"
