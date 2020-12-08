@@ -29,10 +29,6 @@ class CopyPlugin {
   }
 
   static async createSnapshot(compilation, startTime, dependency) {
-    if (!compilation.fileSystemInfo) {
-      return;
-    }
-
     // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
       compilation.fileSystemInfo.createSnapshot(
@@ -57,10 +53,6 @@ class CopyPlugin {
   }
 
   static async checkSnapshotValid(compilation, snapshot) {
-    if (!compilation.fileSystemInfo) {
-      return;
-    }
-
     // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
       compilation.fileSystemInfo.checkSnapshotValid(
@@ -606,14 +598,14 @@ class CopyPlugin {
 
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       const logger = compilation.getLogger("copy-webpack-plugin");
-      const cache = compilation.getCache
-        ? compilation.getCache("CopyWebpackPlugin")
-        : // eslint-disable-next-line no-undefined
-          undefined;
+      const cache = compilation.getCache("CopyWebpackPlugin");
 
-      compilation.hooks.additionalAssets.tapAsync(
-        "copy-webpack-plugin",
-        async (callback) => {
+      compilation.hooks.processAssets.tapAsync(
+        {
+          name: "copy-webpack-plugin",
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+        },
+        async (unusedAssets, callback) => {
           logger.log("starting to add additional assets...");
 
           let assets;
@@ -654,15 +646,6 @@ class CopyPlugin {
                 source,
                 force,
               } = asset;
-
-              // For old version webpack 4
-              /* istanbul ignore if */
-              if (typeof compilation.emitAsset !== "function") {
-                // eslint-disable-next-line no-param-reassign
-                compilation.assets[filename] = source;
-
-                return;
-              }
 
               const existingAsset = compilation.getAsset(filename);
 

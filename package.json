@@ -48,8 +48,7 @@
     "normalize-path": "^3.0.0",
     "p-limit": "^3.0.2",
     "schema-utils": "^3.0.0",
-    "serialize-javascript": "^5.0.1",
-    "webpack-sources": "^1.4.3"
+    "serialize-javascript": "^5.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.1",
@@ -60,7 +59,6 @@
     "@webpack-contrib/defaults": "^6.3.0",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-jest": "^26.6.3",
-    "chokidar": "^3.4.3",
     "cross-env": "^7.0.2",
     "del": "^6.0.0",
     "del-cli": "^3.0.1",
