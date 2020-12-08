@@ -1,9 +1,3 @@
-import webpack from "webpack";
-
-const { RawSource } =
-  // eslint-disable-next-line global-require
-  webpack.sources || require("webpack-sources");
-
 class PreCopyPlugin {
   constructor(options = {}) {
     this.options = options.options || {};
@@ -17,6 +11,7 @@ class PreCopyPlugin {
         "pre-copy-webpack-plugin",
         (callback) => {
           this.options.additionalAssets.forEach(({ name, data, info }) => {
+            const { RawSource } = compiler.webpack.sources;
             const source = new RawSource(data);
 
             compilation.emitAsset(name, source, info);

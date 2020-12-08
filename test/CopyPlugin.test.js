@@ -351,9 +351,7 @@ describe("CopyPlugin", () => {
     });
 
     it('should copy files and print "copied" in the string representation ', (done) => {
-      const isWebpack4 = webpack.version[0] === "4";
-
-      expect.assertions(isWebpack4 ? 0 : 1);
+      expect.assertions(1);
 
       const expectedAssetKeys = [
         ".dottedfile",
@@ -374,9 +372,7 @@ describe("CopyPlugin", () => {
         .then(({ stats }) => {
           const stringStats = stats.toString();
 
-          if (!isWebpack4) {
-            expect(stringStats.match(/\[copied]/g).length).toBe(4);
-          }
+          expect(stringStats.match(/\[copied]/g).length).toBe(4);
         })
         .then(done)
         .catch(done);
@@ -427,12 +423,8 @@ describe("CopyPlugin", () => {
       ]);
 
       compiler.compilers.forEach((item) => {
-        const outputFileSystem = createFsFromVolume(new Volume());
-        // Todo remove when we drop webpack@4 support
-        outputFileSystem.join = path.join.bind(path);
-
         // eslint-disable-next-line no-param-reassign
-        item.outputFileSystem = outputFileSystem;
+        item.outputFileSystem = createFsFromVolume(new Volume());
       });
 
       const { stats } = await compile(compiler);
@@ -719,16 +711,7 @@ describe("CopyPlugin", () => {
 
       const { stats } = await compile(compiler);
 
-      if (webpack.version[0] === "4") {
-        expect(
-          Object.keys(stats.compilation.assets).filter(
-            (assetName) => stats.compilation.assets[assetName].emitted
-          ).length
-        ).toBe(5);
-      } else {
-        expect(stats.compilation.emittedAssets.size).toBe(5);
-      }
-
+      expect(stats.compilation.emittedAssets.size).toBe(5);
       expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
       expect(stats.compilation.errors).toMatchSnapshot("errors");
       expect(stats.compilation.warnings).toMatchSnapshot("warnings");
@@ -736,16 +719,7 @@ describe("CopyPlugin", () => {
       await new Promise(async (resolve) => {
         const { stats: newStats } = await compile(compiler);
 
-        if (webpack.version[0] === "4") {
-          expect(
-            Object.keys(newStats.compilation.assets).filter(
-              (assetName) => newStats.compilation.assets[assetName].emitted
-            ).length
-          ).toBe(4);
-        } else {
-          expect(newStats.compilation.emittedAssets.size).toBe(0);
-        }
-
+        expect(newStats.compilation.emittedAssets.size).toBe(0);
         expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
         expect(newStats.compilation.errors).toMatchSnapshot("errors");
         expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
@@ -776,16 +750,7 @@ describe("CopyPlugin", () => {
 
       const { stats } = await compile(compiler);
 
-      if (webpack.version[0] === "4") {
-        expect(
-          Object.keys(stats.compilation.assets).filter(
-            (assetName) => stats.compilation.assets[assetName].emitted
-          ).length
-        ).toBe(5);
-      } else {
-        expect(stats.compilation.emittedAssets.size).toBe(5);
-      }
-
+      expect(stats.compilation.emittedAssets.size).toBe(5);
       expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
       expect(stats.compilation.errors).toMatchSnapshot("errors");
       expect(stats.compilation.warnings).toMatchSnapshot("warnings");
@@ -793,16 +758,7 @@ describe("CopyPlugin", () => {
       await new Promise(async (resolve) => {
         const { stats: newStats } = await compile(compiler);
 
-        if (webpack.version[0] === "4") {
-          expect(
-            Object.keys(newStats.compilation.assets).filter(
-              (assetName) => newStats.compilation.assets[assetName].emitted
-            ).length
-          ).toBe(4);
-        } else {
-          expect(newStats.compilation.emittedAssets.size).toBe(0);
-        }
-
+        expect(newStats.compilation.emittedAssets.size).toBe(0);
         expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
         expect(newStats.compilation.errors).toMatchSnapshot("errors");
         expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
@@ -875,27 +831,14 @@ describe("CopyPlugin", () => {
       ]);
 
       compiler.compilers.forEach((item) => {
-        const outputFileSystem = createFsFromVolume(new Volume());
-        // Todo remove when we drop webpack@4 support
-        outputFileSystem.join = path.join.bind(path);
-
         // eslint-disable-next-line no-param-reassign
-        item.outputFileSystem = outputFileSystem;
+        item.outputFileSystem = createFsFromVolume(new Volume());
       });
 
       const { stats } = await compile(compiler);
 
       stats.stats.forEach((item, index) => {
-        if (webpack.version[0] === "4") {
-          expect(
-            Object.keys(item.compilation.assets).filter(
-              (assetName) => item.compilation.assets[assetName].emitted
-            ).length
-          ).toBe(5);
-        } else {
-          expect(item.compilation.emittedAssets.size).toBe(5);
-        }
-
+        expect(item.compilation.emittedAssets.size).toBe(5);
         expect(item.compilation.errors).toMatchSnapshot("errors");
         expect(item.compilation.warnings).toMatchSnapshot("warnings");
         expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
@@ -907,16 +850,7 @@ describe("CopyPlugin", () => {
         const { stats: newStats } = await compile(compiler);
 
         newStats.stats.forEach((item, index) => {
-          if (webpack.version[0] === "4") {
-            expect(
-              Object.keys(item.compilation.assets).filter(
-                (assetName) => item.compilation.assets[assetName].emitted
-              ).length
-            ).toBe(4);
-          } else {
-            expect(item.compilation.emittedAssets.size).toBe(0);
-          }
-
+          expect(item.compilation.emittedAssets.size).toBe(0);
           expect(item.compilation.errors).toMatchSnapshot("errors");
           expect(item.compilation.warnings).toMatchSnapshot("warnings");
           expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
@@ -1035,16 +969,7 @@ describe("CopyPlugin", () => {
 
       const { stats } = await compile(compiler);
 
-      if (webpack.version[0] === "4") {
-        expect(
-          Object.keys(stats.compilation.assets).filter(
-            (assetName) => stats.compilation.assets[assetName].emitted
-          ).length
-        ).toBe(8);
-      } else {
-        expect(stats.compilation.emittedAssets.size).toBe(8);
-      }
-
+      expect(stats.compilation.emittedAssets.size).toBe(8);
       expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
       expect(stats.compilation.errors).toMatchSnapshot("errors");
       expect(stats.compilation.warnings).toMatchSnapshot("warnings");
@@ -1052,16 +977,7 @@ describe("CopyPlugin", () => {
       await new Promise(async (resolve) => {
         const { stats: newStats } = await compile(compiler);
 
-        if (webpack.version[0] === "4") {
-          expect(
-            Object.keys(newStats.compilation.assets).filter(
-              (assetName) => newStats.compilation.assets[assetName].emitted
-            ).length
-          ).toBe(7);
-        } else {
-          expect(newStats.compilation.emittedAssets.size).toBe(1);
-        }
-
+        expect(newStats.compilation.emittedAssets.size).toBe(1);
         expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
         expect(newStats.compilation.errors).toMatchSnapshot("errors");
         expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
@@ -1138,16 +1054,6 @@ describe("CopyPlugin", () => {
             .map((entry) =>
               entry.args[0].replace(/\\/g, "/").split(root).join(".")
             )
-            // TODO remove after drop webpack@4
-            .filter(
-              (item) =>
-                !item.startsWith("created snapshot") &&
-                !item.startsWith("creating snapshot") &&
-                !item.startsWith("getting cache") &&
-                !item.startsWith("missed cache") &&
-                !item.startsWith("stored cache") &&
-                !item.startsWith("storing cache")
-            )
             .sort();
 
           expect(
@@ -1180,16 +1086,6 @@ describe("CopyPlugin", () => {
             .get("copy-webpack-plugin")
             .map((entry) =>
               entry.args[0].replace(/\\/g, "/").split(root).join(".")
-            )
-            // TODO remove after drop webpack@4
-            .filter(
-              (item) =>
-                !item.startsWith("created snapshot") &&
-                !item.startsWith("creating snapshot") &&
-                !item.startsWith("getting cache") &&
-                !item.startsWith("missed cache") &&
-                !item.startsWith("stored cache") &&
-                !item.startsWith("storing cache")
             )
             .sort();
 
@@ -1226,16 +1122,6 @@ describe("CopyPlugin", () => {
             .map((entry) =>
               entry.args[0].replace(/\\/g, "/").split(root).join(".")
             )
-            // TODO remove after drop webpack@4
-            .filter(
-              (item) =>
-                !item.startsWith("created snapshot") &&
-                !item.startsWith("creating snapshot") &&
-                !item.startsWith("getting cache") &&
-                !item.startsWith("missed cache") &&
-                !item.startsWith("stored cache") &&
-                !item.startsWith("storing cache")
-            )
             .sort();
 
           expect(
@@ -1266,16 +1152,6 @@ describe("CopyPlugin", () => {
             .get("copy-webpack-plugin")
             .map((entry) =>
               entry.args[0].replace(/\\/g, "/").split(root).join(".")
-            )
-            // TODO remove after drop webpack@4
-            .filter(
-              (item) =>
-                !item.startsWith("created snapshot") &&
-                !item.startsWith("creating snapshot") &&
-                !item.startsWith("getting cache") &&
-                !item.startsWith("missed cache") &&
-                !item.startsWith("stored cache") &&
-                !item.startsWith("storing cache")
             )
             .sort();
 

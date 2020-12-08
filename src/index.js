@@ -1,14 +1,10 @@
 import path from "path";
-import os from "os";
 import crypto from "crypto";
 
-import webpack from "webpack";
 import { validate } from "schema-utils";
 import pLimit from "p-limit";
 import globby from "globby";
-import findCacheDir from "find-cache-dir";
 import serialize from "serialize-javascript";
-import cacache from "cacache";
 import loaderUtils from "loader-utils";
 import normalizePath from "normalize-path";
 import globParent from "glob-parent";
@@ -18,11 +14,6 @@ import { version } from "../package.json";
 
 import schema from "./options.json";
 import { readFile, stat } from "./utils/promisify";
-
-// webpack 5 exposes the sources property to ensure the right version of webpack-sources is used
-const { RawSource } =
-  // eslint-disable-next-line global-require
-  webpack.sources || require("webpack-sources");
 
 const template = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(?::(\d+))?\])|(\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\])|(\[\d+\])/;
 
@@ -95,6 +86,7 @@ class CopyPlugin {
     inputPattern,
     index
   ) {
+    const { RawSource } = compiler.webpack.sources;
     const pattern =
       typeof inputPattern === "string"
         ? { from: inputPattern }
@@ -151,18 +143,6 @@ class CopyPlugin {
       ...(pattern.globOptions || {}),
       ...{ cwd: pattern.context, objectMode: true },
     };
-
-    // TODO remove after drop webpack@4
-    if (
-      inputFileSystem.lstat &&
-      inputFileSystem.stat &&
-      inputFileSystem.lstatSync &&
-      inputFileSystem.statSync &&
-      inputFileSystem.readdir &&
-      inputFileSystem.readdirSync
-    ) {
-      pattern.globOptions.fs = inputFileSystem;
-    }
 
     switch (pattern.fromType) {
       case "dir":
@@ -504,42 +484,16 @@ class CopyPlugin {
                   : { ...defaultCacheKeys, ...pattern.cacheTransform.keys }
               )}`;
 
-              let cacheItem;
-              let cacheDirectory;
-
               logger.debug(
                 `getting transformation cache for '${absoluteFilename}'...`
               );
 
-              // webpack@5 API
-              if (cache) {
-                cacheItem = cache.getItemCache(
-                  cacheKeys,
-                  cache.getLazyHashedEtag(result.source)
-                );
+              const cacheItem = cache.getItemCache(
+                cacheKeys,
+                cache.getLazyHashedEtag(result.source)
+              );
 
-                result.source = await cacheItem.getPromise();
-              } else {
-                cacheDirectory = pattern.cacheTransform.directory
-                  ? pattern.cacheTransform.directory
-                  : typeof pattern.cacheTransform === "string"
-                  ? pattern.cacheTransform
-                  : findCacheDir({ name: "copy-webpack-plugin" }) ||
-                    os.tmpdir();
-
-                let cached;
-
-                try {
-                  cached = await cacache.get(cacheDirectory, cacheKeys);
-                } catch (error) {
-                  logger.debug(
-                    `no transformation cache for '${absoluteFilename}'...`
-                  );
-                }
-
-                // eslint-disable-next-line no-undefined
-                result.source = cached ? new RawSource(cached.data) : undefined;
-              }
+              result.source = await cacheItem.getPromise();
 
               logger.debug(
                 result.source
@@ -559,18 +513,7 @@ class CopyPlugin {
                   `caching transformation for '${absoluteFilename}'...`
                 );
 
-                // webpack@5 API
-                if (cache) {
-                  await cacheItem.storePromise(result.source);
-                } else {
-                  try {
-                    await cacache.put(cacheDirectory, cacheKeys, transformed);
-                  } catch (error) {
-                    compilation.errors.push(error);
-
-                    return;
-                  }
-                }
+                await cacheItem.storePromise(result.source);
 
                 logger.debug(`cached transformation for '${absoluteFilename}'`);
               }

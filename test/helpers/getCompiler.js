@@ -13,21 +13,13 @@ export default (config = {}) => {
     },
     module: {
       rules: [
-        webpack.version[0] === "5"
-          ? {
-              test: /\.txt/,
-              type: "asset/resource",
-              generator: {
-                filename: "asset-modules/[name][ext]",
-              },
-            }
-          : {
-              test: /\.txt/,
-              loader: "file-loader",
-              options: {
-                name: "asset-modules/[name].[ext]",
-              },
-            },
+        {
+          test: /\.txt/,
+          type: "asset/resource",
+          generator: {
+            filename: "asset-modules/[name][ext]",
+          },
+        },
       ],
     },
     ...config,
@@ -36,11 +28,7 @@ export default (config = {}) => {
   const compiler = webpack(fullConfig);
 
   if (!config.outputFileSystem) {
-    const outputFileSystem = createFsFromVolume(new Volume());
-    // Todo remove when we drop webpack@4 support
-    outputFileSystem.join = path.join.bind(path);
-
-    compiler.outputFileSystem = outputFileSystem;
+    compiler.outputFileSystem = createFsFromVolume(new Volume());
   }
 
   return compiler;

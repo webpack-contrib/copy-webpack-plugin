@@ -1,7 +1,5 @@
 import os from "os";
 
-import findCacheDir from "find-cache-dir";
-
 import CopyPlugin from "../src/index";
 
 describe("validate options", () => {
@@ -69,8 +67,7 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform:
-              findCacheDir({ name: "copy-webpack-plugin-a" }) || os.tmpdir(),
+            cacheTransform: os.tmpdir(),
           },
         ],
         [
@@ -115,8 +112,7 @@ describe("validate options", () => {
             to: "dir",
             context: "context",
             cacheTransform: {
-              directory:
-                findCacheDir({ name: "copy-webpack-plugin-b" }) || os.tmpdir(),
+              directory: os.tmpdir(),
               keys: {
                 foo: "bar",
               },
@@ -129,8 +125,7 @@ describe("validate options", () => {
             to: "dir",
             context: "context",
             cacheTransform: {
-              directory:
-                findCacheDir({ name: "copy-webpack-plugin-c" }) || os.tmpdir(),
+              directory: os.tmpdir(),
               keys: () => ({
                 foo: "bar",
               }),
