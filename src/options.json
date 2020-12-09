@@ -43,36 +43,39 @@
             }
           ]
         },
-        "flatten": {
-          "type": "boolean"
-        },
         "transform": {
-          "instanceof": "Function"
-        },
-        "cacheTransform": {
           "anyOf": [
             {
-              "type": "boolean"
-            },
-            {
-              "type": "string"
+              "instanceof": "Function"
             },
             {
               "type": "object",
               "additionalProperties": false,
               "properties": {
-                "directory": {
-                  "type": "string",
-                  "absolutePath": true
+                "transformer": {
+                  "instanceof": "Function"
                 },
-                "keys": {
+                "cache": {
                   "anyOf": [
                     {
-                      "type": "object",
-                      "additionalProperties": true
+                      "type": "boolean"
                     },
                     {
-                      "instanceof": "Function"
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "keys": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "additionalProperties": true
+                            },
+                            {
+                              "instanceof": "Function"
+                            }
+                          ]
+                        }
+                      }
                     }
                   ]
                 }

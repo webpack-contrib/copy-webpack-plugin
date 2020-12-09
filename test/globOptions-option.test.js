@@ -199,14 +199,16 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it("should ignore files with flatten true", (done) => {
+  it("should ignore files with flatten copy", (done) => {
     runEmit({
       expectedAssetKeys: ["img/.dottedfile", "img/nestedfile.txt"],
       patterns: [
         {
           from: "directory/",
-          to: "img/",
-          flatten: true,
+          toType: "file",
+          to({ absoluteFilename }) {
+            return `img/${path.basename(absoluteFilename)}`;
+          },
           globOptions: {
             ignore: ["**/directoryfile.*", "**/deep-nested/**"],
           },

@@ -76,21 +76,18 @@ module.exports = {
 
 ### Patterns
 
-|                  Name                   |            Type             |                     Default                     | Description                                                                                           |
-| :-------------------------------------: | :-------------------------: | :---------------------------------------------: | :---------------------------------------------------------------------------------------------------- |
-|             [`from`](#from)             |         `{String}`          |                   `undefined`                   | Glob or path from where we сopy files.                                                                |
-|               [`to`](#to)               |    `{String\|Function}`     |            `compiler.options.output`            | Output path.                                                                                          |
-|          [`context`](#context)          |         `{String}`          | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                              |
-|      [`globOptions`](#globoptions)      |         `{Object}`          |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.        |
-|           [`filter`](#filter)           |        `{Function}`         |                   `undefined`                   | Allows to filter copied assets.                                                                       |
-|           [`toType`](#totype)           |         `{String}`          |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                        |
-|            [`force`](#force)            |         `{Boolean}`         |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).            |
-|          [`flatten`](#flatten)          |         `{Boolean}`         |                     `false`                     | Removes all directory references and only copies file names.                                          |
-|        [`transform`](#transform)        |        `{Function}`         |                   `undefined`                   | Allows to modify the file contents.                                                                   |
-|   [`cacheTransform`](#cacheTransform)   | `{Boolean\|String\|Object}` |                     `false`                     | Enable `transform` caching. You can use `{ cache: { key: 'my-cache-key' } }` to invalidate the cache. |
-|    [`transformPath`](#transformpath)    |        `{Function}`         |                   `undefined`                   | Allows to modify the writing path.                                                                    |
-| [`noErrorOnMissing`](#noerroronmissing) |         `{Boolean}`         |                     `false`                     | Doesn't generate an error on missing file(s).                                                         |
-|             [`info`](#info)             |    `{Object\|Function}`     |                   `undefined`                   | Allows to add assets info.                                                                            |
+|                  Name                   |         Type         |                     Default                     | Description                                                                                                                                            |
+| :-------------------------------------: | :------------------: | :---------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
+|             [`from`](#from)             |      `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                                                                 |
+|               [`to`](#to)               | `{String\|Function}` |            `compiler.options.output`            | Output path.                                                                                                                                           |
+|          [`context`](#context)          |      `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                                                                               |
+|      [`globOptions`](#globoptions)      |      `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.                                                         |
+|           [`filter`](#filter)           |     `{Function}`     |                   `undefined`                   | Allows to filter copied assets.                                                                                                                        |
+|           [`toType`](#totype)           |      `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                                                                         |
+|            [`force`](#force)            |     `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).                                                             |
+|        [`transform`](#transform)        |      `{Object}`      |                   `undefined`                   | Allows to modify the file contents. Enable `transform` caching. You can use `{ transform: {cache: { key: 'my-cache-key' }} }` to invalidate the cache. |
+| [`noErrorOnMissing`](#noerroronmissing) |     `{Boolean}`      |                     `false`                     | Doesn't generate an error on missing file(s).                                                                                                          |
+|             [`info`](#info)             | `{Object\|Function}` |                   `undefined`                   | Allows to add assets info.                                                                                                                             |
 
 #### `from`
 
@@ -229,7 +226,7 @@ module.exports = {
         {
           from: "src/*.png",
           to({ context, absoluteFilename }) {
-            return "dest/newPath";
+            return "dest/newPath/[name][ext]";
           },
         },
       ],
@@ -247,9 +244,8 @@ module.exports = {
       patterns: [
         {
           from: "src/*.png",
-          to: "dest/",
           to({ context, absoluteFilename }) {
-            return Promise.resolve("dest/newPath");
+            return Promise.resolve("dest/newPath/[name][ext]");
           },
         },
       ],
@@ -466,39 +462,14 @@ module.exports = {
 };
 ```
 
-#### `flatten`
-
-Type: `Boolean`
-Default: `false`
-
-Removes all directory references and only copies file names.
-
-> ⚠️ If files have the same name, the result is non-deterministic.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "src/**/*",
-          to: "dest/",
-          flatten: true,
-        },
-      ],
-    }),
-  ],
-};
-```
-
 #### `transform`
 
-Type: `Function`
+Type: `Function|Object`
 Default: `undefined`
 
 Allows to modify the file contents.
+
+##### `Function`
 
 **webpack.config.js**
 
@@ -522,6 +493,18 @@ module.exports = {
 };
 ```
 
+##### `Object`
+
+|               Name                |        Type         |   Default   | Description                                                                                                      |
+| :-------------------------------: | :-----------------: | :---------: | :--------------------------------------------------------------------------------------------------------------- |
+| **[`transformer`](#transformer)** |    `{Function}`     | `undefined` | Allows to modify the file contents.                                                                              |
+|       **[`cache`](#cache)**       | `{Boolean\|Object}` |   `false`   | Enable `transform` caching. You can use `transform: { cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+
+###### `transformer`
+
+Type: `Function`
+Default: `undefined`
+
 **webpack.config.js**
 
 ```js
@@ -532,8 +515,12 @@ module.exports = {
         {
           from: "src/*.png",
           to: "dest/",
-          transform(content, path) {
-            return Promise.resolve(optimize(content));
+          // The `content` argument is a [`Buffer`](https://nodejs.org/api/buffer.html) object, it could be converted to a `String` to be processed using `content.toString()`
+          // The `absoluteFrom` argument is a `String`, it is absolute path from where the file is being copied
+          transform: {
+            transformer(content, absoluteFrom) {
+              return optimize(content);
+            },
           },
         },
       ],
@@ -542,15 +529,39 @@ module.exports = {
 };
 ```
 
-#### `cacheTransform`
+**webpack.config.js**
 
-Type: `Boolean|String|Object`
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/*.png",
+          to: "dest/",
+          transform: {
+            transformer(content, path) {
+              return Promise.resolve(optimize(content));
+            },
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+###### `cache`
+
+Type: `Boolean|Object`
 Default: `false`
+
+**webpack.config.js**
 
 Enable/disable and configure caching.
 Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
 
-##### `Boolean`
+###### `Boolean`
 
 Enables/Disable `transform` caching.
 
@@ -564,36 +575,12 @@ module.exports = {
         {
           from: "src/*.png",
           to: "dest/",
-          transform(content, path) {
-            return optimize(content);
+          transform: {
+            transformer(content, path) {
+              return optimize(content);
+            },
+            cache: true,
           },
-          cacheTransform: true,
-        },
-      ],
-    }),
-  ],
-};
-```
-
-##### `String`
-
-Enables `transform` caching and setup cache directory.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "src/*.png",
-          to: "dest/",
-          transform(content, path) {
-            return optimize(content);
-          },
-          // Should be absolute
-          cacheTransform: path.resolve(__dirname, "cache-directory"),
         },
       ],
     }),
@@ -615,15 +602,17 @@ module.exports = {
         {
           from: "src/*.png",
           to: "dest/",
-          transform(content, path) {
-            return optimize(content);
-          },
-          cacheTransform: {
-            directory: path.resolve(__dirname, "cache-directory"),
-            keys: {
-              // May be useful for invalidating cache based on external values
-              // For example, you can invalid cache based on `process.version` - { node: process.version }
-              key: "value",
+          transform: {
+            transformer(content, path) {
+              return optimize(content);
+            },
+            cache: {
+              directory: path.resolve(__dirname, "cache-directory"),
+              keys: {
+                // May be useful for invalidating cache based on external values
+                // For example, you can invalid cache based on `process.version` - { node: process.version }
+                key: "value",
+              },
             },
           },
         },
@@ -647,18 +636,20 @@ module.exports = {
         {
           from: "src/*.png",
           to: "dest/",
-          transform(content, path) {
-            return optimize(content);
-          },
-          cacheTransform: {
-            directory: path.resolve(__dirname, "cache-directory"),
-            keys: (defaultCacheKeys, absoluteFrom) => {
-              const keys = getCustomCacheInvalidationKeysSync();
+          transform: {
+            transformer(content, path) {
+              return optimize(content);
+            },
+            cache: {
+              directory: path.resolve(__dirname, "cache-directory"),
+              keys: (defaultCacheKeys, absoluteFrom) => {
+                const keys = getCustomCacheInvalidationKeysSync();
 
-              return {
-                ...defaultCacheKeys,
-                keys,
-              };
+                return {
+                  ...defaultCacheKeys,
+                  keys,
+                };
+              },
             },
           },
         },
@@ -680,70 +671,21 @@ module.exports = {
         {
           from: "src/*.png",
           to: "dest/",
-          transform(content, path) {
-            return optimize(content);
-          },
-          cacheTransform: {
-            directory: path.resolve(__dirname, "cache-directory"),
-            keys: async (defaultCacheKeys, absoluteFrom) => {
-              const keys = await getCustomCacheInvalidationKeysAsync();
-
-              return {
-                ...defaultCacheKeys,
-                keys,
-              };
+          transform: {
+            transformer(content, path) {
+              return optimize(content);
             },
-          },
-        },
-      ],
-    }),
-  ],
-};
-```
+            cache: {
+              directory: path.resolve(__dirname, "cache-directory"),
+              keys: async (defaultCacheKeys, absoluteFrom) => {
+                const keys = await getCustomCacheInvalidationKeysAsync();
 
-#### `transformPath`
-
-Type: `Function`
-Default: `undefined`
-
-Allows to modify the writing path.
-
-> ⚠️ Don't return directly `\\` in `transformPath` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
-> On Windows, the forward slash and the backward slash are both separators.
-> Instead please use `/` or `path` methods.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "src/*.png",
-          to: "dest/",
-          transformPath(targetPath, absolutePath) {
-            return "newPath";
-          },
-        },
-      ],
-    }),
-  ],
-};
-```
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "src/*.png",
-          to: "dest/",
-          transformPath(targetPath, absolutePath) {
-            return Promise.resolve("newPath");
+                return {
+                  ...defaultCacheKeys,
+                  keys,
+                };
+              },
+            },
           },
         },
       ],
@@ -1036,6 +978,40 @@ module.exports = {
     }),
   ],
 };
+```
+
+#### Flatten copy
+
+Removes all directory references and only copies file names.
+
+> ⚠️ If files have the same name, the result is non-deterministic.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/**/*",
+          toType: "file",
+          to({ absoluteFilename }) {
+            return path.basename(absoluteFilename);
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+file-1.txt
+file-2.txt
+nested-file.txt
 ```
 
 ## Contributing

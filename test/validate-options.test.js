@@ -1,7 +1,3 @@
-import os from "os";
-
-import findCacheDir from "find-cache-dir";
-
 import CopyPlugin from "../src/index";
 
 describe("validate options", () => {
@@ -48,11 +44,19 @@ describe("validate options", () => {
             context: "context",
             toType: "file",
             force: true,
-            flatten: true,
-            transform: () => {},
-            cacheTransform: true,
-            transformPath: () => {},
+            transform: {
+              transformer: () => {},
+              cache: true,
+            },
             noErrorOnMissing: true,
+          },
+        ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            context: "context",
+            transform: () => {},
           },
         ],
         [
@@ -70,18 +74,11 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform:
-              findCacheDir({ name: "copy-webpack-plugin-a" }) || os.tmpdir(),
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: {
-              keys: {
-                foo: "bar",
+            transform: {
+              cache: {
+                keys: {
+                  foo: "bar",
+                },
               },
             },
           },
@@ -91,35 +88,11 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform: {
-              keys: () => ({
-                foo: "bar",
-              }),
-            },
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: {
-              keys: async () => ({
-                foo: "bar",
-              }),
-            },
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: {
-              directory:
-                findCacheDir({ name: "copy-webpack-plugin-b" }) || os.tmpdir(),
-              keys: {
-                foo: "bar",
+            transform: {
+              cache: {
+                keys: () => ({
+                  foo: "bar",
+                }),
               },
             },
           },
@@ -129,12 +102,12 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            cacheTransform: {
-              directory:
-                findCacheDir({ name: "copy-webpack-plugin-c" }) || os.tmpdir(),
-              keys: () => ({
-                foo: "bar",
-              }),
+            transform: {
+              cache: {
+                keys: async () => ({
+                  foo: "bar",
+                }),
+              },
             },
           },
         ],
@@ -226,23 +199,7 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
-            flatten: "true",
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: () => {},
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            cacheTransform: {
+            transform: {
               foo: "bar",
             },
           },
@@ -253,14 +210,6 @@ describe("validate options", () => {
             to: "dir",
             context: "context",
             transform: true,
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            transformPath: true,
           },
         ],
         [
