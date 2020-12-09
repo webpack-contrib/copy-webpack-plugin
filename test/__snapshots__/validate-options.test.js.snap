@@ -87,19 +87,20 @@ exports[`validate options should throw an error on the "patterns" option with "[
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","transform":true}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0].transform should be an object:
-   object { transformer?, cache? }"
+ - options.patterns[0] should be one of these:
+   non-empty string | object { from, to?, context?, globOptions?, filter?, toType?, force?, info?, transform?, transformPath?, noErrorOnMissing? }
+   Details:
+    * options.patterns[0].transform should be one of these:
+      function | object { transformer?, cache? }
+      Details:
+       * options.patterns[0].transform should be an instance of function.
+       * options.patterns[0].transform should be an object:
+         object { transformer?, cache? }"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","transformPath":true}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns[0].transformPath should be an instance of function."
-`;
-
-exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context"}]" value 1`] = `
-"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0].transform should be an object:
-   object { transformer?, cache? }"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":true}]" value 1`] = `

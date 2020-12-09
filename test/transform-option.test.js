@@ -89,7 +89,45 @@ describe("transform option", () => {
       .catch(done);
   });
 
+  it("should transform file when transform is function", (done) => {
+    runEmit({
+      expectedAssetKeys: ["file.txt"],
+      expectedAssetContent: {
+        "file.txt": "newchanged!",
+      },
+      patterns: [
+        {
+          from: "file.txt",
+          transform: (content) => `${content}changed!`,
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
   it("should transform file when function return Promise", (done) => {
+    runEmit({
+      expectedAssetKeys: ["file.txt"],
+      expectedAssetContent: {
+        "file.txt": "newchanged!",
+      },
+      patterns: [
+        {
+          from: "file.txt",
+          transform(content) {
+            return new Promise((resolve) => {
+              resolve(`${content}changed!`);
+            });
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should transform file when function `transformer` return Promise", (done) => {
     runEmit({
       expectedAssetKeys: ["file.txt"],
       expectedAssetContent: {

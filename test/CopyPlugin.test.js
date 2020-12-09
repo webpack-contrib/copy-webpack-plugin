@@ -976,12 +976,31 @@ describe("CopyPlugin", () => {
               },
             },
           },
+          {
+            from: path.resolve(
+              __dirname,
+              "./fixtures/directory/directoryfile.txt"
+            ),
+            to: "new6.txt",
+            transform: {
+              transformer: (content) => {
+                return `${content.toString()}${getMyVar()}`;
+              },
+              cache: {
+                keys: () => {
+                  return {
+                    foo: "bazz",
+                  };
+                },
+              },
+            },
+          },
         ],
       }).apply(compiler);
 
       const { stats } = await compile(compiler);
 
-      expect(stats.compilation.emittedAssets.size).toBe(8);
+      expect(stats.compilation.emittedAssets.size).toBe(9);
       expect(readAssets(compiler, stats)).toMatchSnapshot("assets");
       expect(stats.compilation.errors).toMatchSnapshot("errors");
       expect(stats.compilation.warnings).toMatchSnapshot("warnings");

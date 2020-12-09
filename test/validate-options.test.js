@@ -57,6 +57,14 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             context: "context",
+            transform: () => {},
+          },
+        ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            context: "context",
             globOptions: {
               dot: false,
             },
@@ -185,14 +193,6 @@ describe("validate options", () => {
             to: "dir",
             context: "context",
             force: "true",
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            transform: () => {},
           },
         ],
         [

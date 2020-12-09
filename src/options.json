@@ -44,37 +44,44 @@
           ]
         },
         "transform": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "transformer": {
+          "anyOf": [
+            {
               "instanceof": "Function"
             },
-            "cache": {
-              "anyOf": [
-                {
-                  "type": "boolean"
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "transformer": {
+                  "instanceof": "Function"
                 },
-                {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "keys": {
-                      "anyOf": [
-                        {
-                          "type": "object",
-                          "additionalProperties": true
-                        },
-                        {
-                          "instanceof": "Function"
+                "cache": {
+                  "anyOf": [
+                    {
+                      "type": "boolean"
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "keys": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "additionalProperties": true
+                            },
+                            {
+                              "instanceof": "Function"
+                            }
+                          ]
                         }
-                      ]
+                      }
                     }
-                  }
+                  ]
                 }
-              ]
+              }
             }
-          }
+          ]
         },
         "transformPath": {
           "instanceof": "Function"

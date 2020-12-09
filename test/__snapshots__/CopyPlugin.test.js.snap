@@ -149,6 +149,7 @@ Object {
   "new3.txt": "newadded3",
   "new4.txt": "newbaz",
   "new5.txt": "newbaz",
+  "new6.txt": "newbaz",
 }
 `;
 
@@ -161,6 +162,7 @@ Object {
   "new3.txt": "newadded3",
   "new4.txt": "newbaz",
   "new5.txt": "newbaz",
+  "new6.txt": "newbaz",
 }
 `;
 

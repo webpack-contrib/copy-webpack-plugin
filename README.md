@@ -466,20 +466,46 @@ module.exports = {
 
 #### `transform`
 
-Type: `Object`
+Type: `Function|Object`
 Default: `undefined`
+
+Allows to modify the file contents.
+
+##### `Function`
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: "src/*.png",
+          to: "dest/",
+          // The `content` argument is a [`Buffer`](https://nodejs.org/api/buffer.html) object, it could be converted to a `String` to be processed using `content.toString()`
+          // The `absoluteFrom` argument is a `String`, it is absolute path from where the file is being copied
+          transform(content, absoluteFrom) {
+            return optimize(content);
+          },
+        },
+      ],
+    }),
+  ],
+};
+```
+
+##### `Object`
 
 |             Name              |        Type         |   Default   | Description                                                                                                      |
 | :---------------------------: | :-----------------: | :---------: | :--------------------------------------------------------------------------------------------------------------- |
 | [`transformer`](#transformer) |    `{Function}`     | `undefined` | Allows to modify the file contents.                                                                              |
 |       [`cache`](#cache)       | `{Boolean\|Object}` |   `false`   | Enable `transform` caching. You can use `transform: { cache: { key: 'my-cache-key' } }` to invalidate the cache. |
 
-##### `transformer`
+###### `transformer`
 
 Type: `Function`
 Default: `undefined`
-
-Allows to modify the file contents.
 
 **webpack.config.js**
 
@@ -527,7 +553,7 @@ module.exports = {
 };
 ```
 
-##### `cache`
+###### `cache`
 
 Type: `Boolean|Object`
 Default: `false`

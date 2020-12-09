@@ -94,8 +94,13 @@ class CopyPlugin {
           : pattern.context
         : pattern.compilerContext
     );
+
     pattern.transform =
-      typeof pattern.transform !== "undefined" ? pattern.transform : {};
+      typeof pattern.transform !== "undefined"
+        ? typeof pattern.transform === "function"
+          ? { transformer: pattern.transform }
+          : pattern.transform
+        : {};
 
     logger.log(
       `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context`
@@ -137,6 +142,8 @@ class CopyPlugin {
       ...(pattern.globOptions || {}),
       ...{ cwd: pattern.context, objectMode: true },
     };
+
+    pattern.globOptions.fs = inputFileSystem;
 
     switch (pattern.fromType) {
       case "dir":
