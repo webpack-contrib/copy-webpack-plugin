@@ -561,23 +561,6 @@ class CopyPlugin {
             );
           }
 
-          if (pattern.transformPath) {
-            logger.log(
-              `transforming '${result.filename}' for '${absoluteFilename}'...`
-            );
-
-            // eslint-disable-next-line no-param-reassign
-            result.immutable = false;
-            // eslint-disable-next-line no-param-reassign
-            result.filename = await pattern.transformPath(
-              result.filename,
-              absoluteFilename
-            );
-            logger.log(
-              `transformed new '${result.filename}' for '${absoluteFilename}'...`
-            );
-          }
-
           // eslint-disable-next-line no-param-reassign
           result.filename = normalizePath(result.filename);
 

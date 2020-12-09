@@ -86,7 +86,6 @@ module.exports = {
 |           [`toType`](#totype)           |      `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                                                                         |
 |            [`force`](#force)            |     `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).                                                             |
 |        [`transform`](#transform)        |      `{Object}`      |                   `undefined`                   | Allows to modify the file contents. Enable `transform` caching. You can use `{ transform: {cache: { key: 'my-cache-key' }} }` to invalidate the cache. |
-|    [`transformPath`](#transformpath)    |     `{Function}`     |                   `undefined`                   | Allows to modify the writing path.                                                                                                                     |
 | [`noErrorOnMissing`](#noerroronmissing) |     `{Boolean}`      |                     `false`                     | Doesn't generate an error on missing file(s).                                                                                                          |
 |             [`info`](#info)             | `{Object\|Function}` |                   `undefined`                   | Allows to add assets info.                                                                                                                             |
 
@@ -227,7 +226,7 @@ module.exports = {
         {
           from: "src/*.png",
           to({ context, absoluteFilename }) {
-            return "dest/newPath";
+            return "dest/newPath/[name][ext]";
           },
         },
       ],
@@ -245,9 +244,8 @@ module.exports = {
       patterns: [
         {
           from: "src/*.png",
-          to: "dest/",
           to({ context, absoluteFilename }) {
-            return Promise.resolve("dest/newPath");
+            return Promise.resolve("dest/newPath/[name][ext]");
           },
         },
       ],
@@ -497,10 +495,10 @@ module.exports = {
 
 ##### `Object`
 
-|             Name              |        Type         |   Default   | Description                                                                                                      |
-| :---------------------------: | :-----------------: | :---------: | :--------------------------------------------------------------------------------------------------------------- |
-| [`transformer`](#transformer) |    `{Function}`     | `undefined` | Allows to modify the file contents.                                                                              |
-|       [`cache`](#cache)       | `{Boolean\|Object}` |   `false`   | Enable `transform` caching. You can use `transform: { cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|               Name                |        Type         |   Default   | Description                                                                                                      |
+| :-------------------------------: | :-----------------: | :---------: | :--------------------------------------------------------------------------------------------------------------- |
+| **[`transformer`](#transformer)** |    `{Function}`     | `undefined` | Allows to modify the file contents.                                                                              |
+|       **[`cache`](#cache)**       | `{Boolean\|Object}` |   `false`   | Enable `transform` caching. You can use `transform: { cache: { key: 'my-cache-key' } }` to invalidate the cache. |
 
 ###### `transformer`
 
@@ -688,57 +686,6 @@ module.exports = {
                 };
               },
             },
-          },
-        },
-      ],
-    }),
-  ],
-};
-```
-
-#### `transformPath`
-
-Type: `Function`
-Default: `undefined`
-
-Allows to modify the writing path.
-
-> ⚠️ Don't return directly `\\` in `transformPath` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
-> On Windows, the forward slash and the backward slash are both separators.
-> Instead please use `/` or `path` methods.
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "src/*.png",
-          to: "dest/",
-          transformPath(targetPath, absolutePath) {
-            return "newPath";
-          },
-        },
-      ],
-    }),
-  ],
-};
-```
-
-**webpack.config.js**
-
-```js
-module.exports = {
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        {
-          from: "src/*.png",
-          to: "dest/",
-          transformPath(targetPath, absolutePath) {
-            return Promise.resolve("newPath");
           },
         },
       ],

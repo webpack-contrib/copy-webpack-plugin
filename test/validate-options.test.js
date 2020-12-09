@@ -48,7 +48,6 @@ describe("validate options", () => {
               transformer: () => {},
               cache: true,
             },
-            transformPath: () => {},
             noErrorOnMissing: true,
           },
         ],
@@ -211,14 +210,6 @@ describe("validate options", () => {
             to: "dir",
             context: "context",
             transform: true,
-          },
-        ],
-        [
-          {
-            from: "test.txt",
-            to: "dir",
-            context: "context",
-            transformPath: true,
           },
         ],
         [
