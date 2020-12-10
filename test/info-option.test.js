@@ -97,7 +97,9 @@ describe("info option", () => {
         {
           from: "file.txt",
           force: true,
-          info: () => ({ test: true }),
+          info: () => {
+            return { test: true };
+          },
         },
       ],
     })

@@ -2,7 +2,7 @@
 import fs from "fs";
 import path from "path";
 
-import CopyPlugin from "../../src";
+import CopyPlugin from "../../src/index";
 
 import ChildCompilerPlugin from "./ChildCompiler";
 import PreCopyPlugin from "./PreCopyPlugin";

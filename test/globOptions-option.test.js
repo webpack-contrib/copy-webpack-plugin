@@ -383,6 +383,7 @@ describe("globOptions option", () => {
       expectedAssetKeys: [],
       patterns: [
         {
+          noErrorOnMissing: true,
           from: "directory",
           globOptions: {
             onlyDirectories: true,
@@ -392,6 +393,28 @@ describe("globOptions option", () => {
     })
       .then(done)
       .catch(done);
+  });
+
+  it("should emit error when not found assets for copy", (done) => {
+    expect.assertions(1);
+
+    runEmit({
+      expectedAssetKeys: [],
+      patterns: [
+        {
+          from: "directory",
+          globOptions: {
+            onlyDirectories: true,
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch((error) => {
+        expect(error).toBeDefined();
+
+        done();
+      });
   });
 
   it('should work with the "onlyFiles" option', (done) => {

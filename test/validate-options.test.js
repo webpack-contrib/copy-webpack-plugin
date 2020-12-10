@@ -90,9 +90,11 @@ describe("validate options", () => {
             context: "context",
             transform: {
               cache: {
-                keys: () => ({
-                  foo: "bar",
-                }),
+                keys: () => {
+                  return {
+                    foo: "bar",
+                  };
+                },
               },
             },
           },
@@ -104,9 +106,11 @@ describe("validate options", () => {
             context: "context",
             transform: {
               cache: {
-                keys: async () => ({
-                  foo: "bar",
-                }),
+                keys: async () => {
+                  return {
+                    foo: "bar",
+                  };
+                },
               },
             },
           },
@@ -124,7 +128,9 @@ describe("validate options", () => {
           },
           {
             from: "test.txt",
-            info: () => ({ custom: true }),
+            info: () => {
+              return { custom: true };
+            },
           },
         ],
       ],

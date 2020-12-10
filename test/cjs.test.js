@@ -1,4 +1,4 @@
-import src from "../src";
+import src from "../src/index";
 import cjs from "../src/cjs";
 
 describe("cjs", () => {

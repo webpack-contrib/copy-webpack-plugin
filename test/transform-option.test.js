@@ -204,9 +204,9 @@ describe("transform option", () => {
           from: "file.txt",
           transform: {
             transformer() {
-              return new Promise((resolve, reject) => {
-                return reject(new Error("a failure happened"));
-              });
+              return new Promise((resolve, reject) =>
+                reject(new Error("a failure happened"))
+              );
             },
           },
         },
