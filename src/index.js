@@ -264,7 +264,9 @@ class CopyPlugin {
         return;
       }
 
-      const missingError = new Error(`unable to locate '${pattern.glob}' glob`);
+      const missingError = new Error(
+        `unable to locate '${pattern.glob}' glob after filtering paths`
+      );
 
       compilation.errors.push(missingError);
 

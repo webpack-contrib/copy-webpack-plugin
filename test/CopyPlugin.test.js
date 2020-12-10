@@ -4,7 +4,7 @@ import webpack from "webpack";
 import del from "del";
 import { createFsFromVolume, Volume } from "memfs";
 
-import CopyPlugin from "../src";
+import CopyPlugin from "../src/index";
 
 import { run, runEmit, runChange } from "./helpers/run";
 
