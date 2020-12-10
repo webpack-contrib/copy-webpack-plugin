@@ -86,14 +86,12 @@ class CopyPlugin {
 
     pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
-    pattern.compilerContext = compiler.context;
-    pattern.context = path.normalize(
-      typeof pattern.context !== "undefined"
-        ? !path.isAbsolute(pattern.context)
-          ? path.join(pattern.compilerContext, pattern.context)
-          : pattern.context
-        : pattern.compilerContext
-    );
+    pattern.context =
+      typeof pattern.context === "undefined"
+        ? compiler.context
+        : path.isAbsolute(pattern.context)
+        ? pattern.context
+        : path.join(compiler.context, pattern.context);
 
     logger.log(
       `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context`
@@ -313,7 +311,7 @@ class CopyPlugin {
         logger.log(`determined that '${from}' should write to '${filename}'`);
 
         const sourceFilename = normalizePath(
-          path.relative(pattern.compilerContext, absoluteFilename)
+          path.relative(compiler.context, absoluteFilename)
         );
 
         return { absoluteFilename, sourceFilename, filename, toType };
@@ -326,15 +324,16 @@ class CopyPlugin {
       assets = await Promise.all(
         files.map(async (file) => {
           const { absoluteFilename, sourceFilename, filename, toType } = file;
+          const info =
+            typeof pattern.info === "function"
+              ? pattern.info(file) || {}
+              : pattern.info || {};
           const result = {
             absoluteFilename,
             sourceFilename,
             filename,
             force: pattern.force,
-            info:
-              typeof pattern.info === "function"
-                ? pattern.info(file) || {}
-                : pattern.info || {},
+            info,
           };
 
           // If this came from a glob or dir, add it to the file dependencies
