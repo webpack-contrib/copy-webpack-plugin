@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [7.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.4.0...v7.0.0) (2020-12-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* minimum supported webpack version is `5`
+* the `flatten` option was removed in favor `[name].[ext]` value for the `to` option, 
+* the `transformPath` option was removed in favor `Function` type of the `to` option, look at [examples](https://github.com/webpack-contrib/copy-webpack-plugin#function)
+* the `cacheTransform` option was removed in favor `Object` type of the `transform` option, look at [examples](https://github.com/webpack-contrib/copy-webpack-plugin#transform)
+* migration on the `compilation.hooks.processAssets` hook
+* empty filtered paths throw an error, you can disable this behaviour using the `noErrorOnMissing` option
+
 ## [6.4.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.3.2...v6.4.0) (2020-12-07)
 
 
