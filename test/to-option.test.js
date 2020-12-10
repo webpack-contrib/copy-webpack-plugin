@@ -780,7 +780,6 @@ describe("to option", () => {
         expectedAssetKeys: ["nested/directoryfile.txt"],
         patterns: [
           {
-            toType: "file",
             to({ absoluteFilename }) {
               return `nested/${path.basename(absoluteFilename)}`;
             },
@@ -802,10 +801,7 @@ describe("to option", () => {
         ],
         patterns: [
           {
-            toType: "file",
-            to({ absoluteFilename }) {
-              return path.basename(absoluteFilename);
-            },
+            to: "[name].[ext]",
             from: "directory",
           },
         ],
@@ -845,7 +841,6 @@ describe("to option", () => {
         ],
         patterns: [
           {
-            toType: "file",
             to({ absoluteFilename }) {
               return path.basename(absoluteFilename);
             },
@@ -866,7 +861,6 @@ describe("to option", () => {
         ],
         patterns: [
           {
-            toType: "file",
             to({ absoluteFilename }) {
               return `nested/${path.basename(absoluteFilename)}`;
             },
@@ -889,7 +883,6 @@ describe("to option", () => {
           {
             context: "directory",
             from: "**/*",
-            toType: "file",
             to({ absoluteFilename }) {
               return path.basename(absoluteFilename);
             },
@@ -911,7 +904,6 @@ describe("to option", () => {
           {
             context: "directory",
             from: "**/*",
-            toType: "file",
             to({ absoluteFilename }) {
               return `nested/${path.basename(absoluteFilename)}`;
             },

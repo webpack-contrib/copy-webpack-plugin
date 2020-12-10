@@ -995,10 +995,7 @@ module.exports = {
       patterns: [
         {
           from: "src/**/*",
-          toType: "file",
-          to({ absoluteFilename }) {
-            return path.basename(absoluteFilename);
-          },
+          to: "[name].[ext]",
         },
       ],
     }),
@@ -1012,6 +1009,38 @@ Result:
 file-1.txt
 file-2.txt
 nested-file.txt
+```
+
+#### Copy in new directory
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          // When copying files starting with a dot, must specify the toType option
+          // toType: "file",
+          to({ context, absoluteFilename }) {
+            return `newdirectory/${path.relative(context, absoluteFilename)}`;
+          },
+          from: "directory",
+        },
+      ],
+    }),
+  ],
+};
+```
+
+Result:
+
+```txt
+"newdirectory/file-1.txt",
+"newdirectory/nestedfile.txt",
+"newdirectory/nested/deep-nested/deepnested.txt",
+"newdirectory/nested/nestedfile.txt",
 ```
 
 ## Contributing
