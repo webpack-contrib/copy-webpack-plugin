@@ -459,7 +459,7 @@ class CopyPlugin {
 
               const buffer = result.source.source();
 
-              if (pattern.transform.cache) {
+              if (transform.cache) {
                 const defaultCacheKeys = {
                   version,
                   sourceFilename,

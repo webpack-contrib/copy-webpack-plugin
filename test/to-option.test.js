@@ -628,9 +628,9 @@ describe("to option", () => {
           {
             from: "file.txt",
             to() {
-              return new Promise((resolve, reject) => {
-                return reject(new Error("a failure happened"));
-              });
+              return new Promise((resolve, reject) =>
+                reject(new Error("a failure happened"))
+              );
             },
           },
         ],

@@ -51,9 +51,9 @@
     "serialize-javascript": "^5.0.1"
   },
   "devDependencies": {
-    "@babel/cli": "^7.12.1",
-    "@babel/core": "^7.12.3",
-    "@babel/preset-env": "^7.12.1",
+    "@babel/cli": "^7.12.10",
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.10",
     "@commitlint/cli": "^11.0.0",
     "@commitlint/config-conventional": "^11.0.0",
     "@webpack-contrib/defaults": "^6.3.0",
@@ -63,7 +63,7 @@
     "del": "^6.0.0",
     "del-cli": "^3.0.1",
     "eslint": "^7.13.0",
-    "eslint-config-prettier": "^6.15.0",
+    "eslint-config-prettier": "^7.0.0",
     "eslint-plugin-import": "^2.22.1",
     "file-loader": "^6.1.1",
     "husky": "^4.3.0",

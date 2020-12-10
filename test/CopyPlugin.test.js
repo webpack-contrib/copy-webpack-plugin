@@ -877,9 +877,7 @@ describe("CopyPlugin", () => {
         },
       });
 
-      const getMyVar = () => {
-        return "baz";
-      };
+      const getMyVar = () => "baz";
 
       new CopyPlugin({
         patterns: [
@@ -897,9 +895,7 @@ describe("CopyPlugin", () => {
             ),
             to: "new1.txt",
             transform: {
-              transformer: (content) => {
-                return `${content.toString()}added1`;
-              },
+              transformer: (content) => `${content.toString()}added1`,
               cache: true,
             },
           },
@@ -910,9 +906,7 @@ describe("CopyPlugin", () => {
             ),
             to: "new1-2.txt",
             transform: {
-              transformer: (content) => {
-                return `${content.toString()}added1`;
-              },
+              transformer: (content) => `${content.toString()}added1`,
               cache: true,
             },
           },
@@ -923,9 +917,7 @@ describe("CopyPlugin", () => {
             ),
             to: "new2.txt",
             transform: {
-              transformer: (content) => {
-                return `${content.toString()}added2`;
-              },
+              transformer: (content) => `${content.toString()}added2`,
               cache: false,
             },
           },
@@ -936,9 +928,7 @@ describe("CopyPlugin", () => {
             ),
             to: "new3.txt",
             transform: {
-              transformer: (content) => {
-                return `${content.toString()}added3`;
-              },
+              transformer: (content) => `${content.toString()}added3`,
               cache: true,
             },
           },
@@ -949,9 +939,7 @@ describe("CopyPlugin", () => {
             ),
             to: "new4.txt",
             transform: {
-              transformer: (content) => {
-                return `${content.toString()}${getMyVar()}`;
-              },
+              transformer: (content) => `${content.toString()}${getMyVar()}`,
               cache: {
                 keys: {
                   foo: "bar",
@@ -966,9 +954,7 @@ describe("CopyPlugin", () => {
             ),
             to: "new5.txt",
             transform: {
-              transformer: (content) => {
-                return `${content.toString()}${getMyVar()}`;
-              },
+              transformer: (content) => `${content.toString()}${getMyVar()}`,
               cache: {
                 keys: {
                   foo: "baz",
@@ -983,9 +969,7 @@ describe("CopyPlugin", () => {
             ),
             to: "new6.txt",
             transform: {
-              transformer: (content) => {
-                return `${content.toString()}${getMyVar()}`;
-              },
+              transformer: (content) => `${content.toString()}${getMyVar()}`,
               cache: {
                 keys: () => {
                   return {
