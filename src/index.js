@@ -154,6 +154,7 @@ class CopyPlugin {
 
     // TODO remove after drop webpack@4
     if (
+      compiler.webpack &&
       inputFileSystem.lstat &&
       inputFileSystem.stat &&
       inputFileSystem.lstatSync &&
