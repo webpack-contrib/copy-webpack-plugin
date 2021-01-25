@@ -22,7 +22,7 @@ Copies individual files or entire directories, which already exist, to the build
 To begin, you'll need to install `copy-webpack-plugin`:
 
 ```console
-$ npm install copy-webpack-plugin --save-dev
+npm install copy-webpack-plugin --save-dev
 ```
 
 Then add the plugin to your `webpack` config. For example:
