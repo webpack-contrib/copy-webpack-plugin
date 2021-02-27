@@ -43,7 +43,7 @@
   "dependencies": {
     "fast-glob": "^3.2.4",
     "glob-parent": "^5.1.1",
-    "globby": "^11.0.1",
+    "globby": "^11.0.2",
     "loader-utils": "^2.0.0",
     "normalize-path": "^3.0.0",
     "p-limit": "^3.0.2",

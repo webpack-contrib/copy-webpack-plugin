@@ -116,6 +116,28 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
+  it("should work with globOptions.objectMode && globOptions.gitignore", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        ".dottedfile",
+        "directoryfile.txt",
+        "nested/deep-nested/deepnested.txt",
+      ],
+      patterns: [
+        {
+          from: "directory",
+          globOptions: {
+            objectMode: true,
+            gitignore: true,
+            ignore: ["**/nestedfile.*"],
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
   it('should files in nested directory when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [".dottedfile", "directoryfile.txt"],
