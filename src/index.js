@@ -547,10 +547,7 @@ class CopyPlugin {
             const ext = path.extname(result.sourceFilename);
             const base = path.basename(result.sourceFilename);
             const name = base.slice(0, base.length - ext.length);
-            const {
-              path: interpolatedFilename,
-              info: assetInfo,
-            } = compilation.getPathWithInfo(result.filename, {
+            const data = {
               filename: normalizePath(
                 path.relative(pattern.context, absoluteFilename)
               ),
@@ -561,7 +558,14 @@ class CopyPlugin {
                 hash: contentHash,
                 contentHash,
               },
-            });
+            };
+            const {
+              path: interpolatedFilename,
+              info: assetInfo,
+            } = compilation.getPathWithInfo(
+              normalizePath(result.filename),
+              data
+            );
 
             result.info = { ...result.info, ...assetInfo };
             result.filename = interpolatedFilename;
