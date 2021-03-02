@@ -47,7 +47,6 @@
     "fast-glob": "^3.2.5",
     "glob-parent": "^5.1.1",
     "globby": "^11.0.2",
-    "loader-utils": "^2.0.0",
     "normalize-path": "^3.0.0",
     "p-limit": "^3.0.2",
     "schema-utils": "^3.0.0",

@@ -1,6 +1,7 @@
 import path from "path";
 
 import { runEmit } from "./helpers/run";
+import { getCompiler } from "./helpers";
 
 const FIXTURES_DIR_NORMALIZED = path
   .join(__dirname, "fixtures")
@@ -389,7 +390,14 @@ describe("from option", () => {
     });
 
     it("should move files in nested directory using globstar", (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashDigestLength: 6,
+        },
+      });
+
       runEmit({
+        compiler,
         expectedAssetKeys: [
           "nested/[(){}[]!+@escaped-test^$]/hello-31d6cf.txt",
           "nested/binextension-31d6cf.bin",
@@ -409,7 +417,7 @@ describe("from option", () => {
         patterns: [
           {
             from: "**/*",
-            to: "nested/[path][name]-[hash:6].[ext]",
+            to: "nested/[path][name]-[contenthash][ext]",
           },
         ],
       })

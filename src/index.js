@@ -5,7 +5,6 @@ import { validate } from "schema-utils";
 import pLimit from "p-limit";
 import globby from "globby";
 import serialize from "serialize-javascript";
-import loaderUtils from "loader-utils";
 import normalizePath from "normalize-path";
 import globParent from "glob-parent";
 import fastGlob from "fast-glob";
@@ -15,7 +14,7 @@ import { version } from "../package.json";
 import schema from "./options.json";
 import { readFile, stat } from "./utils/promisify";
 
-const template = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(?::(\d+))?\])|(\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\])|(\[\d+\])/;
+const template = /(\[ext\])|(\[name\])|(\[path\])|(\[base\])|(\[filebase\])|(\[file\])|(\[query\])|(\[fragment\])|(\[fullhash\])|(\[hash\])|(\[contenthash\])/;
 
 class CopyPlugin {
   constructor(options = {}) {
@@ -536,19 +535,46 @@ class CopyPlugin {
             }
 
             // eslint-disable-next-line no-param-reassign
-            result.immutable = /\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\]/gi.test(
+            result.immutable = /(\[fullhash\])|(\[hash\])|(\[contenthash\])/gi.test(
               result.filename
             );
 
-            // eslint-disable-next-line no-param-reassign
-            result.filename = loaderUtils.interpolateName(
-              { resourcePath: absoluteFilename },
-              result.filename,
-              {
-                content: result.source.source(),
-                context: pattern.context,
-              }
-            );
+            const { outputOptions } = compilation;
+            const {
+              hashDigest,
+              hashDigestLength,
+              hashFunction,
+              hashSalt,
+            } = outputOptions;
+            const hash = compiler.webpack.util.createHash(hashFunction);
+
+            if (hashSalt) {
+              hash.update(hashSalt);
+            }
+
+            hash.update(result.source.source());
+
+            const fullHash = hash.digest(hashDigest);
+            const contentHash = fullHash.slice(0, hashDigestLength);
+            const ext = path.extname(result.sourceFilename);
+            const base = path.basename(result.sourceFilename);
+            const name = base.slice(0, base.length - ext.length);
+            const {
+              path: interpolatedFilename,
+              info: assetInfo,
+            } = compilation.getPathWithInfo(result.filename, {
+              filename: path.relative(pattern.context, absoluteFilename),
+              contentHash,
+              chunk: {
+                name,
+                id: result.sourceFilename,
+                hash: contentHash,
+                contentHash,
+              },
+            });
+
+            result.info = { ...result.info, ...assetInfo };
+            result.filename = interpolatedFilename;
 
             // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
             // eslint-disable-next-line no-param-reassign

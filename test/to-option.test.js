@@ -1,6 +1,7 @@
 import path from "path";
 
 import { runEmit } from "./helpers/run";
+import { getCompiler } from "./helpers";
 
 const BUILD_DIR = path.join(__dirname, "build");
 const TEMP_DIR = path.join(__dirname, "tempdir");
@@ -347,12 +348,19 @@ describe("to option", () => {
 
   describe("is a template", () => {
     it('should move a file using "contenthash"', (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashDigestLength: 6,
+        },
+      });
+
       runEmit({
+        compiler,
         expectedAssetKeys: ["directory/5d7817.txt"],
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "directory/[contenthash:6].txt",
+            to: "directory/[contenthash].txt",
           },
         ],
       })
@@ -361,14 +369,23 @@ describe("to option", () => {
     });
 
     it("should move a file using custom `contenthash` digest", (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashFunction: "sha1",
+          hashDigest: "hex",
+          hashDigestLength: 4,
+        },
+      });
+
       runEmit({
         expectedAssetKeys: ["directory/c2a6.txt"],
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "directory/[sha1:contenthash:hex:4].txt",
+            to: "directory/[contenthash].txt",
           },
         ],
+        compiler,
       })
         .then(done)
         .catch(done);
@@ -380,7 +397,7 @@ describe("to option", () => {
         patterns: [
           {
             from: "binextension.bin",
-            to: "[name].[ext]",
+            to: "[name][ext]",
           },
         ],
       })
@@ -394,7 +411,7 @@ describe("to option", () => {
         patterns: [
           {
             from: "file.txt",
-            to: "[name]-[contenthash:6].[ext]",
+            to: "[name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -408,7 +425,7 @@ describe("to option", () => {
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "[name]-[hash:6].[ext]",
+            to: "[name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -422,7 +439,7 @@ describe("to option", () => {
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "newdirectory/[name]-[hash:6].[ext]",
+            to: "newdirectory/[name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -455,7 +472,7 @@ describe("to option", () => {
         patterns: [
           {
             from: "directory",
-            to: "newdirectory/[path][name]-[contenthash:6].[ext]",
+            to: "newdirectory/[path][name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -671,7 +688,7 @@ describe("to option", () => {
             to({ absoluteFilename }) {
               expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
 
-              return "transformed/[path][name]-[hash:6].[ext]";
+              return "transformed/[path][name]-[contenthash:6][ext]";
             },
           },
         ],
@@ -801,7 +818,7 @@ describe("to option", () => {
         ],
         patterns: [
           {
-            to: "[name].[ext]",
+            to: "[name][ext]",
             from: "directory",
           },
         ],
@@ -914,4 +931,34 @@ describe("to option", () => {
         .catch(done);
     });
   });
+});
+
+it("should rewrite invalid [contenthash] in 'production' mode", (done) => {
+  const compiler = getCompiler({
+    mode: "production",
+  });
+
+  runEmit({
+    compiler,
+    breakContenthash: {
+      // eslint-disable-next-line no-useless-escape
+      targetAssets: [
+        {
+          name: "5d7817ed5bc246756d73-directoryfile.txt",
+          newName: "33333333333333333333-directoryfile.txt",
+          newHash: "33333333333333333333",
+        },
+      ],
+    },
+    expectedAssetKeys: ["5d7817ed5bc246756d73-directoryfile.txt"],
+    patterns: [
+      {
+        from: "directory/directoryfile.*",
+        to: "[contenthash]-[name][ext]",
+        toType: "template",
+      },
+    ],
+  })
+    .then(done)
+    .catch(done);
 });

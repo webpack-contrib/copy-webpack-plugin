@@ -6,6 +6,7 @@ import CopyPlugin from "../../src/index";
 
 import ChildCompilerPlugin from "./ChildCompiler";
 import PreCopyPlugin from "./PreCopyPlugin";
+import BreakContenthashPlugin from "./BreakContenthashPlugin";
 
 import removeIllegalCharacterForWindows from "./removeIllegalCharacterForWindows";
 
@@ -47,6 +48,12 @@ function run(opts) {
 
     if (opts.preCopy) {
       new PreCopyPlugin({ options: opts.preCopy }).apply(compiler);
+    }
+
+    if (opts.breakContenthash) {
+      new BreakContenthashPlugin({ options: opts.breakContenthash }).apply(
+        compiler
+      );
     }
 
     new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(

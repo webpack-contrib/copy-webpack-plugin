@@ -310,17 +310,17 @@ describe("CopyPlugin", () => {
       expect.assertions(5);
 
       const expectedAssetKeys = [
-        "directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt",
-        ".dottedfile.5e294e270db6734a42f014f0dd18d9ac",
-        "nested/nestedfile.31d6cfe0d16ae931b73c59d7e0c089c0.txt",
-        "nested/deep-nested/deepnested.31d6cfe0d16ae931b73c59d7e0c089c0.txt",
+        "directoryfile.5d7817ed5bc246756d73.txt",
+        ".dottedfile.5e294e270db6734a42f0",
+        "nested/nestedfile.31d6cfe0d16ae931b73c.txt",
+        "nested/deep-nested/deepnested.31d6cfe0d16ae931b73c.txt",
       ];
 
       run({
         preCopy: {
           additionalAssets: [
             {
-              name: "directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt",
+              name: "directoryfile.5d7817ed5bc246756d73.txt",
               data: "Content",
               info: { custom: true },
             },
@@ -330,7 +330,7 @@ describe("CopyPlugin", () => {
         patterns: [
           {
             from: "directory",
-            to: "[path][name].[contenthash].[ext]",
+            to: "[path][name].[contenthash][ext]",
             force: true,
           },
         ],
@@ -341,7 +341,7 @@ describe("CopyPlugin", () => {
 
             expect(info.immutable).toBe(true);
 
-            if (name === "directoryfile.5d7817ed5bc246756d73d6a4c8e94c33.txt") {
+            if (name === "directoryfile.5d7817ed5bc246756d73.txt") {
               expect(info.immutable).toBe(true);
             }
           }

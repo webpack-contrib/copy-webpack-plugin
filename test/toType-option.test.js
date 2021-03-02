@@ -40,13 +40,13 @@ describe("toType option", () => {
   it("should move a file to a new directory", (done) => {
     runEmit({
       expectedAssetKeys: [
-        "directory/directorynew-directoryfile.txt.5d7817ed5bc246756d73d6a4c8e94c33.5d7817ed5bc246756d73d6a4c8e94c33.22af645d.22af645d.txt",
+        "directory/directoryfile.txt-new-directoryfile.txt.5d7817ed5bc246756d73.ac7f6fcb65ddfcc43b2c-ac7f6fcb65ddfcc43b2c.txt",
       ],
       patterns: [
         {
           from: "directory/directoryfile.*",
           to:
-            "[path][folder]new-[name].[ext].[hash].[contenthash].[md5:contenthash:hex:8].[md5:hash:hex:8].txt",
+            "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]",
           toType: "template",
         },
       ],
