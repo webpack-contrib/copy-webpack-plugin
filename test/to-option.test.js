@@ -931,34 +931,51 @@ describe("to option", () => {
         .catch(done);
     });
   });
-});
 
-it("should rewrite invalid [contenthash] in 'production' mode", (done) => {
-  const compiler = getCompiler({
-    mode: "production",
-  });
-
-  runEmit({
-    compiler,
-    breakContenthash: {
-      // eslint-disable-next-line no-useless-escape
-      targetAssets: [
+  it("should process template string", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "directory/directoryfile.txt-new-directoryfile.txt.5d7817ed5bc246756d73.ac7f6fcb65ddfcc43b2c-ac7f6fcb65ddfcc43b2c.txt--[unknown]",
+      ],
+      patterns: [
         {
-          name: "5d7817ed5bc246756d73-directoryfile.txt",
-          newName: "33333333333333333333-directoryfile.txt",
-          newHash: "33333333333333333333",
+          from: "directory/directoryfile.*",
+          to:
+            "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]--[unknown]",
         },
       ],
-    },
-    expectedAssetKeys: ["5d7817ed5bc246756d73-directoryfile.txt"],
-    patterns: [
-      {
-        from: "directory/directoryfile.*",
-        to: "[contenthash]-[name][ext]",
-        toType: "template",
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should rewrite invalid [contenthash] in 'production' mode", (done) => {
+    const compiler = getCompiler({
+      mode: "production",
+    });
+
+    runEmit({
+      compiler,
+      breakContenthash: {
+        // eslint-disable-next-line no-useless-escape
+        targetAssets: [
+          {
+            name: "5d7817ed5bc246756d73-directoryfile.txt",
+            newName: "33333333333333333333-directoryfile.txt",
+            newHash: "33333333333333333333",
+          },
+        ],
       },
-    ],
-  })
-    .then(done)
-    .catch(done);
+      expectedAssetKeys: ["5d7817ed5bc246756d73-directoryfile.txt"],
+      patterns: [
+        {
+          from: "directory/directoryfile.*",
+          to: "[contenthash]-[name][ext]",
+          toType: "template",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
 });

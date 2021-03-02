@@ -14,7 +14,7 @@ import { version } from "../package.json";
 import schema from "./options.json";
 import { readFile, stat } from "./utils/promisify";
 
-const template = /(\[ext\])|(\[name\])|(\[path\])|(\[base\])|(\[filebase\])|(\[file\])|(\[query\])|(\[fragment\])|(\[fullhash\])|(\[hash\])|(\[contenthash\])/;
+const template = /\[\\*([\w:]+)\\*\]/i;
 
 class CopyPlugin {
   constructor(options = {}) {
@@ -527,18 +527,6 @@ class CopyPlugin {
               `interpolating template '${filename}' for '${sourceFilename}'...`
             );
 
-            // If it doesn't have an extension, remove it from the pattern
-            // ie. [name].[ext] or [name][ext] both become [name]
-            if (!path.extname(absoluteFilename)) {
-              // eslint-disable-next-line no-param-reassign
-              result.filename = result.filename.replace(/\.?\[ext]/g, "");
-            }
-
-            // eslint-disable-next-line no-param-reassign
-            result.immutable = /(\[fullhash\])|(\[hash\])|(\[contenthash\])/gi.test(
-              result.filename
-            );
-
             const { outputOptions } = compilation;
             const {
               hashDigest,
@@ -554,8 +542,8 @@ class CopyPlugin {
 
             hash.update(result.source.source());
 
-            const fullHash = hash.digest(hashDigest);
-            const contentHash = fullHash.slice(0, hashDigestLength);
+            const fullContentHash = hash.digest(hashDigest);
+            const contentHash = fullContentHash.slice(0, hashDigestLength);
             const ext = path.extname(result.sourceFilename);
             const base = path.basename(result.sourceFilename);
             const name = base.slice(0, base.length - ext.length);
@@ -563,7 +551,9 @@ class CopyPlugin {
               path: interpolatedFilename,
               info: assetInfo,
             } = compilation.getPathWithInfo(result.filename, {
-              filename: path.relative(pattern.context, absoluteFilename),
+              filename: normalizePath(
+                path.relative(pattern.context, absoluteFilename)
+              ),
               contentHash,
               chunk: {
                 name,
@@ -576,17 +566,13 @@ class CopyPlugin {
             result.info = { ...result.info, ...assetInfo };
             result.filename = interpolatedFilename;
 
-            // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
-            // eslint-disable-next-line no-param-reassign
-            result.filename = path.normalize(result.filename);
-
             logger.log(
               `interpolated template '${filename}' for '${sourceFilename}'`
             );
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            result.filename = normalizePath(result.filename);
           }
-
-          // eslint-disable-next-line no-param-reassign
-          result.filename = normalizePath(result.filename);
 
           // eslint-disable-next-line consistent-return
           return result;
@@ -667,10 +653,6 @@ class CopyPlugin {
                 if (force) {
                   const info = { copied: true, sourceFilename };
 
-                  if (asset.immutable) {
-                    info.immutable = true;
-                  }
-
                   logger.log(
                     `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`
                   );
@@ -695,10 +677,6 @@ class CopyPlugin {
               }
 
               const info = { copied: true, sourceFilename };
-
-              if (asset.immutable) {
-                info.immutable = true;
-              }
 
               logger.log(
                 `writing '${filename}' from '${absoluteFilename}' to compilation assets...`
