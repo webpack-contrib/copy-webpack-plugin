@@ -8,7 +8,7 @@ const FIXTURES_DIR_NORMALIZED = path
 
 describe("globOptions option", () => {
   // Expected behavior from `globby`/`fast-glob`
-  it('should move files exclude dot files when "from" is a directory', (done) => {
+  it('should copy files exclude dot files when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [".file.txt"],
       patterns: [
@@ -24,7 +24,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should move files exclude dot files when "from" is a directory', (done) => {
+  it('should copy files exclude dot files when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [
         "directoryfile.txt",
@@ -44,7 +44,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should move files exclude dot files when "from" is a glob', (done) => {
+  it('should copy files exclude dot files when "from" is a glob', (done) => {
     runEmit({
       expectedAssetKeys: ["file.txt"],
       patterns: [
@@ -60,7 +60,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it("should move files include dot files", (done) => {
+  it("should copy files include dot files", (done) => {
     runEmit({
       expectedAssetKeys: [".file.txt", "file.txt"],
       patterns: [
