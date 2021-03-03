@@ -391,6 +391,27 @@ describe("to option", () => {
         .catch(done);
     });
 
+    it("should move a file using `contenthash` with hashSalt", (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashSalt: "qwerty",
+        },
+      });
+
+      runEmit({
+        expectedAssetKeys: ["directory/64cc145fc382934bd97a.txt"],
+        patterns: [
+          {
+            from: "directory/directoryfile.txt",
+            to: "directory/[contenthash].txt",
+          },
+        ],
+        compiler,
+      })
+        .then(done)
+        .catch(done);
+    });
+
     it('should move a file using "name" and "ext"', (done) => {
       runEmit({
         expectedAssetKeys: ["binextension.bin"],
