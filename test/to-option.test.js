@@ -1,6 +1,7 @@
 import path from "path";
 
 import { runEmit } from "./helpers/run";
+import { getCompiler } from "./helpers";
 
 const BUILD_DIR = path.join(__dirname, "build");
 const TEMP_DIR = path.join(__dirname, "tempdir");
@@ -8,7 +9,7 @@ const FIXTURES_DIR = path.join(__dirname, "fixtures");
 
 describe("to option", () => {
   describe("is a file", () => {
-    it("should move a file to a new file", (done) => {
+    it("should copy a file to a new file", (done) => {
       runEmit({
         expectedAssetKeys: ["newfile.txt"],
         patterns: [
@@ -22,7 +23,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to a new file when "to" is absolute path', (done) => {
+    it('should copy a file to a new file when "to" is absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ["../tempdir/newfile.txt"],
         patterns: [
@@ -36,7 +37,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file to a new file inside nested directory", (done) => {
+    it("should copy a file to a new file inside nested directory", (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/newfile.txt"],
         patterns: [
@@ -50,7 +51,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to a new file inside nested directory when "to" an absolute path', (done) => {
+    it('should copy a file to a new file inside nested directory when "to" an absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/newfile.txt"],
         patterns: [
@@ -64,7 +65,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file to a new file inside other directory what out of context", (done) => {
+    it("should copy a file to a new file inside other directory what out of context", (done) => {
       runEmit({
         expectedAssetKeys: ["../tempdir/newdirectory/newfile.txt"],
         patterns: [
@@ -78,7 +79,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file using invalid template syntax", (done) => {
+    it("should copy a file using invalid template syntax", (done) => {
       runEmit({
         expectedAssetKeys: ["directory/[md5::base64:20].txt"],
         patterns: [
@@ -94,7 +95,7 @@ describe("to option", () => {
   });
 
   describe("is a directory", () => {
-    it("should move a file to a new directory", (done) => {
+    it("should copy a file to a new directory", (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/file.txt"],
         patterns: [
@@ -108,7 +109,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file to a new directory out of context", (done) => {
+    it("should copy a file to a new directory out of context", (done) => {
       runEmit({
         expectedAssetKeys: ["../tempdir/file.txt"],
         patterns: [
@@ -122,7 +123,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file to a new directory with a forward slash", (done) => {
+    it("should copy a file to a new directory with a forward slash", (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/file.txt"],
         patterns: [
@@ -136,7 +137,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file to a new directory with an extension and path separator at end", (done) => {
+    it("should copy a file to a new directory with an extension and path separator at end", (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory.ext/file.txt"],
         patterns: [
@@ -150,7 +151,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to a new directory when "to" is absolute path', (done) => {
+    it('should copy a file to a new directory when "to" is absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ["file.txt"],
         patterns: [
@@ -164,7 +165,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to a new directory when "to" is absolute path with a forward slash', (done) => {
+    it('should copy a file to a new directory when "to" is absolute path with a forward slash', (done) => {
       runEmit({
         expectedAssetKeys: ["file.txt"],
         patterns: [
@@ -178,7 +179,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file to a new directory from nested directory", (done) => {
+    it("should copy a file to a new directory from nested directory", (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/directoryfile.txt"],
         patterns: [
@@ -192,7 +193,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to a new directory from nested directory when "from" is absolute path', (done) => {
+    it('should copy a file to a new directory from nested directory when "from" is absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/directoryfile.txt"],
         patterns: [
@@ -206,7 +207,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to a new directory from nested directory when "from" is absolute path with a forward slash', (done) => {
+    it('should copy a file to a new directory from nested directory when "from" is absolute path with a forward slash', (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/directoryfile.txt"],
         patterns: [
@@ -220,7 +221,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move files to a new directory", (done) => {
+    it("should copy files to a new directory", (done) => {
       runEmit({
         expectedAssetKeys: [
           "newdirectory/.dottedfile",
@@ -239,7 +240,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move files to a new nested directory", (done) => {
+    it("should copy files to a new nested directory", (done) => {
       runEmit({
         expectedAssetKeys: [
           "newdirectory/deep-nested/deepnested.txt",
@@ -256,7 +257,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move files to a new directory out of context", (done) => {
+    it("should copy files to a new directory out of context", (done) => {
       runEmit({
         expectedAssetKeys: [
           "../tempdir/.dottedfile",
@@ -275,7 +276,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move files to a new directory when "to" is absolute path', (done) => {
+    it('should copy files to a new directory when "to" is absolute path', (done) => {
       runEmit({
         expectedAssetKeys: [
           ".dottedfile",
@@ -294,7 +295,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move files to a new directory when "to" is absolute path with a forward slash', (done) => {
+    it('should copy files to a new directory when "to" is absolute path with a forward slash', (done) => {
       runEmit({
         expectedAssetKeys: [
           ".dottedfile",
@@ -313,7 +314,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move files to a new directory from nested directory", (done) => {
+    it("should copy files to a new directory from nested directory", (done) => {
       runEmit({
         expectedAssetKeys: [
           "newdirectory/deep-nested/deepnested.txt",
@@ -330,7 +331,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to a new directory when "to" is empty', (done) => {
+    it('should copy a file to a new directory when "to" is empty', (done) => {
       runEmit({
         expectedAssetKeys: ["file.txt"],
         patterns: [
@@ -346,13 +347,20 @@ describe("to option", () => {
   });
 
   describe("is a template", () => {
-    it('should move a file using "contenthash"', (done) => {
+    it('should copy a file using "contenthash"', (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashDigestLength: 6,
+        },
+      });
+
       runEmit({
+        compiler,
         expectedAssetKeys: ["directory/5d7817.txt"],
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "directory/[contenthash:6].txt",
+            to: "directory/[contenthash].txt",
           },
         ],
       })
@@ -360,27 +368,57 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file using custom `contenthash` digest", (done) => {
+    it("should copy a file using custom `contenthash` digest", (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashFunction: "sha1",
+          hashDigest: "hex",
+          hashDigestLength: 4,
+        },
+      });
+
       runEmit({
         expectedAssetKeys: ["directory/c2a6.txt"],
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "directory/[sha1:contenthash:hex:4].txt",
+            to: "directory/[contenthash].txt",
           },
         ],
+        compiler,
       })
         .then(done)
         .catch(done);
     });
 
-    it('should move a file using "name" and "ext"', (done) => {
+    it("should copy a file using `contenthash` with hashSalt", (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashSalt: "qwerty",
+        },
+      });
+
+      runEmit({
+        expectedAssetKeys: ["directory/64cc145fc382934bd97a.txt"],
+        patterns: [
+          {
+            from: "directory/directoryfile.txt",
+            to: "directory/[contenthash].txt",
+          },
+        ],
+        compiler,
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy a file using "name" and "ext"', (done) => {
       runEmit({
         expectedAssetKeys: ["binextension.bin"],
         patterns: [
           {
             from: "binextension.bin",
-            to: "[name].[ext]",
+            to: "[name][ext]",
           },
         ],
       })
@@ -388,13 +426,13 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file using "name", "contenthash" and "ext"', (done) => {
+    it('should copy a file using "name", "contenthash" and "ext"', (done) => {
       runEmit({
         expectedAssetKeys: ["file-5d7817.txt"],
         patterns: [
           {
             from: "file.txt",
-            to: "[name]-[contenthash:6].[ext]",
+            to: "[name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -402,13 +440,13 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file from nested directory", (done) => {
+    it("should copy a file from nested directory", (done) => {
       runEmit({
         expectedAssetKeys: ["directoryfile-5d7817.txt"],
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "[name]-[hash:6].[ext]",
+            to: "[name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -416,13 +454,13 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move a file from nested directory to new directory", (done) => {
+    it("should copy a file from nested directory to new directory", (done) => {
       runEmit({
         expectedAssetKeys: ["newdirectory/directoryfile-5d7817.txt"],
         patterns: [
           {
             from: "directory/directoryfile.txt",
-            to: "newdirectory/[name]-[hash:6].[ext]",
+            to: "newdirectory/[name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -430,7 +468,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file without an extension using "name", "ext"', (done) => {
+    it('should copy a file without an extension using "name", "ext"', (done) => {
       runEmit({
         expectedAssetKeys: ["noextension.31d6cf.newext"],
         patterns: [
@@ -444,7 +482,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move files using "path", "name", "contenthash" and "ext"', (done) => {
+    it('should copy files using "path", "name", "contenthash" and "ext"', (done) => {
       runEmit({
         expectedAssetKeys: [
           "newdirectory/.dottedfile-5e294e",
@@ -455,7 +493,7 @@ describe("to option", () => {
         patterns: [
           {
             from: "directory",
-            to: "newdirectory/[path][name]-[contenthash:6].[ext]",
+            to: "newdirectory/[path][name]-[contenthash:6][ext]",
           },
         ],
       })
@@ -463,7 +501,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it('should move a file to "compiler.options.output" by default', (done) => {
+    it('should copy a file to "compiler.options.output" by default', (done) => {
       runEmit({
         compilation: { output: { path: "/path/to" } },
         expectedAssetKeys: ["newfile.txt"],
@@ -671,7 +709,7 @@ describe("to option", () => {
             to({ absoluteFilename }) {
               expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
 
-              return "transformed/[path][name]-[hash:6].[ext]";
+              return "transformed/[path][name]-[contenthash:6][ext]";
             },
           },
         ],
@@ -680,7 +718,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move files", (done) => {
+    it("should copy files", (done) => {
       runEmit({
         expectedAssetKeys: ["txt"],
         patterns: [
@@ -701,7 +739,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move files to a non-root directory", (done) => {
+    it("should copy files to a non-root directory", (done) => {
       runEmit({
         expectedAssetKeys: ["nested/txt"],
         patterns: [
@@ -722,7 +760,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should move files", (done) => {
+    it("should copy files", (done) => {
       runEmit({
         expectedAssetKeys: [
           "deep-nested-deepnested.txt",
@@ -801,7 +839,7 @@ describe("to option", () => {
         ],
         patterns: [
           {
-            to: "[name].[ext]",
+            to: "[name][ext]",
             from: "directory",
           },
         ],
@@ -913,5 +951,52 @@ describe("to option", () => {
         .then(done)
         .catch(done);
     });
+  });
+
+  it("should process template string", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "directory/directoryfile.txt-new-directoryfile.txt.5d7817ed5bc246756d73.ac7f6fcb65ddfcc43b2c-ac7f6fcb65ddfcc43b2c.txt--[unknown]",
+      ],
+      patterns: [
+        {
+          from: "directory/directoryfile.*",
+          to:
+            "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]--[unknown]",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should rewrite invalid [contenthash] in 'production' mode", (done) => {
+    const compiler = getCompiler({
+      mode: "production",
+    });
+
+    runEmit({
+      compiler,
+      breakContenthash: {
+        // eslint-disable-next-line no-useless-escape
+        targetAssets: [
+          {
+            name: "5d7817ed5bc246756d73-directoryfile.txt",
+            newName: "33333333333333333333-directoryfile.txt",
+            newHash: "33333333333333333333",
+          },
+        ],
+      },
+      expectedAssetKeys: ["5d7817ed5bc246756d73-directoryfile.txt"],
+      patterns: [
+        {
+          from: "directory/directoryfile.*",
+          to: "[contenthash]-[name][ext]",
+          toType: "template",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
   });
 });

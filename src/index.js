@@ -5,7 +5,6 @@ import { validate } from "schema-utils";
 import pLimit from "p-limit";
 import globby from "globby";
 import serialize from "serialize-javascript";
-import loaderUtils from "loader-utils";
 import normalizePath from "normalize-path";
 import globParent from "glob-parent";
 import fastGlob from "fast-glob";
@@ -15,7 +14,7 @@ import { version } from "../package.json";
 import schema from "./options.json";
 import { readFile, stat } from "./utils/promisify";
 
-const template = /(\[ext\])|(\[name\])|(\[path\])|(\[folder\])|(\[emoji(?::(\d+))?\])|(\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\])|(\[\d+\])/;
+const template = /\[\\*([\w:]+)\\*\]/i;
 
 class CopyPlugin {
   constructor(options = {}) {
@@ -528,39 +527,56 @@ class CopyPlugin {
               `interpolating template '${filename}' for '${sourceFilename}'...`
             );
 
-            // If it doesn't have an extension, remove it from the pattern
-            // ie. [name].[ext] or [name][ext] both become [name]
-            if (!path.extname(absoluteFilename)) {
-              // eslint-disable-next-line no-param-reassign
-              result.filename = result.filename.replace(/\.?\[ext]/g, "");
+            const { outputOptions } = compilation;
+            const {
+              hashDigest,
+              hashDigestLength,
+              hashFunction,
+              hashSalt,
+            } = outputOptions;
+            const hash = compiler.webpack.util.createHash(hashFunction);
+
+            if (hashSalt) {
+              hash.update(hashSalt);
             }
 
-            // eslint-disable-next-line no-param-reassign
-            result.immutable = /\[(?:([^:\]]+):)?(?:hash|contenthash)(?::([a-z]+\d*))?(?::(\d+))?\]/gi.test(
-              result.filename
+            hash.update(result.source.source());
+
+            const fullContentHash = hash.digest(hashDigest);
+            const contentHash = fullContentHash.slice(0, hashDigestLength);
+            const ext = path.extname(result.sourceFilename);
+            const base = path.basename(result.sourceFilename);
+            const name = base.slice(0, base.length - ext.length);
+            const data = {
+              filename: normalizePath(
+                path.relative(pattern.context, absoluteFilename)
+              ),
+              contentHash,
+              chunk: {
+                name,
+                id: result.sourceFilename,
+                hash: contentHash,
+                contentHash,
+              },
+            };
+            const {
+              path: interpolatedFilename,
+              info: assetInfo,
+            } = compilation.getPathWithInfo(
+              normalizePath(result.filename),
+              data
             );
 
-            // eslint-disable-next-line no-param-reassign
-            result.filename = loaderUtils.interpolateName(
-              { resourcePath: absoluteFilename },
-              result.filename,
-              {
-                content: result.source.source(),
-                context: pattern.context,
-              }
-            );
-
-            // Bug in `loader-utils`, package convert `\\` to `/`, need fix in loader-utils
-            // eslint-disable-next-line no-param-reassign
-            result.filename = path.normalize(result.filename);
+            result.info = { ...result.info, ...assetInfo };
+            result.filename = interpolatedFilename;
 
             logger.log(
               `interpolated template '${filename}' for '${sourceFilename}'`
             );
+          } else {
+            // eslint-disable-next-line no-param-reassign
+            result.filename = normalizePath(result.filename);
           }
-
-          // eslint-disable-next-line no-param-reassign
-          result.filename = normalizePath(result.filename);
 
           // eslint-disable-next-line consistent-return
           return result;
@@ -641,10 +657,6 @@ class CopyPlugin {
                 if (force) {
                   const info = { copied: true, sourceFilename };
 
-                  if (asset.immutable) {
-                    info.immutable = true;
-                  }
-
                   logger.log(
                     `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`
                   );
@@ -669,10 +681,6 @@ class CopyPlugin {
               }
 
               const info = { copied: true, sourceFilename };
-
-              if (asset.immutable) {
-                info.immutable = true;
-              }
 
               logger.log(
                 `writing '${filename}' from '${absoluteFilename}' to compilation assets...`

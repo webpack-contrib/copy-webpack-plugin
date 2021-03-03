@@ -1,6 +1,7 @@
 import path from "path";
 
 import { runEmit } from "./helpers/run";
+import { getCompiler } from "./helpers";
 
 const FIXTURES_DIR_NORMALIZED = path
   .join(__dirname, "fixtures")
@@ -8,7 +9,7 @@ const FIXTURES_DIR_NORMALIZED = path
 
 describe("from option", () => {
   describe("is a file", () => {
-    it("should move a file", (done) => {
+    it("should copy a file", (done) => {
       runEmit({
         expectedAssetKeys: ["file.txt"],
         patterns: [
@@ -21,7 +22,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it('should move a file when "from" an absolute path', (done) => {
+    it('should copy a file when "from" an absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ["file.txt"],
         patterns: [
@@ -34,7 +35,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move a file from nesting directory", (done) => {
+    it("should copy a file from nesting directory", (done) => {
       runEmit({
         expectedAssetKeys: ["directoryfile.txt"],
         patterns: [
@@ -47,7 +48,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it('should move a file from nesting directory when "from" an absolute path', (done) => {
+    it('should copy a file from nesting directory when "from" an absolute path', (done) => {
       runEmit({
         expectedAssetKeys: ["directoryfile.txt"],
         patterns: [
@@ -63,7 +64,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move a file (symbolic link)", (done) => {
+    it("should copy a file (symbolic link)", (done) => {
       runEmit({
         symlink: true,
         expectedErrors:
@@ -105,7 +106,7 @@ describe("from option", () => {
   });
 
   describe("is a directory", () => {
-    it("should move files", (done) => {
+    it("should copy files", (done) => {
       runEmit({
         expectedAssetKeys: [
           ".dottedfile",
@@ -123,7 +124,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it('should move files when "from" is current directory', (done) => {
+    it('should copy files when "from" is current directory', (done) => {
       runEmit({
         expectedAssetKeys: [
           ".file.txt",
@@ -153,7 +154,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it('should move files when "from" is relative path to context', (done) => {
+    it('should copy files when "from" is relative path to context', (done) => {
       runEmit({
         expectedAssetKeys: [
           ".file.txt",
@@ -183,7 +184,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files with a forward slash", (done) => {
+    it("should copy files with a forward slash", (done) => {
       runEmit({
         expectedAssetKeys: [
           ".dottedfile",
@@ -201,7 +202,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files from symbolic link", (done) => {
+    it("should copy files from symbolic link", (done) => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,
@@ -227,7 +228,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files when 'from' is a absolute path", (done) => {
+    it("should copy files when 'from' is a absolute path", (done) => {
       runEmit({
         expectedAssetKeys: [
           ".dottedfile",
@@ -245,7 +246,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files when 'from' with special characters", (done) => {
+    it("should copy files when 'from' with special characters", (done) => {
       runEmit({
         expectedAssetKeys: [
           "directoryfile.txt",
@@ -263,7 +264,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files from nested directory", (done) => {
+    it("should copy files from nested directory", (done) => {
       runEmit({
         expectedAssetKeys: ["deep-nested/deepnested.txt", "nestedfile.txt"],
         patterns: [
@@ -276,7 +277,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files from nested directory with an absolute path", (done) => {
+    it("should copy files from nested directory with an absolute path", (done) => {
       runEmit({
         expectedAssetKeys: ["deep-nested/deepnested.txt", "nestedfile.txt"],
         patterns: [
@@ -309,7 +310,7 @@ describe("from option", () => {
   });
 
   describe("is a glob", () => {
-    it("should move files", (done) => {
+    it("should copy files", (done) => {
       runEmit({
         expectedAssetKeys: ["file.txt"],
         patterns: [
@@ -322,7 +323,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files when a glob contains absolute path", (done) => {
+    it("should copy files when a glob contains absolute path", (done) => {
       runEmit({
         expectedAssetKeys: ["file.txt"],
         patterns: [
@@ -335,7 +336,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files using globstar", (done) => {
+    it("should copy files using globstar", (done) => {
       runEmit({
         expectedAssetKeys: [
           "[(){}[]!+@escaped-test^$]/hello.txt",
@@ -363,7 +364,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files using globstar and contains an absolute path", (done) => {
+    it("should copy files using globstar and contains an absolute path", (done) => {
       runEmit({
         expectedAssetKeys: [
           "[(){}[]!+@escaped-test^$]/hello.txt",
@@ -388,8 +389,15 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files in nested directory using globstar", (done) => {
+    it("should copy files in nested directory using globstar", (done) => {
+      const compiler = getCompiler({
+        output: {
+          hashDigestLength: 6,
+        },
+      });
+
       runEmit({
+        compiler,
         expectedAssetKeys: [
           "nested/[(){}[]!+@escaped-test^$]/hello-31d6cf.txt",
           "nested/binextension-31d6cf.bin",
@@ -409,7 +417,7 @@ describe("from option", () => {
         patterns: [
           {
             from: "**/*",
-            to: "nested/[path][name]-[hash:6].[ext]",
+            to: "nested/[path][name]-[contenthash][ext]",
           },
         ],
       })
@@ -417,7 +425,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files from nested directory", (done) => {
+    it("should copy files from nested directory", (done) => {
       runEmit({
         expectedAssetKeys: ["directory/directoryfile.txt"],
         patterns: [
@@ -430,7 +438,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files from nested directory #2", (done) => {
+    it("should copy files from nested directory #2", (done) => {
       runEmit({
         expectedAssetKeys: [
           "directory/directoryfile.txt",
@@ -447,7 +455,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files using bracketed glob", (done) => {
+    it("should copy files using bracketed glob", (done) => {
       runEmit({
         expectedAssetKeys: [
           "directory/directoryfile.txt",
@@ -466,7 +474,7 @@ describe("from option", () => {
         .catch(done);
     });
 
-    it("should move files (symbolic link)", (done) => {
+    it("should copy files (symbolic link)", (done) => {
       runEmit({
         // Windows doesn't support symbolic link
         symlink: true,

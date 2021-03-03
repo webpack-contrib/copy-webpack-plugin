@@ -7,7 +7,7 @@ const FIXTURES_DIR_NORMALIZED = path
   .replace(/\\/g, "/");
 
 describe("toType option", () => {
-  it("should move a file to a new file", (done) => {
+  it("should copy a file to a new file", (done) => {
     runEmit({
       expectedAssetKeys: ["new-file.txt"],
       patterns: [
@@ -22,7 +22,7 @@ describe("toType option", () => {
       .catch(done);
   });
 
-  it("should move a file to a new directory", (done) => {
+  it("should copy a file to a new directory", (done) => {
     runEmit({
       expectedAssetKeys: ["new-file.txt/file.txt"],
       patterns: [
@@ -37,16 +37,16 @@ describe("toType option", () => {
       .catch(done);
   });
 
-  it("should move a file to a new directory", (done) => {
+  it("should copy a file to a new directory", (done) => {
     runEmit({
       expectedAssetKeys: [
-        "directory/directorynew-directoryfile.txt.5d7817ed5bc246756d73d6a4c8e94c33.5d7817ed5bc246756d73d6a4c8e94c33.22af645d.22af645d.txt",
+        "directory/directoryfile.txt-new-directoryfile.txt.5d7817ed5bc246756d73.ac7f6fcb65ddfcc43b2c-ac7f6fcb65ddfcc43b2c.txt",
       ],
       patterns: [
         {
           from: "directory/directoryfile.*",
           to:
-            "[path][folder]new-[name].[ext].[hash].[contenthash].[md5:contenthash:hex:8].[md5:hash:hex:8].txt",
+            "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]",
           toType: "template",
         },
       ],
@@ -55,7 +55,7 @@ describe("toType option", () => {
       .catch(done);
   });
 
-  it("should move a file to a new file with no extension", (done) => {
+  it("should copy a file to a new file with no extension", (done) => {
     runEmit({
       expectedAssetKeys: ["newname"],
       patterns: [
@@ -70,7 +70,7 @@ describe("toType option", () => {
       .catch(done);
   });
 
-  it("should move a file to a new directory with an extension", (done) => {
+  it("should copy a file to a new directory with an extension", (done) => {
     runEmit({
       expectedAssetKeys: ["newdirectory.ext/file.txt"],
       patterns: [
