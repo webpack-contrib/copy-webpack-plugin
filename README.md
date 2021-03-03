@@ -1043,6 +1043,29 @@ Result:
 "newdirectory/nested/nestedfile.txt",
 ```
 
+#### Skip running JavaScript files through a minimizer
+
+Useful if you need to simply copy `*.js` files to destination "as is" without evaluating and minimizing them using Terser.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        "relative/path/to/file.ext",
+        {
+          from: "**/*",
+          // Terser skip this file for minimization
+          info: { minimized: true },
+        },
+      ],
+    }),
+  ],
+};
+```
+
 ## Contributing
 
 Please take a moment to read our contributing guidelines if you haven't yet done so.
