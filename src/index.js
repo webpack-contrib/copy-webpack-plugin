@@ -70,7 +70,6 @@ class CopyPlugin {
   }
 
   static async runPattern(
-    assetMap,
     compiler,
     compilation,
     logger,
@@ -319,7 +318,6 @@ class CopyPlugin {
           sourceFilename,
           filename,
           toType,
-          priority: pattern.priority || 0,
         };
       })
     );
@@ -329,13 +327,7 @@ class CopyPlugin {
     try {
       assets = await Promise.all(
         files.map(async (file) => {
-          const {
-            absoluteFilename,
-            sourceFilename,
-            filename,
-            toType,
-            priority,
-          } = file;
+          const { absoluteFilename, sourceFilename, filename, toType } = file;
           const info =
             typeof pattern.info === "function"
               ? pattern.info(file) || {}
@@ -585,12 +577,6 @@ class CopyPlugin {
             result.filename = normalizePath(result.filename);
           }
 
-          if (!assetMap.has(priority)) {
-            assetMap.set(priority, []);
-          }
-
-          assetMap.get(priority).push(result);
-
           // eslint-disable-next-line consistent-return
           return result;
         })
@@ -627,29 +613,38 @@ class CopyPlugin {
 
           const assetMap = new Map();
 
-          try {
-            await Promise.all(
-              this.patterns.map((item, index) =>
-                limit(async () =>
-                  CopyPlugin.runPattern(
-                    assetMap,
+          await Promise.all(
+            this.patterns.map((item, index) =>
+              limit(async () => {
+                let assets;
+
+                try {
+                  assets = await CopyPlugin.runPattern(
                     compiler,
                     compilation,
                     logger,
                     cache,
                     item,
                     index
-                  )
-                )
-              )
-            );
-          } catch (error) {
-            compilation.errors.push(error);
+                  );
+                } catch (error) {
+                  compilation.errors.push(error);
 
-            callback();
+                  return;
+                }
 
-            return;
-          }
+                if (assets && assets.length > 0) {
+                  const priority = item.priority || 0;
+
+                  if (!assetMap.has(priority)) {
+                    assetMap.set(priority, []);
+                  }
+
+                  assetMap.get(priority).push(...assets);
+                }
+              })
+            )
+          );
 
           const assets = [...assetMap.entries()].sort((a, b) => a[0] - b[0]);
 
