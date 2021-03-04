@@ -70,6 +70,7 @@ class CopyPlugin {
   }
 
   static async runPattern(
+    assetMap,
     compiler,
     compilation,
     logger,
@@ -313,7 +314,13 @@ class CopyPlugin {
           path.relative(compiler.context, absoluteFilename)
         );
 
-        return { absoluteFilename, sourceFilename, filename, toType };
+        return {
+          absoluteFilename,
+          sourceFilename,
+          filename,
+          toType,
+          priority: pattern.priority || 0,
+        };
       })
     );
 
@@ -322,7 +329,13 @@ class CopyPlugin {
     try {
       assets = await Promise.all(
         files.map(async (file) => {
-          const { absoluteFilename, sourceFilename, filename, toType } = file;
+          const {
+            absoluteFilename,
+            sourceFilename,
+            filename,
+            toType,
+            priority,
+          } = file;
           const info =
             typeof pattern.info === "function"
               ? pattern.info(file) || {}
@@ -578,6 +591,12 @@ class CopyPlugin {
             result.filename = normalizePath(result.filename);
           }
 
+          if (!assetMap.has(priority)) {
+            assetMap.set(priority, []);
+          }
+
+          assetMap.get(priority).push(result);
+
           // eslint-disable-next-line consistent-return
           return result;
         })
@@ -612,13 +631,14 @@ class CopyPlugin {
         async (unusedAssets, callback) => {
           logger.log("starting to add additional assets...");
 
-          let assets;
+          const assetMap = new Map();
 
           try {
-            assets = await Promise.all(
+            await Promise.all(
               this.patterns.map((item, index) =>
                 limit(async () =>
                   CopyPlugin.runPattern(
+                    assetMap,
                     compiler,
                     compilation,
                     logger,
@@ -637,10 +657,12 @@ class CopyPlugin {
             return;
           }
 
+          const assets = [...assetMap.entries()].sort((a, b) => a[0] - b[0]);
+
           // Avoid writing assets inside `p-limit`, because it creates concurrency.
           // It could potentially lead to an error - 'Multiple assets emit different content to the same filename'
           assets
-            .reduce((acc, val) => acc.concat(val), [])
+            .reduce((acc, val) => acc.concat(val[1]), [])
             .filter(Boolean)
             .forEach((asset) => {
               const {

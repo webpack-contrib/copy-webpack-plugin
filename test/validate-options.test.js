@@ -133,6 +133,13 @@ describe("validate options", () => {
             },
           },
         ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            priority: 5,
+          },
+        ],
       ],
       failure: [
         // eslint-disable-next-line no-undefined
@@ -240,6 +247,27 @@ describe("validate options", () => {
           {
             from: "test.txt",
             filter: "test",
+          },
+        ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            priority: "5",
+          },
+        ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            priority: () => {},
+          },
+        ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            priority: true,
           },
         ],
       ],

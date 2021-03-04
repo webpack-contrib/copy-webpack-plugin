@@ -33,6 +33,9 @@
         "force": {
           "type": "boolean"
         },
+        "priority": {
+          "type": "number"
+        },
         "info": {
           "anyOf": [
             {
