@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v7.0.0...v8.0.0) (2021-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* logic for some placeholders was changed:
+    - `[hash]` and `[fullhash]` works as in webpack (i.e. it is `hash` of build, not content hash of file), to migrate change `[name].[hash].[ext]` to `[name].[contenthash][ext]`
+    - `[ext]` doesn't require `.` (dot) before, i.e. change `[name].[ext]` to `[name][ext]`
+    - `[<hashType>:contenthash:<digestType>:<length>]` and `[<hashType>:hash:<digestType>:<length>]` is not supported anymore, you can use `output.hashDigest`, `output.hashDigestLength` and `output.hashFunction` options to setup it
+    - `[N]` was removed in favor of using the `to` option as a function
+    - `[folder]` was removed
+    - `[emoji]` was removed
+
+### Features
+
+* added `priority` option ([#590](https://github.com/webpack-contrib/copy-webpack-plugin/issues/590)) ([ea610bc](https://github.com/webpack-contrib/copy-webpack-plugin/commit/ea610bc1a0fa7097f291b0928fb28eb96b0f03af))
+
 ## [7.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v6.4.0...v7.0.0) (2020-12-10)
 
 
