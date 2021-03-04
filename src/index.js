@@ -402,11 +402,7 @@ class CopyPlugin {
           }
 
           if (!result.source) {
-            let startTime;
-
-            if (cache) {
-              startTime = Date.now();
-            }
+            const startTime = Date.now();
 
             logger.debug(`reading '${absoluteFilename}'...`);
 
@@ -424,40 +420,38 @@ class CopyPlugin {
 
             result.source = new RawSource(data);
 
-            if (cache) {
-              let snapshot;
+            let snapshot;
 
-              logger.debug(`creating snapshot for '${absoluteFilename}'...`);
+            logger.debug(`creating snapshot for '${absoluteFilename}'...`);
+
+            try {
+              snapshot = await CopyPlugin.createSnapshot(
+                compilation,
+                startTime,
+                absoluteFilename
+              );
+            } catch (error) {
+              compilation.errors.push(error);
+
+              return;
+            }
+
+            if (snapshot) {
+              logger.debug(`created snapshot for '${absoluteFilename}'`);
+              logger.debug(`storing cache for '${absoluteFilename}'...`);
 
               try {
-                snapshot = await CopyPlugin.createSnapshot(
-                  compilation,
-                  startTime,
-                  absoluteFilename
-                );
+                await cache.storePromise(`${sourceFilename}|${index}`, null, {
+                  source: result.source,
+                  snapshot,
+                });
               } catch (error) {
                 compilation.errors.push(error);
 
                 return;
               }
 
-              if (snapshot) {
-                logger.debug(`created snapshot for '${absoluteFilename}'`);
-                logger.debug(`storing cache for '${absoluteFilename}'...`);
-
-                try {
-                  await cache.storePromise(`${sourceFilename}|${index}`, null, {
-                    source: result.source,
-                    snapshot,
-                  });
-                } catch (error) {
-                  compilation.errors.push(error);
-
-                  return;
-                }
-
-                logger.debug(`stored cache for '${absoluteFilename}'`);
-              }
+              logger.debug(`stored cache for '${absoluteFilename}'`);
             }
           }
 
