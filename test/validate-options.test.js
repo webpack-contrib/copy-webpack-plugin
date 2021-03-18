@@ -140,6 +140,14 @@ describe("validate options", () => {
             priority: 5,
           },
         ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            context: "context",
+            transformAll: ({ existingAsset }) => existingAsset.source.source(),
+          },
+        ],
       ],
       failure: [
         // eslint-disable-next-line no-undefined
@@ -268,6 +276,14 @@ describe("validate options", () => {
             from: "test.txt",
             to: "dir",
             priority: true,
+          },
+        ],
+        [
+          {
+            from: "test.txt",
+            to: "dir",
+            context: "context",
+            transformAll: true,
           },
         ],
       ],
