@@ -738,7 +738,7 @@ Default: `undefined`
 
 Allows you to modify the contents of multiple files and save the result to one file.
 
-> ℹ️ The `to` option must specify to a file. It is allowed to use only `[contenthash]` and `[fullhash]` template strings.
+> ℹ️ The `to` option must be specified and point to a file. It is allowed to use only `[contenthash]` and `[fullhash]` template strings.
 
 **webpack.config.js**
 

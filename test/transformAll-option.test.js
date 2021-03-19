@@ -10,6 +10,7 @@ describe("transformAll option", () => {
       patterns: [
         {
           from: "file.txt",
+          to: "file.txt",
           transformAll(assets) {
             expect(assets).toBeDefined();
 
@@ -102,6 +103,27 @@ describe("transformAll option", () => {
             return result;
           },
           force: true,
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should warn when "to" option is not defined', (done) => {
+    runEmit({
+      expectedAssetKeys: [],
+      expectedErrors: [
+        new Error(
+          `Invalid "pattern.to" for the "pattern.from": "file.txt" and "pattern.transformAll" function. The "to" option must be specified.`
+        ),
+      ],
+      patterns: [
+        {
+          from: "file.txt",
+          transformAll() {
+            return "";
+          },
         },
       ],
     })

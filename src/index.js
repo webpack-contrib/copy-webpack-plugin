@@ -359,7 +359,6 @@ class CopyPlugin {
             filename,
             force: pattern.force,
             info,
-            toType,
           };
 
           // If this came from a glob or dir, add it to the file dependencies
@@ -645,6 +644,16 @@ class CopyPlugin {
 
                 if (assets && assets.length > 0) {
                   if (item.transformAll) {
+                    if (typeof item.to === "undefined") {
+                      compilation.errors.push(
+                        new Error(
+                          `Invalid "pattern.to" for the "pattern.from": "${item.from}" and "pattern.transformAll" function. The "to" option must be specified.`
+                        )
+                      );
+
+                      return;
+                    }
+
                     assets.sort((a, b) =>
                       a.absoluteFilename > b.absoluteFilename
                         ? 1
@@ -672,6 +681,8 @@ class CopyPlugin {
 
                     const cacheKeys = `transformAll|${serialize({
                       version,
+                      from: item.from,
+                      to: item.to,
                       transform: item.transformAll,
                     })}`;
                     const eTag = cache.getLazyHashedEtag(mergedEtag);
@@ -681,7 +692,9 @@ class CopyPlugin {
                     if (!transformedAsset) {
                       const { RawSource } = compiler.webpack.sources;
 
-                      transformedAsset = {};
+                      transformedAsset = {
+                        filename: item.to,
+                      };
 
                       try {
                         transformedAsset.source = new RawSource(
@@ -693,30 +706,34 @@ class CopyPlugin {
                         return;
                       }
 
-                      let mergedFilename = assets[0].filename;
-
-                      if (assets[0].toType === "template") {
-                        const mergedContentHash = CopyPlugin.getContentHash(
+                      if (template.test(item.to)) {
+                        const contentHash = CopyPlugin.getContentHash(
                           compiler,
                           compilation,
                           transformedAsset.source.source()
                         );
-                        const { contenthash: oldContentHash } = assets[0].info;
-                        const regExp = new RegExp(oldContentHash, "gi");
 
-                        mergedFilename = mergedFilename.replace(
-                          regExp,
-                          mergedContentHash
+                        const data = {
+                          contentHash,
+                          chunk: {
+                            hash: contentHash,
+                            contentHash,
+                          },
+                        };
+
+                        const {
+                          path: interpolatedFilename,
+                          info: assetInfo,
+                        } = compilation.getPathWithInfo(
+                          normalizePath(item.to),
+                          data
                         );
 
-                        transformedAsset.info = {
-                          contenthash: mergedContentHash,
-                          fullhash: assets[0].info.fullhash,
-                        };
+                        transformedAsset.filename = interpolatedFilename;
+                        transformedAsset.info = assetInfo;
                       }
 
                       transformedAsset.force = item.force;
-                      transformedAsset.filename = mergedFilename;
 
                       await cacheItem.storePromise(transformedAsset);
                     }
