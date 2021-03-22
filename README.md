@@ -1142,6 +1142,30 @@ module.exports = {
 };
 ```
 
+##### `yarn workspaces` and `monorepos`
+
+When using `yarn workspaces` or` monorepos`, relative copy paths from node_modules can be broken due to the way packages are hoisting.
+To avoid this, should explicitly specify where to copy the files from using `require.resolve`.
+
+**webpack.config.js**
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        {
+          from: `${path.dirname(
+            require.resolve(`${moduleName}/package.json`)
+          )}/target`,
+          to: "target",
+        },
+      ],
+    }),
+  ],
+};
+```
+
 ## Contributing
 
 Please take a moment to read our contributing guidelines if you haven't yet done so.
