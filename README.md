@@ -755,7 +755,7 @@ module.exports = {
             const result = assets.reduce((accumulator, asset) => {
               // The asset content can be obtained from `asset.source` using `source` method.
               // The asset content is a [`Buffer`](https://nodejs.org/api/buffer.html) object, it could be converted to a `String` to be processed using `content.toString()`
-              const content = asset.source.source();
+              const content = asset.data;
 
               accumulator = `${accumulator}${content}\n`;
               return accumulator;

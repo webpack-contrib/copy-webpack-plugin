@@ -36,8 +36,7 @@ describe("transformAll option", () => {
           to: "file.txt",
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
-              const content =
-                asset.source.source().toString() || asset.sourceFilename;
+              const content = asset.data.toString() || asset.sourceFilename;
               // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${content}::`;
               return accumulator;
@@ -164,7 +163,7 @@ describe("transformAll option", () => {
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
               // eslint-disable-next-line no-param-reassign
-              accumulator = `${accumulator}${asset.source.source()}::`;
+              accumulator = `${accumulator}${asset.data}::`;
               return accumulator;
             }, "");
 
@@ -189,8 +188,7 @@ describe("cache", () => {
           to: "file.txt",
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
-              const content =
-                asset.source.source().toString() || asset.sourceFilename;
+              const content = asset.data.toString() || asset.sourceFilename;
               // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${content}::`;
               return accumulator;

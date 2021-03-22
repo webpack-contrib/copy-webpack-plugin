@@ -477,7 +477,7 @@ class CopyPlugin {
             if (transform.transformer) {
               logger.log(`transforming content for '${absoluteFilename}'...`);
 
-              const buffer = result.source.source();
+              const buffer = result.source.buffer();
 
               if (transform.cache) {
                 const defaultCacheKeys = {
@@ -550,7 +550,7 @@ class CopyPlugin {
             const contentHash = CopyPlugin.getContentHash(
               compiler,
               compilation,
-              result.source.source()
+              result.source.buffer()
             );
             const ext = path.extname(result.sourceFilename);
             const base = path.basename(result.sourceFilename);
@@ -664,16 +664,16 @@ class CopyPlugin {
 
                     const mergedEtag =
                       assets.length === 1
-                        ? cache.getLazyHashedEtag(assets[0].source.source())
-                        : assets.reduce((accumulator, asset, ind) => {
+                        ? cache.getLazyHashedEtag(assets[0].source.buffer())
+                        : assets.reduce((accumulator, asset, i) => {
                             // eslint-disable-next-line no-param-reassign
                             accumulator = cache.mergeEtags(
-                              ind === 1
+                              i === 1
                                 ? cache.getLazyHashedEtag(
-                                    accumulator.source.source()
+                                    accumulator.source.buffer()
                                   )
                                 : accumulator,
-                              cache.getLazyHashedEtag(asset.source.source())
+                              cache.getLazyHashedEtag(asset.source.buffer())
                             );
 
                             return accumulator;
@@ -683,22 +683,24 @@ class CopyPlugin {
                       version,
                       from: item.from,
                       to: item.to,
-                      transform: item.transformAll,
+                      transformAll: item.transformAll,
                     })}`;
                     const eTag = cache.getLazyHashedEtag(mergedEtag);
                     const cacheItem = cache.getItemCache(cacheKeys, eTag);
                     let transformedAsset = await cacheItem.getPromise();
 
                     if (!transformedAsset) {
-                      const { RawSource } = compiler.webpack.sources;
-
-                      transformedAsset = {
-                        filename: item.to,
-                      };
+                      transformedAsset = { filename: item.to };
 
                       try {
-                        transformedAsset.source = new RawSource(
-                          await item.transformAll(assets)
+                        transformedAsset.data = await item.transformAll(
+                          assets.map((asset) => {
+                            return {
+                              data: asset.source.buffer(),
+                              sourceFilename: asset.sourceFilename,
+                              absoluteFilename: asset.absoluteFilename,
+                            };
+                          })
                         );
                       } catch (error) {
                         compilation.errors.push(error);
@@ -710,29 +712,32 @@ class CopyPlugin {
                         const contentHash = CopyPlugin.getContentHash(
                           compiler,
                           compilation,
-                          transformedAsset.source.source()
+                          transformedAsset.data
                         );
-
-                        const data = {
-                          contentHash,
-                          chunk: {
-                            hash: contentHash,
-                            contentHash,
-                          },
-                        };
 
                         const {
                           path: interpolatedFilename,
                           info: assetInfo,
                         } = compilation.getPathWithInfo(
                           normalizePath(item.to),
-                          data
+                          {
+                            contentHash,
+                            chunk: {
+                              hash: contentHash,
+                              contentHash,
+                            },
+                          }
                         );
 
                         transformedAsset.filename = interpolatedFilename;
                         transformedAsset.info = assetInfo;
                       }
 
+                      const { RawSource } = compiler.webpack.sources;
+
+                      transformedAsset.source = new RawSource(
+                        transformedAsset.data
+                      );
                       transformedAsset.force = item.force;
 
                       await cacheItem.storePromise(transformedAsset);
