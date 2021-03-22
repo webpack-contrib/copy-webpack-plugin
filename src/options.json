@@ -27,6 +27,9 @@
         "filter": {
           "instanceof": "Function"
         },
+        "transformAll": {
+          "instanceof": "Function"
+        },
         "toType": {
           "enum": ["dir", "file", "template"]
         },
