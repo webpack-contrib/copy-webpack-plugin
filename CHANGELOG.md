@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v8.0.0...v8.1.0) (2021-03-22)
+
+
+### Features
+
+* added the `transformAll` option ([#596](https://github.com/webpack-contrib/copy-webpack-plugin/issues/596)) ([dde71f0](https://github.com/webpack-contrib/copy-webpack-plugin/commit/dde71f01417b9291c7029a3876e043d76beb9e8d))
+
 ## [8.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v7.0.0...v8.0.0) (2021-03-04)
 
 
