@@ -615,7 +615,7 @@ class CopyPlugin {
       compilation.hooks.processAssets.tapAsync(
         {
           name: "copy-webpack-plugin",
-          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONS,
+          stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
         },
         async (unusedAssets, callback) => {
           logger.log("starting to add additional assets...");
