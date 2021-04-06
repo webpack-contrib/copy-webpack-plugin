@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v8.1.0...v8.1.1) (2021-04-06)
+
+
+### Bug Fixes
+
+* `stage` for processing assets  ([#600](https://github.com/webpack-contrib/copy-webpack-plugin/issues/600)) ([#601](https://github.com/webpack-contrib/copy-webpack-plugin/issues/601)) ([d8fa32a](https://github.com/webpack-contrib/copy-webpack-plugin/commit/d8fa32ac1a9e3d42c6257ac7aab6c43cc1bed791))
+
 ## [8.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v8.0.0...v8.1.0) (2021-03-22)
 
 

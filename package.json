@@ -1,6 +1,6 @@
 {
   "name": "copy-webpack-plugin",
-  "version": "8.1.0",
+  "version": "8.1.1",
   "description": "Copy files && directories with webpack",
   "license": "MIT",
   "repository": "webpack-contrib/copy-webpack-plugin",
