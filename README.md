@@ -78,7 +78,7 @@ module.exports = {
 
 |                  Name                   |         Type         |                     Default                     | Description                                                                                                                                            |
 | :-------------------------------------: | :------------------: | :---------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
-|             [`from`](#from)             |      `{String}`      |                   `undefined`                   | Glob or path from where we сopy files.                                                                                                                 |
+|             [`from`](#from)             |      `{String}`      |                   `undefined`                   | Glob or path from where we copy files.                                                                                                                 |
 |               [`to`](#to)               | `{String\|Function}` |            `compiler.options.output`            | Output path.                                                                                                                                           |
 |          [`context`](#context)          |      `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                                                                               |
 |      [`globOptions`](#globoptions)      |      `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.                                                         |
@@ -96,7 +96,7 @@ module.exports = {
 Type: `String`
 Default: `undefined`
 
-Glob or path from where we сopy files.
+Glob or path from where we copy files.
 Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
 Glob can only be a `string`.
 
@@ -480,14 +480,14 @@ module.exports = {
   plugins: [
     new CopyPlugin({
       patterns: [
-        // Сopied second and will overwrite "dir_2/file.txt"
+        // Copied second and will overwrite "dir_2/file.txt"
         {
           from: "dir_1/file.txt",
           to: "newfile.txt",
           force: true,
           priority: 10,
         },
-        // Сopied first
+        // Copied first
         {
           from: "dir_2/file.txt",
           to: "newfile.txt",
