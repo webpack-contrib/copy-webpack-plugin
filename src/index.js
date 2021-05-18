@@ -71,12 +71,8 @@ class CopyPlugin {
 
   static getContentHash(compiler, compilation, source) {
     const { outputOptions } = compilation;
-    const {
-      hashDigest,
-      hashDigestLength,
-      hashFunction,
-      hashSalt,
-    } = outputOptions;
+    const { hashDigest, hashDigestLength, hashFunction, hashSalt } =
+      outputOptions;
     const hash = compiler.webpack.util.createHash(hashFunction);
 
     if (hashSalt) {
@@ -567,13 +563,8 @@ class CopyPlugin {
                 contentHash,
               },
             };
-            const {
-              path: interpolatedFilename,
-              info: assetInfo,
-            } = compilation.getPathWithInfo(
-              normalizePath(result.filename),
-              data
-            );
+            const { path: interpolatedFilename, info: assetInfo } =
+              compilation.getPathWithInfo(normalizePath(result.filename), data);
 
             result.info = { ...result.info, ...assetInfo };
             result.filename = interpolatedFilename;
@@ -715,19 +706,14 @@ class CopyPlugin {
                           transformedAsset.data
                         );
 
-                        const {
-                          path: interpolatedFilename,
-                          info: assetInfo,
-                        } = compilation.getPathWithInfo(
-                          normalizePath(item.to),
-                          {
+                        const { path: interpolatedFilename, info: assetInfo } =
+                          compilation.getPathWithInfo(normalizePath(item.to), {
                             contentHash,
                             chunk: {
                               hash: contentHash,
                               contentHash,
                             },
-                          }
-                        );
+                          });
 
                         transformedAsset.filename = interpolatedFilename;
                         transformedAsset.info = assetInfo;

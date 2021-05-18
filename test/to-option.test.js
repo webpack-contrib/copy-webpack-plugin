@@ -961,8 +961,7 @@ describe("to option", () => {
       patterns: [
         {
           from: "directory/directoryfile.*",
-          to:
-            "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]--[unknown]",
+          to: "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]--[unknown]",
         },
       ],
     })

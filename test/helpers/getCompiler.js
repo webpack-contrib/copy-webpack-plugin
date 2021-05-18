@@ -1,6 +1,8 @@
 import path from "path";
 
+// eslint-disable-next-line import/no-extraneous-dependencies
 import webpack from "webpack";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { createFsFromVolume, Volume } from "memfs";
 
 export default (config = {}) => {

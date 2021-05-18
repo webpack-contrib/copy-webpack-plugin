@@ -45,8 +45,7 @@ describe("toType option", () => {
       patterns: [
         {
           from: "directory/directoryfile.*",
-          to:
-            "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]",
+          to: "[path][base]-new-[name][ext].[contenthash].[hash]-[fullhash][ext]",
           toType: "template",
         },
       ],
