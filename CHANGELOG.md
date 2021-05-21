@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v8.1.1...v9.0.0) (2021-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* minimum supported `Node.js` version is `12.13.0`
+
 ### [8.1.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v8.1.0...v8.1.1) (2021-04-06)
 
 
