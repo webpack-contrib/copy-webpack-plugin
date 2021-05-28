@@ -1071,7 +1071,7 @@ module.exports = {
       patterns: [
         {
           from: "src/**/*",
-          to: "[name][ext]",
+          to: "[name].[ext]",
         },
       ],
     }),
