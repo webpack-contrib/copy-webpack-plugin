@@ -19,12 +19,12 @@ exports[`validate options should throw an error on the "patterns" option with ""
 
 exports[`validate options should throw an error on the "patterns" option with "[""]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0] should be an non-empty string."
+ - options.patterns[0] should be a non-empty string."
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns should be an non-empty array."
+ - options.patterns should be a non-empty array."
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"","to":"dir","context":"context","noErrorOnMissing":"true"}]" value 1`] = `
@@ -34,7 +34,7 @@ exports[`validate options should throw an error on the "patterns" option with "[
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"","to":"dir","context":"context"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0].from should be an non-empty string."
+ - options.patterns[0].from should be a non-empty string."
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"dir","info":"string"}]" value 1`] = `
