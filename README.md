@@ -52,6 +52,11 @@ module.exports = {
 
 ## Options
 
+|            Name             |         Type         | Description                              |
+| :-------------------------: | :------------------: | :--------------------------------------- |
+| **[`patterns`](#patterns)** | `{Array<String\|Object>}` | Specify file related patterns for plugin |
+| **[`options`](#options-1)** |      `{Object}`      | Specify options for plugin               |
+
 The plugin's signature:
 
 **webpack.config.js**
