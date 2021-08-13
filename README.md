@@ -54,7 +54,7 @@ module.exports = {
 
 |            Name             |         Type         | Description                              |
 | :-------------------------: | :------------------: | :--------------------------------------- |
-| **[`patterns`](#patterns)** | `[String]\|[Object]` | Specify file related patterns for plugin |
+| **[`patterns`](#patterns)** | `{Array<String\|Object>}` | Specify file related patterns for plugin |
 | **[`options`](#options-1)** |      `{Object}`      | Specify options for plugin               |
 
 The plugin's signature:
