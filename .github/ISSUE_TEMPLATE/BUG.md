@@ -48,3 +48,5 @@ about: Something went awry and you'd like to tell us about it.
   If your webpack config is over 50 lines long, please provide a URL to a repo
   for your beefy 🍖 app that we can use to reproduce.
 -->
+
+### Please paste the results of `npx --no-install webpack info` here, and mention other relevant information
