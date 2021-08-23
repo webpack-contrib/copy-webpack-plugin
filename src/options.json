@@ -34,10 +34,13 @@
         },
         "filter": {
           "instanceof": "Function",
+          "description": "Allows to filter copied assets.",
           "link": "https://github.com/webpack-contrib/copy-webpack-plugin#filter"
         },
         "transformAll": {
-          "instanceof": "Function"
+          "instanceof": "Function",
+          "description": "Allows you to modify the contents of multiple files and save the result to one file.",
+          "link": "https://github.com/webpack-contrib/copy-webpack-plugin#transformall"
         },
         "toType": {
           "enum": ["dir", "file", "template"],
