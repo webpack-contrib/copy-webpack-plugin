@@ -378,11 +378,11 @@ Sometimes it is hard to say what is `to`, example `path/to/dir-with.ext`.
 If you want to copy files in directory you need use `dir` option.
 We try to automatically determine the `type` so you most likely do not need this option.
 
-|       Name       |    Type    |   Default   | Description                                                                                          |
-| :--------------: | :--------: | :---------: | :--------------------------------------------------------------------------------------------------- |
-|   **`'dir'`**    | `{String}` | `undefined` | If `to` has no extension or ends on `'/'`                                                            |
-|   **`'file'`**   | `{String}` | `undefined` | If `to` is not a directory and is not a template                                                     |
-| **`'template'`** | `{String}` | `undefined` | If `to` contains [a template pattern](https://webpack.js.org/configuration/output/#template-strings) |
+|             Name              |    Type    |   Default   | Description                                                                                          |
+| :---------------------------: | :--------: | :---------: | :--------------------------------------------------------------------------------------------------- |
+|      **[`'dir'`](#dir)**      | `{String}` | `undefined` | If `to` has no extension or ends on `'/'`                                                            |
+|     **[`'file'`](#file)**     | `{String}` | `undefined` | If `to` is not a directory and is not a template                                                     |
+| **[`'template'`](#template)** | `{String}` | `undefined` | If `to` contains [a template pattern](https://webpack.js.org/configuration/output/#template-strings) |
 
 ##### `'dir'`
 
@@ -780,7 +780,7 @@ module.exports = {
 Type: `Boolean`
 Default: `false`
 
-Doesn't generate an error on missing file(s);
+Doesn't generate an error on missing file(s).
 
 ```js
 module.exports = {
