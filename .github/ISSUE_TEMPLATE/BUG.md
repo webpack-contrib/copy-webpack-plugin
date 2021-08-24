@@ -14,11 +14,7 @@ about: Something went awry and you'd like to tell us about it.
   Head to StackOverflow or https://gitter.im/webpack/webpack.
 -->
 
-- Operating System:
-- Node Version:
-- NPM Version:
-- webpack Version:
-- copy-webpack-plugin Version:
+### Please paste the results of `npx webpack info` here, and mention other relevant information
 
 ### Expected Behavior
 
@@ -48,5 +44,3 @@ about: Something went awry and you'd like to tell us about it.
   If your webpack config is over 50 lines long, please provide a URL to a repo
   for your beefy 🍖 app that we can use to reproduce.
 -->
-
-### Please paste the results of `npx --no-install webpack info` here, and mention other relevant information
