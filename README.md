@@ -69,7 +69,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "source", to: "dest" },
-        { from: "other", to: "public" },
+        "path/to/source", // absolute or relative, files/directories/globs - see "from" section for examples
       ],
       options: {
         concurrency: 100,
