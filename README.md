@@ -757,10 +757,17 @@ module.exports = {
           to: "dest/file.txt",
           // The `assets` argument is an assets array for the pattern.from ("src/**/*.txt")
           transformAll(assets) {
+            // The assets parameter contains an array of assets
             const result = assets.reduce((accumulator, asset) => {
-              // The asset content can be obtained from `asset.source` using `source` method.
-              // The asset content is a [`Buffer`](https://nodejs.org/api/buffer.html) object, it could be converted to a `String` to be processed using `content.toString()`
-              const content = asset.data;
+              // Each `asset` contains the following data structure:
+              // {
+              //   data: [`Buffer`], // asset text content can be obtained via asset.data.toString()
+              //   sourceFilename: [`String`],
+              //   absoluteFilename: [`String`],
+              // }
+              // The asset content can be obtained from `asset.data`.
+              // The asset content is a [`Buffer`](https://nodejs.org/api/buffer.html) object, it could be converted to a `String` to be processed using `data.toString()`
+              const content = asset.data.toString();
 
               accumulator = `${accumulator}${content}\n`;
               return accumulator;
