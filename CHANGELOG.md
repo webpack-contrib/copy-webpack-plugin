@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [9.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v9.0.1...v9.1.0) (2021-11-11)
+
+
+### Features
+
+* output helpful descriptions and links on errors ([#625](https://github.com/webpack-contrib/copy-webpack-plugin/issues/625)) ([396bed6](https://github.com/webpack-contrib/copy-webpack-plugin/commit/396bed6a8ad12cea344e988fefb9a554bb9c7b1a))
+
+
+### Bug Fixes
+
+* compatibility with Node.js 17 ([20af0c7](https://github.com/webpack-contrib/copy-webpack-plugin/commit/20af0c7f1b06a7e597e6b498dbc2b432a4a6d0de))
+
 ### [9.0.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v9.0.0...v9.0.1) (2021-06-25)
 
 ### Chore
