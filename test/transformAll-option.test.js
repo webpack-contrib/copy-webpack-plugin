@@ -151,9 +151,9 @@ describe("transformAll option", () => {
 
   it("should interpolate [fullhash] and [contenthash]", (done) => {
     runEmit({
-      expectedAssetKeys: ["4333a40fa67dfaaaefc9-ac7f6fcb65ddfcc43b2c-file.txt"],
+      expectedAssetKeys: ["4333a40fa67dfaaaefc9-47e8bdc316eff74b2d6e-file.txt"],
       expectedAssetContent: {
-        "4333a40fa67dfaaaefc9-ac7f6fcb65ddfcc43b2c-file.txt":
+        "4333a40fa67dfaaaefc9-47e8bdc316eff74b2d6e-file.txt":
           "::special::new::::::::::new::::::new::",
       },
       patterns: [
