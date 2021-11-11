@@ -309,7 +309,7 @@ More [`examples`](#examples)
 Type: `Object`
 Default: `undefined`
 
-Allows to configute the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
+Allows to configure the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
 To exclude files from the selection, you should use [globOptions.ignore option](https://github.com/mrmlnc/fast-glob#ignore)
 
 **webpack.config.js**
