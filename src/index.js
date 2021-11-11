@@ -1,7 +1,6 @@
 import path from "path";
 
 import { validate } from "schema-utils";
-import pLimit from "p-limit";
 import globby from "globby";
 import serialize from "serialize-javascript";
 import normalizePath from "normalize-path";
@@ -11,7 +10,7 @@ import fastGlob from "fast-glob";
 import { version } from "../package.json";
 
 import schema from "./options.json";
-import { readFile, stat } from "./utils/promisify";
+import { readFile, stat, throttleAll } from "./utils";
 
 const template = /\[\\*([\w:]+)\\*\]/i;
 
@@ -602,7 +601,6 @@ class CopyPlugin {
 
   apply(compiler) {
     const pluginName = this.constructor.name;
-    const limit = pLimit(this.options.concurrency || 100);
 
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       const logger = compilation.getLogger("copy-webpack-plugin");
@@ -617,137 +615,138 @@ class CopyPlugin {
           logger.log("starting to add additional assets...");
 
           const assetMap = new Map();
+          const scheduledTasks = [];
 
-          await Promise.all(
-            this.patterns.map((item, index) =>
-              limit(async () => {
-                let assets;
+          this.patterns.map((item, index) =>
+            scheduledTasks.push(async () => {
+              let assets;
 
-                try {
-                  assets = await CopyPlugin.runPattern(
-                    compiler,
-                    compilation,
-                    logger,
-                    cache,
-                    item,
-                    index
+              try {
+                assets = await CopyPlugin.runPattern(
+                  compiler,
+                  compilation,
+                  logger,
+                  cache,
+                  item,
+                  index
+                );
+              } catch (error) {
+                compilation.errors.push(error);
+
+                return;
+              }
+
+              if (assets && assets.length > 0) {
+                if (item.transformAll) {
+                  if (typeof item.to === "undefined") {
+                    compilation.errors.push(
+                      new Error(
+                        `Invalid "pattern.to" for the "pattern.from": "${item.from}" and "pattern.transformAll" function. The "to" option must be specified.`
+                      )
+                    );
+
+                    return;
+                  }
+
+                  assets.sort((a, b) =>
+                    a.absoluteFilename > b.absoluteFilename
+                      ? 1
+                      : a.absoluteFilename < b.absoluteFilename
+                      ? -1
+                      : 0
                   );
-                } catch (error) {
-                  compilation.errors.push(error);
 
-                  return;
-                }
+                  const mergedEtag =
+                    assets.length === 1
+                      ? cache.getLazyHashedEtag(assets[0].source.buffer())
+                      : assets.reduce((accumulator, asset, i) => {
+                          // eslint-disable-next-line no-param-reassign
+                          accumulator = cache.mergeEtags(
+                            i === 1
+                              ? cache.getLazyHashedEtag(
+                                  accumulator.source.buffer()
+                                )
+                              : accumulator,
+                            cache.getLazyHashedEtag(asset.source.buffer())
+                          );
 
-                if (assets && assets.length > 0) {
-                  if (item.transformAll) {
-                    if (typeof item.to === "undefined") {
-                      compilation.errors.push(
-                        new Error(
-                          `Invalid "pattern.to" for the "pattern.from": "${item.from}" and "pattern.transformAll" function. The "to" option must be specified.`
-                        )
+                          return accumulator;
+                        });
+
+                  const cacheKeys = `transformAll|${serialize({
+                    version,
+                    from: item.from,
+                    to: item.to,
+                    transformAll: item.transformAll,
+                  })}`;
+                  const eTag = cache.getLazyHashedEtag(mergedEtag);
+                  const cacheItem = cache.getItemCache(cacheKeys, eTag);
+                  let transformedAsset = await cacheItem.getPromise();
+
+                  if (!transformedAsset) {
+                    transformedAsset = { filename: item.to };
+
+                    try {
+                      transformedAsset.data = await item.transformAll(
+                        assets.map((asset) => {
+                          return {
+                            data: asset.source.buffer(),
+                            sourceFilename: asset.sourceFilename,
+                            absoluteFilename: asset.absoluteFilename,
+                          };
+                        })
                       );
+                    } catch (error) {
+                      compilation.errors.push(error);
 
                       return;
                     }
 
-                    assets.sort((a, b) =>
-                      a.absoluteFilename > b.absoluteFilename
-                        ? 1
-                        : a.absoluteFilename < b.absoluteFilename
-                        ? -1
-                        : 0
-                    );
-
-                    const mergedEtag =
-                      assets.length === 1
-                        ? cache.getLazyHashedEtag(assets[0].source.buffer())
-                        : assets.reduce((accumulator, asset, i) => {
-                            // eslint-disable-next-line no-param-reassign
-                            accumulator = cache.mergeEtags(
-                              i === 1
-                                ? cache.getLazyHashedEtag(
-                                    accumulator.source.buffer()
-                                  )
-                                : accumulator,
-                              cache.getLazyHashedEtag(asset.source.buffer())
-                            );
-
-                            return accumulator;
-                          });
-
-                    const cacheKeys = `transformAll|${serialize({
-                      version,
-                      from: item.from,
-                      to: item.to,
-                      transformAll: item.transformAll,
-                    })}`;
-                    const eTag = cache.getLazyHashedEtag(mergedEtag);
-                    const cacheItem = cache.getItemCache(cacheKeys, eTag);
-                    let transformedAsset = await cacheItem.getPromise();
-
-                    if (!transformedAsset) {
-                      transformedAsset = { filename: item.to };
-
-                      try {
-                        transformedAsset.data = await item.transformAll(
-                          assets.map((asset) => {
-                            return {
-                              data: asset.source.buffer(),
-                              sourceFilename: asset.sourceFilename,
-                              absoluteFilename: asset.absoluteFilename,
-                            };
-                          })
-                        );
-                      } catch (error) {
-                        compilation.errors.push(error);
-
-                        return;
-                      }
-
-                      if (template.test(item.to)) {
-                        const contentHash = CopyPlugin.getContentHash(
-                          compiler,
-                          compilation,
-                          transformedAsset.data
-                        );
-
-                        const { path: interpolatedFilename, info: assetInfo } =
-                          compilation.getPathWithInfo(normalizePath(item.to), {
-                            contentHash,
-                            chunk: {
-                              hash: contentHash,
-                              contentHash,
-                            },
-                          });
-
-                        transformedAsset.filename = interpolatedFilename;
-                        transformedAsset.info = assetInfo;
-                      }
-
-                      const { RawSource } = compiler.webpack.sources;
-
-                      transformedAsset.source = new RawSource(
+                    if (template.test(item.to)) {
+                      const contentHash = CopyPlugin.getContentHash(
+                        compiler,
+                        compilation,
                         transformedAsset.data
                       );
-                      transformedAsset.force = item.force;
 
-                      await cacheItem.storePromise(transformedAsset);
+                      const { path: interpolatedFilename, info: assetInfo } =
+                        compilation.getPathWithInfo(normalizePath(item.to), {
+                          contentHash,
+                          chunk: {
+                            hash: contentHash,
+                            contentHash,
+                          },
+                        });
+
+                      transformedAsset.filename = interpolatedFilename;
+                      transformedAsset.info = assetInfo;
                     }
 
-                    assets = [transformedAsset];
+                    const { RawSource } = compiler.webpack.sources;
+
+                    transformedAsset.source = new RawSource(
+                      transformedAsset.data
+                    );
+                    transformedAsset.force = item.force;
+
+                    await cacheItem.storePromise(transformedAsset);
                   }
 
-                  const priority = item.priority || 0;
-
-                  if (!assetMap.has(priority)) {
-                    assetMap.set(priority, []);
-                  }
-
-                  assetMap.get(priority).push(...assets);
+                  assets = [transformedAsset];
                 }
-              })
-            )
+
+                const priority = item.priority || 0;
+
+                if (!assetMap.has(priority)) {
+                  assetMap.set(priority, []);
+                }
+
+                assetMap.get(priority).push(...assets);
+              }
+            })
           );
+
+          await throttleAll(this.options.concurrency || 100, scheduledTasks);
 
           const assets = [...assetMap.entries()].sort((a, b) => a[0] - b[0]);
 
