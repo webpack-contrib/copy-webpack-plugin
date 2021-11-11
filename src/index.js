@@ -1,5 +1,4 @@
 import path from "path";
-import crypto from "crypto";
 
 import { validate } from "schema-utils";
 import pLimit from "p-limit";
@@ -476,14 +475,20 @@ class CopyPlugin {
               const buffer = result.source.buffer();
 
               if (transform.cache) {
+                // TODO: remove in the next major release
+                const hasher =
+                  compiler.webpack &&
+                  compiler.webpack.util &&
+                  compiler.webpack.util.createHash
+                    ? compiler.webpack.util.createHash("xxhash64")
+                    : // eslint-disable-next-line global-require
+                      require("crypto").createHash("md4");
+
                 const defaultCacheKeys = {
                   version,
                   sourceFilename,
                   transform: transform.transformer,
-                  contentHash: crypto
-                    .createHash("md4")
-                    .update(buffer)
-                    .digest("hex"),
+                  contentHash: hasher.update(buffer).digest("hex"),
                   index,
                 };
                 const cacheKeys = `transform|${serialize(
