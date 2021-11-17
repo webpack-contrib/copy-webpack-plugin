@@ -3,6 +3,7 @@ const fs = require("fs");
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const mkdirp = require("mkdirp");
+const webpack = require("webpack");
 
 const removeIllegalCharacterForWindows = require("./test/helpers/removeIllegalCharacterForWindows");
 
@@ -23,4 +24,43 @@ module.exports = () => {
 
     fs.writeFileSync(path.join(baseDir, file), specialFiles[originFile]);
   });
+
+  return Promise.resolve()
+    .then(() => {
+      const compiler = webpack({
+        devtool: false,
+        mode: "development",
+        target: "node",
+        entry: path.resolve(__dirname, "node_modules/globby/index.js"),
+        output: {
+          path: path.resolve(__dirname, "test/bundled/globby"),
+          filename: "index.js",
+          library: {
+            type: "commonjs2",
+          },
+        },
+      });
+
+      return new Promise((resolve, reject) => {
+        compiler.run((error, stats) => {
+          if (error) {
+            reject(error);
+
+            return;
+          }
+
+          // eslint-disable-next-line no-console
+          console.log(stats.toString());
+
+          compiler.close(() => {
+            resolve();
+          });
+        });
+      });
+    })
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.log(error);
+      process.exit(1);
+    });
 };
