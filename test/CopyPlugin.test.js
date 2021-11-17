@@ -1,10 +1,7 @@
 import path from "path";
+import fs from "fs";
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import webpack from "webpack";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import del from "del";
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { createFsFromVolume, Volume } from "memfs";
 
 import CopyPlugin from "../src/index";
@@ -734,7 +731,11 @@ describe("CopyPlugin", () => {
     it('should work with the "filesystem" cache', async () => {
       const cacheDirectory = path.resolve(__dirname, "./outputs/.cache/simple");
 
-      await del(cacheDirectory);
+      try {
+        fs.rmdirSync(cacheDirectory, { recursive: true });
+      } catch (_) {
+        // Nothing
+      }
 
       const compiler = getCompiler({
         cache: {
@@ -780,7 +781,12 @@ describe("CopyPlugin", () => {
         "./outputs/.cache/multi-compiler/b"
       );
 
-      await del([cacheDirectoryA, cacheDirectoryB]);
+      try {
+        fs.rmdirSync(cacheDirectoryA, { recursive: true });
+        fs.rmdirSync(cacheDirectoryB, { recursive: true });
+      } catch (_) {
+        // Nothing
+      }
 
       const compiler = webpack([
         {
@@ -868,10 +874,15 @@ describe("CopyPlugin", () => {
     it('should work with the "transform" option', async () => {
       const cacheDirectory = path.resolve(__dirname, "./outputs/.cache/simple");
 
-      await del([
-        cacheDirectory,
-        path.resolve(__dirname, "../node_modules/.cache/copy-webpack-plugin"),
-      ]);
+      try {
+        fs.rmdirSync(cacheDirectory, { recursive: true });
+        fs.rmdirSync(
+          path.resolve(__dirname, "../node_modules/.cache/copy-webpack-plugin"),
+          { recursive: true }
+        );
+      } catch (_) {
+        // Nothing
+      }
 
       const compiler = getCompiler({
         cache: {

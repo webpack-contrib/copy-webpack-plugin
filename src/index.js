@@ -1,7 +1,6 @@
 import path from "path";
 
 import { validate } from "schema-utils";
-import globby from "globby";
 import serialize from "serialize-javascript";
 import normalizePath from "normalize-path";
 import globParent from "glob-parent";
@@ -85,6 +84,7 @@ class CopyPlugin {
   }
 
   static async runPattern(
+    globby,
     compiler,
     compilation,
     logger,
@@ -605,6 +605,7 @@ class CopyPlugin {
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       const logger = compilation.getLogger("copy-webpack-plugin");
       const cache = compilation.getCache("CopyWebpackPlugin");
+      let globby;
 
       compilation.hooks.processAssets.tapAsync(
         {
@@ -612,6 +613,16 @@ class CopyPlugin {
           stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL,
         },
         async (unusedAssets, callback) => {
+          if (typeof globby === "undefined") {
+            try {
+              ({ globby } = await import("globby"));
+            } catch (error) {
+              callback(error);
+
+              return;
+            }
+          }
+
           logger.log("starting to add additional assets...");
 
           const assetMap = new Map();
@@ -623,6 +634,7 @@ class CopyPlugin {
 
               try {
                 assets = await CopyPlugin.runPattern(
+                  globby,
                   compiler,
                   compilation,
                   logger,
