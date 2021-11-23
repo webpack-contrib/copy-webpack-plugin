@@ -83,7 +83,7 @@ module.exports = {
 
 |                  Name                   |         Type         |                     Default                     | Description                                                                                                                                            |
 | :-------------------------------------: | :------------------: | :---------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
-|             [`from`](#from)             |      `{String}`      |                   `undefined`                   | Glob or path from where we copy files.                                                                                                                 |
+|             [`from`](#from)             |  `{String\|Array}`   |                   `undefined`                   | Glob or path from where we copy files, or array of such values.                                                                                        |
 |               [`to`](#to)               | `{String\|Function}` |            `compiler.options.output`            | Output path.                                                                                                                                           |
 |          [`context`](#context)          |      `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                                                                               |
 |      [`globOptions`](#globoptions)      |      `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.                                                         |
@@ -98,12 +98,12 @@ module.exports = {
 
 #### `from`
 
-Type: `String`
+Type: `String or Array of strings`
 Default: `undefined`
 
 Glob or path from where we copy files.
 Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
-Glob can only be a `string`.
+Glob can only be a non-empty `string` or non-empty array of non-empty strings.
 
 > ⚠️ Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -176,6 +176,31 @@ module.exports = {
 
 The `context` behaves differently depending on what the `from` is (`glob`, `file` or `dir`).
 More [`examples`](#examples)
+
+##### Using arrays in `from`
+
+When `from` is specified as an array, it behaves the same as if all array elements were processed separately
+using shared options, such as `transform`. The only exception is `transformAll` which receives assets from processed
+array elements in a single call, thus allowing to process group of specific files at once.
+
+```js
+module.exports = {
+  plugins: [
+    new CopyPlugin({
+      from: ["file.txt", "directory/directoryfile.txt"],
+      to: "file.txt",
+      transformAll(assets) {
+        const result = assets.sort().reduce((accumulator, asset) => {
+          const content = asset.sourceFilename;
+          accumulator = `${accumulator}${content}::`;
+          return accumulator;
+        }, "");
+        return result;
+      },
+    }),
+  ],
+};
+```
 
 #### `to`
 

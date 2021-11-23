@@ -21,6 +21,18 @@ describe("from option", () => {
         .then(done)
         .catch(done);
     });
+    it("should copy an array of files", (done) => {
+      runEmit({
+        expectedAssetKeys: ["file.txt", "directoryfile.txt"],
+        patterns: [
+          {
+            from: ["file.txt", "directory/directoryfile.txt"],
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
 
     it('should copy a file when "from" an absolute path', (done) => {
       runEmit({
@@ -147,6 +159,27 @@ describe("from option", () => {
         patterns: [
           {
             from: ".",
+          },
+        ],
+      })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should copy files when "from" is an array of directories', (done) => {
+      runEmit({
+        expectedAssetKeys: [
+          "file.txt",
+          "nesteddir/deepnesteddir/deepnesteddir.txt",
+          "nesteddir/nestedfile.txt",
+          ".dottedfile",
+          "directoryfile.txt",
+          "nested/deep-nested/deepnested.txt",
+          "nested/nestedfile.txt",
+        ],
+        patterns: [
+          {
+            from: ["dir (86)", "directory"],
           },
         ],
       })

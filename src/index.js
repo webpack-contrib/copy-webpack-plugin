@@ -633,15 +633,41 @@ class CopyPlugin {
               let assets;
 
               try {
-                assets = await CopyPlugin.runPattern(
-                  globby,
-                  compiler,
-                  compilation,
-                  logger,
-                  cache,
-                  item,
-                  index
-                );
+                if (item.from instanceof Array) {
+                  if (!item.from.every((from) => typeof from === "string")) {
+                    compilation.errors.push(
+                      new Error(
+                        `Invalid "pattern.from": ${item.from}, every element should be a string"`
+                      )
+                    );
+                  }
+
+                  assets = [].concat(
+                    ...(await Promise.all(
+                      item.from.map(async (from) =>
+                        CopyPlugin.runPattern(
+                          globby,
+                          compiler,
+                          compilation,
+                          logger,
+                          cache,
+                          { ...item, from },
+                          index
+                        )
+                      )
+                    ))
+                  );
+                } else {
+                  assets = await CopyPlugin.runPattern(
+                    globby,
+                    compiler,
+                    compilation,
+                    logger,
+                    cache,
+                    item,
+                    index
+                  );
+                }
               } catch (error) {
                 compilation.errors.push(error);
 

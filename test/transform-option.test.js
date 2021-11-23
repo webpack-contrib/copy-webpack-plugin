@@ -29,6 +29,30 @@ describe("transform option", () => {
       .catch(done);
   });
 
+  it('should transform files when "from" is an array of files', (done) => {
+    runEmit({
+      expectedAssetKeys: ["file.txt", "directoryfile.txt"],
+      expectedAssetContent: {
+        "file.txt": "newchanged",
+        "directoryfile.txt": "newchanged",
+      },
+      patterns: [
+        {
+          from: ["file.txt", "directory/directoryfile.txt"],
+          transform: {
+            transformer(content, absoluteFrom) {
+              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+
+              return `${content}changed`;
+            },
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
   it('should transform target path of every when "from" is a directory', (done) => {
     runEmit({
       expectedAssetKeys: [

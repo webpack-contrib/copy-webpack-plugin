@@ -5,13 +5,25 @@
       "additionalProperties": false,
       "properties": {
         "from": {
-          "type": "string",
-          "description": "Glob or path from where we copy files.",
-          "link": "https://github.com/webpack-contrib/copy-webpack-plugin#from",
-          "minLength": 1
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          ],
+          "description": "Glob or path from where we copy files, or array of paths or globs.",
+          "link": "https://github.com/webpack-contrib/copy-webpack-plugin#from"
         },
         "to": {
-          "anyOf": [
+          "oneOf": [
             {
               "type": "string"
             },
@@ -58,7 +70,7 @@
           "link": "https://github.com/webpack-contrib/copy-webpack-plugin#priority"
         },
         "info": {
-          "anyOf": [
+          "oneOf": [
             {
               "type": "object"
             },
@@ -72,7 +84,7 @@
         "transform": {
           "description": "Allows to modify the file contents.",
           "link": "https://github.com/webpack-contrib/copy-webpack-plugin#transform",
-          "anyOf": [
+          "oneOf": [
             {
               "instanceof": "Function"
             },

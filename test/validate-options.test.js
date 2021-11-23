@@ -61,6 +61,14 @@ describe("validate options", () => {
         ],
         [
           {
+            from: ["test1.txt", "test2.txt"],
+            to: "dir",
+            context: "context",
+            transform: () => {},
+          },
+        ],
+        [
+          {
             from: "test.txt",
             to: "dir",
             context: "context",
@@ -167,6 +175,11 @@ describe("validate options", () => {
         ],
         [
           {
+            from: [],
+          },
+        ],
+        [
+          {
             from: "dir",
             info: true,
           },
@@ -231,6 +244,14 @@ describe("validate options", () => {
             to: "dir",
             context: "context",
             transform: true,
+          },
+        ],
+        [
+          {
+            from: ["test1.txt", 1],
+            to: "dir",
+            context: "context",
+            transform: () => {},
           },
         ],
         [
