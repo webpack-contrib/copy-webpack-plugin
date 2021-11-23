@@ -38,9 +38,7 @@ exports[`validate options should throw an error on the "patterns" option with "[
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"","to":"dir","context":"context"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0].from should be a non-empty string.
-   -> Glob or path from where we copy files.
-   -> Read more at https://github.com/webpack-contrib/copy-webpack-plugin#from"
+ - options.patterns[0].from should be a non-empty string."
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"dir","info":"string"}]" value 1`] = `
@@ -165,25 +163,51 @@ exports[`validate options should throw an error on the "patterns" option with "[
        * options.patterns[0].to should be an instance of function."
 `;
 
+exports[`validate options should throw an error on the "patterns" option with "[{"from":["test1.txt",1],"to":"dir","context":"context"}]" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.patterns[0].from[1] should be a non-empty string."
+`;
+
+exports[`validate options should throw an error on the "patterns" option with "[{"from":[]}]" value 1`] = `
+"Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
+ - options.patterns[0].from should be a non-empty array."
+`;
+
 exports[`validate options should throw an error on the "patterns" option with "[{"from":{"glob":"**/*","dot":false},"to":"dir","context":"context"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0].from should be a non-empty string.
-   -> Glob or path from where we copy files.
-   -> Read more at https://github.com/webpack-contrib/copy-webpack-plugin#from"
+ - options.patterns[0] should be one of these:
+   non-empty string | object { from, to?, context?, globOptions?, filter?, transformAll?, toType?, force?, priority?, info?, transform?, transformPath?, noErrorOnMissing? }
+   Details:
+    * options.patterns[0].from should be one of these:
+      non-empty string | [non-empty string, ...] (should not have fewer than 1 item)
+      -> Glob or path from where we copy files, or array of paths or globs.
+      -> Read more at https://github.com/webpack-contrib/copy-webpack-plugin#from
+      Details:
+       * options.patterns[0].from should be a non-empty string.
+       * options.patterns[0].from should be an array:
+         [non-empty string, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{"from":true,"to":"dir","context":"context"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
- - options.patterns[0].from should be a non-empty string.
-   -> Glob or path from where we copy files.
-   -> Read more at https://github.com/webpack-contrib/copy-webpack-plugin#from"
+ - options.patterns[0] should be one of these:
+   non-empty string | object { from, to?, context?, globOptions?, filter?, transformAll?, toType?, force?, priority?, info?, transform?, transformPath?, noErrorOnMissing? }
+   Details:
+    * options.patterns[0].from should be one of these:
+      non-empty string | [non-empty string, ...] (should not have fewer than 1 item)
+      -> Glob or path from where we copy files, or array of paths or globs.
+      -> Read more at https://github.com/webpack-contrib/copy-webpack-plugin#from
+      Details:
+       * options.patterns[0].from should be a non-empty string.
+       * options.patterns[0].from should be an array:
+         [non-empty string, ...] (should not have fewer than 1 item)"
 `;
 
 exports[`validate options should throw an error on the "patterns" option with "[{}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns[0] misses the property 'from'. Should be:
-   non-empty string
-   -> Glob or path from where we copy files.
+   non-empty string | [non-empty string, ...] (should not have fewer than 1 item)
+   -> Glob or path from where we copy files, or array of paths or globs.
    -> Read more at https://github.com/webpack-contrib/copy-webpack-plugin#from"
 `;
 

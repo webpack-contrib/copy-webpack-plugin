@@ -51,6 +51,33 @@ describe("transformAll option", () => {
       .catch(done);
   });
 
+  it('should transform files when  when "from" is an array of files', (done) => {
+    runEmit({
+      expectedAssetKeys: ["file.txt"],
+      expectedAssetContent: {
+        "file.txt": "directory/directoryfile.txt::file.txt::",
+      },
+      patterns: [
+        {
+          from: ["file.txt", "directory/directoryfile.txt"],
+          to: "file.txt",
+          transformAll(assets) {
+            const result = assets.sort().reduce((accumulator, asset) => {
+              const content = asset.sourceFilename;
+              // eslint-disable-next-line no-param-reassign
+              accumulator = `${accumulator}${content}::`;
+              return accumulator;
+            }, "");
+
+            return result;
+          },
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
   it("should transform files when async function used", (done) => {
     runEmit({
       expectedAssetKeys: ["file.txt"],
