@@ -1,26 +1,65 @@
+/** @typedef {import("webpack").Compilation["inputFileSystem"] } InputFileSystem */
+/** @typedef {import("fs").Stats } Stats */
+
+/**
+ * @param {InputFileSystem} inputFileSystem
+ * @param {string} path
+ * @return {Promise<undefined | Stats>}
+ */
 function stat(inputFileSystem, path) {
   return new Promise((resolve, reject) => {
-    inputFileSystem.stat(path, (err, stats) => {
-      if (err) {
-        reject(err);
+    inputFileSystem.stat(
+      path,
+      /**
+       * @param {null | undefined | NodeJS.ErrnoException} err
+       * @param {undefined | Stats} stats
+       */
+      // @ts-ignore
+      (err, stats) => {
+        if (err) {
+          reject(err);
+
+          return;
+        }
+
+        resolve(stats);
       }
-      resolve(stats);
-    });
+    );
   });
 }
 
+/**
+ * @param {InputFileSystem} inputFileSystem
+ * @param {string} path
+ * @return {Promise<string | Buffer>}
+ */
 function readFile(inputFileSystem, path) {
   return new Promise((resolve, reject) => {
-    inputFileSystem.readFile(path, (err, stats) => {
-      if (err) {
-        reject(err);
+    inputFileSystem.readFile(
+      path,
+      /**
+       * @param {null | undefined | NodeJS.ErrnoException} err
+       * @param {undefined | string | Buffer} data
+       */
+      (err, data) => {
+        if (err) {
+          reject(err);
+
+          return;
+        }
+
+        resolve(/** @type {string | Buffer} */ (data));
       }
-      resolve(stats);
-    });
+    );
   });
 }
 
 const notSettled = Symbol(`not-settled`);
+
+/**
+ * @template T
+ * @typedef {() => Promise<T>} Task
+ */
 
 /**
  * Run tasks with limited concurency.

@@ -13,23 +13,180 @@ import { readFile, stat, throttleAll } from "./utils";
 
 const template = /\[\\*([\w:]+)\\*\]/i;
 
+/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
+/** @typedef {import("webpack").Compiler} Compiler */
+/** @typedef {import("webpack").Compilation} Compilation */
+/** @typedef {import("webpack").WebpackError} WebpackError */
+/** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("globby").Options} GlobbyOptions */
+/** @typedef {import("globby").GlobEntry} GlobEntry */
+/** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
+/** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
+/** @typedef {ReturnType<ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]>} Etag */
+/** @typedef {ReturnType<Compilation["fileSystemInfo"]["mergeSnapshots"]>} Snapshot */
+
+/**
+ * @typedef {boolean} Force
+ */
+
+/**
+ * @typedef {Object} CopiedResult
+ * @property {string} sourceFilename
+ * @property {string} absoluteFilename
+ * @property {string} filename
+ * @property {Asset["source"]} source
+ * @property {Force | undefined} force
+ * @property {{ [key: string]: string }} info
+ */
+
+/**
+ * @typedef {string} StringPattern
+ */
+
+/**
+ * @typedef {boolean} NoErrorOnMissing
+ */
+
+// TODO fix me
+/**
+ * @typedef {string} Context
+ */
+
+/**
+ * @typedef {string} From
+ */
+
+/**
+ * @callback ToFunction
+ * @param {{ context: string, absoluteFilename: string }} pathData
+ * @return {string}
+ */
+
+/**
+ * @typedef {string | ToFunction} To
+ */
+
+/**
+ * @typedef {"dir" | "file" | "template"} ToType
+ */
+
+/**
+ * @callback TransformerFunction
+ * @param {Buffer} input
+ * @param {string} absoluteFilename
+ */
+
+/**
+ * @typedef {{ keys: { [key: string]: any } } | { keys: ((defaultCacheKeys: { [key: string]: any }, absoluteFilename: string) => Promise<{ [key: string]: any }>) }} TransformerCacheObject
+ */
+
+/**
+ * @typedef {Object} TransformerObject
+ * @property {TransformerFunction} transformer
+ * @property {boolean | TransformerCacheObject} [cache]
+ */
+
+/**
+ * @typedef {TransformerFunction | TransformerObject} Transform
+ */
+
+/**
+ * @callback Filter
+ * @param {string} filepath
+ */
+
+/**
+ * @callback TransformAllFunction
+ * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
+ */
+
+/**
+ * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
+ */
+
+/**
+ * @typedef {Object} ObjectPattern
+ * @property {Context} [context]
+ * @property {From} from
+ * @property {To} [to]
+ * @property {GlobbyOptions} [globOptions]
+ * @property {Filter} [filter]
+ * @property {TransformAllFunction} [transformAll]
+ * @property {ToType} [toType]
+ * @property {Force} [force]
+ * @property {number} [priority]
+ * @property {Info} [info]
+ * @property {Transform} [transform]
+ * @property {(() => {})} [transformPath]
+ * @property {NoErrorOnMissing} [noErrorOnMissing]
+ */
+
+/**
+ * @typedef {Object} InternalPattern
+ * @property {Context} context
+ * @property {From} from
+ * @property {To} to
+ * @property {ToType} toType
+ * @property {GlobbyOptions} globOptions
+ * @property {Force} force
+ * @property {string} fromOrigin
+ * @property {"file" | "dir" | "glob"} fromType
+ * @property {string} absoluteFrom
+ * @property {string} glob
+ * @property {NoErrorOnMissing} noErrorOnMissing
+ * @property {Filter} [filter]
+ * @property {Transform} [transform]
+ * @property {Info} [info]
+ */
+
+/**
+ * @typedef {StringPattern | ObjectPattern} Pattern
+ */
+
+/**
+ * @typedef {Object} AdditionalOptions
+ * @property {number} [concurrency]
+ */
+
+/**
+ * @typedef {Object} PluginOptions
+ * @property {Pattern[]} patterns
+ * @property {AdditionalOptions} [options]
+ */
+
 class CopyPlugin {
-  constructor(options = {}) {
-    validate(schema, options, {
+  /**
+   * @param {PluginOptions} [options]
+   */
+  constructor(options = { patterns: [] }) {
+    validate(/** @type {Schema} */ (schema), options, {
       name: "Copy Plugin",
       baseDataPath: "options",
     });
 
     this.patterns = options.patterns;
+
+    /**
+     * @private
+     * @type {AdditionalOptions}
+     */
     this.options = options.options || {};
   }
 
+  /**
+   * @private
+   * @param {Compilation} compilation
+   * @param {number} startTime
+   * @param {string} dependency
+   * @returns {Promise<Snapshot | undefined>}
+   */
   static async createSnapshot(compilation, startTime, dependency) {
     // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
       compilation.fileSystemInfo.createSnapshot(
         startTime,
         [dependency],
+        // @ts-ignore
         // eslint-disable-next-line no-undefined
         undefined,
         // eslint-disable-next-line no-undefined
@@ -48,6 +205,12 @@ class CopyPlugin {
     });
   }
 
+  /**
+   * @private
+   * @param {Compilation} compilation
+   * @param {Snapshot} snapshot
+   * @returns {Promise<boolean | undefined>}
+   */
   static async checkSnapshotValid(compilation, snapshot) {
     // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
@@ -66,11 +229,20 @@ class CopyPlugin {
     });
   }
 
+  /**
+   * @private
+   * @param {Compiler} compiler
+   * @param {Compilation} compilation
+   * @param {Buffer} source
+   * @returns {string}
+   */
   static getContentHash(compiler, compilation, source) {
     const { outputOptions } = compilation;
     const { hashDigest, hashDigestLength, hashFunction, hashSalt } =
       outputOptions;
-    const hash = compiler.webpack.util.createHash(hashFunction);
+    const hash = compiler.webpack.util.createHash(
+      /** @type {string} */ (hashFunction)
+    );
 
     if (hashSalt) {
       hash.update(hashSalt);
@@ -80,9 +252,20 @@ class CopyPlugin {
 
     const fullContentHash = hash.digest(hashDigest);
 
-    return fullContentHash.slice(0, hashDigestLength);
+    return fullContentHash.toString().slice(0, hashDigestLength);
   }
 
+  /**
+   * @private
+   * @param {typeof import("globby").globby} globby
+   * @param {Compiler} compiler
+   * @param {Compilation} compilation
+   * @param {WebpackLogger} logger
+   * @param {CacheFacade} cache
+   * @param {Partial<InternalPattern> & { from: string }} inputPattern
+   * @param {number} index
+   * @returns {Promise<CopiedResult[] | undefined>}
+   */
   static async runPattern(
     globby,
     compiler,
@@ -93,10 +276,10 @@ class CopyPlugin {
     index
   ) {
     const { RawSource } = compiler.webpack.sources;
-    const pattern =
-      typeof inputPattern === "string"
-        ? { from: inputPattern }
-        : { ...inputPattern };
+    /**
+     * @type {Partial<InternalPattern> & { from: string }}
+     */
+    const pattern = inputPattern;
 
     pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
@@ -148,6 +331,7 @@ class CopyPlugin {
       ...{ cwd: pattern.context, objectMode: true },
     };
 
+    // @ts-ignore
     pattern.globOptions.fs = inputFileSystem;
 
     switch (pattern.fromType) {
@@ -210,12 +394,20 @@ class CopyPlugin {
 
     logger.log(`begin globbing '${pattern.glob}'...`);
 
+    /**
+     * @type {GlobEntry[]}
+     */
     let paths;
 
     try {
-      paths = await globby(pattern.glob, pattern.globOptions);
+      paths = await globby(
+        pattern.glob,
+        /** @type {GlobbyOptions & { objectMode: true }} */ (
+          pattern.globOptions
+        )
+      );
     } catch (error) {
-      compilation.errors.push(error);
+      compilation.errors.push(/** @type {WebpackError} */ (error));
 
       return;
     }
@@ -231,41 +423,43 @@ class CopyPlugin {
 
       const missingError = new Error(`unable to locate '${pattern.glob}' glob`);
 
-      compilation.errors.push(missingError);
+      compilation.errors.push(/** @type {WebpackError} */ (missingError));
 
       return;
     }
 
-    const filteredPaths = (
-      await Promise.all(
-        paths.map(async (item) => {
-          // Exclude directories
-          if (!item.dirent.isFile()) {
-            return false;
-          }
-
-          if (pattern.filter) {
-            let isFiltered;
-
-            try {
-              isFiltered = await pattern.filter(item.path);
-            } catch (error) {
-              compilation.errors.push(error);
-
+    const filteredPaths = /** @type {GlobEntry[]} */ (
+      (
+        await Promise.all(
+          paths.map(async (item) => {
+            // Exclude directories
+            if (!item.dirent.isFile()) {
               return false;
             }
 
-            if (!isFiltered) {
-              logger.log(`skip '${item.path}', because it was filtered`);
+            if (pattern.filter) {
+              let isFiltered;
+
+              try {
+                isFiltered = await pattern.filter(item.path);
+              } catch (error) {
+                compilation.errors.push(/** @type {WebpackError} */ (error));
+
+                return false;
+              }
+
+              if (!isFiltered) {
+                logger.log(`skip '${item.path}', because it was filtered`);
+              }
+
+              return isFiltered ? item : false;
             }
 
-            return isFiltered ? item : false;
-          }
-
-          return item;
-        })
-      )
-    ).filter((item) => item);
+            return item;
+          })
+        )
+      ).filter((item) => item)
+    );
 
     if (filteredPaths.length === 0) {
       if (pattern.noErrorOnMissing) {
@@ -280,7 +474,7 @@ class CopyPlugin {
         `unable to locate '${pattern.glob}' glob after filtering paths`
       );
 
-      compilation.errors.push(missingError);
+      compilation.errors.push(/** @type {WebpackError} */ (missingError));
 
       return;
     }
@@ -292,11 +486,22 @@ class CopyPlugin {
         logger.debug(`found '${from}'`);
 
         // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-        const absoluteFilename = path.resolve(pattern.context, from);
+        const absoluteFilename = path.resolve(
+          /** @type {string} */
+          (pattern.context),
+          from
+        );
 
+        /**
+         * @type {string}
+         */
         pattern.to =
           typeof pattern.to === "function"
-            ? await pattern.to({ context: pattern.context, absoluteFilename })
+            ? /** @typedef {string} */
+              await pattern.to({
+                context: /** @type {string} */ (pattern.context),
+                absoluteFilename,
+              })
             : path.normalize(
                 typeof pattern.to !== "undefined" ? pattern.to : ""
               );
@@ -314,12 +519,19 @@ class CopyPlugin {
 
         logger.log(`'to' option '${pattern.to}' determinated as '${toType}'`);
 
-        const relativeFrom = path.relative(pattern.context, absoluteFilename);
+        const relativeFrom = path.relative(
+          /** @type {string} */
+          (pattern.context),
+          absoluteFilename
+        );
         let filename =
           toType === "dir" ? path.join(pattern.to, relativeFrom) : pattern.to;
 
         if (path.isAbsolute(filename)) {
-          filename = path.relative(compiler.options.output.path, filename);
+          filename = path.relative(
+            /** @type {string} */ (compiler.options.output.path),
+            filename
+          );
         }
 
         logger.log(`determined that '${from}' should write to '${filename}'`);
@@ -344,9 +556,15 @@ class CopyPlugin {
         files.map(async (file) => {
           const { absoluteFilename, sourceFilename, filename, toType } = file;
           const info =
-            typeof pattern.info === "function"
+            typeof pattern.info === "undefined"
+              ? {}
+              : typeof pattern.info === "function"
               ? pattern.info(file) || {}
               : pattern.info || {};
+
+          /**
+           * @type {Partial<CopiedResult>}
+           */
           const result = {
             absoluteFilename,
             sourceFilename,
@@ -372,7 +590,7 @@ class CopyPlugin {
               null
             );
           } catch (error) {
-            compilation.errors.push(error);
+            compilation.errors.push(/** @type {WebpackError} */ (error));
 
             return;
           }
@@ -392,7 +610,7 @@ class CopyPlugin {
                 cacheEntry.snapshot
               );
             } catch (error) {
-              compilation.errors.push(error);
+              compilation.errors.push(/** @type {WebpackError} */ (error));
 
               return;
             }
@@ -418,7 +636,7 @@ class CopyPlugin {
             try {
               data = await readFile(inputFileSystem, absoluteFilename);
             } catch (error) {
-              compilation.errors.push(error);
+              compilation.errors.push(/** @type {WebpackError} */ (error));
 
               return;
             }
@@ -438,7 +656,7 @@ class CopyPlugin {
                 absoluteFilename
               );
             } catch (error) {
-              compilation.errors.push(error);
+              compilation.errors.push(/** @type {WebpackError} */ (error));
 
               return;
             }
@@ -453,7 +671,7 @@ class CopyPlugin {
                   snapshot,
                 });
               } catch (error) {
-                compilation.errors.push(error);
+                compilation.errors.push(/** @type {WebpackError} */ (error));
 
                 return;
               }
@@ -463,6 +681,9 @@ class CopyPlugin {
           }
 
           if (pattern.transform) {
+            /**
+             * @type {TransformerObject}
+             */
             const transform =
               typeof pattern.transform === "function"
                 ? { transformer: pattern.transform }
@@ -491,12 +712,14 @@ class CopyPlugin {
                   index,
                 };
                 const cacheKeys = `transform|${serialize(
-                  typeof transform.cache.keys === "function"
+                  typeof transform.cache === "boolean"
+                    ? defaultCacheKeys
+                    : typeof transform.cache.keys === "function"
                     ? await transform.cache.keys(
                         defaultCacheKeys,
                         absoluteFilename
                       )
-                    : { ...defaultCacheKeys, ...pattern.transform.cache.keys }
+                    : { ...defaultCacheKeys, ...transform.cache.keys }
                 )}`;
 
                 logger.debug(
@@ -552,12 +775,16 @@ class CopyPlugin {
               compilation,
               result.source.buffer()
             );
-            const ext = path.extname(result.sourceFilename);
-            const base = path.basename(result.sourceFilename);
+            const ext = path.extname(sourceFilename);
+            const base = path.basename(sourceFilename);
             const name = base.slice(0, base.length - ext.length);
             const data = {
               filename: normalizePath(
-                path.relative(pattern.context, absoluteFilename)
+                path.relative(
+                  /** @type {string} */
+                  (pattern.context),
+                  absoluteFilename
+                )
               ),
               contentHash,
               chunk: {
@@ -568,7 +795,12 @@ class CopyPlugin {
               },
             };
             const { path: interpolatedFilename, info: assetInfo } =
-              compilation.getPathWithInfo(normalizePath(result.filename), data);
+              compilation.getPathWithInfo(
+                normalizePath(filename),
+                // @ts-ignore
+                // TODO test me
+                data
+              );
 
             result.info = { ...result.info, ...assetInfo };
             result.filename = interpolatedFilename;
@@ -578,7 +810,7 @@ class CopyPlugin {
             );
           } else {
             // eslint-disable-next-line no-param-reassign
-            result.filename = normalizePath(result.filename);
+            result.filename = normalizePath(filename);
           }
 
           // eslint-disable-next-line consistent-return
@@ -586,7 +818,7 @@ class CopyPlugin {
         })
       );
     } catch (error) {
-      compilation.errors.push(error);
+      compilation.errors.push(/** @type {WebpackError} */ (error));
 
       return;
     }
@@ -595,16 +827,25 @@ class CopyPlugin {
       `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`
     );
 
+    // TODO: test me
+    // @ts-ignore
     // eslint-disable-next-line consistent-return
     return assets;
   }
 
+  /**
+   * @param {Compiler} compiler
+   */
   apply(compiler) {
     const pluginName = this.constructor.name;
 
     compiler.hooks.thisCompilation.tap(pluginName, (compilation) => {
       const logger = compilation.getLogger("copy-webpack-plugin");
       const cache = compilation.getCache("CopyWebpackPlugin");
+
+      /**
+       * @type {typeof import("globby").globby}
+       */
       let globby;
 
       compilation.hooks.processAssets.tapAsync(
@@ -615,9 +856,10 @@ class CopyPlugin {
         async (unusedAssets, callback) => {
           if (typeof globby === "undefined") {
             try {
+              // @ts-ignore
               ({ globby } = await import("globby"));
             } catch (error) {
-              callback(error);
+              callback(/** @type {Error} */ (error));
 
               return;
             }
@@ -626,136 +868,175 @@ class CopyPlugin {
           logger.log("starting to add additional assets...");
 
           const assetMap = new Map();
+          /**
+           * @type {(() => Promise<void>)[]}
+           */
           const scheduledTasks = [];
 
-          this.patterns.map((item, index) =>
-            scheduledTasks.push(async () => {
-              let assets;
+          this.patterns.map(
+            /**
+             * @param {Pattern} item
+             * @param {number} index
+             * @return {number}
+             */
+            (item, index) =>
+              scheduledTasks.push(async () => {
+                /**
+                 * @type {Partial<ObjectPattern> & { from: string }}
+                 */
+                const normalizedPattern =
+                  typeof item === "string" ? { from: item } : { ...item };
 
-              try {
-                assets = await CopyPlugin.runPattern(
-                  globby,
-                  compiler,
-                  compilation,
-                  logger,
-                  cache,
-                  item,
-                  index
-                );
-              } catch (error) {
-                compilation.errors.push(error);
+                /**
+                 * @type {CopiedResult[] | undefined}
+                 */
+                let assets;
 
-                return;
-              }
-
-              if (assets && assets.length > 0) {
-                if (item.transformAll) {
-                  if (typeof item.to === "undefined") {
-                    compilation.errors.push(
-                      new Error(
-                        `Invalid "pattern.to" for the "pattern.from": "${item.from}" and "pattern.transformAll" function. The "to" option must be specified.`
-                      )
-                    );
-
-                    return;
-                  }
-
-                  assets.sort((a, b) =>
-                    a.absoluteFilename > b.absoluteFilename
-                      ? 1
-                      : a.absoluteFilename < b.absoluteFilename
-                      ? -1
-                      : 0
+                try {
+                  assets = await CopyPlugin.runPattern(
+                    globby,
+                    compiler,
+                    compilation,
+                    logger,
+                    cache,
+                    normalizedPattern,
+                    index
                   );
+                } catch (error) {
+                  compilation.errors.push(/** @type {WebpackError} */ (error));
 
-                  const mergedEtag =
-                    assets.length === 1
-                      ? cache.getLazyHashedEtag(assets[0].source.buffer())
-                      : assets.reduce((accumulator, asset, i) => {
-                          // eslint-disable-next-line no-param-reassign
-                          accumulator = cache.mergeEtags(
-                            i === 1
-                              ? cache.getLazyHashedEtag(
-                                  accumulator.source.buffer()
-                                )
-                              : accumulator,
-                            cache.getLazyHashedEtag(asset.source.buffer())
-                          );
+                  return;
+                }
 
-                          return accumulator;
-                        });
-
-                  const cacheKeys = `transformAll|${serialize({
-                    version,
-                    from: item.from,
-                    to: item.to,
-                    transformAll: item.transformAll,
-                  })}`;
-                  const eTag = cache.getLazyHashedEtag(mergedEtag);
-                  const cacheItem = cache.getItemCache(cacheKeys, eTag);
-                  let transformedAsset = await cacheItem.getPromise();
-
-                  if (!transformedAsset) {
-                    transformedAsset = { filename: item.to };
-
-                    try {
-                      transformedAsset.data = await item.transformAll(
-                        assets.map((asset) => {
-                          return {
-                            data: asset.source.buffer(),
-                            sourceFilename: asset.sourceFilename,
-                            absoluteFilename: asset.absoluteFilename,
-                          };
-                        })
+                if (assets && assets.length > 0) {
+                  if (typeof normalizedPattern.transformAll !== "undefined") {
+                    if (typeof normalizedPattern.to === "undefined") {
+                      compilation.errors.push(
+                        /** @type {WebpackError} */
+                        (
+                          new Error(
+                            `Invalid "pattern.to" for the "pattern.from": "${normalizedPattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`
+                          )
+                        )
                       );
-                    } catch (error) {
-                      compilation.errors.push(error);
 
                       return;
                     }
 
-                    if (template.test(item.to)) {
-                      const contentHash = CopyPlugin.getContentHash(
-                        compiler,
-                        compilation,
+                    assets.sort((a, b) =>
+                      a.absoluteFilename > b.absoluteFilename
+                        ? 1
+                        : a.absoluteFilename < b.absoluteFilename
+                        ? -1
+                        : 0
+                    );
+
+                    const mergedEtag =
+                      assets.length === 1
+                        ? cache.getLazyHashedEtag(assets[0].source)
+                        : assets.reduce(
+                            // TODO: fix me
+                            /**
+                             * @param {any} accumulator
+                             * @param {CopiedResult} asset
+                             * @param {number} i
+                             * @return {Etag}
+                             */
+                            // @ts-ignore
+                            (accumulator, asset, i) => {
+                              // eslint-disable-next-line no-param-reassign
+                              accumulator = cache.mergeEtags(
+                                i === 1
+                                  ? cache.getLazyHashedEtag(accumulator.source)
+                                  : accumulator,
+                                cache.getLazyHashedEtag(asset.source)
+                              );
+
+                              return accumulator;
+                            }
+                          );
+
+                    const cacheKeys = `transformAll|${serialize({
+                      version,
+                      from: normalizedPattern.from,
+                      to: normalizedPattern.to,
+                      transformAll: normalizedPattern.transformAll,
+                    })}`;
+                    const cacheItem = cache.getItemCache(cacheKeys, mergedEtag);
+                    let transformedAsset = await cacheItem.getPromise();
+
+                    if (!transformedAsset) {
+                      transformedAsset = { filename: normalizedPattern.to };
+
+                      try {
+                        transformedAsset.data =
+                          await normalizedPattern.transformAll(
+                            assets.map((asset) => {
+                              return {
+                                data: asset.source.buffer(),
+                                sourceFilename: asset.sourceFilename,
+                                absoluteFilename: asset.absoluteFilename,
+                              };
+                            })
+                          );
+                      } catch (error) {
+                        compilation.errors.push(
+                          /** @type {WebpackError} */ (error)
+                        );
+
+                        return;
+                      }
+
+                      // TODO: fix me
+                      // @ts-ignore
+                      if (template.test(normalizedPattern.to)) {
+                        const contentHash = CopyPlugin.getContentHash(
+                          compiler,
+                          compilation,
+                          transformedAsset.data
+                        );
+
+                        const { path: interpolatedFilename, info: assetInfo } =
+                          compilation.getPathWithInfo(
+                            // @ts-ignore
+                            normalizePath(normalizedPattern.to),
+                            {
+                              contentHash,
+                              chunk: {
+                                hash: contentHash,
+                                // TODO test me
+                                // @ts-ignore
+                                contentHash,
+                              },
+                            }
+                          );
+
+                        transformedAsset.filename = interpolatedFilename;
+                        transformedAsset.info = assetInfo;
+                      }
+
+                      const { RawSource } = compiler.webpack.sources;
+
+                      transformedAsset.source = new RawSource(
                         transformedAsset.data
                       );
+                      transformedAsset.force = normalizedPattern.force;
 
-                      const { path: interpolatedFilename, info: assetInfo } =
-                        compilation.getPathWithInfo(normalizePath(item.to), {
-                          contentHash,
-                          chunk: {
-                            hash: contentHash,
-                            contentHash,
-                          },
-                        });
-
-                      transformedAsset.filename = interpolatedFilename;
-                      transformedAsset.info = assetInfo;
+                      await cacheItem.storePromise(transformedAsset);
                     }
 
-                    const { RawSource } = compiler.webpack.sources;
-
-                    transformedAsset.source = new RawSource(
-                      transformedAsset.data
-                    );
-                    transformedAsset.force = item.force;
-
-                    await cacheItem.storePromise(transformedAsset);
+                    assets = [transformedAsset];
                   }
 
-                  assets = [transformedAsset];
+                  const priority = normalizedPattern.priority || 0;
+
+                  if (!assetMap.has(priority)) {
+                    assetMap.set(priority, []);
+                  }
+
+                  assetMap.get(priority).push(...assets);
                 }
-
-                const priority = item.priority || 0;
-
-                if (!assetMap.has(priority)) {
-                  assetMap.set(priority, []);
-                }
-
-                assetMap.get(priority).push(...assets);
-              }
-            })
+              })
           );
 
           await throttleAll(this.options.concurrency || 100, scheduledTasks);
@@ -767,59 +1048,65 @@ class CopyPlugin {
           assets
             .reduce((acc, val) => acc.concat(val[1]), [])
             .filter(Boolean)
-            .forEach((asset) => {
-              const {
-                absoluteFilename,
-                sourceFilename,
-                filename,
-                source,
-                force,
-              } = asset;
+            .forEach(
+              /**
+               * @param {CopiedResult} asset
+               * @returns {void}
+               */
+              (asset) => {
+                const {
+                  absoluteFilename,
+                  sourceFilename,
+                  filename,
+                  source,
+                  force,
+                } = asset;
 
-              const existingAsset = compilation.getAsset(filename);
+                const existingAsset = compilation.getAsset(filename);
 
-              if (existingAsset) {
-                if (force) {
-                  const info = { copied: true, sourceFilename };
+                if (existingAsset) {
+                  if (force) {
+                    const info = { copied: true, sourceFilename };
+
+                    logger.log(
+                      `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`
+                    );
+
+                    compilation.updateAsset(filename, source, {
+                      ...info,
+                      ...asset.info,
+                    });
+
+                    logger.log(
+                      `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`
+                    );
+
+                    return;
+                  }
 
                   logger.log(
-                    `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`
-                  );
-
-                  compilation.updateAsset(filename, source, {
-                    ...info,
-                    ...asset.info,
-                  });
-
-                  logger.log(
-                    `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`
+                    `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`
                   );
 
                   return;
                 }
 
+                const info = { copied: true, sourceFilename };
+
                 logger.log(
-                  `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`
+                  `writing '${filename}' from '${absoluteFilename}' to compilation assets...`
                 );
 
-                return;
+                compilation.emitAsset(filename, source, {
+                  ...info,
+                  ...asset.info,
+                });
+
+                logger.log(
+                  `written '${filename}' from '${absoluteFilename}' to compilation assets`
+                );
               }
-
-              const info = { copied: true, sourceFilename };
-
-              logger.log(
-                `writing '${filename}' from '${absoluteFilename}' to compilation assets...`
-              );
-
-              compilation.emitAsset(filename, source, {
-                ...info,
-                ...asset.info,
-              });
-
-              logger.log(
-                `written '${filename}' from '${absoluteFilename}' to compilation assets`
-              );
-            });
+            );
 
           logger.log("finished to adding additional assets");
 
@@ -832,8 +1119,11 @@ class CopyPlugin {
           stats.hooks.print
             .for("asset.info.copied")
             .tap("copy-webpack-plugin", (copied, { green, formatFlag }) =>
-              // eslint-disable-next-line no-undefined
-              copied ? green(formatFlag("copied")) : undefined
+              copied
+                ? /** @type {Function} */ (green)(
+                    /** @type {Function} */ (formatFlag)("copied")
+                  )
+                : ""
             );
         });
       }
