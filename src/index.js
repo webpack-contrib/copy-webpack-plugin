@@ -379,17 +379,17 @@ class CopyPlugin {
     /**
      * @type {GlobEntry[]}
      */
-    let paths;
+    let globEntries;
 
     try {
-      paths = await globby(glob, globOptions);
+      globEntries = await globby(glob, globOptions);
     } catch (error) {
       compilation.errors.push(/** @type {WebpackError} */ (error));
 
       return;
     }
 
-    if (paths.length === 0) {
+    if (globEntries.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
           `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
@@ -405,57 +405,6 @@ class CopyPlugin {
       return;
     }
 
-    const filteredGlobEntries = /** @type {GlobEntry[]} */ (
-      (
-        await Promise.all(
-          paths.map(async (item) => {
-            // Exclude directories
-            if (!item.dirent.isFile()) {
-              return false;
-            }
-
-            if (pattern.filter) {
-              let isFiltered;
-
-              try {
-                isFiltered = await pattern.filter(item.path);
-              } catch (error) {
-                compilation.errors.push(/** @type {WebpackError} */ (error));
-
-                return false;
-              }
-
-              if (!isFiltered) {
-                logger.log(`skip '${item.path}', because it was filtered`);
-              }
-
-              return isFiltered ? item : false;
-            }
-
-            return item;
-          })
-        )
-      ).filter((item) => item)
-    );
-
-    if (filteredGlobEntries.length === 0) {
-      if (pattern.noErrorOnMissing) {
-        logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
-        );
-
-        return;
-      }
-
-      const missingError = new Error(
-        `unable to locate '${glob}' glob after filtering paths`
-      );
-
-      compilation.errors.push(/** @type {WebpackError} */ (missingError));
-
-      return;
-    }
-
     /**
      * @type {Array<CopiedResult | undefined>}
      */
@@ -463,12 +412,35 @@ class CopyPlugin {
 
     try {
       copiedResult = await Promise.all(
-        filteredGlobEntries.map(
+        globEntries.map(
           /**
            * @param {GlobEntry} globEntry
            * @returns {Promise<CopiedResult | undefined>}
            */
           async (globEntry) => {
+            // Exclude directories
+            if (!globEntry.dirent.isFile()) {
+              return;
+            }
+
+            if (pattern.filter) {
+              let isFiltered;
+
+              try {
+                isFiltered = await pattern.filter(globEntry.path);
+              } catch (error) {
+                compilation.errors.push(/** @type {WebpackError} */ (error));
+
+                return;
+              }
+
+              if (!isFiltered) {
+                logger.log(`skip '${globEntry.path}', because it was filtered`);
+
+                return;
+              }
+            }
+
             const from = globEntry.path;
 
             logger.debug(`found '${from}'`);
@@ -773,6 +745,24 @@ class CopyPlugin {
       );
     } catch (error) {
       compilation.errors.push(/** @type {WebpackError} */ (error));
+
+      return;
+    }
+
+    if (copiedResult.length === 0) {
+      if (pattern.noErrorOnMissing) {
+        logger.log(
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
+        );
+
+        return;
+      }
+
+      const missingError = new Error(
+        `unable to locate '${glob}' glob after filtering paths`
+      );
+
+      compilation.errors.push(/** @type {WebpackError} */ (missingError));
 
       return;
     }
