@@ -122,7 +122,6 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 /**
  * @typedef {Object} InternalPattern
  * @property {Context} context
- * @property {From} from
  * @property {To} to
  * @property {ToType} toType
  * @property {GlobbyOptions} globOptions
@@ -277,8 +276,8 @@ class CopyPlugin {
      */
     const pattern = { ...inputPattern };
     const originalFrom = pattern.from;
+    const normalizedOriginalFrom = path.normalize(pattern.from);
 
-    pattern.from = path.normalize(pattern.from);
     pattern.context =
       typeof pattern.context === "undefined"
         ? compiler.context
@@ -287,13 +286,16 @@ class CopyPlugin {
         : path.join(compiler.context, pattern.context);
 
     logger.log(
-      `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context`
+      `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`
     );
 
-    if (path.isAbsolute(pattern.from)) {
-      pattern.absoluteFrom = pattern.from;
+    if (path.isAbsolute(normalizedOriginalFrom)) {
+      pattern.absoluteFrom = normalizedOriginalFrom;
     } else {
-      pattern.absoluteFrom = path.resolve(pattern.context, pattern.from);
+      pattern.absoluteFrom = path.resolve(
+        pattern.context,
+        normalizedOriginalFrom
+      );
     }
 
     logger.debug(`getting stats for '${pattern.absoluteFrom}'...`);
@@ -421,7 +423,7 @@ class CopyPlugin {
     if (paths.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
         );
 
         return;
@@ -470,7 +472,7 @@ class CopyPlugin {
     if (filteredPaths.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
         );
 
         return;
@@ -824,7 +826,7 @@ class CopyPlugin {
     }
 
     logger.log(
-      `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`
+      `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
     );
 
     // TODO: test me
