@@ -119,22 +119,6 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {NoErrorOnMissing} [noErrorOnMissing]
  */
 
-// TODO remove me
-/**
- * @typedef {Object} InternalPattern
- * @property {Context} context
- * @property {To} to
- * @property {ToType} toType
- * @property {GlobbyOptions} globOptions
- * @property {Force} force
- * @property {string} absoluteFrom
- * @property {string} glob
- * @property {NoErrorOnMissing} noErrorOnMissing
- * @property {Filter} [filter]
- * @property {Transform} [transform]
- * @property {Info} [info]
- */
-
 /**
  * @typedef {StringPattern | ObjectPattern} Pattern
  */
@@ -258,7 +242,7 @@ class CopyPlugin {
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
    * @param {CacheFacade} cache
-   * @param {Partial<InternalPattern> & { from: string }} inputPattern
+   * @param {ObjectPattern} inputPattern
    * @param {number} index
    * @returns {Promise<CopiedResult[] | undefined>}
    */
@@ -272,9 +256,6 @@ class CopyPlugin {
     index
   ) {
     const { RawSource } = compiler.webpack.sources;
-    /**
-     * @type {Partial<InternalPattern> & { from: string }}
-     */
     const pattern = { ...inputPattern };
     const originalFrom = pattern.from;
     const normalizedOriginalFrom = path.normalize(pattern.from);
@@ -341,6 +322,8 @@ class CopyPlugin {
     // @ts-ignore
     pattern.globOptions.fs = inputFileSystem;
 
+    let glob;
+
     switch (fromType) {
       case "dir":
         compilation.contextDependencies.add(absoluteFrom);
@@ -348,13 +331,13 @@ class CopyPlugin {
         logger.debug(`added '${absoluteFrom}' as a context dependency`);
 
         context = absoluteFrom;
-        /* eslint-disable no-param-reassign */
-        pattern.glob = path.posix.join(
+        glob = path.posix.join(
           fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom))),
           "**/*"
         );
         absoluteFrom = path.join(absoluteFrom, "**/*");
 
+        /* eslint-disable no-param-reassign */
         if (typeof pattern.globOptions.dot === "undefined") {
           pattern.globOptions.dot = true;
         }
@@ -366,11 +349,9 @@ class CopyPlugin {
         logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
         context = path.dirname(absoluteFrom);
-        /* eslint-disable no-param-reassign */
-        pattern.glob = fastGlob.escapePath(
-          normalizePath(path.resolve(absoluteFrom))
-        );
+        glob = fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom)));
 
+        /* eslint-disable no-param-reassign */
         if (typeof pattern.globOptions.dot === "undefined") {
           pattern.globOptions.dot = true;
         }
@@ -384,18 +365,16 @@ class CopyPlugin {
 
         logger.debug(`added '${contextDependencies}' as a context dependency`);
 
-        /* eslint-disable no-param-reassign */
-        pattern.glob = path.isAbsolute(originalFrom)
+        glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
               fastGlob.escapePath(normalizePath(path.resolve(context))),
               originalFrom
             );
-        /* eslint-enable no-param-reassign */
       }
     }
 
-    logger.log(`begin globbing '${pattern.glob}'...`);
+    logger.log(`begin globbing '${glob}'...`);
 
     /**
      * @type {GlobEntry[]}
@@ -404,7 +383,7 @@ class CopyPlugin {
 
     try {
       paths = await globby(
-        pattern.glob,
+        glob,
         /** @type {GlobbyOptions & { objectMode: true }} */ (
           pattern.globOptions
         )
@@ -424,7 +403,7 @@ class CopyPlugin {
         return;
       }
 
-      const missingError = new Error(`unable to locate '${pattern.glob}' glob`);
+      const missingError = new Error(`unable to locate '${glob}' glob`);
 
       compilation.errors.push(/** @type {WebpackError} */ (missingError));
 
@@ -474,7 +453,7 @@ class CopyPlugin {
       }
 
       const missingError = new Error(
-        `unable to locate '${pattern.glob}' glob after filtering paths`
+        `unable to locate '${glob}' glob after filtering paths`
       );
 
       compilation.errors.push(/** @type {WebpackError} */ (missingError));
