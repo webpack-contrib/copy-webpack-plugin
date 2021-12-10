@@ -901,9 +901,8 @@ class CopyPlugin {
                     filteredCopiedResult.length === 1
                       ? cache.getLazyHashedEtag(filteredCopiedResult[0].source)
                       : filteredCopiedResult.reduce(
-                          // TODO: fix me
                           /**
-                           * @param {any} accumulator
+                           * @param {Etag} accumulator
                            * @param {CopiedResult} asset
                            * @param {number} i
                            * @return {Etag}
@@ -913,7 +912,10 @@ class CopyPlugin {
                             // eslint-disable-next-line no-param-reassign
                             accumulator = cache.mergeEtags(
                               i === 1
-                                ? cache.getLazyHashedEtag(accumulator.source)
+                                ? cache.getLazyHashedEtag(
+                                    /** @type {CopiedResult}*/ (accumulator)
+                                      .source
+                                  )
                                 : accumulator,
                               cache.getLazyHashedEtag(asset.source)
                             );
