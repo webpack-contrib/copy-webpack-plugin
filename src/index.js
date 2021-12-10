@@ -453,15 +453,11 @@ class CopyPlugin {
                 : path.normalize(
                     typeof pattern.to !== "undefined" ? pattern.to : ""
                   );
-
-            const isToDirectory =
-              path.extname(to) === "" || to.slice(-1) === path.sep;
-
             const toType = pattern.toType
               ? pattern.toType
               : template.test(to)
               ? "template"
-              : isToDirectory
+              : path.extname(to) === "" || to.slice(-1) === path.sep
               ? "dir"
               : "file";
 
