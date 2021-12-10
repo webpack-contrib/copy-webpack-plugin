@@ -516,7 +516,7 @@ class CopyPlugin {
     try {
       assets = await Promise.all(
         files.map(async (file) => {
-          const { absoluteFilename } = file;
+          const { absoluteFilename, sourceFilename } = file;
 
           // If this came from a glob or dir, add it to the file dependencies
           if (fromType === "dir" || fromType === "glob") {
@@ -531,7 +531,7 @@ class CopyPlugin {
 
           try {
             cacheEntry = await cache.getPromise(
-              `${file.sourceFilename}|${index}`,
+              `${sourceFilename}|${index}`,
               null
             );
           } catch (error) {
@@ -616,11 +616,10 @@ class CopyPlugin {
               logger.debug(`storing cache for '${absoluteFilename}'...`);
 
               try {
-                await cache.storePromise(
-                  `${file.sourceFilename}|${index}`,
-                  null,
-                  { source, snapshot }
-                );
+                await cache.storePromise(`${sourceFilename}|${index}`, null, {
+                  source,
+                  snapshot,
+                });
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
 
@@ -657,7 +656,7 @@ class CopyPlugin {
 
                 const defaultCacheKeys = {
                   version,
-                  sourceFilename: file.sourceFilename,
+                  sourceFilename,
                   transform: transformObj.transformer,
                   contentHash: hasher.update(buffer).digest("hex"),
                   index,
@@ -726,7 +725,7 @@ class CopyPlugin {
 
           if (file.toType === "template") {
             logger.log(
-              `interpolating template '${file.filename}' for '${file.sourceFilename}'...`
+              `interpolating template '${file.filename}' for '${sourceFilename}'...`
             );
 
             const contentHash = CopyPlugin.getContentHash(
@@ -734,15 +733,15 @@ class CopyPlugin {
               compilation,
               source.buffer()
             );
-            const ext = path.extname(file.sourceFilename);
-            const base = path.basename(file.sourceFilename);
+            const ext = path.extname(sourceFilename);
+            const base = path.basename(sourceFilename);
             const name = base.slice(0, base.length - ext.length);
             const data = {
               filename: normalizePath(path.relative(context, absoluteFilename)),
               contentHash,
               chunk: {
                 name,
-                id: /** @type {string} */ (file.sourceFilename),
+                id: /** @type {string} */ (sourceFilename),
                 hash: contentHash,
               },
             };
@@ -753,7 +752,7 @@ class CopyPlugin {
             filename = interpolatedFilename;
 
             logger.log(
-              `interpolated template '${file.filename}' for '${file.sourceFilename}'`
+              `interpolated template '${file.filename}' for '${sourceFilename}'`
             );
           } else {
             filename = normalizePath(file.filename);
@@ -761,7 +760,7 @@ class CopyPlugin {
 
           // eslint-disable-next-line consistent-return
           return {
-            sourceFilename: file.sourceFilename,
+            sourceFilename,
             absoluteFilename,
             filename,
             source,
