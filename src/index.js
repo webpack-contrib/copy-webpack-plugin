@@ -719,7 +719,8 @@ class CopyPlugin {
             }
           }
 
-          const info =
+          let filename;
+          let info =
             typeof pattern.info === "undefined"
               ? {}
               : typeof pattern.info === "function"
@@ -751,23 +752,25 @@ class CopyPlugin {
             const { path: interpolatedFilename, info: assetInfo } =
               compilation.getPathWithInfo(normalizePath(file.filename), data);
 
-            result.info = { ...result.info, ...assetInfo };
-            result.filename = interpolatedFilename;
+            info = { ...result.info, ...assetInfo };
+            filename = interpolatedFilename;
 
             logger.log(
               `interpolated template '${file.filename}' for '${file.sourceFilename}'`
             );
           } else {
-            result.filename = normalizePath(file.filename);
-            result.info = info;
+            filename = normalizePath(file.filename);
           }
 
-          result.absoluteFilename = file.absoluteFilename;
-          result.sourceFilename = file.sourceFilename;
-          result.force = pattern.force;
-
           // eslint-disable-next-line consistent-return
-          return result;
+          return {
+            ...result,
+            filename,
+            info,
+            absoluteFilename,
+            sourceFilename: file.sourceFilename,
+            force: pattern.force,
+          };
         })
       );
     } catch (error) {
