@@ -94,19 +94,6 @@ export type ObjectPattern = {
   transform?: Transform | undefined;
   noErrorOnMissing?: boolean | undefined;
 };
-export type InternalPattern = {
-  context: Context;
-  to: To;
-  toType: ToType;
-  globOptions: GlobbyOptions;
-  force: Force;
-  absoluteFrom: string;
-  glob: string;
-  noErrorOnMissing: NoErrorOnMissing;
-  filter?: Filter | undefined;
-  transform?: Transform | undefined;
-  info?: Info | undefined;
-};
 export type Pattern = StringPattern | ObjectPattern;
 export type AdditionalOptions = {
   concurrency?: number | undefined;
@@ -204,20 +191,6 @@ export type PluginOptions = {
  * @property {NoErrorOnMissing} [noErrorOnMissing]
  */
 /**
- * @typedef {Object} InternalPattern
- * @property {Context} context
- * @property {To} to
- * @property {ToType} toType
- * @property {GlobbyOptions} globOptions
- * @property {Force} force
- * @property {string} absoluteFrom
- * @property {string} glob
- * @property {NoErrorOnMissing} noErrorOnMissing
- * @property {Filter} [filter]
- * @property {Transform} [transform]
- * @property {Info} [info]
- */
-/**
  * @typedef {StringPattern | ObjectPattern} Pattern
  */
 /**
@@ -260,7 +233,7 @@ declare class CopyPlugin {
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
    * @param {CacheFacade} cache
-   * @param {Partial<InternalPattern> & { from: string }} inputPattern
+   * @param {ObjectPattern} inputPattern
    * @param {number} index
    * @returns {Promise<CopiedResult[] | undefined>}
    */

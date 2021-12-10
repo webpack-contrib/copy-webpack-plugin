@@ -833,7 +833,7 @@ class CopyPlugin {
             (item, index) =>
               scheduledTasks.push(async () => {
                 /**
-                 * @type {Partial<ObjectPattern> & { from: string }}
+                 * @type {ObjectPattern}
                  */
                 const normalizedPattern =
                   typeof item === "string" ? { from: item } : { ...item };
