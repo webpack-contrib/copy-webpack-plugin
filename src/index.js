@@ -452,6 +452,11 @@ class CopyPlugin {
       return;
     }
 
+    /**
+     * @type {string}
+     */
+    let to;
+
     const files = await Promise.all(
       filteredPaths.map(async (item) => {
         const from = item.path;
@@ -461,10 +466,7 @@ class CopyPlugin {
         // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
         const absoluteFilename = path.resolve(context, from);
 
-        /**
-         * @type {string}
-         */
-        pattern.to =
+        to =
           typeof pattern.to === "function"
             ? await pattern.to({ context, absoluteFilename })
             : path.normalize(
@@ -472,21 +474,20 @@ class CopyPlugin {
               );
 
         const isToDirectory =
-          path.extname(pattern.to) === "" || pattern.to.slice(-1) === path.sep;
+          path.extname(to) === "" || to.slice(-1) === path.sep;
 
         const toType = pattern.toType
           ? pattern.toType
-          : template.test(pattern.to)
+          : template.test(to)
           ? "template"
           : isToDirectory
           ? "dir"
           : "file";
 
-        logger.log(`'to' option '${pattern.to}' determinated as '${toType}'`);
+        logger.log(`'to' option '${to}' determinated as '${toType}'`);
 
         const relativeFrom = path.relative(context, absoluteFilename);
-        let filename =
-          toType === "dir" ? path.join(pattern.to, relativeFrom) : pattern.to;
+        let filename = toType === "dir" ? path.join(to, relativeFrom) : to;
 
         if (path.isAbsolute(filename)) {
           filename = path.relative(
@@ -773,7 +774,8 @@ class CopyPlugin {
     }
 
     logger.log(
-      `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
+      // @ts-ignore
+      `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${to}'`
     );
 
     // TODO: test me
