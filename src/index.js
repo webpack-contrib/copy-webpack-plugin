@@ -516,14 +516,13 @@ class CopyPlugin {
     try {
       assets = await Promise.all(
         files.map(async (file) => {
-          const { absoluteFilename, sourceFilename } = file;
+          const { absoluteFilename } = file;
 
           /**
            * @type {Partial<CopiedResult>}
            */
           const result = {
             absoluteFilename,
-            sourceFilename,
           };
 
           // If this came from a glob or dir, add it to the file dependencies
@@ -539,7 +538,7 @@ class CopyPlugin {
 
           try {
             cacheEntry = await cache.getPromise(
-              `${sourceFilename}|${index}`,
+              `${file.sourceFilename}|${index}`,
               null
             );
           } catch (error) {
@@ -619,10 +618,14 @@ class CopyPlugin {
               logger.debug(`storing cache for '${absoluteFilename}'...`);
 
               try {
-                await cache.storePromise(`${sourceFilename}|${index}`, null, {
-                  source: result.source,
-                  snapshot,
-                });
+                await cache.storePromise(
+                  `${file.sourceFilename}|${index}`,
+                  null,
+                  {
+                    source: result.source,
+                    snapshot,
+                  }
+                );
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
 
@@ -659,7 +662,7 @@ class CopyPlugin {
 
                 const defaultCacheKeys = {
                   version,
-                  sourceFilename,
+                  sourceFilename: file.sourceFilename,
                   transform: transformObj.transformer,
                   contentHash: hasher.update(buffer).digest("hex"),
                   index,
@@ -727,7 +730,7 @@ class CopyPlugin {
 
           if (file.toType === "template") {
             logger.log(
-              `interpolating template '${file.filename}' for '${sourceFilename}'...`
+              `interpolating template '${file.filename}' for '${file.sourceFilename}'...`
             );
 
             const contentHash = CopyPlugin.getContentHash(
@@ -735,8 +738,8 @@ class CopyPlugin {
               compilation,
               result.source.buffer()
             );
-            const ext = path.extname(sourceFilename);
-            const base = path.basename(sourceFilename);
+            const ext = path.extname(file.sourceFilename);
+            const base = path.basename(file.sourceFilename);
             const name = base.slice(0, base.length - ext.length);
             const data = {
               filename: normalizePath(path.relative(context, absoluteFilename)),
@@ -754,13 +757,14 @@ class CopyPlugin {
             result.filename = interpolatedFilename;
 
             logger.log(
-              `interpolated template '${file.filename}' for '${sourceFilename}'`
+              `interpolated template '${file.filename}' for '${file.sourceFilename}'`
             );
           } else {
             result.filename = normalizePath(file.filename);
             result.info = info;
           }
 
+          result.sourceFilename = file.sourceFilename;
           result.force = pattern.force;
 
           // eslint-disable-next-line consistent-return
