@@ -517,12 +517,6 @@ class CopyPlugin {
       assets = await Promise.all(
         files.map(async (file) => {
           const { absoluteFilename, sourceFilename, filename, toType } = file;
-          const info =
-            typeof pattern.info === "undefined"
-              ? {}
-              : typeof pattern.info === "function"
-              ? pattern.info(file) || {}
-              : pattern.info || {};
 
           /**
            * @type {Partial<CopiedResult>}
@@ -532,7 +526,6 @@ class CopyPlugin {
             sourceFilename,
             filename,
             force: pattern.force,
-            info,
           };
 
           // If this came from a glob or dir, add it to the file dependencies
@@ -727,6 +720,13 @@ class CopyPlugin {
             }
           }
 
+          const info =
+            typeof pattern.info === "undefined"
+              ? {}
+              : typeof pattern.info === "function"
+              ? pattern.info(file) || {}
+              : pattern.info || {};
+
           if (toType === "template") {
             logger.log(
               `interpolating template '${filename}' for '${sourceFilename}'...`
@@ -761,6 +761,7 @@ class CopyPlugin {
           } else {
             // eslint-disable-next-line no-param-reassign
             result.filename = normalizePath(filename);
+            result.info = info;
           }
 
           // eslint-disable-next-line consistent-return
