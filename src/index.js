@@ -516,7 +516,7 @@ class CopyPlugin {
     try {
       assets = await Promise.all(
         files.map(async (file) => {
-          const { absoluteFilename, sourceFilename, filename, toType } = file;
+          const { absoluteFilename, sourceFilename, toType } = file;
 
           /**
            * @type {Partial<CopiedResult>}
@@ -754,7 +754,7 @@ class CopyPlugin {
             result.filename = interpolatedFilename;
 
             logger.log(
-              `interpolated template '${filename}' for '${sourceFilename}'`
+              `interpolated template '${file.filename}' for '${sourceFilename}'`
             );
           } else {
             result.filename = normalizePath(file.filename);
