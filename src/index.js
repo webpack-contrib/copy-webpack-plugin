@@ -258,7 +258,7 @@ class CopyPlugin {
     const { RawSource } = compiler.webpack.sources;
     const pattern = { ...inputPattern };
     const originalFrom = pattern.from;
-    const normalizedOriginalFrom = path.normalize(pattern.from);
+    const normalizedOriginalFrom = path.normalize(originalFrom);
     let context =
       typeof pattern.context === "undefined"
         ? compiler.context
@@ -646,17 +646,17 @@ class CopyPlugin {
             /**
              * @type {TransformerObject}
              */
-            const transform =
+            const transformObj =
               typeof pattern.transform === "function"
                 ? { transformer: pattern.transform }
                 : pattern.transform;
 
-            if (transform.transformer) {
+            if (transformObj.transformer) {
               logger.log(`transforming content for '${absoluteFilename}'...`);
 
               const buffer = result.source.buffer();
 
-              if (transform.cache) {
+              if (transformObj.cache) {
                 // TODO: remove in the next major release
                 const hasher =
                   compiler.webpack &&
@@ -669,19 +669,19 @@ class CopyPlugin {
                 const defaultCacheKeys = {
                   version,
                   sourceFilename,
-                  transform: transform.transformer,
+                  transform: transformObj.transformer,
                   contentHash: hasher.update(buffer).digest("hex"),
                   index,
                 };
                 const cacheKeys = `transform|${serialize(
-                  typeof transform.cache === "boolean"
+                  typeof transformObj.cache === "boolean"
                     ? defaultCacheKeys
-                    : typeof transform.cache.keys === "function"
-                    ? await transform.cache.keys(
+                    : typeof transformObj.cache.keys === "function"
+                    ? await transformObj.cache.keys(
                         defaultCacheKeys,
                         absoluteFilename
                       )
-                    : { ...defaultCacheKeys, ...transform.cache.keys }
+                    : { ...defaultCacheKeys, ...transformObj.cache.keys }
                 )}`;
 
                 logger.debug(
@@ -702,7 +702,7 @@ class CopyPlugin {
                 );
 
                 if (!result.source) {
-                  const transformed = await transform.transformer(
+                  const transformed = await transformObj.transformer(
                     buffer,
                     absoluteFilename
                   );
@@ -721,7 +721,7 @@ class CopyPlugin {
                 }
               } else {
                 result.source = new RawSource(
-                  await transform.transformer(buffer, absoluteFilename)
+                  await transformObj.transformer(buffer, absoluteFilename)
                 );
               }
             }
