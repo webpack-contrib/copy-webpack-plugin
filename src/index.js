@@ -244,7 +244,7 @@ class CopyPlugin {
    * @param {CacheFacade} cache
    * @param {ObjectPattern} inputPattern
    * @param {number} index
-   * @returns {Promise<CopiedResult[] | undefined>}
+   * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
    */
   static async runPattern(
     globby,
@@ -505,6 +505,9 @@ class CopyPlugin {
       })
     );
 
+    /**
+     * @type {Array<CopiedResult | undefined>}
+     */
     let assets;
 
     try {
@@ -782,8 +785,6 @@ class CopyPlugin {
       `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context`
     );
 
-    // TODO: test me
-    // @ts-ignore
     // eslint-disable-next-line consistent-return
     return assets;
   }
@@ -843,7 +844,7 @@ class CopyPlugin {
                   typeof item === "string" ? { from: item } : { ...item };
 
                 /**
-                 * @type {CopiedResult[] | undefined}
+                 * @type {Array<CopiedResult | undefined> | undefined}
                  */
                 let assets;
 
