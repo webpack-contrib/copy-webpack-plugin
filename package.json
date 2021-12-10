@@ -20,7 +20,7 @@
     "start": "npm run build -- -w",
     "clean": "del-cli dist",
     "prebuild": "npm run clean",
-    "build:types": "tsc --declaration --emitDeclarationOnly --outDir types && prettier \"types/**/*.ts\" --write && prettier types --write",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir types --rootDir src && prettier \"types/**/*.ts\" --write",
     "build:code": "cross-env NODE_ENV=production babel src -d dist --copy-files",
     "build": "npm-run-all -p \"build:**\"",
     "commitlint": "commitlint --from=master",
@@ -38,7 +38,8 @@
     "release": "standard-version"
   },
   "files": [
-    "dist"
+    "dist",
+    "types"
   ],
   "peerDependencies": {
     "webpack": "^5.1.0"
@@ -79,7 +80,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.3.2",
     "standard-version": "^9.3.1",
-    "typescript": "^4.5.2",
+    "typescript": "^4.5.3",
     "webpack": "^5.64.1"
   },
   "keywords": [

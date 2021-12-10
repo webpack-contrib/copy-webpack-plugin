@@ -6,6 +6,7 @@ import normalizePath from "normalize-path";
 import globParent from "glob-parent";
 import fastGlob from "fast-glob";
 
+// @ts-ignore
 import { version } from "../package.json";
 
 import schema from "./options.json";
