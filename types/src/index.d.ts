@@ -81,17 +81,17 @@ export type Info =
       [key: string]: string;
     });
 export type ObjectPattern = {
-  context?: string | undefined;
   from: From;
-  to?: To | undefined;
   globOptions?: import("globby").Options | undefined;
-  filter?: Filter | undefined;
-  transformAll?: TransformAllFunction | undefined;
+  context?: string | undefined;
+  to?: To | undefined;
   toType?: ToType | undefined;
+  info?: Info | undefined;
+  filter?: Filter | undefined;
+  transform?: Transform | undefined;
+  transformAll?: TransformAllFunction | undefined;
   force?: boolean | undefined;
   priority?: number | undefined;
-  info?: Info | undefined;
-  transform?: Transform | undefined;
   noErrorOnMissing?: boolean | undefined;
 };
 export type Pattern = StringPattern | ObjectPattern;
@@ -177,17 +177,17 @@ export type PluginOptions = {
  */
 /**
  * @typedef {Object} ObjectPattern
- * @property {Context} [context]
  * @property {From} from
- * @property {To} [to]
  * @property {GlobbyOptions} [globOptions]
- * @property {Filter} [filter]
- * @property {TransformAllFunction} [transformAll]
+ * @property {Context} [context]
+ * @property {To} [to]
  * @property {ToType} [toType]
+ * @property {Info} [info]
+ * @property {Filter} [filter]
+ * @property {Transform} [transform]
+ * @property {TransformAllFunction} [transformAll]
  * @property {Force} [force]
  * @property {number} [priority]
- * @property {Info} [info]
- * @property {Transform} [transform]
  * @property {NoErrorOnMissing} [noErrorOnMissing]
  */
 /**
@@ -235,14 +235,18 @@ declare class CopyPlugin {
    * @param {CacheFacade} cache
    * @param {ObjectPattern} inputPattern
    * @param {number} index
-   * @returns {Promise<CopiedResult[] | undefined>}
+   * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
    */
   private static runPattern;
   /**
    * @param {PluginOptions} [options]
    */
   constructor(options?: PluginOptions | undefined);
-  patterns: Pattern[];
+  /**
+   * @private
+   * @type {Pattern[]}
+   */
+  private patterns;
   /**
    * @private
    * @type {AdditionalOptions}

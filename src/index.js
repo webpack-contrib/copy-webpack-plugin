@@ -105,17 +105,17 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 
 /**
  * @typedef {Object} ObjectPattern
- * @property {Context} [context]
  * @property {From} from
- * @property {To} [to]
  * @property {GlobbyOptions} [globOptions]
- * @property {Filter} [filter]
- * @property {TransformAllFunction} [transformAll]
+ * @property {Context} [context]
+ * @property {To} [to]
  * @property {ToType} [toType]
+ * @property {Info} [info]
+ * @property {Filter} [filter]
+ * @property {Transform} [transform]
+ * @property {TransformAllFunction} [transformAll]
  * @property {Force} [force]
  * @property {number} [priority]
- * @property {Info} [info]
- * @property {Transform} [transform]
  * @property {NoErrorOnMissing} [noErrorOnMissing]
  */
 
@@ -144,6 +144,10 @@ class CopyPlugin {
       baseDataPath: "options",
     });
 
+    /**
+     * @private
+     * @type {Pattern[]}
+     */
     this.patterns = options.patterns;
 
     /**
@@ -815,7 +819,7 @@ class CopyPlugin {
 
           logger.log("starting to add additional assets...");
 
-          const assetMap = new Map();
+          const copiedResultMap = new Map();
           /**
            * @type {(() => Promise<void>)[]}
            */
@@ -838,10 +842,10 @@ class CopyPlugin {
                 /**
                  * @type {Array<CopiedResult | undefined> | undefined}
                  */
-                let assets;
+                let copiedResult;
 
                 try {
-                  assets = await CopyPlugin.runPattern(
+                  copiedResult = await CopyPlugin.runPattern(
                     globby,
                     compiler,
                     compilation,
@@ -856,9 +860,20 @@ class CopyPlugin {
                   return;
                 }
 
-                if (!assets || assets.length === 0) {
+                if (!copiedResult) {
                   return;
                 }
+
+                /**
+                 * @type {Array<CopiedResult>}
+                 */
+                let filteredCopiedResult = copiedResult.filter(
+                  /**
+                   * @param {CopiedResult | undefined} result
+                   * @returns {result is CopiedResult}
+                   */
+                  (result) => Boolean(result)
+                );
 
                 if (typeof normalizedPattern.transformAll !== "undefined") {
                   if (typeof normalizedPattern.to === "undefined") {
@@ -874,7 +889,7 @@ class CopyPlugin {
                     return;
                   }
 
-                  assets.sort((a, b) =>
+                  filteredCopiedResult.sort((a, b) =>
                     a.absoluteFilename > b.absoluteFilename
                       ? 1
                       : a.absoluteFilename < b.absoluteFilename
@@ -883,9 +898,9 @@ class CopyPlugin {
                   );
 
                   const mergedEtag =
-                    assets.length === 1
-                      ? cache.getLazyHashedEtag(assets[0].source)
-                      : assets.reduce(
+                    filteredCopiedResult.length === 1
+                      ? cache.getLazyHashedEtag(filteredCopiedResult[0].source)
+                      : filteredCopiedResult.reduce(
                           // TODO: fix me
                           /**
                            * @param {any} accumulator
@@ -922,7 +937,7 @@ class CopyPlugin {
                     try {
                       transformedAsset.data =
                         await normalizedPattern.transformAll(
-                          assets.map((asset) => {
+                          filteredCopiedResult.map((asset) => {
                             return {
                               data: asset.source.buffer(),
                               sourceFilename: asset.sourceFilename,
@@ -974,41 +989,43 @@ class CopyPlugin {
                     await cacheItem.storePromise(transformedAsset);
                   }
 
-                  assets = [transformedAsset];
+                  filteredCopiedResult = [transformedAsset];
                 }
 
                 const priority = normalizedPattern.priority || 0;
 
-                if (!assetMap.has(priority)) {
-                  assetMap.set(priority, []);
+                if (!copiedResultMap.has(priority)) {
+                  copiedResultMap.set(priority, []);
                 }
 
-                assetMap.get(priority).push(...assets);
+                copiedResultMap.get(priority).push(...filteredCopiedResult);
               })
           );
 
           await throttleAll(this.options.concurrency || 100, scheduledTasks);
 
-          const assets = [...assetMap.entries()].sort((a, b) => a[0] - b[0]);
+          const copiedResult = [...copiedResultMap.entries()].sort(
+            (a, b) => a[0] - b[0]
+          );
 
           // Avoid writing assets inside `p-limit`, because it creates concurrency.
           // It could potentially lead to an error - 'Multiple assets emit different content to the same filename'
-          assets
+          copiedResult
             .reduce((acc, val) => acc.concat(val[1]), [])
             .filter(Boolean)
             .forEach(
               /**
-               * @param {CopiedResult} asset
+               * @param {CopiedResult} result
                * @returns {void}
                */
-              (asset) => {
+              (result) => {
                 const {
                   absoluteFilename,
                   sourceFilename,
                   filename,
                   source,
                   force,
-                } = asset;
+                } = result;
 
                 const existingAsset = compilation.getAsset(filename);
 
@@ -1022,7 +1039,7 @@ class CopyPlugin {
 
                     compilation.updateAsset(filename, source, {
                       ...info,
-                      ...asset.info,
+                      ...result.info,
                     });
 
                     logger.log(
@@ -1047,7 +1064,7 @@ class CopyPlugin {
 
                 compilation.emitAsset(filename, source, {
                   ...info,
-                  ...asset.info,
+                  ...result.info,
                 });
 
                 logger.log(
