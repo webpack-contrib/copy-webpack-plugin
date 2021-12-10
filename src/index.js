@@ -787,18 +787,12 @@ class CopyPlugin {
               contentHash,
               chunk: {
                 name,
-                id: result.sourceFilename,
+                id: /** @type {string} */ (result.sourceFilename),
                 hash: contentHash,
-                contentHash,
               },
             };
             const { path: interpolatedFilename, info: assetInfo } =
-              compilation.getPathWithInfo(
-                normalizePath(filename),
-                // @ts-ignore
-                // TODO test me
-                data
-              );
+              compilation.getPathWithInfo(normalizePath(filename), data);
 
             result.info = { ...result.info, ...assetInfo };
             result.filename = interpolatedFilename;
