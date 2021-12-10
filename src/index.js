@@ -127,7 +127,6 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {ToType} toType
  * @property {GlobbyOptions} globOptions
  * @property {Force} force
- * @property {string} fromOrigin
  * @property {"file" | "dir" | "glob"} fromType
  * @property {string} absoluteFrom
  * @property {string} glob
@@ -278,8 +277,8 @@ class CopyPlugin {
      * @type {Partial<InternalPattern> & { from: string }}
      */
     const pattern = { ...inputPattern };
+    const originalFrom = pattern.from;
 
-    pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
     pattern.context =
       typeof pattern.context === "undefined"
@@ -380,11 +379,11 @@ class CopyPlugin {
 
         /* eslint-disable no-param-reassign */
         pattern.fromType = "glob";
-        pattern.glob = path.isAbsolute(pattern.fromOrigin)
-          ? pattern.fromOrigin
+        pattern.glob = path.isAbsolute(originalFrom)
+          ? originalFrom
           : path.posix.join(
               fastGlob.escapePath(normalizePath(path.resolve(pattern.context))),
-              pattern.fromOrigin
+              originalFrom
             );
         /* eslint-enable no-param-reassign */
       }
