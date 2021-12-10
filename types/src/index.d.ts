@@ -31,7 +31,7 @@ export type Context = string;
 export type From = string;
 export type ToFunction = (pathData: {
   context: string;
-  absoluteFilename: string;
+  absoluteFilename?: string;
 }) => string;
 export type To = string | ToFunction;
 export type ToType = "dir" | "file" | "template";
@@ -139,7 +139,7 @@ export type PluginOptions = {
  */
 /**
  * @callback ToFunction
- * @param {{ context: string, absoluteFilename: string }} pathData
+ * @param {{ context: string, absoluteFilename?: string }} pathData
  * @return {string}
  */
 /**
@@ -233,7 +233,7 @@ declare class CopyPlugin {
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
    * @param {CacheFacade} cache
-   * @param {ObjectPattern} inputPattern
+   * @param {ObjectPattern & { context: string }} inputPattern
    * @param {number} index
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
    */

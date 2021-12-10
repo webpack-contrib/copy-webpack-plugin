@@ -57,7 +57,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 
 /**
  * @callback ToFunction
- * @param {{ context: string, absoluteFilename: string }} pathData
+ * @param {{ context: string, absoluteFilename?: string }} pathData
  * @return {string}
  */
 
@@ -246,7 +246,7 @@ class CopyPlugin {
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
    * @param {CacheFacade} cache
-   * @param {ObjectPattern} inputPattern
+   * @param {ObjectPattern & { context: string }} inputPattern
    * @param {number} index
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
    */
@@ -263,15 +263,9 @@ class CopyPlugin {
     const pattern = { ...inputPattern };
     const originalFrom = pattern.from;
     const normalizedOriginalFrom = path.normalize(originalFrom);
-    let context =
-      typeof pattern.context === "undefined"
-        ? compiler.context
-        : path.isAbsolute(pattern.context)
-        ? pattern.context
-        : path.join(compiler.context, pattern.context);
 
     logger.log(
-      `starting to process a pattern from '${normalizedOriginalFrom}' using '${context}' context`
+      `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`
     );
 
     let absoluteFrom;
@@ -279,7 +273,7 @@ class CopyPlugin {
     if (path.isAbsolute(normalizedOriginalFrom)) {
       absoluteFrom = normalizedOriginalFrom;
     } else {
-      absoluteFrom = path.resolve(context, normalizedOriginalFrom);
+      absoluteFrom = path.resolve(pattern.context, normalizedOriginalFrom);
     }
 
     logger.debug(`getting stats for '${absoluteFrom}'...`);
@@ -320,7 +314,7 @@ class CopyPlugin {
     const globOptions = {
       ...{ followSymbolicLinks: true },
       ...(pattern.globOptions || {}),
-      ...{ cwd: context, objectMode: true },
+      ...{ cwd: pattern.context, objectMode: true },
     };
 
     // @ts-ignore
@@ -334,7 +328,7 @@ class CopyPlugin {
 
         logger.debug(`added '${absoluteFrom}' as a context dependency`);
 
-        context = absoluteFrom;
+        pattern.context = absoluteFrom;
         glob = path.posix.join(
           fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom))),
           "**/*"
@@ -350,7 +344,7 @@ class CopyPlugin {
 
         logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
-        context = path.dirname(absoluteFrom);
+        pattern.context = path.dirname(absoluteFrom);
         glob = fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom)));
 
         if (typeof globOptions.dot === "undefined") {
@@ -368,7 +362,7 @@ class CopyPlugin {
         glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
-              fastGlob.escapePath(normalizePath(path.resolve(context))),
+              fastGlob.escapePath(normalizePath(path.resolve(pattern.context))),
               originalFrom
             );
       }
@@ -392,7 +386,7 @@ class CopyPlugin {
     if (globEntries.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
         );
 
         return;
@@ -446,10 +440,13 @@ class CopyPlugin {
             logger.debug(`found '${from}'`);
 
             // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-            const absoluteFilename = path.resolve(context, from);
+            const absoluteFilename = path.resolve(pattern.context, from);
             const to =
               typeof pattern.to === "function"
-                ? await pattern.to({ context, absoluteFilename })
+                ? await pattern.to({
+                    context: pattern.context,
+                    absoluteFilename,
+                  })
                 : path.normalize(
                     typeof pattern.to !== "undefined" ? pattern.to : ""
                   );
@@ -463,7 +460,10 @@ class CopyPlugin {
 
             logger.log(`'to' option '${to}' determinated as '${toType}'`);
 
-            const relativeFrom = path.relative(context, absoluteFilename);
+            const relativeFrom = path.relative(
+              pattern.context,
+              absoluteFilename
+            );
             let filename = toType === "dir" ? path.join(to, relativeFrom) : to;
 
             if (path.isAbsolute(filename)) {
@@ -705,7 +705,7 @@ class CopyPlugin {
               const name = base.slice(0, base.length - ext.length);
               const data = {
                 filename: normalizePath(
-                  path.relative(context, absoluteFilename)
+                  path.relative(pattern.context, absoluteFilename)
                 ),
                 contentHash,
                 chunk: {
@@ -748,7 +748,7 @@ class CopyPlugin {
     if (copiedResult.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
         );
 
         return;
@@ -764,7 +764,7 @@ class CopyPlugin {
     }
 
     logger.log(
-      `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context`
+      `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`
     );
 
     // eslint-disable-next-line consistent-return
@@ -824,6 +824,14 @@ class CopyPlugin {
                  */
                 const normalizedPattern =
                   typeof item === "string" ? { from: item } : { ...item };
+                const context =
+                  typeof normalizedPattern.context === "undefined"
+                    ? compiler.context
+                    : path.isAbsolute(normalizedPattern.context)
+                    ? normalizedPattern.context
+                    : path.join(compiler.context, normalizedPattern.context);
+
+                normalizedPattern.context = context;
 
                 /**
                  * @type {Array<CopiedResult | undefined> | undefined}
@@ -837,7 +845,9 @@ class CopyPlugin {
                     compilation,
                     logger,
                     cache,
-                    normalizedPattern,
+                    /** @type {ObjectPattern & { context: string }} */ (
+                      normalizedPattern
+                    ),
                     index
                   );
                 } catch (error) {
@@ -910,13 +920,15 @@ class CopyPlugin {
                           }
                         );
 
-                  const cacheKeys = `transformAll|${serialize({
-                    version,
-                    from: normalizedPattern.from,
-                    to: normalizedPattern.to,
-                    transformAll: normalizedPattern.transformAll,
-                  })}`;
-                  const cacheItem = cache.getItemCache(cacheKeys, mergedEtag);
+                  const cacheItem = cache.getItemCache(
+                    `transformAll|${serialize({
+                      version,
+                      from: normalizedPattern.from,
+                      to: normalizedPattern.to,
+                      transformAll: normalizedPattern.transformAll,
+                    })}`,
+                    mergedEtag
+                  );
                   let transformedAsset = await cacheItem.getPromise();
 
                   if (!transformedAsset) {
@@ -941,9 +953,12 @@ class CopyPlugin {
                       return;
                     }
 
-                    // TODO: fix me
-                    // @ts-ignore
-                    if (template.test(normalizedPattern.to)) {
+                    const filename =
+                      typeof normalizedPattern.to === "function"
+                        ? normalizedPattern.to({ context })
+                        : normalizedPattern.to;
+
+                    if (template.test(filename)) {
                       const contentHash = CopyPlugin.getContentHash(
                         compiler,
                         compilation,
@@ -951,17 +966,13 @@ class CopyPlugin {
                       );
 
                       const { path: interpolatedFilename, info: assetInfo } =
-                        compilation.getPathWithInfo(
-                          // @ts-ignore
-                          normalizePath(normalizedPattern.to),
-                          {
-                            contentHash,
-                            chunk: {
-                              id: "unknown-copied-asset",
-                              hash: contentHash,
-                            },
-                          }
-                        );
+                        compilation.getPathWithInfo(normalizePath(filename), {
+                          contentHash,
+                          chunk: {
+                            id: "unknown-copied-asset",
+                            hash: contentHash,
+                          },
+                        });
 
                       transformedAsset.filename = interpolatedFilename;
                       transformedAsset.info = assetInfo;
