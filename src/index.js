@@ -518,11 +518,6 @@ class CopyPlugin {
         files.map(async (file) => {
           const { absoluteFilename } = file;
 
-          /**
-           * @type {Partial<CopiedResult>}
-           */
-          const result = {};
-
           // If this came from a glob or dir, add it to the file dependencies
           if (fromType === "dir" || fromType === "glob") {
             compilation.fileDependencies.add(absoluteFilename);
@@ -544,6 +539,11 @@ class CopyPlugin {
 
             return;
           }
+
+          /**
+           * @type {Asset["source"] | undefined}
+           */
+          let source;
 
           if (cacheEntry) {
             logger.debug(`found cache for '${absoluteFilename}'...`);
@@ -568,7 +568,7 @@ class CopyPlugin {
             if (isValidSnapshot) {
               logger.debug(`snapshot for '${absoluteFilename}' is valid`);
 
-              result.source = cacheEntry.source;
+              ({ source } = cacheEntry);
             } else {
               logger.debug(`snapshot for '${absoluteFilename}' is invalid`);
             }
@@ -576,7 +576,7 @@ class CopyPlugin {
             logger.debug(`missed cache for '${absoluteFilename}'`);
           }
 
-          if (!result.source) {
+          if (!source) {
             const startTime = Date.now();
 
             logger.debug(`reading '${absoluteFilename}'...`);
@@ -593,7 +593,7 @@ class CopyPlugin {
 
             logger.debug(`read '${absoluteFilename}'`);
 
-            result.source = new RawSource(data);
+            source = new RawSource(data);
 
             let snapshot;
 
@@ -619,10 +619,7 @@ class CopyPlugin {
                 await cache.storePromise(
                   `${file.sourceFilename}|${index}`,
                   null,
-                  {
-                    source: result.source,
-                    snapshot,
-                  }
+                  { source, snapshot }
                 );
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -646,7 +643,7 @@ class CopyPlugin {
             if (transformObj.transformer) {
               logger.log(`transforming content for '${absoluteFilename}'...`);
 
-              const buffer = result.source.buffer();
+              const buffer = source.buffer();
 
               if (transformObj.cache) {
                 // TODO: remove in the next major release
@@ -682,37 +679,37 @@ class CopyPlugin {
 
                 const cacheItem = cache.getItemCache(
                   cacheKeys,
-                  cache.getLazyHashedEtag(result.source)
+                  cache.getLazyHashedEtag(source)
                 );
 
-                result.source = await cacheItem.getPromise();
+                source = await cacheItem.getPromise();
 
                 logger.debug(
-                  result.source
+                  source
                     ? `found transformation cache for '${absoluteFilename}'`
                     : `no transformation cache for '${absoluteFilename}'`
                 );
 
-                if (!result.source) {
+                if (!source) {
                   const transformed = await transformObj.transformer(
                     buffer,
                     absoluteFilename
                   );
 
-                  result.source = new RawSource(transformed);
+                  source = new RawSource(transformed);
 
                   logger.debug(
                     `caching transformation for '${absoluteFilename}'...`
                   );
 
-                  await cacheItem.storePromise(result.source);
+                  await cacheItem.storePromise(source);
 
                   logger.debug(
                     `cached transformation for '${absoluteFilename}'`
                   );
                 }
               } else {
-                result.source = new RawSource(
+                source = new RawSource(
                   await transformObj.transformer(buffer, absoluteFilename)
                 );
               }
@@ -735,7 +732,7 @@ class CopyPlugin {
             const contentHash = CopyPlugin.getContentHash(
               compiler,
               compilation,
-              result.source.buffer()
+              source.buffer()
             );
             const ext = path.extname(file.sourceFilename);
             const base = path.basename(file.sourceFilename);
@@ -745,14 +742,14 @@ class CopyPlugin {
               contentHash,
               chunk: {
                 name,
-                id: /** @type {string} */ (result.sourceFilename),
+                id: /** @type {string} */ (file.sourceFilename),
                 hash: contentHash,
               },
             };
             const { path: interpolatedFilename, info: assetInfo } =
               compilation.getPathWithInfo(normalizePath(file.filename), data);
 
-            info = { ...result.info, ...assetInfo };
+            info = { ...info, ...assetInfo };
             filename = interpolatedFilename;
 
             logger.log(
@@ -764,11 +761,11 @@ class CopyPlugin {
 
           // eslint-disable-next-line consistent-return
           return {
-            ...result,
-            filename,
-            info,
-            absoluteFilename,
             sourceFilename: file.sourceFilename,
+            absoluteFilename,
+            filename,
+            source,
+            info,
             force: pattern.force,
           };
         })
