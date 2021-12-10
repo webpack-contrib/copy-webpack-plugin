@@ -863,132 +863,134 @@ class CopyPlugin {
                   return;
                 }
 
-                if (assets && assets.length > 0) {
-                  if (typeof normalizedPattern.transformAll !== "undefined") {
-                    if (typeof normalizedPattern.to === "undefined") {
-                      compilation.errors.push(
-                        /** @type {WebpackError} */
-                        (
-                          new Error(
-                            `Invalid "pattern.to" for the "pattern.from": "${normalizedPattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`
-                          )
+                if (!assets || assets.length === 0) {
+                  return;
+                }
+
+                if (typeof normalizedPattern.transformAll !== "undefined") {
+                  if (typeof normalizedPattern.to === "undefined") {
+                    compilation.errors.push(
+                      /** @type {WebpackError} */
+                      (
+                        new Error(
+                          `Invalid "pattern.to" for the "pattern.from": "${normalizedPattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`
                         )
+                      )
+                    );
+
+                    return;
+                  }
+
+                  assets.sort((a, b) =>
+                    a.absoluteFilename > b.absoluteFilename
+                      ? 1
+                      : a.absoluteFilename < b.absoluteFilename
+                      ? -1
+                      : 0
+                  );
+
+                  const mergedEtag =
+                    assets.length === 1
+                      ? cache.getLazyHashedEtag(assets[0].source)
+                      : assets.reduce(
+                          // TODO: fix me
+                          /**
+                           * @param {any} accumulator
+                           * @param {CopiedResult} asset
+                           * @param {number} i
+                           * @return {Etag}
+                           */
+                          // @ts-ignore
+                          (accumulator, asset, i) => {
+                            // eslint-disable-next-line no-param-reassign
+                            accumulator = cache.mergeEtags(
+                              i === 1
+                                ? cache.getLazyHashedEtag(accumulator.source)
+                                : accumulator,
+                              cache.getLazyHashedEtag(asset.source)
+                            );
+
+                            return accumulator;
+                          }
+                        );
+
+                  const cacheKeys = `transformAll|${serialize({
+                    version,
+                    from: normalizedPattern.from,
+                    to: normalizedPattern.to,
+                    transformAll: normalizedPattern.transformAll,
+                  })}`;
+                  const cacheItem = cache.getItemCache(cacheKeys, mergedEtag);
+                  let transformedAsset = await cacheItem.getPromise();
+
+                  if (!transformedAsset) {
+                    transformedAsset = { filename: normalizedPattern.to };
+
+                    try {
+                      transformedAsset.data =
+                        await normalizedPattern.transformAll(
+                          assets.map((asset) => {
+                            return {
+                              data: asset.source.buffer(),
+                              sourceFilename: asset.sourceFilename,
+                              absoluteFilename: asset.absoluteFilename,
+                            };
+                          })
+                        );
+                    } catch (error) {
+                      compilation.errors.push(
+                        /** @type {WebpackError} */ (error)
                       );
 
                       return;
                     }
 
-                    assets.sort((a, b) =>
-                      a.absoluteFilename > b.absoluteFilename
-                        ? 1
-                        : a.absoluteFilename < b.absoluteFilename
-                        ? -1
-                        : 0
-                    );
-
-                    const mergedEtag =
-                      assets.length === 1
-                        ? cache.getLazyHashedEtag(assets[0].source)
-                        : assets.reduce(
-                            // TODO: fix me
-                            /**
-                             * @param {any} accumulator
-                             * @param {CopiedResult} asset
-                             * @param {number} i
-                             * @return {Etag}
-                             */
-                            // @ts-ignore
-                            (accumulator, asset, i) => {
-                              // eslint-disable-next-line no-param-reassign
-                              accumulator = cache.mergeEtags(
-                                i === 1
-                                  ? cache.getLazyHashedEtag(accumulator.source)
-                                  : accumulator,
-                                cache.getLazyHashedEtag(asset.source)
-                              );
-
-                              return accumulator;
-                            }
-                          );
-
-                    const cacheKeys = `transformAll|${serialize({
-                      version,
-                      from: normalizedPattern.from,
-                      to: normalizedPattern.to,
-                      transformAll: normalizedPattern.transformAll,
-                    })}`;
-                    const cacheItem = cache.getItemCache(cacheKeys, mergedEtag);
-                    let transformedAsset = await cacheItem.getPromise();
-
-                    if (!transformedAsset) {
-                      transformedAsset = { filename: normalizedPattern.to };
-
-                      try {
-                        transformedAsset.data =
-                          await normalizedPattern.transformAll(
-                            assets.map((asset) => {
-                              return {
-                                data: asset.source.buffer(),
-                                sourceFilename: asset.sourceFilename,
-                                absoluteFilename: asset.absoluteFilename,
-                              };
-                            })
-                          );
-                      } catch (error) {
-                        compilation.errors.push(
-                          /** @type {WebpackError} */ (error)
-                        );
-
-                        return;
-                      }
-
-                      // TODO: fix me
-                      // @ts-ignore
-                      if (template.test(normalizedPattern.to)) {
-                        const contentHash = CopyPlugin.getContentHash(
-                          compiler,
-                          compilation,
-                          transformedAsset.data
-                        );
-
-                        const { path: interpolatedFilename, info: assetInfo } =
-                          compilation.getPathWithInfo(
-                            // @ts-ignore
-                            normalizePath(normalizedPattern.to),
-                            {
-                              contentHash,
-                              chunk: {
-                                id: "unknown-copied-asset",
-                                hash: contentHash,
-                              },
-                            }
-                          );
-
-                        transformedAsset.filename = interpolatedFilename;
-                        transformedAsset.info = assetInfo;
-                      }
-
-                      const { RawSource } = compiler.webpack.sources;
-
-                      transformedAsset.source = new RawSource(
+                    // TODO: fix me
+                    // @ts-ignore
+                    if (template.test(normalizedPattern.to)) {
+                      const contentHash = CopyPlugin.getContentHash(
+                        compiler,
+                        compilation,
                         transformedAsset.data
                       );
-                      transformedAsset.force = normalizedPattern.force;
 
-                      await cacheItem.storePromise(transformedAsset);
+                      const { path: interpolatedFilename, info: assetInfo } =
+                        compilation.getPathWithInfo(
+                          // @ts-ignore
+                          normalizePath(normalizedPattern.to),
+                          {
+                            contentHash,
+                            chunk: {
+                              id: "unknown-copied-asset",
+                              hash: contentHash,
+                            },
+                          }
+                        );
+
+                      transformedAsset.filename = interpolatedFilename;
+                      transformedAsset.info = assetInfo;
                     }
 
-                    assets = [transformedAsset];
+                    const { RawSource } = compiler.webpack.sources;
+
+                    transformedAsset.source = new RawSource(
+                      transformedAsset.data
+                    );
+                    transformedAsset.force = normalizedPattern.force;
+
+                    await cacheItem.storePromise(transformedAsset);
                   }
 
-                  const priority = normalizedPattern.priority || 0;
-
-                  if (!assetMap.has(priority)) {
-                    assetMap.set(priority, []);
-                  }
-
-                  assetMap.get(priority).push(...assets);
+                  assets = [transformedAsset];
                 }
+
+                const priority = normalizedPattern.priority || 0;
+
+                if (!assetMap.has(priority)) {
+                  assetMap.set(priority, []);
+                }
+
+                assetMap.get(priority).push(...assets);
               })
           );
 
