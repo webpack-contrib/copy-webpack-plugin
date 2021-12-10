@@ -1001,10 +1001,8 @@ class CopyPlugin {
                             {
                               contentHash,
                               chunk: {
+                                id: "unknown-copied-asset",
                                 hash: contentHash,
-                                // TODO test me
-                                // @ts-ignore
-                                contentHash,
                               },
                             }
                           );

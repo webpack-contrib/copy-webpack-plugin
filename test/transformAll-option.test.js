@@ -161,13 +161,11 @@ describe("transformAll option", () => {
           from: "**/*.txt",
           to: "[contenthash]-[fullhash]-file.txt",
           transformAll(assets) {
-            const result = assets.reduce((accumulator, asset) => {
+            return assets.reduce((accumulator, asset) => {
               // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${asset.data}::`;
               return accumulator;
             }, "");
-
-            return result;
           },
         },
       ],
