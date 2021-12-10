@@ -119,6 +119,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {NoErrorOnMissing} [noErrorOnMissing]
  */
 
+// TODO remove me
 /**
  * @typedef {Object} InternalPattern
  * @property {Context} context
@@ -277,8 +278,7 @@ class CopyPlugin {
     const pattern = { ...inputPattern };
     const originalFrom = pattern.from;
     const normalizedOriginalFrom = path.normalize(pattern.from);
-
-    pattern.context =
+    let context =
       typeof pattern.context === "undefined"
         ? compiler.context
         : path.isAbsolute(pattern.context)
@@ -286,26 +286,25 @@ class CopyPlugin {
         : path.join(compiler.context, pattern.context);
 
     logger.log(
-      `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`
+      `starting to process a pattern from '${normalizedOriginalFrom}' using '${context}' context`
     );
 
+    let absoluteFrom;
+
     if (path.isAbsolute(normalizedOriginalFrom)) {
-      pattern.absoluteFrom = normalizedOriginalFrom;
+      absoluteFrom = normalizedOriginalFrom;
     } else {
-      pattern.absoluteFrom = path.resolve(
-        pattern.context,
-        normalizedOriginalFrom
-      );
+      absoluteFrom = path.resolve(context, normalizedOriginalFrom);
     }
 
-    logger.debug(`getting stats for '${pattern.absoluteFrom}'...`);
+    logger.debug(`getting stats for '${absoluteFrom}'...`);
 
     const { inputFileSystem } = compiler;
 
     let stats;
 
     try {
-      stats = await stat(inputFileSystem, pattern.absoluteFrom);
+      stats = await stat(inputFileSystem, absoluteFrom);
     } catch (error) {
       // Nothing
     }
@@ -318,25 +317,25 @@ class CopyPlugin {
     if (stats) {
       if (stats.isDirectory()) {
         fromType = "dir";
-        logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);
+        logger.debug(`determined '${absoluteFrom}' is a directory`);
       } else if (stats.isFile()) {
         fromType = "file";
-        logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
+        logger.debug(`determined '${absoluteFrom}' is a file`);
       } else {
         // Fallback
         fromType = "glob";
-        logger.debug(`determined '${pattern.absoluteFrom}' is unknown`);
+        logger.debug(`determined '${absoluteFrom}' is unknown`);
       }
     } else {
       fromType = "glob";
-      logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
+      logger.debug(`determined '${absoluteFrom}' is a glob`);
     }
 
     // eslint-disable-next-line no-param-reassign
     pattern.globOptions = {
       ...{ followSymbolicLinks: true },
       ...(pattern.globOptions || {}),
-      ...{ cwd: pattern.context, objectMode: true },
+      ...{ cwd: context, objectMode: true },
     };
 
     // @ts-ignore
@@ -344,19 +343,17 @@ class CopyPlugin {
 
     switch (fromType) {
       case "dir":
-        compilation.contextDependencies.add(pattern.absoluteFrom);
+        compilation.contextDependencies.add(absoluteFrom);
 
-        logger.debug(`added '${pattern.absoluteFrom}' as a context dependency`);
+        logger.debug(`added '${absoluteFrom}' as a context dependency`);
 
+        context = absoluteFrom;
         /* eslint-disable no-param-reassign */
-        pattern.context = pattern.absoluteFrom;
         pattern.glob = path.posix.join(
-          fastGlob.escapePath(
-            normalizePath(path.resolve(pattern.absoluteFrom))
-          ),
+          fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom))),
           "**/*"
         );
-        pattern.absoluteFrom = path.join(pattern.absoluteFrom, "**/*");
+        absoluteFrom = path.join(absoluteFrom, "**/*");
 
         if (typeof pattern.globOptions.dot === "undefined") {
           pattern.globOptions.dot = true;
@@ -364,14 +361,14 @@ class CopyPlugin {
         /* eslint-enable no-param-reassign */
         break;
       case "file":
-        compilation.fileDependencies.add(pattern.absoluteFrom);
+        compilation.fileDependencies.add(absoluteFrom);
 
-        logger.debug(`added '${pattern.absoluteFrom}' as a file dependency`);
+        logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
+        context = path.dirname(absoluteFrom);
         /* eslint-disable no-param-reassign */
-        pattern.context = path.dirname(pattern.absoluteFrom);
         pattern.glob = fastGlob.escapePath(
-          normalizePath(path.resolve(pattern.absoluteFrom))
+          normalizePath(path.resolve(absoluteFrom))
         );
 
         if (typeof pattern.globOptions.dot === "undefined") {
@@ -381,9 +378,7 @@ class CopyPlugin {
         break;
       case "glob":
       default: {
-        const contextDependencies = path.normalize(
-          globParent(pattern.absoluteFrom)
-        );
+        const contextDependencies = path.normalize(globParent(absoluteFrom));
 
         compilation.contextDependencies.add(contextDependencies);
 
@@ -393,7 +388,7 @@ class CopyPlugin {
         pattern.glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
-              fastGlob.escapePath(normalizePath(path.resolve(pattern.context))),
+              fastGlob.escapePath(normalizePath(path.resolve(context))),
               originalFrom
             );
         /* eslint-enable no-param-reassign */
@@ -423,7 +418,7 @@ class CopyPlugin {
     if (paths.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
         );
 
         return;
@@ -472,7 +467,7 @@ class CopyPlugin {
     if (filteredPaths.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
         );
 
         return;
@@ -494,22 +489,14 @@ class CopyPlugin {
         logger.debug(`found '${from}'`);
 
         // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-        const absoluteFilename = path.resolve(
-          /** @type {string} */
-          (pattern.context),
-          from
-        );
+        const absoluteFilename = path.resolve(context, from);
 
         /**
          * @type {string}
          */
         pattern.to =
           typeof pattern.to === "function"
-            ? /** @typedef {string} */
-              await pattern.to({
-                context: /** @type {string} */ (pattern.context),
-                absoluteFilename,
-              })
+            ? await pattern.to({ context, absoluteFilename })
             : path.normalize(
                 typeof pattern.to !== "undefined" ? pattern.to : ""
               );
@@ -527,11 +514,7 @@ class CopyPlugin {
 
         logger.log(`'to' option '${pattern.to}' determinated as '${toType}'`);
 
-        const relativeFrom = path.relative(
-          /** @type {string} */
-          (pattern.context),
-          absoluteFilename
-        );
+        const relativeFrom = path.relative(context, absoluteFilename);
         let filename =
           toType === "dir" ? path.join(pattern.to, relativeFrom) : pattern.to;
 
@@ -787,13 +770,7 @@ class CopyPlugin {
             const base = path.basename(sourceFilename);
             const name = base.slice(0, base.length - ext.length);
             const data = {
-              filename: normalizePath(
-                path.relative(
-                  /** @type {string} */
-                  (pattern.context),
-                  absoluteFilename
-                )
-              ),
+              filename: normalizePath(path.relative(context, absoluteFilename)),
               contentHash,
               chunk: {
                 name,
@@ -826,7 +803,7 @@ class CopyPlugin {
     }
 
     logger.log(
-      `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
+      `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
     );
 
     // TODO: test me

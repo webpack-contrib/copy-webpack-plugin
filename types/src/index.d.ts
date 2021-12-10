@@ -92,18 +92,14 @@ export type ObjectPattern = {
   priority?: number | undefined;
   info?: Info | undefined;
   transform?: Transform | undefined;
-  transformPath?: (() => {}) | undefined;
   noErrorOnMissing?: boolean | undefined;
 };
 export type InternalPattern = {
   context: Context;
-  from: From;
   to: To;
   toType: ToType;
   globOptions: GlobbyOptions;
   force: Force;
-  fromOrigin: string;
-  fromType: "file" | "dir" | "glob";
   absoluteFrom: string;
   glob: string;
   noErrorOnMissing: NoErrorOnMissing;
@@ -205,19 +201,15 @@ export type PluginOptions = {
  * @property {number} [priority]
  * @property {Info} [info]
  * @property {Transform} [transform]
- * @property {(() => {})} [transformPath]
  * @property {NoErrorOnMissing} [noErrorOnMissing]
  */
 /**
  * @typedef {Object} InternalPattern
  * @property {Context} context
- * @property {From} from
  * @property {To} to
  * @property {ToType} toType
  * @property {GlobbyOptions} globOptions
  * @property {Force} force
- * @property {string} fromOrigin
- * @property {"file" | "dir" | "glob"} fromType
  * @property {string} absoluteFrom
  * @property {string} glob
  * @property {NoErrorOnMissing} noErrorOnMissing
