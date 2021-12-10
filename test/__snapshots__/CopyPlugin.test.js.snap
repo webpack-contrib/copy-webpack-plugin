@@ -290,6 +290,7 @@ Object {
     "creating snapshot for './fixtures/directory/directoryfile.txt'...",
     "creating snapshot for './fixtures/directory/nested/deep-nested/deepnested.txt'...",
     "creating snapshot for './fixtures/directory/nested/nestedfile.txt'...",
+    "determined './fixtures/directory/**' is a glob",
     "determined that './fixtures/directory/directoryfile.txt' should write to 'directory/directoryfile.txt'",
     "determined that './fixtures/directory/nested/deep-nested/deepnested.txt' should write to 'directory/nested/deep-nested/deepnested.txt'",
     "determined that './fixtures/directory/nested/nestedfile.txt' should write to 'directory/nested/nestedfile.txt'",

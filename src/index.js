@@ -127,7 +127,6 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {ToType} toType
  * @property {GlobbyOptions} globOptions
  * @property {Force} force
- * @property {"file" | "dir" | "glob"} fromType
  * @property {string} absoluteFrom
  * @property {string} glob
  * @property {NoErrorOnMissing} noErrorOnMissing
@@ -309,16 +308,26 @@ class CopyPlugin {
       // Nothing
     }
 
+    /**
+     * @type {"file" | "dir" | "glob"}
+     */
+    let fromType;
+
     if (stats) {
       if (stats.isDirectory()) {
-        pattern.fromType = "dir";
+        fromType = "dir";
         logger.debug(`determined '${pattern.absoluteFrom}' is a directory`);
       } else if (stats.isFile()) {
-        pattern.fromType = "file";
+        fromType = "file";
         logger.debug(`determined '${pattern.absoluteFrom}' is a file`);
       } else {
-        logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
+        // Fallback
+        fromType = "glob";
+        logger.debug(`determined '${pattern.absoluteFrom}' is unknown`);
       }
+    } else {
+      fromType = "glob";
+      logger.debug(`determined '${pattern.absoluteFrom}' is a glob`);
     }
 
     // eslint-disable-next-line no-param-reassign
@@ -331,7 +340,7 @@ class CopyPlugin {
     // @ts-ignore
     pattern.globOptions.fs = inputFileSystem;
 
-    switch (pattern.fromType) {
+    switch (fromType) {
       case "dir":
         compilation.contextDependencies.add(pattern.absoluteFrom);
 
@@ -368,6 +377,7 @@ class CopyPlugin {
         }
         /* eslint-enable no-param-reassign */
         break;
+      case "glob":
       default: {
         const contextDependencies = path.normalize(
           globParent(pattern.absoluteFrom)
@@ -378,7 +388,6 @@ class CopyPlugin {
         logger.debug(`added '${contextDependencies}' as a context dependency`);
 
         /* eslint-disable no-param-reassign */
-        pattern.fromType = "glob";
         pattern.glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
@@ -571,7 +580,7 @@ class CopyPlugin {
           };
 
           // If this came from a glob or dir, add it to the file dependencies
-          if (pattern.fromType === "dir" || pattern.fromType === "glob") {
+          if (fromType === "dir" || fromType === "glob") {
             compilation.fileDependencies.add(absoluteFilename);
 
             logger.debug(`added '${absoluteFilename}' as a file dependency`);
