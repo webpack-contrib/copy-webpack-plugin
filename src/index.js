@@ -516,7 +516,7 @@ class CopyPlugin {
     try {
       assets = await Promise.all(
         files.map(async (file) => {
-          const { absoluteFilename, sourceFilename, toType } = file;
+          const { absoluteFilename, sourceFilename } = file;
 
           /**
            * @type {Partial<CopiedResult>}
@@ -725,7 +725,7 @@ class CopyPlugin {
               ? pattern.info(file) || {}
               : pattern.info || {};
 
-          if (toType === "template") {
+          if (file.toType === "template") {
             logger.log(
               `interpolating template '${file.filename}' for '${sourceFilename}'...`
             );
