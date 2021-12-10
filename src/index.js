@@ -525,7 +525,6 @@ class CopyPlugin {
             absoluteFilename,
             sourceFilename,
             filename,
-            force: pattern.force,
           };
 
           // If this came from a glob or dir, add it to the file dependencies
@@ -763,6 +762,8 @@ class CopyPlugin {
             result.filename = normalizePath(filename);
             result.info = info;
           }
+
+          result.force = pattern.force;
 
           // eslint-disable-next-line consistent-return
           return result;
