@@ -521,9 +521,7 @@ class CopyPlugin {
           /**
            * @type {Partial<CopiedResult>}
            */
-          const result = {
-            absoluteFilename,
-          };
+          const result = {};
 
           // If this came from a glob or dir, add it to the file dependencies
           if (fromType === "dir" || fromType === "glob") {
@@ -764,6 +762,7 @@ class CopyPlugin {
             result.info = info;
           }
 
+          result.absoluteFilename = file.absoluteFilename;
           result.sourceFilename = file.sourceFilename;
           result.force = pattern.force;
 
