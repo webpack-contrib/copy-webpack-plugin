@@ -452,11 +452,6 @@ class CopyPlugin {
       return;
     }
 
-    /**
-     * @type {string}
-     */
-    let to;
-
     const files = await Promise.all(
       filteredPaths.map(async (item) => {
         const from = item.path;
@@ -465,8 +460,7 @@ class CopyPlugin {
 
         // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
         const absoluteFilename = path.resolve(context, from);
-
-        to =
+        const to =
           typeof pattern.to === "function"
             ? await pattern.to({ context, absoluteFilename })
             : path.normalize(
@@ -785,7 +779,7 @@ class CopyPlugin {
 
     logger.log(
       // @ts-ignore
-      `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${to}'`
+      `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context`
     );
 
     // TODO: test me
