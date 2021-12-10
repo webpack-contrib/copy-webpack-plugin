@@ -524,7 +524,6 @@ class CopyPlugin {
           const result = {
             absoluteFilename,
             sourceFilename,
-            filename,
           };
 
           // If this came from a glob or dir, add it to the file dependencies
@@ -728,7 +727,7 @@ class CopyPlugin {
 
           if (toType === "template") {
             logger.log(
-              `interpolating template '${filename}' for '${sourceFilename}'...`
+              `interpolating template '${file.filename}' for '${sourceFilename}'...`
             );
 
             const contentHash = CopyPlugin.getContentHash(
@@ -749,7 +748,7 @@ class CopyPlugin {
               },
             };
             const { path: interpolatedFilename, info: assetInfo } =
-              compilation.getPathWithInfo(normalizePath(filename), data);
+              compilation.getPathWithInfo(normalizePath(file.filename), data);
 
             result.info = { ...result.info, ...assetInfo };
             result.filename = interpolatedFilename;
@@ -758,8 +757,7 @@ class CopyPlugin {
               `interpolated template '${filename}' for '${sourceFilename}'`
             );
           } else {
-            // eslint-disable-next-line no-param-reassign
-            result.filename = normalizePath(filename);
+            result.filename = normalizePath(file.filename);
             result.info = info;
           }
 
