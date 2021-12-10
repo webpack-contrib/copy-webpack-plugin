@@ -312,15 +312,15 @@ class CopyPlugin {
       logger.debug(`determined '${absoluteFrom}' is a glob`);
     }
 
-    // eslint-disable-next-line no-param-reassign
-    pattern.globOptions = {
+    /** @type {GlobbyOptions & { objectMode: true }} */
+    const globOptions = {
       ...{ followSymbolicLinks: true },
       ...(pattern.globOptions || {}),
       ...{ cwd: context, objectMode: true },
     };
 
     // @ts-ignore
-    pattern.globOptions.fs = inputFileSystem;
+    globOptions.fs = inputFileSystem;
 
     let glob;
 
@@ -337,11 +337,9 @@ class CopyPlugin {
         );
         absoluteFrom = path.join(absoluteFrom, "**/*");
 
-        /* eslint-disable no-param-reassign */
-        if (typeof pattern.globOptions.dot === "undefined") {
-          pattern.globOptions.dot = true;
+        if (typeof globOptions.dot === "undefined") {
+          globOptions.dot = true;
         }
-        /* eslint-enable no-param-reassign */
         break;
       case "file":
         compilation.fileDependencies.add(absoluteFrom);
@@ -351,11 +349,9 @@ class CopyPlugin {
         context = path.dirname(absoluteFrom);
         glob = fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom)));
 
-        /* eslint-disable no-param-reassign */
-        if (typeof pattern.globOptions.dot === "undefined") {
-          pattern.globOptions.dot = true;
+        if (typeof globOptions.dot === "undefined") {
+          globOptions.dot = true;
         }
-        /* eslint-enable no-param-reassign */
         break;
       case "glob":
       default: {
@@ -382,12 +378,7 @@ class CopyPlugin {
     let paths;
 
     try {
-      paths = await globby(
-        glob,
-        /** @type {GlobbyOptions & { objectMode: true }} */ (
-          pattern.globOptions
-        )
-      );
+      paths = await globby(glob, globOptions);
     } catch (error) {
       compilation.errors.push(/** @type {WebpackError} */ (error));
 
