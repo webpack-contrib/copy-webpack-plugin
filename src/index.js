@@ -401,7 +401,7 @@ class CopyPlugin {
       return;
     }
 
-    const filteredPaths = /** @type {GlobEntry[]} */ (
+    const filteredGlobEntries = /** @type {GlobEntry[]} */ (
       (
         await Promise.all(
           paths.map(async (item) => {
@@ -434,7 +434,7 @@ class CopyPlugin {
       ).filter((item) => item)
     );
 
-    if (filteredPaths.length === 0) {
+    if (filteredGlobEntries.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
           `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context to '${pattern.to}'`
@@ -452,73 +452,62 @@ class CopyPlugin {
       return;
     }
 
-    const files = await Promise.all(
-      filteredPaths.map(async (item) => {
-        const from = item.path;
-
-        logger.debug(`found '${from}'`);
-
-        // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-        const absoluteFilename = path.resolve(context, from);
-        const to =
-          typeof pattern.to === "function"
-            ? await pattern.to({ context, absoluteFilename })
-            : path.normalize(
-                typeof pattern.to !== "undefined" ? pattern.to : ""
-              );
-
-        const isToDirectory =
-          path.extname(to) === "" || to.slice(-1) === path.sep;
-
-        const toType = pattern.toType
-          ? pattern.toType
-          : template.test(to)
-          ? "template"
-          : isToDirectory
-          ? "dir"
-          : "file";
-
-        logger.log(`'to' option '${to}' determinated as '${toType}'`);
-
-        const relativeFrom = path.relative(context, absoluteFilename);
-        let filename = toType === "dir" ? path.join(to, relativeFrom) : to;
-
-        if (path.isAbsolute(filename)) {
-          filename = path.relative(
-            /** @type {string} */ (compiler.options.output.path),
-            filename
-          );
-        }
-
-        logger.log(`determined that '${from}' should write to '${filename}'`);
-
-        const sourceFilename = normalizePath(
-          path.relative(compiler.context, absoluteFilename)
-        );
-
-        return {
-          absoluteFilename,
-          sourceFilename,
-          filename,
-          toType,
-        };
-      })
-    );
-
     /**
      * @type {Array<CopiedResult | undefined>}
      */
-    let assets;
+    let copiedResult;
 
     try {
-      assets = await Promise.all(
-        files.map(
+      copiedResult = await Promise.all(
+        filteredGlobEntries.map(
           /**
-           * @param {{ absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }} file
+           * @param {GlobEntry} globEntry
            * @returns {Promise<CopiedResult | undefined>}
            */
-          async (file) => {
-            const { absoluteFilename, sourceFilename } = file;
+          async (globEntry) => {
+            const from = globEntry.path;
+
+            logger.debug(`found '${from}'`);
+
+            // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
+            const absoluteFilename = path.resolve(context, from);
+            const to =
+              typeof pattern.to === "function"
+                ? await pattern.to({ context, absoluteFilename })
+                : path.normalize(
+                    typeof pattern.to !== "undefined" ? pattern.to : ""
+                  );
+
+            const isToDirectory =
+              path.extname(to) === "" || to.slice(-1) === path.sep;
+
+            const toType = pattern.toType
+              ? pattern.toType
+              : template.test(to)
+              ? "template"
+              : isToDirectory
+              ? "dir"
+              : "file";
+
+            logger.log(`'to' option '${to}' determinated as '${toType}'`);
+
+            const relativeFrom = path.relative(context, absoluteFilename);
+            let filename = toType === "dir" ? path.join(to, relativeFrom) : to;
+
+            if (path.isAbsolute(filename)) {
+              filename = path.relative(
+                /** @type {string} */ (compiler.options.output.path),
+                filename
+              );
+            }
+
+            logger.log(
+              `determined that '${from}' should write to '${filename}'`
+            );
+
+            const sourceFilename = normalizePath(
+              path.relative(compiler.context, absoluteFilename)
+            );
 
             // If this came from a glob or dir, add it to the file dependencies
             if (fromType === "dir" || fromType === "glob") {
@@ -717,17 +706,21 @@ class CopyPlugin {
               }
             }
 
-            let filename;
             let info =
               typeof pattern.info === "undefined"
                 ? {}
                 : typeof pattern.info === "function"
-                ? pattern.info(file) || {}
+                ? pattern.info({
+                    absoluteFilename,
+                    sourceFilename,
+                    filename,
+                    toType,
+                  }) || {}
                 : pattern.info || {};
 
-            if (file.toType === "template") {
+            if (toType === "template") {
               logger.log(
-                `interpolating template '${file.filename}' for '${sourceFilename}'...`
+                `interpolating template '${filename}' for '${sourceFilename}'...`
               );
 
               const contentHash = CopyPlugin.getContentHash(
@@ -750,16 +743,16 @@ class CopyPlugin {
                 },
               };
               const { path: interpolatedFilename, info: assetInfo } =
-                compilation.getPathWithInfo(normalizePath(file.filename), data);
+                compilation.getPathWithInfo(normalizePath(filename), data);
 
               info = { ...info, ...assetInfo };
               filename = interpolatedFilename;
 
               logger.log(
-                `interpolated template '${file.filename}' for '${sourceFilename}'`
+                `interpolated template '${filename}' for '${sourceFilename}'`
               );
             } else {
-              filename = normalizePath(file.filename);
+              filename = normalizePath(filename);
             }
 
             // eslint-disable-next-line consistent-return
@@ -781,12 +774,11 @@ class CopyPlugin {
     }
 
     logger.log(
-      // @ts-ignore
       `finished to process a pattern from '${normalizedOriginalFrom}' using '${context}' context`
     );
 
     // eslint-disable-next-line consistent-return
-    return assets;
+    return copiedResult;
   }
 
   /**
