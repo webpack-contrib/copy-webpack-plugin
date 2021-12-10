@@ -12,6 +12,7 @@
     "url": "https://opencollective.com/webpack"
   },
   "main": "dist/cjs.js",
+  "types": "types/cjs.d.ts",
   "engines": {
     "node": ">= 12.20.0"
   },
