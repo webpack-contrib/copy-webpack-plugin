@@ -277,7 +277,7 @@ class CopyPlugin {
     /**
      * @type {Partial<InternalPattern> & { from: string }}
      */
-    const pattern = inputPattern;
+    const pattern = { ...inputPattern };
 
     pattern.fromOrigin = pattern.from;
     pattern.from = path.normalize(pattern.from);
