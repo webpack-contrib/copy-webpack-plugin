@@ -47,7 +47,6 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @typedef {boolean} NoErrorOnMissing
  */
 
-// TODO fix me
 /**
  * @typedef {string} Context
  */
@@ -117,7 +116,6 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {number} [priority]
  * @property {Info} [info]
  * @property {Transform} [transform]
- * @property {(() => {})} [transformPath]
  * @property {NoErrorOnMissing} [noErrorOnMissing]
  */
 

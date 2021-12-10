@@ -115,9 +115,6 @@
             }
           ]
         },
-        "transformPath": {
-          "instanceof": "Function"
-        },
         "noErrorOnMissing": {
           "type": "boolean",
           "description": "Doesn't generate an error on missing file(s).",
