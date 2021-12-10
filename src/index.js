@@ -515,49 +515,29 @@ class CopyPlugin {
 
     try {
       assets = await Promise.all(
-        files.map(async (file) => {
-          const { absoluteFilename, sourceFilename } = file;
-
-          // If this came from a glob or dir, add it to the file dependencies
-          if (fromType === "dir" || fromType === "glob") {
-            compilation.fileDependencies.add(absoluteFilename);
-
-            logger.debug(`added '${absoluteFilename}' as a file dependency`);
-          }
-
-          let cacheEntry;
-
-          logger.debug(`getting cache for '${absoluteFilename}'...`);
-
-          try {
-            cacheEntry = await cache.getPromise(
-              `${sourceFilename}|${index}`,
-              null
-            );
-          } catch (error) {
-            compilation.errors.push(/** @type {WebpackError} */ (error));
-
-            return;
-          }
-
+        files.map(
           /**
-           * @type {Asset["source"] | undefined}
+           * @param {{ absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }} file
+           * @returns {Promise<CopiedResult | undefined>}
            */
-          let source;
+          async (file) => {
+            const { absoluteFilename, sourceFilename } = file;
 
-          if (cacheEntry) {
-            logger.debug(`found cache for '${absoluteFilename}'...`);
+            // If this came from a glob or dir, add it to the file dependencies
+            if (fromType === "dir" || fromType === "glob") {
+              compilation.fileDependencies.add(absoluteFilename);
 
-            let isValidSnapshot;
+              logger.debug(`added '${absoluteFilename}' as a file dependency`);
+            }
 
-            logger.debug(
-              `checking snapshot on valid for '${absoluteFilename}'...`
-            );
+            let cacheEntry;
+
+            logger.debug(`getting cache for '${absoluteFilename}'...`);
 
             try {
-              isValidSnapshot = await CopyPlugin.checkSnapshotValid(
-                compilation,
-                cacheEntry.snapshot
+              cacheEntry = await cache.getPromise(
+                `${sourceFilename}|${index}`,
+                null
               );
             } catch (error) {
               compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -565,209 +545,237 @@ class CopyPlugin {
               return;
             }
 
-            if (isValidSnapshot) {
-              logger.debug(`snapshot for '${absoluteFilename}' is valid`);
+            /**
+             * @type {Asset["source"] | undefined}
+             */
+            let source;
 
-              ({ source } = cacheEntry);
-            } else {
-              logger.debug(`snapshot for '${absoluteFilename}' is invalid`);
-            }
-          } else {
-            logger.debug(`missed cache for '${absoluteFilename}'`);
-          }
+            if (cacheEntry) {
+              logger.debug(`found cache for '${absoluteFilename}'...`);
 
-          if (!source) {
-            const startTime = Date.now();
+              let isValidSnapshot;
 
-            logger.debug(`reading '${absoluteFilename}'...`);
-
-            let data;
-
-            try {
-              data = await readFile(inputFileSystem, absoluteFilename);
-            } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
-
-              return;
-            }
-
-            logger.debug(`read '${absoluteFilename}'`);
-
-            source = new RawSource(data);
-
-            let snapshot;
-
-            logger.debug(`creating snapshot for '${absoluteFilename}'...`);
-
-            try {
-              snapshot = await CopyPlugin.createSnapshot(
-                compilation,
-                startTime,
-                absoluteFilename
+              logger.debug(
+                `checking snapshot on valid for '${absoluteFilename}'...`
               );
-            } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
-
-              return;
-            }
-
-            if (snapshot) {
-              logger.debug(`created snapshot for '${absoluteFilename}'`);
-              logger.debug(`storing cache for '${absoluteFilename}'...`);
 
               try {
-                await cache.storePromise(`${sourceFilename}|${index}`, null, {
-                  source,
-                  snapshot,
-                });
+                isValidSnapshot = await CopyPlugin.checkSnapshotValid(
+                  compilation,
+                  cacheEntry.snapshot
+                );
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
 
                 return;
               }
 
-              logger.debug(`stored cache for '${absoluteFilename}'`);
-            }
-          }
+              if (isValidSnapshot) {
+                logger.debug(`snapshot for '${absoluteFilename}' is valid`);
 
-          if (pattern.transform) {
-            /**
-             * @type {TransformerObject}
-             */
-            const transformObj =
-              typeof pattern.transform === "function"
-                ? { transformer: pattern.transform }
-                : pattern.transform;
-
-            if (transformObj.transformer) {
-              logger.log(`transforming content for '${absoluteFilename}'...`);
-
-              const buffer = source.buffer();
-
-              if (transformObj.cache) {
-                // TODO: remove in the next major release
-                const hasher =
-                  compiler.webpack &&
-                  compiler.webpack.util &&
-                  compiler.webpack.util.createHash
-                    ? compiler.webpack.util.createHash("xxhash64")
-                    : // eslint-disable-next-line global-require
-                      require("crypto").createHash("md4");
-
-                const defaultCacheKeys = {
-                  version,
-                  sourceFilename,
-                  transform: transformObj.transformer,
-                  contentHash: hasher.update(buffer).digest("hex"),
-                  index,
-                };
-                const cacheKeys = `transform|${serialize(
-                  typeof transformObj.cache === "boolean"
-                    ? defaultCacheKeys
-                    : typeof transformObj.cache.keys === "function"
-                    ? await transformObj.cache.keys(
-                        defaultCacheKeys,
-                        absoluteFilename
-                      )
-                    : { ...defaultCacheKeys, ...transformObj.cache.keys }
-                )}`;
-
-                logger.debug(
-                  `getting transformation cache for '${absoluteFilename}'...`
-                );
-
-                const cacheItem = cache.getItemCache(
-                  cacheKeys,
-                  cache.getLazyHashedEtag(source)
-                );
-
-                source = await cacheItem.getPromise();
-
-                logger.debug(
-                  source
-                    ? `found transformation cache for '${absoluteFilename}'`
-                    : `no transformation cache for '${absoluteFilename}'`
-                );
-
-                if (!source) {
-                  const transformed = await transformObj.transformer(
-                    buffer,
-                    absoluteFilename
-                  );
-
-                  source = new RawSource(transformed);
-
-                  logger.debug(
-                    `caching transformation for '${absoluteFilename}'...`
-                  );
-
-                  await cacheItem.storePromise(source);
-
-                  logger.debug(
-                    `cached transformation for '${absoluteFilename}'`
-                  );
-                }
+                ({ source } = cacheEntry);
               } else {
-                source = new RawSource(
-                  await transformObj.transformer(buffer, absoluteFilename)
+                logger.debug(`snapshot for '${absoluteFilename}' is invalid`);
+              }
+            } else {
+              logger.debug(`missed cache for '${absoluteFilename}'`);
+            }
+
+            if (!source) {
+              const startTime = Date.now();
+
+              logger.debug(`reading '${absoluteFilename}'...`);
+
+              let data;
+
+              try {
+                data = await readFile(inputFileSystem, absoluteFilename);
+              } catch (error) {
+                compilation.errors.push(/** @type {WebpackError} */ (error));
+
+                return;
+              }
+
+              logger.debug(`read '${absoluteFilename}'`);
+
+              source = new RawSource(data);
+
+              let snapshot;
+
+              logger.debug(`creating snapshot for '${absoluteFilename}'...`);
+
+              try {
+                snapshot = await CopyPlugin.createSnapshot(
+                  compilation,
+                  startTime,
+                  absoluteFilename
                 );
+              } catch (error) {
+                compilation.errors.push(/** @type {WebpackError} */ (error));
+
+                return;
+              }
+
+              if (snapshot) {
+                logger.debug(`created snapshot for '${absoluteFilename}'`);
+                logger.debug(`storing cache for '${absoluteFilename}'...`);
+
+                try {
+                  await cache.storePromise(`${sourceFilename}|${index}`, null, {
+                    source,
+                    snapshot,
+                  });
+                } catch (error) {
+                  compilation.errors.push(/** @type {WebpackError} */ (error));
+
+                  return;
+                }
+
+                logger.debug(`stored cache for '${absoluteFilename}'`);
               }
             }
-          }
 
-          let filename;
-          let info =
-            typeof pattern.info === "undefined"
-              ? {}
-              : typeof pattern.info === "function"
-              ? pattern.info(file) || {}
-              : pattern.info || {};
+            if (pattern.transform) {
+              /**
+               * @type {TransformerObject}
+               */
+              const transformObj =
+                typeof pattern.transform === "function"
+                  ? { transformer: pattern.transform }
+                  : pattern.transform;
 
-          if (file.toType === "template") {
-            logger.log(
-              `interpolating template '${file.filename}' for '${sourceFilename}'...`
-            );
+              if (transformObj.transformer) {
+                logger.log(`transforming content for '${absoluteFilename}'...`);
 
-            const contentHash = CopyPlugin.getContentHash(
-              compiler,
-              compilation,
-              source.buffer()
-            );
-            const ext = path.extname(sourceFilename);
-            const base = path.basename(sourceFilename);
-            const name = base.slice(0, base.length - ext.length);
-            const data = {
-              filename: normalizePath(path.relative(context, absoluteFilename)),
-              contentHash,
-              chunk: {
-                name,
-                id: /** @type {string} */ (sourceFilename),
-                hash: contentHash,
-              },
+                const buffer = source.buffer();
+
+                if (transformObj.cache) {
+                  // TODO: remove in the next major release
+                  const hasher =
+                    compiler.webpack &&
+                    compiler.webpack.util &&
+                    compiler.webpack.util.createHash
+                      ? compiler.webpack.util.createHash("xxhash64")
+                      : // eslint-disable-next-line global-require
+                        require("crypto").createHash("md4");
+
+                  const defaultCacheKeys = {
+                    version,
+                    sourceFilename,
+                    transform: transformObj.transformer,
+                    contentHash: hasher.update(buffer).digest("hex"),
+                    index,
+                  };
+                  const cacheKeys = `transform|${serialize(
+                    typeof transformObj.cache === "boolean"
+                      ? defaultCacheKeys
+                      : typeof transformObj.cache.keys === "function"
+                      ? await transformObj.cache.keys(
+                          defaultCacheKeys,
+                          absoluteFilename
+                        )
+                      : { ...defaultCacheKeys, ...transformObj.cache.keys }
+                  )}`;
+
+                  logger.debug(
+                    `getting transformation cache for '${absoluteFilename}'...`
+                  );
+
+                  const cacheItem = cache.getItemCache(
+                    cacheKeys,
+                    cache.getLazyHashedEtag(source)
+                  );
+
+                  source = await cacheItem.getPromise();
+
+                  logger.debug(
+                    source
+                      ? `found transformation cache for '${absoluteFilename}'`
+                      : `no transformation cache for '${absoluteFilename}'`
+                  );
+
+                  if (!source) {
+                    const transformed = await transformObj.transformer(
+                      buffer,
+                      absoluteFilename
+                    );
+
+                    source = new RawSource(transformed);
+
+                    logger.debug(
+                      `caching transformation for '${absoluteFilename}'...`
+                    );
+
+                    await cacheItem.storePromise(source);
+
+                    logger.debug(
+                      `cached transformation for '${absoluteFilename}'`
+                    );
+                  }
+                } else {
+                  source = new RawSource(
+                    await transformObj.transformer(buffer, absoluteFilename)
+                  );
+                }
+              }
+            }
+
+            let filename;
+            let info =
+              typeof pattern.info === "undefined"
+                ? {}
+                : typeof pattern.info === "function"
+                ? pattern.info(file) || {}
+                : pattern.info || {};
+
+            if (file.toType === "template") {
+              logger.log(
+                `interpolating template '${file.filename}' for '${sourceFilename}'...`
+              );
+
+              const contentHash = CopyPlugin.getContentHash(
+                compiler,
+                compilation,
+                source.buffer()
+              );
+              const ext = path.extname(sourceFilename);
+              const base = path.basename(sourceFilename);
+              const name = base.slice(0, base.length - ext.length);
+              const data = {
+                filename: normalizePath(
+                  path.relative(context, absoluteFilename)
+                ),
+                contentHash,
+                chunk: {
+                  name,
+                  id: /** @type {string} */ (sourceFilename),
+                  hash: contentHash,
+                },
+              };
+              const { path: interpolatedFilename, info: assetInfo } =
+                compilation.getPathWithInfo(normalizePath(file.filename), data);
+
+              info = { ...info, ...assetInfo };
+              filename = interpolatedFilename;
+
+              logger.log(
+                `interpolated template '${file.filename}' for '${sourceFilename}'`
+              );
+            } else {
+              filename = normalizePath(file.filename);
+            }
+
+            // eslint-disable-next-line consistent-return
+            return {
+              sourceFilename,
+              absoluteFilename,
+              filename,
+              source,
+              info,
+              force: pattern.force,
             };
-            const { path: interpolatedFilename, info: assetInfo } =
-              compilation.getPathWithInfo(normalizePath(file.filename), data);
-
-            info = { ...info, ...assetInfo };
-            filename = interpolatedFilename;
-
-            logger.log(
-              `interpolated template '${file.filename}' for '${sourceFilename}'`
-            );
-          } else {
-            filename = normalizePath(file.filename);
           }
-
-          // eslint-disable-next-line consistent-return
-          return {
-            sourceFilename,
-            absoluteFilename,
-            filename,
-            source,
-            info,
-            force: pattern.force,
-          };
-        })
+        )
       );
     } catch (error) {
       compilation.errors.push(/** @type {WebpackError} */ (error));
