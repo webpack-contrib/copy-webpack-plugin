@@ -1,16 +1,16 @@
-import path from "path";
+const path = require("path");
 
-import { validate } from "schema-utils";
-import serialize from "serialize-javascript";
-import normalizePath from "normalize-path";
-import globParent from "glob-parent";
-import fastGlob from "fast-glob";
+const { validate } = require("schema-utils");
+const serialize = require("serialize-javascript");
+const normalizePath = require("normalize-path");
+const globParent = require("glob-parent");
+const fastGlob = require("fast-glob");
 
 // @ts-ignore
-import { version } from "../package.json";
+const { version } = require("../package.json");
 
-import schema from "./options.json";
-import { readFile, stat, throttleAll } from "./utils";
+const schema = require("./options.json");
+const { readFile, stat, throttleAll } = require("./utils");
 
 const template = /\[\\*([\w:]+)\\*\]/i;
 
@@ -1096,4 +1096,4 @@ class CopyPlugin {
   }
 }
 
-export default CopyPlugin;
+module.exports = CopyPlugin;

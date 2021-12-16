@@ -119,4 +119,4 @@ function throttleAll(limit, tasks) {
   });
 }
 
-export { stat, readFile, throttleAll };
+module.exports = { stat, readFile, throttleAll };

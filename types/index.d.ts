@@ -1,107 +1,4 @@
-export default CopyPlugin;
-export type Schema = import("schema-utils/declarations/validate").Schema;
-export type Compiler = import("webpack").Compiler;
-export type Compilation = import("webpack").Compilation;
-export type WebpackError = import("webpack").WebpackError;
-export type Asset = import("webpack").Asset;
-export type GlobbyOptions = import("globby").Options;
-export type GlobEntry = import("globby").GlobEntry;
-export type WebpackLogger = ReturnType<Compilation["getLogger"]>;
-export type CacheFacade = ReturnType<Compilation["getCache"]>;
-export type Etag = ReturnType<
-  ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]
->;
-export type Snapshot = ReturnType<
-  Compilation["fileSystemInfo"]["mergeSnapshots"]
->;
-export type Force = boolean;
-export type CopiedResult = {
-  sourceFilename: string;
-  absoluteFilename: string;
-  filename: string;
-  source: Asset["source"];
-  force: Force | undefined;
-  info: {
-    [key: string]: string;
-  };
-};
-export type StringPattern = string;
-export type NoErrorOnMissing = boolean;
-export type Context = string;
-export type From = string;
-export type ToFunction = (pathData: {
-  context: string;
-  absoluteFilename?: string;
-}) => string;
-export type To = string | ToFunction;
-export type ToType = "dir" | "file" | "template";
-export type TransformerFunction = (
-  input: Buffer,
-  absoluteFilename: string
-) => any;
-export type TransformerCacheObject =
-  | {
-      keys: {
-        [key: string]: any;
-      };
-    }
-  | {
-      keys: (
-        defaultCacheKeys: {
-          [key: string]: any;
-        },
-        absoluteFilename: string
-      ) => Promise<{
-        [key: string]: any;
-      }>;
-    };
-export type TransformerObject = {
-  transformer: TransformerFunction;
-  cache?: boolean | TransformerCacheObject | undefined;
-};
-export type Transform = TransformerFunction | TransformerObject;
-export type Filter = (filepath: string) => any;
-export type TransformAllFunction = (
-  data: {
-    data: Buffer;
-    sourceFilename: string;
-    absoluteFilename: string;
-  }[]
-) => any;
-export type Info =
-  | {
-      [key: string]: string;
-    }
-  | ((item: {
-      absoluteFilename: string;
-      sourceFilename: string;
-      filename: string;
-      toType: ToType;
-    }) => {
-      [key: string]: string;
-    });
-export type ObjectPattern = {
-  from: From;
-  globOptions?: import("globby").Options | undefined;
-  context?: string | undefined;
-  to?: To | undefined;
-  toType?: ToType | undefined;
-  info?: Info | undefined;
-  filter?: Filter | undefined;
-  transform?: Transform | undefined;
-  transformAll?: TransformAllFunction | undefined;
-  force?: boolean | undefined;
-  priority?: number | undefined;
-  noErrorOnMissing?: boolean | undefined;
-};
-export type Pattern = StringPattern | ObjectPattern;
-export type AdditionalOptions = {
-  concurrency?: number | undefined;
-};
-export type PluginOptions = {
-  patterns: Pattern[];
-  options?: AdditionalOptions | undefined;
-};
+export = CopyPlugin;
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").Compilation} Compilation */
@@ -257,3 +154,136 @@ declare class CopyPlugin {
    */
   apply(compiler: Compiler): void;
 }
+declare namespace CopyPlugin {
+  export {
+    Schema,
+    Compiler,
+    Compilation,
+    WebpackError,
+    Asset,
+    GlobbyOptions,
+    GlobEntry,
+    WebpackLogger,
+    CacheFacade,
+    Etag,
+    Snapshot,
+    Force,
+    CopiedResult,
+    StringPattern,
+    NoErrorOnMissing,
+    Context,
+    From,
+    ToFunction,
+    To,
+    ToType,
+    TransformerFunction,
+    TransformerCacheObject,
+    TransformerObject,
+    Transform,
+    Filter,
+    TransformAllFunction,
+    Info,
+    ObjectPattern,
+    Pattern,
+    AdditionalOptions,
+    PluginOptions,
+  };
+}
+type Compiler = import("webpack").Compiler;
+type PluginOptions = {
+  patterns: Pattern[];
+  options?: AdditionalOptions | undefined;
+};
+type Schema = import("schema-utils/declarations/validate").Schema;
+type Compilation = import("webpack").Compilation;
+type WebpackError = import("webpack").WebpackError;
+type Asset = import("webpack").Asset;
+type GlobbyOptions = import("globby").Options;
+type GlobEntry = import("globby").GlobEntry;
+type WebpackLogger = ReturnType<Compilation["getLogger"]>;
+type CacheFacade = ReturnType<Compilation["getCache"]>;
+type Etag = ReturnType<
+  ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]
+>;
+type Snapshot = ReturnType<Compilation["fileSystemInfo"]["mergeSnapshots"]>;
+type Force = boolean;
+type CopiedResult = {
+  sourceFilename: string;
+  absoluteFilename: string;
+  filename: string;
+  source: Asset["source"];
+  force: Force | undefined;
+  info: {
+    [key: string]: string;
+  };
+};
+type StringPattern = string;
+type NoErrorOnMissing = boolean;
+type Context = string;
+type From = string;
+type ToFunction = (pathData: {
+  context: string;
+  absoluteFilename?: string;
+}) => string;
+type To = string | ToFunction;
+type ToType = "dir" | "file" | "template";
+type TransformerFunction = (input: Buffer, absoluteFilename: string) => any;
+type TransformerCacheObject =
+  | {
+      keys: {
+        [key: string]: any;
+      };
+    }
+  | {
+      keys: (
+        defaultCacheKeys: {
+          [key: string]: any;
+        },
+        absoluteFilename: string
+      ) => Promise<{
+        [key: string]: any;
+      }>;
+    };
+type TransformerObject = {
+  transformer: TransformerFunction;
+  cache?: boolean | TransformerCacheObject | undefined;
+};
+type Transform = TransformerFunction | TransformerObject;
+type Filter = (filepath: string) => any;
+type TransformAllFunction = (
+  data: {
+    data: Buffer;
+    sourceFilename: string;
+    absoluteFilename: string;
+  }[]
+) => any;
+type Info =
+  | {
+      [key: string]: string;
+    }
+  | ((item: {
+      absoluteFilename: string;
+      sourceFilename: string;
+      filename: string;
+      toType: ToType;
+    }) => {
+      [key: string]: string;
+    });
+type ObjectPattern = {
+  from: From;
+  globOptions?: import("globby").Options | undefined;
+  context?: string | undefined;
+  to?: To | undefined;
+  toType?: ToType | undefined;
+  info?: Info | undefined;
+  filter?: Filter | undefined;
+  transform?: Transform | undefined;
+  transformAll?: TransformAllFunction | undefined;
+  force?: boolean | undefined;
+  priority?: number | undefined;
+  noErrorOnMissing?: boolean | undefined;
+};
+type Pattern = StringPattern | ObjectPattern;
+type AdditionalOptions = {
+  concurrency?: number | undefined;
+};
