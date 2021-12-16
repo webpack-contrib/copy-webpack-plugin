@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [10.2.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.1.0...v10.2.0) (2021-12-16)
+
+
+### Features
+
+* removed cjs wrapper and generated types in commonjs format (`export =` and `namespaces` used in types), now you can directly use exported types ([#654](https://github.com/webpack-contrib/copy-webpack-plugin/issues/654)) ([5901006](https://github.com/webpack-contrib/copy-webpack-plugin/commit/590100688f66b9a7591f1f46a02de0cc6967032c))
+
 ## [10.1.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.0.0...v10.1.0) (2021-12-10)
 
 
