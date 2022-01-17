@@ -52,10 +52,8 @@ module.exports = {
 
 ## Options
 
-|            Name             |           Type            | Description                              |
-| :-------------------------: | :-----------------------: | :--------------------------------------- |
-| **[`patterns`](#patterns)** | `{Array<String\|Object>}` | Specify file related patterns for plugin |
-| **[`options`](#options-1)** |        `{Object}`         | Specify options for plugin               |
+- **[`patterns`](#patterns)**
+- **[`options`](#options-1)**
 
 The plugin's signature:
 
@@ -79,26 +77,29 @@ module.exports = {
 };
 ```
 
-### Patterns
+### `Patterns`
 
-|                  Name                   |         Type         |                     Default                     | Description                                                                                                                                            |
-| :-------------------------------------: | :------------------: | :---------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------- |
-|             [`from`](#from)             |      `{String}`      |                   `undefined`                   | Glob or path from where we copy files.                                                                                                                 |
-|               [`to`](#to)               | `{String\|Function}` |            `compiler.options.output`            | Output path.                                                                                                                                           |
-|          [`context`](#context)          |      `{String}`      | `options.context \|\| compiler.options.context` | A path that determines how to interpret the `from` path.                                                                                               |
-|      [`globOptions`](#globoptions)      |      `{Object}`      |                   `undefined`                   | [Options][glob-options] passed to the glob pattern matching library including `ignore` option.                                                         |
-|           [`filter`](#filter)           |     `{Function}`     |                   `undefined`                   | Allows to filter copied assets.                                                                                                                        |
-|           [`toType`](#totype)           |      `{String}`      |                   `undefined`                   | Determinate what is `to` option - directory, file or template.                                                                                         |
-|            [`force`](#force)            |     `{Boolean}`      |                     `false`                     | Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).                                                             |
-|         [`priority`](#priority)         |      `{Number}`      |                       `0`                       | Allows you to specify the copy priority.                                                                                                               |
-|        [`transform`](#transform)        |      `{Object}`      |                   `undefined`                   | Allows to modify the file contents. Enable `transform` caching. You can use `{ transform: {cache: { key: 'my-cache-key' }} }` to invalidate the cache. |
-|     [`transformAll`](#transformAll)     |     `{Function}`     |                   `undefined`                   | Allows you to modify the contents of multiple files and save the result to one file.                                                                   |
-| [`noErrorOnMissing`](#noerroronmissing) |     `{Boolean}`      |                     `false`                     | Doesn't generate an error on missing file(s).                                                                                                          |
-|             [`info`](#info)             | `{Object\|Function}` |                   `undefined`                   | Allows to add assets info.                                                                                                                             |
+- [`from`](#from)
+- [`to`](#to)
+- [`context`](#context)
+- [`globOptions`](#globoptions)
+- [`filter`](#filter)
+- [`toType`](#totype)
+- [`force`](#force)
+- [`priority`](#priority)
+- [`transform`](#transform)
+- [`transformAll`](#transformAll)
+- [`noErrorOnMissing`](#noerroronmissing)
+- [`info`](#info)
 
 #### `from`
 
-Type: `String`
+Type:
+
+```ts
+type from = string;
+```
+
 Default: `undefined`
 
 Glob or path from where we copy files.
@@ -179,10 +180,18 @@ More [`examples`](#examples)
 
 #### `to`
 
-Type: `String|Function`
+Type:
+
+```ts
+type to = string | (pathData: {
+  context: string;
+  absoluteFilename?: string;
+}) => string
+```
+
 Default: `compiler.options.output`
 
-##### String
+##### `string`
 
 Output path.
 
@@ -215,7 +224,7 @@ module.exports = {
 };
 ```
 
-##### Function
+##### `function`
 
 Allows to modify the writing path.
 
@@ -263,7 +272,12 @@ module.exports = {
 
 #### `context`
 
-Type: `String`
+Type:
+
+```ts
+type context = string;
+```
+
 Default: `options.context|compiler.options.context`
 
 A path that determines how to interpret the `from` path.
@@ -306,7 +320,12 @@ More [`examples`](#examples)
 
 #### `globOptions`
 
-Type: `Object`
+Type:
+
+```ts
+type globOptions = object;
+```
+
 Default: `undefined`
 
 Allows to configure the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
@@ -335,7 +354,12 @@ module.exports = {
 
 #### `filter`
 
-Type: `Function`
+Type:
+
+```ts
+type filter = (filepath: string) => any;
+```
+
 Default: `undefined`
 
 > ℹ️ To ignore files by path please use the [`globOptions.ignore`](#globoptions) option.
@@ -370,7 +394,12 @@ module.exports = {
 
 #### `toType`
 
-Type: `String`
+Type:
+
+```ts
+type toType = string;
+```
+
 Default: `undefined`
 
 Determinate what is `to` option - directory, file or template.
@@ -378,11 +407,11 @@ Sometimes it is hard to say what is `to`, example `path/to/dir-with.ext`.
 If you want to copy files in directory you need use `dir` option.
 We try to automatically determine the `type` so you most likely do not need this option.
 
-|             Name              |    Type    |   Default   | Description                                                                                          |
-| :---------------------------: | :--------: | :---------: | :--------------------------------------------------------------------------------------------------- |
-|      **[`'dir'`](#dir)**      | `{String}` | `undefined` | If `to` has no extension or ends on `'/'`                                                            |
-|     **[`'file'`](#file)**     | `{String}` | `undefined` | If `to` is not a directory and is not a template                                                     |
-| **[`'template'`](#template)** | `{String}` | `undefined` | If `to` contains [a template pattern](https://webpack.js.org/configuration/output/#template-strings) |
+|             Name              |   Type   |   Default   | Description                                                                                          |
+| :---------------------------: | :------: | :---------: | :--------------------------------------------------------------------------------------------------- |
+|      **[`'dir'`](#dir)**      | `string` | `undefined` | If `to` has no extension or ends on `'/'`                                                            |
+|     **[`'file'`](#file)**     | `string` | `undefined` | If `to` is not a directory and is not a template                                                     |
+| **[`'template'`](#template)** | `string` | `undefined` | If `to` contains [a template pattern](https://webpack.js.org/configuration/output/#template-strings) |
 
 ##### `'dir'`
 
@@ -446,7 +475,12 @@ module.exports = {
 
 #### `force`
 
-Type: `Boolean`
+Type:
+
+```ts
+type force = boolean;
+```
+
 Default: `false`
 
 Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).
@@ -471,7 +505,12 @@ module.exports = {
 
 #### `priority`
 
-Type: `Number`
+Type:
+
+```ts
+type priority = number;
+```
+
 Default: `0`
 
 Allows to specify the priority of copying files with the same destination name.
@@ -506,12 +545,17 @@ module.exports = {
 
 #### `transform`
 
-Type: `Function|Object`
+Type:
+
+```ts
+type transform = object | (input: string, absoluteFilename: string) => string
+```
+
 Default: `undefined`
 
 Allows to modify the file contents.
 
-##### `Function`
+##### `function`
 
 **webpack.config.js**
 
@@ -535,16 +579,21 @@ module.exports = {
 };
 ```
 
-##### `Object`
+##### `object`
 
-|               Name                |        Type         |   Default   | Description                                                                                                      |
-| :-------------------------------: | :-----------------: | :---------: | :--------------------------------------------------------------------------------------------------------------- |
-| **[`transformer`](#transformer)** |    `{Function}`     | `undefined` | Allows to modify the file contents.                                                                              |
-|       **[`cache`](#cache)**       | `{Boolean\|Object}` |   `false`   | Enable `transform` caching. You can use `transform: { cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|               Name                |   Default   | Description                                                                                                      |
+| :-------------------------------: | :---------: | :--------------------------------------------------------------------------------------------------------------- |
+| **[`transformer`](#transformer)** | `undefined` | Allows to modify the file contents.                                                                              |
+|       **[`cache`](#cache)**       |   `false`   | Enable `transform` caching. You can use `transform: { cache: { key: 'my-cache-key' } }` to invalidate the cache. |
 
 ###### `transformer`
 
-Type: `Function`
+Type:
+
+```ts
+type transformer = (input: string, absoluteFilename: string) => string;
+```
+
 Default: `undefined`
 
 **webpack.config.js**
@@ -595,7 +644,12 @@ module.exports = {
 
 ###### `cache`
 
-Type: `Boolean|Object`
+Type:
+
+```ts
+type cache = boolean | object;
+```
+
 Default: `false`
 
 **webpack.config.js**
@@ -603,7 +657,7 @@ Default: `false`
 Enable/disable and configure caching.
 Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
 
-###### `Boolean`
+###### `boolean`
 
 Enables/Disable `transform` caching.
 
@@ -630,7 +684,7 @@ module.exports = {
 };
 ```
 
-##### `Object`
+##### `object`
 
 Enables `transform` caching and setup cache directory and invalidation keys.
 
@@ -738,7 +792,18 @@ module.exports = {
 
 #### `transformAll`
 
-Type: `Function`
+Type:
+
+```ts
+type TransformAll = (
+  data: {
+    data: Buffer;
+    sourceFilename: string;
+    absoluteFilename: string;
+  }[]
+) => any;
+```
+
 Default: `undefined`
 
 Allows you to modify the contents of multiple files and save the result to one file.
@@ -777,7 +842,12 @@ module.exports = {
 
 ### `noErrorOnMissing`
 
-Type: `Boolean`
+Type:
+
+```ts
+type noErrorOnMissing = boolean;
+```
+
 Default: `false`
 
 Doesn't generate an error on missing file(s).
@@ -799,7 +869,12 @@ module.exports = {
 
 #### `info`
 
-Type: `Object|Function<Object>`
+Type:
+
+```ts
+type info = object| () => object
+```
+
 Default: `undefined`
 
 Allows to add assets info.
@@ -844,11 +919,17 @@ module.exports = {
 
 ### Options
 
-|             Name              |    Type    | Default | Description                                      |
-| :---------------------------: | :--------: | :-----: | :----------------------------------------------- |
-| [`concurrency`](#concurrency) | `{Number}` |  `100`  | Limits the number of simultaneous requests to fs |
+- [`concurrency`](#concurrency)
 
 #### `concurrency`
+
+type:
+
+```ts
+type concurrency = number;
+```
+
+default: `100`
 
 limits the number of simultaneous requests to fs
 
