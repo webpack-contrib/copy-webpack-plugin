@@ -183,10 +183,9 @@ More [`examples`](#examples)
 Type:
 
 ```ts
-type to = string | (pathData: {
-  context: string;
-  absoluteFilename?: string;
-}) => string
+type to =
+  | string
+  | ((pathData: { context: string; absoluteFilename?: string }) => string);
 ```
 
 Default: `compiler.options.output`
@@ -548,7 +547,7 @@ module.exports = {
 Type:
 
 ```ts
-type transform = object | (input: string, absoluteFilename: string) => string
+type transform = object | ((input: string, absoluteFilename: string) => string);
 ```
 
 Default: `undefined`
@@ -872,7 +871,7 @@ module.exports = {
 Type:
 
 ```ts
-type info = object| () => object
+type info = object | (() => object);
 ```
 
 Default: `undefined`
