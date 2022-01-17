@@ -794,7 +794,7 @@ module.exports = {
 Type:
 
 ```ts
-type TransformAll = (
+type transformAll = (
   data: {
     data: Buffer;
     sourceFilename: string;
