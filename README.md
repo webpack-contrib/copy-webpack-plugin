@@ -322,7 +322,7 @@ More [`examples`](#examples)
 Type:
 
 ```ts
-type globOptions = object;
+type globOptions = import("globby").Options;
 ```
 
 Default: `undefined`
@@ -356,7 +356,7 @@ module.exports = {
 Type:
 
 ```ts
-type filter = (filepath: string) => any;
+type filter = (filepath: string) => boolean;
 ```
 
 Default: `undefined`
@@ -396,7 +396,7 @@ module.exports = {
 Type:
 
 ```ts
-type toType = string;
+type toType = "dir" | "file" | "template";
 ```
 
 Default: `undefined`
@@ -547,7 +547,12 @@ module.exports = {
 Type:
 
 ```ts
-type transform = object | ((input: string, absoluteFilename: string) => string);
+type transform =
+  | {
+      transformer: (input: string, absoluteFilename: string) => string;
+      cache?: boolean | TransformerCacheObject | undefined;
+    }
+  | ((input: string, absoluteFilename: string) => string);
 ```
 
 Default: `undefined`
@@ -646,7 +651,24 @@ module.exports = {
 Type:
 
 ```ts
-type cache = boolean | object;
+type cache =
+  | boolean
+  | {
+      keys: {
+        [key: string]: any;
+      };
+    }
+  | {
+      keys: (
+        defaultCacheKeys: {
+          [key: string]: any;
+        },
+        absoluteFilename: string
+      ) => Promise<{
+        [key: string]: any;
+      }>;
+    }
+  | undefined;
 ```
 
 Default: `false`
@@ -871,7 +893,14 @@ module.exports = {
 Type:
 
 ```ts
-type info = object | (() => object);
+type info =
+  | Record<string, string>
+  | ((item: {
+      absoluteFilename: string;
+      sourceFilename: string;
+      filename: string;
+      toType: ToType;
+    }) => Record<string, string>);
 ```
 
 Default: `undefined`

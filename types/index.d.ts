@@ -249,7 +249,7 @@ type TransformerObject = {
   cache?: boolean | TransformerCacheObject | undefined;
 };
 type Transform = TransformerFunction | TransformerObject;
-type Filter = (filepath: string) => any;
+type Filter = (filepath: string) => boolean;
 type TransformAllFunction = (
   data: {
     data: Buffer;
