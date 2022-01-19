@@ -69,7 +69,7 @@ export = CopyPlugin;
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
- * @returns {string}
+ * @returns {string | Buffer}
  */
 /**
  * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
@@ -258,7 +258,7 @@ type TransformAllFunction = (
     sourceFilename: string;
     absoluteFilename: string;
   }[]
-) => string;
+) => string | Buffer;
 type Info =
   | {
       [key: string]: string;

@@ -99,7 +99,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
- * @returns {string}
+ * @returns {string | Buffer}
  */
 
 /**
