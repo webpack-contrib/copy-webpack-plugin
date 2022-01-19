@@ -64,10 +64,12 @@ export = CopyPlugin;
 /**
  * @callback Filter
  * @param {string} filepath
+ * @returns {boolean}
  */
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
+ * @returns {string}
  */
 /**
  * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
@@ -256,7 +258,7 @@ type TransformAllFunction = (
     sourceFilename: string;
     absoluteFilename: string;
   }[]
-) => any;
+) => string;
 type Info =
   | {
       [key: string]: string;
