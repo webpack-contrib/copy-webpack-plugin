@@ -549,10 +549,10 @@ Type:
 ```ts
 type transform =
   | {
-      transformer: (input: string, absoluteFilename: string) => string;
+      transformer: (input: string, absoluteFilename: string) => string | Buffer;
       cache?: boolean | TransformerCacheObject | undefined;
     }
-  | ((input: string, absoluteFilename: string) => string);
+  | ((input: string, absoluteFilename: string) => string | Buffer);
 ```
 
 Default: `undefined`

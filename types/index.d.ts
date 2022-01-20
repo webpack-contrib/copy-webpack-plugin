@@ -49,6 +49,7 @@ export = CopyPlugin;
  * @callback TransformerFunction
  * @param {Buffer} input
  * @param {string} absoluteFilename
+ * @returns {string | Buffer}
  */
 /**
  * @typedef {{ keys: { [key: string]: any } } | { keys: ((defaultCacheKeys: { [key: string]: any }, absoluteFilename: string) => Promise<{ [key: string]: any }>) }} TransformerCacheObject
@@ -229,7 +230,10 @@ type ToFunction = (pathData: {
 }) => string;
 type To = string | ToFunction;
 type ToType = "dir" | "file" | "template";
-type TransformerFunction = (input: Buffer, absoluteFilename: string) => any;
+type TransformerFunction = (
+  input: Buffer,
+  absoluteFilename: string
+) => string | Buffer;
 type TransformerCacheObject =
   | {
       keys: {
