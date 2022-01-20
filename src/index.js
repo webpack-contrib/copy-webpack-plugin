@@ -74,6 +74,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @callback TransformerFunction
  * @param {Buffer} input
  * @param {string} absoluteFilename
+ * @returns {string | Buffer}
  */
 
 /**
