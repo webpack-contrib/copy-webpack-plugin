@@ -93,11 +93,13 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 /**
  * @callback Filter
  * @param {string} filepath
+ * @returns {boolean}
  */
 
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
+ * @returns {string | Buffer}
  */
 
 /**

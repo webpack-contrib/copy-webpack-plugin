@@ -64,10 +64,12 @@ export = CopyPlugin;
 /**
  * @callback Filter
  * @param {string} filepath
+ * @returns {boolean}
  */
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
+ * @returns {string | Buffer}
  */
 /**
  * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
@@ -249,14 +251,14 @@ type TransformerObject = {
   cache?: boolean | TransformerCacheObject | undefined;
 };
 type Transform = TransformerFunction | TransformerObject;
-type Filter = (filepath: string) => any;
+type Filter = (filepath: string) => boolean;
 type TransformAllFunction = (
   data: {
     data: Buffer;
     sourceFilename: string;
     absoluteFilename: string;
   }[]
-) => any;
+) => string | Buffer;
 type Info =
   | {
       [key: string]: string;
