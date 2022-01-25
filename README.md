@@ -25,6 +25,18 @@ To begin, you'll need to install `copy-webpack-plugin`:
 npm install copy-webpack-plugin --save-dev
 ```
 
+or
+
+```console
+yarn add -D copy-webpack-plugin
+```
+
+or
+
+```console
+pnpm add -D copy-webpack-plugin
+```
+
 Then add the plugin to your `webpack` config. For example:
 
 **webpack.config.js**
