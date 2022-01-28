@@ -37,7 +37,7 @@ export = CopyPlugin;
 /**
  * @callback ToFunction
  * @param {{ context: string, absoluteFilename?: string }} pathData
- * @return {string}
+ * @return {string | Promise<string>}
  */
 /**
  * @typedef {string | ToFunction} To
@@ -49,7 +49,7 @@ export = CopyPlugin;
  * @callback TransformerFunction
  * @param {Buffer} input
  * @param {string} absoluteFilename
- * @returns {string | Buffer}
+ * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
  */
 /**
  * @typedef {{ keys: { [key: string]: any } } | { keys: ((defaultCacheKeys: { [key: string]: any }, absoluteFilename: string) => Promise<{ [key: string]: any }>) }} TransformerCacheObject
@@ -65,12 +65,12 @@ export = CopyPlugin;
 /**
  * @callback Filter
  * @param {string} filepath
- * @returns {boolean}
+ * @returns {boolean | Promise<boolean>}
  */
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
- * @returns {string | Buffer}
+ * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
  */
 /**
  * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
@@ -227,13 +227,13 @@ type From = string;
 type ToFunction = (pathData: {
   context: string;
   absoluteFilename?: string;
-}) => string;
+}) => string | Promise<string>;
 type To = string | ToFunction;
 type ToType = "dir" | "file" | "template";
 type TransformerFunction = (
   input: Buffer,
   absoluteFilename: string
-) => string | Buffer;
+) => string | Buffer | Promise<string> | Promise<Buffer>;
 type TransformerCacheObject =
   | {
       keys: {
@@ -255,14 +255,14 @@ type TransformerObject = {
   cache?: boolean | TransformerCacheObject | undefined;
 };
 type Transform = TransformerFunction | TransformerObject;
-type Filter = (filepath: string) => boolean;
+type Filter = (filepath: string) => boolean | Promise<boolean>;
 type TransformAllFunction = (
   data: {
     data: Buffer;
     sourceFilename: string;
     absoluteFilename: string;
   }[]
-) => string | Buffer;
+) => string | Buffer | Promise<string> | Promise<Buffer>;
 type Info =
   | {
       [key: string]: string;

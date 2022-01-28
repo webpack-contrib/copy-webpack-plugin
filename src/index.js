@@ -59,7 +59,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 /**
  * @callback ToFunction
  * @param {{ context: string, absoluteFilename?: string }} pathData
- * @return {string}
+ * @return {string | Promise<string>}
  */
 
 /**
@@ -74,7 +74,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @callback TransformerFunction
  * @param {Buffer} input
  * @param {string} absoluteFilename
- * @returns {string | Buffer}
+ * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
  */
 
 /**
@@ -94,13 +94,13 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 /**
  * @callback Filter
  * @param {string} filepath
- * @returns {boolean}
+ * @returns {boolean | Promise<boolean>}
  */
 
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
- * @returns {string | Buffer}
+ * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
  */
 
 /**
@@ -959,7 +959,7 @@ class CopyPlugin {
 
                     const filename =
                       typeof normalizedPattern.to === "function"
-                        ? normalizedPattern.to({ context })
+                        ? await normalizedPattern.to({ context })
                         : normalizedPattern.to;
 
                     if (template.test(filename)) {
