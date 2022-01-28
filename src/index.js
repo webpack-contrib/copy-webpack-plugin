@@ -37,7 +37,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {string} filename
  * @property {Asset["source"]} source
  * @property {Force | undefined} force
- * @property {{ [key: string]: string }} info
+ * @property {{ [key: string]: any }} info
  */
 
 /**
