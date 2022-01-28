@@ -20,7 +20,7 @@ export = CopyPlugin;
  * @property {string} filename
  * @property {Asset["source"]} source
  * @property {Force | undefined} force
- * @property {{ [key: string]: string }} info
+ * @property {{ [key: string]: any }} info
  */
 /**
  * @typedef {string} StringPattern
@@ -217,7 +217,7 @@ type CopiedResult = {
   source: Asset["source"];
   force: Force | undefined;
   info: {
-    [key: string]: string;
+    [key: string]: any;
   };
 };
 type StringPattern = string;
