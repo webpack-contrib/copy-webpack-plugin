@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.2.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.2...v10.2.3) (2022-01-29)
+
+
+### Bug Fixes
+
+* async `to` support ([fd095fb](https://github.com/webpack-contrib/copy-webpack-plugin/commit/fd095fb79399df5edbd06d9dbd1ed30fe4f7eb24))
+
 ### [10.2.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.1...v10.2.2) (2022-01-28)
 
 
