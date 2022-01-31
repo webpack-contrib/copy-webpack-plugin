@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.2.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.3...v10.2.4) (2022-01-31)
+
+
+### Bug Fixes
+
+* types ([#666](https://github.com/webpack-contrib/copy-webpack-plugin/issues/666)) ([a1c2308](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a1c2308511a4cccb92a22cb395b6eb66dc1c776b))
+
 ### [10.2.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.2...v10.2.3) (2022-01-29)
 
 
