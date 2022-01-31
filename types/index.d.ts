@@ -20,7 +20,7 @@ export = CopyPlugin;
  * @property {string} filename
  * @property {Asset["source"]} source
  * @property {Force | undefined} force
- * @property {{ [key: string]: any }} info
+ * @property {Record<string, any>} info
  */
 /**
  * @typedef {string} StringPattern
@@ -73,7 +73,7 @@ export = CopyPlugin;
  * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
  */
 /**
- * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
+ * @typedef { Record<string, any> | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => Record<string, any>) } Info
  */
 /**
  * @typedef {Object} ObjectPattern
@@ -216,9 +216,7 @@ type CopiedResult = {
   filename: string;
   source: Asset["source"];
   force: Force | undefined;
-  info: {
-    [key: string]: any;
-  };
+  info: Record<string, any>;
 };
 type StringPattern = string;
 type NoErrorOnMissing = boolean;
@@ -264,17 +262,13 @@ type TransformAllFunction = (
   }[]
 ) => string | Buffer | Promise<string> | Promise<Buffer>;
 type Info =
-  | {
-      [key: string]: string;
-    }
+  | Record<string, any>
   | ((item: {
       absoluteFilename: string;
       sourceFilename: string;
       filename: string;
       toType: ToType;
-    }) => {
-      [key: string]: string;
-    });
+    }) => Record<string, any>);
 type ObjectPattern = {
   from: From;
   globOptions?: import("globby").Options | undefined;
