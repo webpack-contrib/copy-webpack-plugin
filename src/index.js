@@ -37,7 +37,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {string} filename
  * @property {Asset["source"]} source
  * @property {Force | undefined} force
- * @property {{ [key: string]: any }} info
+ * @property {Record<string, any>} info
  */
 
 /**
@@ -104,7 +104,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  */
 
 /**
- * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
+ * @typedef { Record<string, any> | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => Record<string, any>) } Info
  */
 
 /**

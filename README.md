@@ -906,13 +906,13 @@ Type:
 
 ```ts
 type info =
-  | Record<string, string>
+  | Record<string, any>
   | ((item: {
       absoluteFilename: string;
       sourceFilename: string;
       filename: string;
       toType: ToType;
-    }) => Record<string, string>);
+    }) => Record<string, any>);
 ```
 
 Default: `undefined`
