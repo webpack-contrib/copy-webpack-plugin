@@ -187,7 +187,7 @@ class CopyPlugin {
             return;
           }
 
-          resolve(snapshot);
+          resolve(/** @type {Snapshot} */ (snapshot));
         }
       );
     });
