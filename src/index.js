@@ -37,7 +37,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @property {string} filename
  * @property {Asset["source"]} source
  * @property {Force | undefined} force
- * @property {{ [key: string]: string }} info
+ * @property {Record<string, any>} info
  */
 
 /**
@@ -59,7 +59,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 /**
  * @callback ToFunction
  * @param {{ context: string, absoluteFilename?: string }} pathData
- * @return {string}
+ * @return {string | Promise<string>}
  */
 
 /**
@@ -74,6 +74,7 @@ const template = /\[\\*([\w:]+)\\*\]/i;
  * @callback TransformerFunction
  * @param {Buffer} input
  * @param {string} absoluteFilename
+ * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
  */
 
 /**
@@ -93,15 +94,17 @@ const template = /\[\\*([\w:]+)\\*\]/i;
 /**
  * @callback Filter
  * @param {string} filepath
+ * @returns {boolean | Promise<boolean>}
  */
 
 /**
  * @callback TransformAllFunction
  * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
+ * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
  */
 
 /**
- * @typedef { { [key: string]: string } | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => { [key: string]: string }) } Info
+ * @typedef { Record<string, any> | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => Record<string, any>) } Info
  */
 
 /**
@@ -956,7 +959,7 @@ class CopyPlugin {
 
                     const filename =
                       typeof normalizedPattern.to === "function"
-                        ? normalizedPattern.to({ context })
+                        ? await normalizedPattern.to({ context })
                         : normalizedPattern.to;
 
                     if (template.test(filename)) {

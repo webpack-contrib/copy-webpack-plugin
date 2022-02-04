@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [10.2.4](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.3...v10.2.4) (2022-01-31)
+
+
+### Bug Fixes
+
+* types ([#666](https://github.com/webpack-contrib/copy-webpack-plugin/issues/666)) ([a1c2308](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a1c2308511a4cccb92a22cb395b6eb66dc1c776b))
+
+### [10.2.3](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.2...v10.2.3) (2022-01-29)
+
+
+### Bug Fixes
+
+* async `to` support ([fd095fb](https://github.com/webpack-contrib/copy-webpack-plugin/commit/fd095fb79399df5edbd06d9dbd1ed30fe4f7eb24))
+
+### [10.2.2](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.1...v10.2.2) (2022-01-28)
+
+
+### Bug Fixes
+
+* types ([#664](https://github.com/webpack-contrib/copy-webpack-plugin/issues/664)) ([f58470e](https://github.com/webpack-contrib/copy-webpack-plugin/commit/f58470ee1275330046b0867f70bcd3f2378a2a25))
+
+### [10.2.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.0...v10.2.1) (2022-01-20)
+
+
+### Bug Fixes
+
+* types ([#661](https://github.com/webpack-contrib/copy-webpack-plugin/issues/661)) ([324aecb](https://github.com/webpack-contrib/copy-webpack-plugin/commit/324aecb42ebd5594dcd1a607522cbbf1c512baff))
+
 ## [10.2.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.1.0...v10.2.0) (2021-12-16)
 
 
