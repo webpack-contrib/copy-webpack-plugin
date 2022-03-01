@@ -40,7 +40,7 @@ jobs:
 
       - name: Lint
         run: npm run lint
-        
+
       - name: Build types
         run: npm run build:types
 
