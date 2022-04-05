@@ -317,8 +317,6 @@ module.exports = {
 
 The `context` option can be an absolute or relative path. If `context` is a relative, then it is converted to absolute based to `compiler.options.context`
 
-Also, `context` indicates how to interpret the search results. Further, he is considered in this role.
-
 To determine the structure from which the found resources will be copied to the destination folder, the `context` option is used.
 
 If `from` is a file, then `context` is equal to the directory in which this file is located. Accordingly, the result will be only the file name.
