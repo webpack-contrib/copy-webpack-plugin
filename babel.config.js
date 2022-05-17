@@ -12,7 +12,7 @@ module.exports = (api) => {
           exclude:
             process.env.NODE_ENV === "test" ? [] : ["proposal-dynamic-import"],
           targets: {
-            node: "14.16.0",
+            node: "14.15.0",
           },
         },
       ],

@@ -14,7 +14,7 @@
   "main": "dist/index.js",
   "types": "types/index.d.ts",
   "engines": {
-    "node": ">= 14.16.0"
+    "node": ">= 14.15.0"
   },
   "scripts": {
     "start": "npm run build -- -w",
@@ -56,14 +56,14 @@
     "@babel/cli": "^7.17.10",
     "@babel/core": "^7.17.10",
     "@babel/eslint-parser": "^7.16.5",
-    "@babel/preset-env": "^7.17.10",
-    "@commitlint/cli": "^16.2.4",
-    "@commitlint/config-conventional": "^16.2.4",
+    "@babel/preset-env": "^7.17.12",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
     "@types/glob-parent": "^5.1.1",
     "@types/normalize-path": "^3.0.0",
     "@types/serialize-javascript": "^5.0.2",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
-    "babel-jest": "^27.5.1",
+    "babel-jest": "^28.1.0",
     "cross-env": "^7.0.3",
     "del": "^6.0.0",
     "del-cli": "^4.0.1",
@@ -73,7 +73,7 @@
     "file-loader": "^6.2.0",
     "husky": "^8.0.1",
     "is-gzip": "^2.0.0",
-    "jest": "^27.5.1",
+    "jest": "^28.1.0",
     "lint-staged": "^12.4.1",
     "memfs": "^3.4.1",
     "mkdirp": "^1.0.4",
