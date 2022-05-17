@@ -14,7 +14,7 @@
   "main": "dist/index.js",
   "types": "types/index.d.ts",
   "engines": {
-    "node": ">= 12.20.0"
+    "node": ">= 14.15.0"
   },
   "scripts": {
     "start": "npm run build -- -w",
@@ -47,7 +47,7 @@
   "dependencies": {
     "fast-glob": "^3.2.11",
     "glob-parent": "^6.0.1",
-    "globby": "^12.2.0",
+    "globby": "^13.1.1",
     "normalize-path": "^3.0.0",
     "schema-utils": "^4.0.0",
     "serialize-javascript": "^6.0.0"
@@ -56,24 +56,24 @@
     "@babel/cli": "^7.17.10",
     "@babel/core": "^7.17.10",
     "@babel/eslint-parser": "^7.16.5",
-    "@babel/preset-env": "^7.17.10",
-    "@commitlint/cli": "^16.2.4",
-    "@commitlint/config-conventional": "^16.2.4",
+    "@babel/preset-env": "^7.17.12",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
     "@types/glob-parent": "^5.1.1",
     "@types/normalize-path": "^3.0.0",
     "@types/serialize-javascript": "^5.0.2",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
-    "babel-jest": "^27.5.1",
+    "babel-jest": "^28.1.0",
     "cross-env": "^7.0.3",
     "del": "^6.0.0",
     "del-cli": "^4.0.1",
-    "eslint": "^8.14.0",
+    "eslint": "^8.15.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-import": "^2.26.0",
     "file-loader": "^6.2.0",
-    "husky": "^7.0.1",
+    "husky": "^8.0.1",
     "is-gzip": "^2.0.0",
-    "jest": "^27.5.1",
+    "jest": "^28.1.0",
     "lint-staged": "^12.4.1",
     "memfs": "^3.4.1",
     "mkdirp": "^1.0.4",
@@ -81,7 +81,7 @@
     "prettier": "^2.6.2",
     "standard-version": "^9.3.1",
     "typescript": "^4.6.4",
-    "webpack": "^5.72.0"
+    "webpack": "^5.72.1"
   },
   "keywords": [
     "webpack",
