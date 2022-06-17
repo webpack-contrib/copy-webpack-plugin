@@ -55,11 +55,17 @@ module.exports = {
 };
 ```
 
-> ℹ️ `copy-webpack-plugin` is not designed to copy files generated from the build process; rather, it is to copy files that already exist in the source tree, as part of the build process.
+> **Note**
+>
+> `copy-webpack-plugin` is not designed to copy files generated from the build process; rather, it is to copy files that already exist in the source tree, as part of the build process.
 
-> ℹ️ If you want `webpack-dev-server` to write files to the output directory during development, you can force it with the [`writeToDisk`](https://github.com/webpack/webpack-dev-middleware#writetodisk) option or the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
+> **Note**
+>
+> If you want `webpack-dev-server` to write files to the output directory during development, you can force it with the [`writeToDisk`](https://github.com/webpack/webpack-dev-middleware#writetodisk) option or the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
 
-> ℹ️ You can get the original source filename from [Asset Objects](https://webpack.js.org/api/stats/#asset-objects).
+> **Note**
+>
+> You can get the original source filename from [Asset Objects](https://webpack.js.org/api/stats/#asset-objects).
 
 ## Options
 
@@ -117,7 +123,9 @@ Glob or path from where we copy files.
 Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
 Glob can only be a `string`.
 
-> ⚠️ Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> **Warning**
+>
+> Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
 > Instead please use `/`.
 
@@ -205,7 +213,9 @@ Default: `compiler.options.output`
 
 Output path.
 
-> ⚠️ Don't use directly `\\` in `to` (i.e `path\to\dest`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> **Warning**
+>
+> Don't use directly `\\` in `to` (i.e `path\to\dest`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
 > Instead please use `/` or `path` methods.
 
@@ -238,7 +248,9 @@ module.exports = {
 
 Allows to modify the writing path.
 
-> ⚠️ Don't return directly `\\` in `to` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> **Warning**
+>
+> Don't return directly `\\` in `to` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
 > Instead please use `/` or `path` methods.
 
@@ -292,7 +304,9 @@ Default: `options.context|compiler.options.context`
 
 A path that determines how to interpret the `from` path.
 
-> ⚠️ Don't use directly `\\` in `context` (i.e `path\to\context`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
+> **Warning**
+>
+> Don't use directly `\\` in `context` (i.e `path\to\context`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
 > Instead please use `/` or `path` methods.
 
@@ -370,7 +384,9 @@ type filter = (filepath: string) => boolean;
 
 Default: `undefined`
 
-> ℹ️ To ignore files by path please use the [`globOptions.ignore`](#globoptions) option.
+> **Note**
+>
+> To ignore files by path please use the [`globOptions.ignore`](#globoptions) option.
 
 **webpack.config.js**
 
@@ -838,7 +854,9 @@ Default: `undefined`
 
 Allows you to modify the contents of multiple files and save the result to one file.
 
-> ℹ️ The `to` option must be specified and point to a file. It is allowed to use only `[contenthash]` and `[fullhash]` template strings.
+> **Note**
+>
+> The `to` option must be specified and point to a file. It is allowed to use only `[contenthash]` and `[fullhash]` template strings.
 
 **webpack.config.js**
 
@@ -1183,7 +1201,9 @@ module.exports = {
 
 Removes all directory references and only copies file names.
 
-> ⚠️ If files have the same name, the result is non-deterministic.
+> **Warning**
+>
+> If files have the same name, the result is non-deterministic.
 
 **webpack.config.js**
 
