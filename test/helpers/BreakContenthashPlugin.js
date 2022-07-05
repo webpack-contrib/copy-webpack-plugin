@@ -30,4 +30,4 @@ class BreakContenthashPlugin {
   }
 }
 
-export default BreakContenthashPlugin;
+module.exports = BreakContenthashPlugin;

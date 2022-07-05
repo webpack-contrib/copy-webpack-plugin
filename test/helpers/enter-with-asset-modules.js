@@ -1,3 +1,3 @@
-import txtURL from "../fixtures/directory/nested/deep-nested/deepnested.txt";
+const txtURL = require("../fixtures/directory/nested/deep-nested/deepnested.txt");
 
-export default txtURL;
+module.exports = txtURL;

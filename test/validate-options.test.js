@@ -1,4 +1,4 @@
-import CopyPlugin from "../src/index";
+const CopyPlugin = require("../src/index");
 
 describe("validate options", () => {
   const tests = {

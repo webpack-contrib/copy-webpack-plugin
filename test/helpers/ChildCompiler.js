@@ -1,4 +1,4 @@
-export default class ChildCompiler {
+module.exports = class ChildCompiler {
   // eslint-disable-next-line class-methods-use-this
   apply(compiler) {
     compiler.hooks.make.tapAsync("Child Compiler", (compilation, callback) => {
@@ -29,4 +29,4 @@ export default class ChildCompiler {
       });
     });
   }
-}
+};

@@ -1,7 +1,7 @@
-import CopyPlugin from "../src";
+const CopyPlugin = require("../src");
 
-import { runEmit } from "./helpers/run";
-import { compile, getCompiler, readAssets } from "./helpers";
+const { runEmit } = require("./helpers/run");
+const { compile, getCompiler, readAssets } = require("./helpers");
 
 describe("transformAll option", () => {
   it('should be defined "assets"', (done) => {

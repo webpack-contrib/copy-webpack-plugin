@@ -1,7 +1,7 @@
-import path from "path";
-import zlib from "zlib";
+const path = require("path");
+const zlib = require("zlib");
 
-import { run, runEmit } from "./helpers/run";
+const { run, runEmit } = require("./helpers/run");
 
 const FIXTURES_DIR = path.join(__dirname, "fixtures");
 

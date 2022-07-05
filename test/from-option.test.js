@@ -1,7 +1,7 @@
-import path from "path";
+const path = require("path");
 
-import { runEmit } from "./helpers/run";
-import { getCompiler } from "./helpers";
+const { runEmit } = require("./helpers/run");
+const { getCompiler } = require("./helpers");
 
 const FIXTURES_DIR_NORMALIZED = path
   .join(__dirname, "fixtures")

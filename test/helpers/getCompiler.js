@@ -1,11 +1,11 @@
-import path from "path";
+const path = require("path");
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-import webpack from "webpack";
+const webpack = require("webpack");
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { createFsFromVolume, Volume } from "memfs";
+const { createFsFromVolume, Volume } = require("memfs");
 
-export default (config = {}) => {
+module.exports = (config = {}) => {
   const fullConfig = {
     mode: "development",
     context: path.resolve(__dirname, "../fixtures"),

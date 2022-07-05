@@ -24,4 +24,4 @@ class PreCopyPlugin {
   }
 }
 
-export default PreCopyPlugin;
+module.exports = PreCopyPlugin;

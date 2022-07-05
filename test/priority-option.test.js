@@ -1,4 +1,4 @@
-import { run } from "./helpers/run";
+const { run } = require("./helpers/run");
 
 describe("priority option", () => {
   it("should copy without specifying priority option", (done) => {

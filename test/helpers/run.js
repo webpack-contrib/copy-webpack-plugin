@@ -1,16 +1,16 @@
 // Ideally we pass in patterns and confirm the resulting assets
-import fs from "fs";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
 
-import CopyPlugin from "../../src/index";
+const CopyPlugin = require("../../src/index");
 
-import ChildCompilerPlugin from "./ChildCompiler";
-import PreCopyPlugin from "./PreCopyPlugin";
-import BreakContenthashPlugin from "./BreakContenthashPlugin";
+const ChildCompilerPlugin = require("./ChildCompiler");
+const PreCopyPlugin = require("./PreCopyPlugin");
+const BreakContenthashPlugin = require("./BreakContenthashPlugin");
 
-import removeIllegalCharacterForWindows from "./removeIllegalCharacterForWindows";
+const removeIllegalCharacterForWindows = require("./removeIllegalCharacterForWindows");
 
-import { compile, getCompiler, readAssets } from "./";
+const { compile, getCompiler, readAssets } = require("./");
 
 /* eslint-disable no-param-reassign */
 
@@ -210,4 +210,4 @@ function runChange(opts) {
   });
 }
 
-export { run, runChange, runEmit, runForce };
+module.exports = { run, runChange, runEmit, runForce };

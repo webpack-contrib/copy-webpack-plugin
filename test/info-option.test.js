@@ -1,4 +1,4 @@
-import { run, runEmit } from "./helpers/run";
+const { run, runEmit } = require("./helpers/run");
 
 describe("info option", () => {
   it('should work without "info" option', (done) => {

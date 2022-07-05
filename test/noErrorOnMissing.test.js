@@ -1,4 +1,4 @@
-import { runEmit } from "./helpers/run";
+const { runEmit } = require("./helpers/run");
 
 describe("noErrorOnMissing option", () => {
   describe("is a file", () => {

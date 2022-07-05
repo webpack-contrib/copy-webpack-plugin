@@ -1,4 +1,4 @@
-import { runForce } from "./helpers/run";
+const { runForce } = require("./helpers/run");
 
 describe("force option", () => {
   describe("is not specified", () => {

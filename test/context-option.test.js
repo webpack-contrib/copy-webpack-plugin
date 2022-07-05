@@ -1,6 +1,6 @@
-import path from "path";
+const path = require("path");
 
-import { runEmit } from "./helpers/run";
+const { runEmit } = require("./helpers/run");
 
 const FIXTURES_DIR = path.join(__dirname, "fixtures");
 

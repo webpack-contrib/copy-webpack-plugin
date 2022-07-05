@@ -1,6 +1,6 @@
-import fs from "fs";
+const fs = require("fs");
 
-import { runEmit } from "./helpers/run";
+const { runEmit } = require("./helpers/run");
 
 describe('"filter" option', () => {
   it("should work, copy files and filter some of them", (done) => {
