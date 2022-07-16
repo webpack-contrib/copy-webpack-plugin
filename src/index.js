@@ -799,7 +799,7 @@ class CopyPlugin {
           if (typeof globby === "undefined") {
             try {
               // @ts-ignore
-              ({ globby } = await import("globby"));
+              ({ globby } = await require("globby"));
             } catch (error) {
               callback(/** @type {Error} */ (error));
 
