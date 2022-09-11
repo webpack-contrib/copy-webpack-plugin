@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CopyPlugin basic should work with multi compiler mode: assets 1`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -11,7 +11,7 @@ Object {
 `;
 
 exports[`CopyPlugin basic should work with multi compiler mode: assets 2`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -20,16 +20,16 @@ Object {
 }
 `;
 
-exports[`CopyPlugin basic should work with multi compiler mode: errors 1`] = `Array []`;
+exports[`CopyPlugin basic should work with multi compiler mode: errors 1`] = `[]`;
 
-exports[`CopyPlugin basic should work with multi compiler mode: errors 2`] = `Array []`;
+exports[`CopyPlugin basic should work with multi compiler mode: errors 2`] = `[]`;
 
-exports[`CopyPlugin basic should work with multi compiler mode: warnings 1`] = `Array []`;
+exports[`CopyPlugin basic should work with multi compiler mode: warnings 1`] = `[]`;
 
-exports[`CopyPlugin basic should work with multi compiler mode: warnings 2`] = `Array []`;
+exports[`CopyPlugin basic should work with multi compiler mode: warnings 2`] = `[]`;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 1`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -39,7 +39,7 @@ Object {
 `;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 2`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -49,7 +49,7 @@ Object {
 `;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 3`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -59,7 +59,7 @@ Object {
 `;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 4`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -68,24 +68,24 @@ Object {
 }
 `;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 2`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 3`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 3`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 4`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: errors 4`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 2`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 3`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 3`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 4`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: warnings 4`] = `[]`;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache: assets 1`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -95,7 +95,7 @@ Object {
 `;
 
 exports[`CopyPlugin cache should work with the "filesystem" cache: assets 2`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -104,16 +104,16 @@ Object {
 }
 `;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache: errors 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache: errors 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache: errors 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache: errors 2`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache: warnings 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache: warnings 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "filesystem" cache: warnings 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "filesystem" cache: warnings 2`] = `[]`;
 
 exports[`CopyPlugin cache should work with the "memory" cache: assets 1`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -123,7 +123,7 @@ Object {
 `;
 
 exports[`CopyPlugin cache should work with the "memory" cache: assets 2`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "directoryfile.txt": "new",
@@ -132,16 +132,16 @@ Object {
 }
 `;
 
-exports[`CopyPlugin cache should work with the "memory" cache: errors 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "memory" cache: errors 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "memory" cache: errors 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "memory" cache: errors 2`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "memory" cache: warnings 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "memory" cache: warnings 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "memory" cache: warnings 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "memory" cache: warnings 2`] = `[]`;
 
 exports[`CopyPlugin cache should work with the "transform" option: assets 1`] = `
-Object {
+{
   "new0.txt": "new",
   "new1-2.txt": "newadded1",
   "new1.txt": "newadded1",
@@ -154,7 +154,7 @@ Object {
 `;
 
 exports[`CopyPlugin cache should work with the "transform" option: assets 2`] = `
-Object {
+{
   "new0.txt": "new",
   "new1-2.txt": "newadded1",
   "new1.txt": "newadded1",
@@ -166,17 +166,17 @@ Object {
 }
 `;
 
-exports[`CopyPlugin cache should work with the "transform" option: errors 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "transform" option: errors 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "transform" option: errors 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "transform" option: errors 2`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "transform" option: warnings 1`] = `Array []`;
+exports[`CopyPlugin cache should work with the "transform" option: warnings 1`] = `[]`;
 
-exports[`CopyPlugin cache should work with the "transform" option: warnings 2`] = `Array []`;
+exports[`CopyPlugin cache should work with the "transform" option: warnings 2`] = `[]`;
 
 exports[`CopyPlugin logging should logging when "from" is a directory: logs 1`] = `
-Object {
-  "logs": Array [
+{
+  "logs": [
     "'to' option '.' determinated as 'dir'",
     "'to' option '.' determinated as 'dir'",
     "'to' option '.' determinated as 'dir'",
@@ -246,8 +246,8 @@ Object {
 `;
 
 exports[`CopyPlugin logging should logging when "from" is a file: logs 1`] = `
-Object {
-  "logs": Array [
+{
+  "logs": [
     "'to' option '.' determinated as 'dir'",
     "added './fixtures/file.txt' as a file dependency",
     "begin globbing './fixtures/file.txt'...",
@@ -274,8 +274,8 @@ Object {
 `;
 
 exports[`CopyPlugin logging should logging when "from" is a glob: logs 1`] = `
-Object {
-  "logs": Array [
+{
+  "logs": [
     "'to' option '.' determinated as 'dir'",
     "'to' option '.' determinated as 'dir'",
     "'to' option '.' determinated as 'dir'",
@@ -331,8 +331,8 @@ Object {
 `;
 
 exports[`CopyPlugin logging should logging when 'to' is a function: logs 1`] = `
-Object {
-  "logs": Array [
+{
+  "logs": [
     "'to' option 'newFile.txt' determinated as 'file'",
     "added './fixtures/file.txt' as a file dependency",
     "begin globbing './fixtures/file.txt'...",
@@ -359,7 +359,7 @@ Object {
 `;
 
 exports[`CopyPlugin stats should work have assets info: assets 1`] = `
-Object {
+{
   ".dottedfile": "dottedfile contents
 ",
   "asset-modules/deepnested.txt": "",
@@ -370,49 +370,49 @@ Object {
 `;
 
 exports[`CopyPlugin stats should work have assets info: assets info 1`] = `
-Array [
-  Object {
-    "info": Object {
+[
+  {
+    "info": {
       "copied": true,
       "immutable": undefined,
       "sourceFilename": "directory/.dottedfile",
     },
     "name": ".dottedfile",
   },
-  Object {
-    "info": Object {
+  {
+    "info": {
       "copied": undefined,
       "immutable": undefined,
       "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
     },
     "name": "asset-modules/deepnested.txt",
   },
-  Object {
-    "info": Object {
+  {
+    "info": {
       "copied": true,
       "immutable": undefined,
       "sourceFilename": "directory/directoryfile.txt",
     },
     "name": "directoryfile.txt",
   },
-  Object {
-    "info": Object {
+  {
+    "info": {
       "copied": undefined,
       "immutable": undefined,
       "sourceFilename": undefined,
     },
     "name": "main.js",
   },
-  Object {
-    "info": Object {
+  {
+    "info": {
       "copied": true,
       "immutable": undefined,
       "sourceFilename": "directory/nested/deep-nested/deepnested.txt",
     },
     "name": "nested/deep-nested/deepnested.txt",
   },
-  Object {
-    "info": Object {
+  {
+    "info": {
       "copied": true,
       "immutable": undefined,
       "sourceFilename": "directory/nested/nestedfile.txt",
@@ -422,6 +422,6 @@ Array [
 ]
 `;
 
-exports[`CopyPlugin stats should work have assets info: errors 1`] = `Array []`;
+exports[`CopyPlugin stats should work have assets info: errors 1`] = `[]`;
 
-exports[`CopyPlugin stats should work have assets info: warnings 1`] = `Array []`;
+exports[`CopyPlugin stats should work have assets info: warnings 1`] = `[]`;
