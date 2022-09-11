@@ -90,7 +90,7 @@ exports[`validate options should throw an error on the "patterns" option with "[
 exports[`validate options should throw an error on the "patterns" option with "[{"from":"test.txt","to":"dir","context":"context","toType":"foo"}]" value 1`] = `
 "Invalid options object. Copy Plugin has been initialized using an options object that does not match the API schema.
  - options.patterns[0].toType should be one of these:
-   \\"dir\\" | \\"file\\" | \\"template\\"
+   "dir" | "file" | "template"
    -> Determinate what is to option - directory, file or template.
    -> Read more at https://github.com/webpack-contrib/copy-webpack-plugin#totype"
 `;
