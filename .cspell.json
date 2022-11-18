@@ -1,0 +1,46 @@
+{
+  "version": "0.2",
+  "language": "en,en-gb",
+  "words": [
+    "commitlint",
+    "nestedfile",
+    "directoryfile",
+    "globby",
+    "posix",
+    "newfile",
+    "fullhash",
+    "deepnested",
+    "subdir",
+    "newdirectory",
+    "nesteddir",
+    "Globby",
+    "determinated",
+    "Etags",
+    "configute",
+    "newchanged",
+    "dottedfile",
+    "mathes",
+    "newext",
+    "noextension",
+    "binextension",
+    "tempdir",
+    "memfs",
+    "enry",
+    "globstar",
+    "deepnesteddir",
+    "globstar",
+    "bazz",
+    "newbinextension",
+    "behavour",
+    "dottedfile",
+    "tempfile"
+  ],
+
+  "ignorePaths": [
+    "CHANGELOG.md",
+    "package.json",
+    "dist/**",
+    "**/__snapshots__/**",
+    "package-lock.json"
+  ]
+}
