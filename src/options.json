@@ -29,7 +29,7 @@
         },
         "globOptions": {
           "type": "object",
-          "description": "Allows to configute the glob pattern matching library used by the plugin.",
+          "description": "Allows to configure the glob pattern matching library used by the plugin.",
           "link": "https://github.com/webpack-contrib/copy-webpack-plugin#globoptions"
         },
         "filter": {
