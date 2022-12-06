@@ -61,6 +61,7 @@
     "@commitlint/cli": "^17.3.0",
     "@commitlint/config-conventional": "^17.3.0",
     "@types/glob-parent": "^5.1.1",
+    "@types/node": "^18.11.11",
     "@types/normalize-path": "^3.0.0",
     "@types/serialize-javascript": "^5.0.2",
     "@webpack-contrib/eslint-config-webpack": "^3.0.0",
