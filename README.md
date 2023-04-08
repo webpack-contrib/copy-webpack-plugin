@@ -1003,7 +1003,7 @@ module.exports = {
 
 ### Examples
 
-#### Different variants `from` (`glob`, `file` or `dir`).
+#### Different variants of `from` (`glob`, `file` or `dir`).
 
 Take for example the following file structure:
 
@@ -1039,7 +1039,7 @@ src/directory-nested/deep-nested/deepnested-file.txt,
 src/directory-nested/nested-file.txt
 ```
 
-If you want only content `src/directory-nested/`, you should only indicate `glob` in `from`. The path to the folder in which the search should take place, should be moved to `context`.
+If you don't want the result paths to start with `src/directory-nested/`, then you should move `src/directory-nested/` to `context`, such that only the glob pattern `**/*` remains in `from`:
 
 **webpack.config.js**
 
