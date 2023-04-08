@@ -302,7 +302,7 @@ type context = string;
 
 Default: `options.context|compiler.options.context`
 
-A path that determines how to interpret the `from` path.
+A path to be (1) prepended to `from` and (2) removed from the start of the result path(s).
 
 > **Warning**
 >
@@ -328,17 +328,15 @@ module.exports = {
 };
 ```
 
-The `context` option can be an absolute or relative path. If `context` is a relative, then it is converted to absolute based to `compiler.options.context`
+`context` can be an absolute path or a relative path. If it is a relative path, then it will be converted to an absolute path based on `compiler.options.context`.
 
-To determine the structure from which the found resources will be copied to the destination folder, the `context` option is used.
+`context` should be explicitly set only when `from` contains a glob. Otherwise, `context` is automatically set, based on whether `from` is a file or a directory:
 
-If `from` is a file, then `context` is equal to the directory in which this file is located. Accordingly, the result will be only the file name.
+If `from` is a file, then `context` is its directory. The result path will be the filename alone.
 
-If `from` is a directory, then `context` is the same as `from` and is equal to the directory itself. In this case, the result will be a hierarchical structure of the found folders and files relative to the specified directory.
+If `from` is a directory, then `context` equals `from`. The result paths will be the paths of the directory's contents (including nested contents), relative to the directory.
 
-If `from` is a glob, then regardless of the `context` option, the result will be the structure specified in the `from` option
-
-More [`examples`](#examples)
+The use of `context` is illustrated by these [`examples`](#examples).
 
 #### `globOptions`
 
