@@ -328,7 +328,7 @@ module.exports = {
 };
 ```
 
-`context` can be an absolute path or a relative path. If it is a relative path, then it will be converted to an absolute path based on `compiler.options.context`. 
+`context` can be an absolute path or a relative path. If it is a relative path, then it will be converted to an absolute path based on `compiler.options.context`.
 
 `context` should be explicitly set only when `from` contains a glob. Otherwise, `context` is automatically set, based on whether `from` is a file or a directory:
 
