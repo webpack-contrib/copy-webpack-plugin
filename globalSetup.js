@@ -1,8 +1,6 @@
 const path = require("path");
 const fs = require("fs");
 
-// eslint-disable-next-line import/no-extraneous-dependencies
-const mkdirp = require("mkdirp");
 const webpack = require("webpack");
 
 const removeIllegalCharacterForWindows = require("./test/helpers/removeIllegalCharacterForWindows");
@@ -20,8 +18,7 @@ module.exports = () => {
     const file = removeIllegalCharacterForWindows(originFile);
     const dir = path.dirname(file);
 
-    mkdirp.sync(path.join(baseDir, dir));
-
+    fs.mkdirSync(path.join(baseDir, dir), { recursive: true });
     fs.writeFileSync(path.join(baseDir, file), specialFiles[originFile]);
   });
 
