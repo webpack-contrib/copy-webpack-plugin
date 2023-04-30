@@ -730,7 +730,7 @@ module.exports = {
 
 ##### `object`
 
-Enables `transform` caching and setup cache directory and invalidation keys.
+Enables `transform` caching and setup invalidation keys.
 
 **webpack.config.js**
 
@@ -747,7 +747,6 @@ module.exports = {
               return optimize(content);
             },
             cache: {
-              directory: path.resolve(__dirname, "cache-directory"),
               keys: {
                 // May be useful for invalidating cache based on external values
                 // For example, you can invalid cache based on `process.version` - { node: process.version }
@@ -781,7 +780,6 @@ module.exports = {
               return optimize(content);
             },
             cache: {
-              directory: path.resolve(__dirname, "cache-directory"),
               keys: (defaultCacheKeys, absoluteFrom) => {
                 const keys = getCustomCacheInvalidationKeysSync();
 
@@ -816,7 +814,6 @@ module.exports = {
               return optimize(content);
             },
             cache: {
-              directory: path.resolve(__dirname, "cache-directory"),
               keys: async (defaultCacheKeys, absoluteFrom) => {
                 const keys = await getCustomCacheInvalidationKeysAsync();
 
