@@ -192,12 +192,8 @@ declare namespace CopyPlugin {
     PluginOptions,
   };
 }
-type Compiler = import("webpack").Compiler;
-type PluginOptions = {
-  patterns: Pattern[];
-  options?: AdditionalOptions | undefined;
-};
 type Schema = import("schema-utils/declarations/validate").Schema;
+type Compiler = import("webpack").Compiler;
 type Compilation = import("webpack").Compilation;
 type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
@@ -286,4 +282,8 @@ type ObjectPattern = {
 type Pattern = StringPattern | ObjectPattern;
 type AdditionalOptions = {
   concurrency?: number | undefined;
+};
+type PluginOptions = {
+  patterns: Pattern[];
+  options?: AdditionalOptions | undefined;
 };
