@@ -114,7 +114,7 @@ describe("transformAll option", () => {
       expectedAssetKeys: [],
       expectedErrors: [
         new Error(
-          `Invalid "pattern.to" for the "pattern.from": "file.txt" and "pattern.transformAll" function. The "to" option must be specified.`
+          `Invalid "pattern.to" for the "pattern.from": "file.txt" and "pattern.transformAll" function. The "to" option must be specified.`,
         ),
       ],
       patterns: [

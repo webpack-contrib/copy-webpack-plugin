@@ -147,7 +147,7 @@ module.exports = {
         // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
         path.posix.join(
           path.resolve(__dirname, "src").replace(/\\/g, "/"),
-          "*.txt"
+          "*.txt",
         ),
       ],
     }),
@@ -185,7 +185,7 @@ module.exports = {
           // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
           from: path.posix.join(
             path.resolve(__dirname, "fixtures").replace(/\\/g, "/"),
-            "*.txt"
+            "*.txt",
           ),
         },
       ],
@@ -686,7 +686,7 @@ type cache =
         defaultCacheKeys: {
           [key: string]: any;
         },
-        absoluteFilename: string
+        absoluteFilename: string,
       ) => Promise<{
         [key: string]: any;
       }>;
@@ -841,7 +841,7 @@ type transformAll = (
     data: Buffer;
     sourceFilename: string;
     absoluteFilename: string;
-  }[]
+  }[],
 ) => any;
 ```
 
@@ -1123,7 +1123,7 @@ module.exports = {
             __dirname,
             "src",
             "directory-nested",
-            "nested-file.txt"
+            "nested-file.txt",
           ),
         },
       ],
@@ -1175,7 +1175,7 @@ module.exports = {
         {
           from: path.posix.join(
             path.resolve(__dirname, "src").replace(/\\/g, "/"),
-            "**/*"
+            "**/*",
           ),
           globOptions: {
             ignore: [
@@ -1294,7 +1294,7 @@ module.exports = {
       patterns: [
         {
           from: `${path.dirname(
-            require.resolve(`${moduleName}/package.json`)
+            require.resolve(`${moduleName}/package.json`),
           )}/target`,
           to: "target",
         },

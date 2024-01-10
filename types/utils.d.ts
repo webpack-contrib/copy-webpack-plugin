@@ -10,7 +10,7 @@ export type Task<T> = () => Promise<T>;
  */
 export function stat(
   inputFileSystem: InputFileSystem,
-  path: string
+  path: string,
 ): Promise<undefined | Stats>;
 /**
  * @param {InputFileSystem} inputFileSystem
@@ -19,7 +19,7 @@ export function stat(
  */
 export function readFile(
   inputFileSystem: InputFileSystem,
-  path: string
+  path: string,
 ): Promise<string | Buffer>;
 /**
  * @template T

@@ -8,7 +8,7 @@ export default class ChildCompiler {
       };
       const childCompiler = compilation.createChildCompiler(
         "ChildCompiler",
-        outputOptions
+        outputOptions,
       );
       childCompiler.runAsChild((error, entries, childCompilation) => {
         if (error) {
@@ -19,7 +19,7 @@ export default class ChildCompiler {
 
         if (assets.length > 0) {
           callback(
-            new Error("Copy plugin should not be ran in child compilations")
+            new Error("Copy plugin should not be ran in child compilations"),
           );
 
           return;

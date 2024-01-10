@@ -188,7 +188,7 @@ class CopyPlugin {
           }
 
           resolve(/** @type {Snapshot} */ (snapshot));
-        }
+        },
       );
     });
   }
@@ -212,7 +212,7 @@ class CopyPlugin {
           }
 
           resolve(isValid);
-        }
+        },
       );
     });
   }
@@ -229,7 +229,7 @@ class CopyPlugin {
     const { hashDigest, hashDigestLength, hashFunction, hashSalt } =
       outputOptions;
     const hash = compiler.webpack.util.createHash(
-      /** @type {string} */ (hashFunction)
+      /** @type {string} */ (hashFunction),
     );
 
     if (hashSalt) {
@@ -261,7 +261,7 @@ class CopyPlugin {
     logger,
     cache,
     inputPattern,
-    index
+    index,
   ) {
     const { RawSource } = compiler.webpack.sources;
     const pattern = { ...inputPattern };
@@ -269,7 +269,7 @@ class CopyPlugin {
     const normalizedOriginalFrom = path.normalize(originalFrom);
 
     logger.log(
-      `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`
+      `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
     );
 
     let absoluteFrom;
@@ -335,7 +335,7 @@ class CopyPlugin {
         pattern.context = absoluteFrom;
         glob = path.posix.join(
           fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom))),
-          "**/*"
+          "**/*",
         );
         absoluteFrom = path.join(absoluteFrom, "**/*");
 
@@ -367,7 +367,7 @@ class CopyPlugin {
           ? originalFrom
           : path.posix.join(
               fastGlob.escapePath(normalizePath(path.resolve(pattern.context))),
-              originalFrom
+              originalFrom,
             );
       }
     }
@@ -390,7 +390,7 @@ class CopyPlugin {
     if (globEntries.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`,
         );
 
         return;
@@ -452,37 +452,37 @@ class CopyPlugin {
                     absoluteFilename,
                   })
                 : path.normalize(
-                    typeof pattern.to !== "undefined" ? pattern.to : ""
+                    typeof pattern.to !== "undefined" ? pattern.to : "",
                   );
             const toType = pattern.toType
               ? pattern.toType
               : template.test(to)
-              ? "template"
-              : path.extname(to) === "" || to.slice(-1) === path.sep
-              ? "dir"
-              : "file";
+                ? "template"
+                : path.extname(to) === "" || to.slice(-1) === path.sep
+                  ? "dir"
+                  : "file";
 
             logger.log(`'to' option '${to}' determinated as '${toType}'`);
 
             const relativeFrom = path.relative(
               pattern.context,
-              absoluteFilename
+              absoluteFilename,
             );
             let filename = toType === "dir" ? path.join(to, relativeFrom) : to;
 
             if (path.isAbsolute(filename)) {
               filename = path.relative(
                 /** @type {string} */ (compiler.options.output.path),
-                filename
+                filename,
               );
             }
 
             logger.log(
-              `determined that '${from}' should write to '${filename}'`
+              `determined that '${from}' should write to '${filename}'`,
             );
 
             const sourceFilename = normalizePath(
-              path.relative(compiler.context, absoluteFilename)
+              path.relative(compiler.context, absoluteFilename),
             );
 
             // If this came from a glob or dir, add it to the file dependencies
@@ -499,7 +499,7 @@ class CopyPlugin {
             try {
               cacheEntry = await cache.getPromise(
                 `${sourceFilename}|${index}`,
-                null
+                null,
               );
             } catch (error) {
               compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -518,13 +518,13 @@ class CopyPlugin {
               let isValidSnapshot;
 
               logger.debug(
-                `checking snapshot on valid for '${absoluteFilename}'...`
+                `checking snapshot on valid for '${absoluteFilename}'...`,
               );
 
               try {
                 isValidSnapshot = await CopyPlugin.checkSnapshotValid(
                   compilation,
-                  cacheEntry.snapshot
+                  cacheEntry.snapshot,
                 );
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -570,7 +570,7 @@ class CopyPlugin {
                 snapshot = await CopyPlugin.createSnapshot(
                   compilation,
                   startTime,
-                  absoluteFilename
+                  absoluteFilename,
                 );
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -632,20 +632,20 @@ class CopyPlugin {
                     typeof transformObj.cache === "boolean"
                       ? defaultCacheKeys
                       : typeof transformObj.cache.keys === "function"
-                      ? await transformObj.cache.keys(
-                          defaultCacheKeys,
-                          absoluteFilename
-                        )
-                      : { ...defaultCacheKeys, ...transformObj.cache.keys }
+                        ? await transformObj.cache.keys(
+                            defaultCacheKeys,
+                            absoluteFilename,
+                          )
+                        : { ...defaultCacheKeys, ...transformObj.cache.keys },
                   )}`;
 
                   logger.debug(
-                    `getting transformation cache for '${absoluteFilename}'...`
+                    `getting transformation cache for '${absoluteFilename}'...`,
                   );
 
                   const cacheItem = cache.getItemCache(
                     cacheKeys,
-                    cache.getLazyHashedEtag(source)
+                    cache.getLazyHashedEtag(source),
                   );
 
                   source = await cacheItem.getPromise();
@@ -653,30 +653,30 @@ class CopyPlugin {
                   logger.debug(
                     source
                       ? `found transformation cache for '${absoluteFilename}'`
-                      : `no transformation cache for '${absoluteFilename}'`
+                      : `no transformation cache for '${absoluteFilename}'`,
                   );
 
                   if (!source) {
                     const transformed = await transformObj.transformer(
                       buffer,
-                      absoluteFilename
+                      absoluteFilename,
                     );
 
                     source = new RawSource(transformed);
 
                     logger.debug(
-                      `caching transformation for '${absoluteFilename}'...`
+                      `caching transformation for '${absoluteFilename}'...`,
                     );
 
                     await cacheItem.storePromise(source);
 
                     logger.debug(
-                      `cached transformation for '${absoluteFilename}'`
+                      `cached transformation for '${absoluteFilename}'`,
                     );
                   }
                 } else {
                   source = new RawSource(
-                    await transformObj.transformer(buffer, absoluteFilename)
+                    await transformObj.transformer(buffer, absoluteFilename),
                   );
                 }
               }
@@ -686,30 +686,30 @@ class CopyPlugin {
               typeof pattern.info === "undefined"
                 ? {}
                 : typeof pattern.info === "function"
-                ? pattern.info({
-                    absoluteFilename,
-                    sourceFilename,
-                    filename,
-                    toType,
-                  }) || {}
-                : pattern.info || {};
+                  ? pattern.info({
+                      absoluteFilename,
+                      sourceFilename,
+                      filename,
+                      toType,
+                    }) || {}
+                  : pattern.info || {};
 
             if (toType === "template") {
               logger.log(
-                `interpolating template '${filename}' for '${sourceFilename}'...`
+                `interpolating template '${filename}' for '${sourceFilename}'...`,
               );
 
               const contentHash = CopyPlugin.getContentHash(
                 compiler,
                 compilation,
-                source.buffer()
+                source.buffer(),
               );
               const ext = path.extname(sourceFilename);
               const base = path.basename(sourceFilename);
               const name = base.slice(0, base.length - ext.length);
               const data = {
                 filename: normalizePath(
-                  path.relative(pattern.context, absoluteFilename)
+                  path.relative(pattern.context, absoluteFilename),
                 ),
                 contentHash,
                 chunk: {
@@ -725,7 +725,7 @@ class CopyPlugin {
               filename = interpolatedFilename;
 
               logger.log(
-                `interpolated template '${filename}' for '${sourceFilename}'`
+                `interpolated template '${filename}' for '${sourceFilename}'`,
               );
             } else {
               filename = normalizePath(filename);
@@ -740,8 +740,8 @@ class CopyPlugin {
               info,
               force: pattern.force,
             };
-          }
-        )
+          },
+        ),
       );
     } catch (error) {
       compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -752,14 +752,14 @@ class CopyPlugin {
     if (copiedResult.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`
+          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`,
         );
 
         return;
       }
 
       const missingError = new Error(
-        `unable to locate '${glob}' glob after filtering paths`
+        `unable to locate '${glob}' glob after filtering paths`,
       );
 
       compilation.errors.push(/** @type {WebpackError} */ (missingError));
@@ -768,7 +768,7 @@ class CopyPlugin {
     }
 
     logger.log(
-      `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`
+      `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
     );
 
     // eslint-disable-next-line consistent-return
@@ -832,8 +832,8 @@ class CopyPlugin {
                   typeof normalizedPattern.context === "undefined"
                     ? compiler.context
                     : path.isAbsolute(normalizedPattern.context)
-                    ? normalizedPattern.context
-                    : path.join(compiler.context, normalizedPattern.context);
+                      ? normalizedPattern.context
+                      : path.join(compiler.context, normalizedPattern.context);
 
                 normalizedPattern.context = context;
 
@@ -852,7 +852,7 @@ class CopyPlugin {
                     /** @type {ObjectPattern & { context: string }} */ (
                       normalizedPattern
                     ),
-                    index
+                    index,
                   );
                 } catch (error) {
                   compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -872,7 +872,7 @@ class CopyPlugin {
                    * @param {CopiedResult | undefined} result
                    * @returns {result is CopiedResult}
                    */
-                  (result) => Boolean(result)
+                  (result) => Boolean(result),
                 );
 
                 if (typeof normalizedPattern.transformAll !== "undefined") {
@@ -881,9 +881,9 @@ class CopyPlugin {
                       /** @type {WebpackError} */
                       (
                         new Error(
-                          `Invalid "pattern.to" for the "pattern.from": "${normalizedPattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`
+                          `Invalid "pattern.to" for the "pattern.from": "${normalizedPattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`,
                         )
-                      )
+                      ),
                     );
 
                     return;
@@ -893,8 +893,8 @@ class CopyPlugin {
                     a.absoluteFilename > b.absoluteFilename
                       ? 1
                       : a.absoluteFilename < b.absoluteFilename
-                      ? -1
-                      : 0
+                        ? -1
+                        : 0,
                   );
 
                   const mergedEtag =
@@ -914,14 +914,14 @@ class CopyPlugin {
                               i === 1
                                 ? cache.getLazyHashedEtag(
                                     /** @type {CopiedResult}*/ (accumulator)
-                                      .source
+                                      .source,
                                   )
                                 : accumulator,
-                              cache.getLazyHashedEtag(asset.source)
+                              cache.getLazyHashedEtag(asset.source),
                             );
 
                             return accumulator;
-                          }
+                          },
                         );
 
                   const cacheItem = cache.getItemCache(
@@ -931,7 +931,7 @@ class CopyPlugin {
                       to: normalizedPattern.to,
                       transformAll: normalizedPattern.transformAll,
                     })}`,
-                    mergedEtag
+                    mergedEtag,
                   );
                   let transformedAsset = await cacheItem.getPromise();
 
@@ -947,11 +947,11 @@ class CopyPlugin {
                               sourceFilename: asset.sourceFilename,
                               absoluteFilename: asset.absoluteFilename,
                             };
-                          })
+                          }),
                         );
                     } catch (error) {
                       compilation.errors.push(
-                        /** @type {WebpackError} */ (error)
+                        /** @type {WebpackError} */ (error),
                       );
 
                       return;
@@ -966,7 +966,7 @@ class CopyPlugin {
                       const contentHash = CopyPlugin.getContentHash(
                         compiler,
                         compilation,
-                        transformedAsset.data
+                        transformedAsset.data,
                       );
 
                       const { path: interpolatedFilename, info: assetInfo } =
@@ -985,7 +985,7 @@ class CopyPlugin {
                     const { RawSource } = compiler.webpack.sources;
 
                     transformedAsset.source = new RawSource(
-                      transformedAsset.data
+                      transformedAsset.data,
                     );
                     transformedAsset.force = normalizedPattern.force;
 
@@ -1002,13 +1002,13 @@ class CopyPlugin {
                 }
 
                 copiedResultMap.get(priority).push(...filteredCopiedResult);
-              })
+              }),
           );
 
           await throttleAll(this.options.concurrency || 100, scheduledTasks);
 
           const copiedResult = [...copiedResultMap.entries()].sort(
-            (a, b) => a[0] - b[0]
+            (a, b) => a[0] - b[0],
           );
 
           // Avoid writing assets inside `p-limit`, because it creates concurrency.
@@ -1037,7 +1037,7 @@ class CopyPlugin {
                     const info = { copied: true, sourceFilename };
 
                     logger.log(
-                      `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`
+                      `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`,
                     );
 
                     compilation.updateAsset(filename, source, {
@@ -1046,14 +1046,14 @@ class CopyPlugin {
                     });
 
                     logger.log(
-                      `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`
+                      `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
                     );
 
                     return;
                   }
 
                   logger.log(
-                    `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`
+                    `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
                   );
 
                   return;
@@ -1062,7 +1062,7 @@ class CopyPlugin {
                 const info = { copied: true, sourceFilename };
 
                 logger.log(
-                  `writing '${filename}' from '${absoluteFilename}' to compilation assets...`
+                  `writing '${filename}' from '${absoluteFilename}' to compilation assets...`,
                 );
 
                 compilation.emitAsset(filename, source, {
@@ -1071,15 +1071,15 @@ class CopyPlugin {
                 });
 
                 logger.log(
-                  `written '${filename}' from '${absoluteFilename}' to compilation assets`
+                  `written '${filename}' from '${absoluteFilename}' to compilation assets`,
                 );
-              }
+              },
             );
 
           logger.log("finished to adding additional assets");
 
           callback();
-        }
+        },
       );
 
       if (compilation.hooks.statsPrinter) {
@@ -1089,9 +1089,9 @@ class CopyPlugin {
             .tap("copy-webpack-plugin", (copied, { green, formatFlag }) =>
               copied
                 ? /** @type {Function} */ (green)(
-                    /** @type {Function} */ (formatFlag)("copied")
+                    /** @type {Function} */ (formatFlag)("copied"),
                   )
-                : ""
+                : "",
             );
         });
       }

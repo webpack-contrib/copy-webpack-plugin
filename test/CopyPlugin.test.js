@@ -433,7 +433,7 @@ describe("CopyPlugin", () => {
         expect(item.compilation.errors).toMatchSnapshot("errors");
         expect(item.compilation.warnings).toMatchSnapshot("warnings");
         expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-          "assets"
+          "assets",
         );
       });
     });
@@ -452,7 +452,7 @@ describe("CopyPlugin", () => {
       })
         .then(({ compiler, stats }) => {
           expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
           ).toEqual(expectedAssetKeys);
         })
         .then(done)
@@ -470,7 +470,7 @@ describe("CopyPlugin", () => {
         .then(({ stats }) => {
           const { contextDependencies } = stats.compilation;
           const isIncludeDependency = contextDependencies.has(
-            path.join(FIXTURES_DIR, "directory")
+            path.join(FIXTURES_DIR, "directory"),
           );
 
           expect(isIncludeDependency).toBe(true);
@@ -490,7 +490,7 @@ describe("CopyPlugin", () => {
         .then(({ stats }) => {
           const { contextDependencies } = stats.compilation;
           const isIncludeDependency = contextDependencies.has(
-            path.join(FIXTURES_DIR, "directory")
+            path.join(FIXTURES_DIR, "directory"),
           );
 
           expect(isIncludeDependency).toBe(true);
@@ -511,7 +511,7 @@ describe("CopyPlugin", () => {
       })
         .then(({ compiler, stats }) => {
           expect(Array.from(Object.keys(readAssets(compiler, stats)))).toEqual(
-            expectedAssetKeys
+            expectedAssetKeys,
           );
         })
         .then(done)
@@ -546,14 +546,14 @@ describe("CopyPlugin", () => {
           "watch",
           "_t4",
           "directory",
-          "tempfile1.txt"
+          "tempfile1.txt",
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
           "watch",
           "_t4",
           "directory",
-          "tempfile2.txt"
+          "tempfile2.txt",
         ),
         patterns: [
           {
@@ -576,14 +576,14 @@ describe("CopyPlugin", () => {
           "watch",
           "_t3",
           "directory",
-          "tempfile1.txt"
+          "tempfile1.txt",
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
           "watch",
           "_t3",
           "directory",
-          "tempfile2.txt"
+          "tempfile2.txt",
         ),
         patterns: [
           {
@@ -610,14 +610,14 @@ describe("CopyPlugin", () => {
           "watch",
           "_t2",
           "directory",
-          "tempfile1.txt"
+          "tempfile1.txt",
         ),
         newFileLoc2: path.join(
           FIXTURES_DIR,
           "watch",
           "_t2",
           "directory",
-          "tempfile2.txt"
+          "tempfile2.txt",
         ),
         patterns: [
           {
@@ -648,7 +648,7 @@ describe("CopyPlugin", () => {
           "watch",
           "_t1",
           "directory",
-          "tempfile1.txt"
+          "tempfile1.txt",
         ),
         newFileLoc2: path.join(FIXTURES_DIR, "watch", "_t1", "tempfile2.txt"),
         patterns: [
@@ -683,7 +683,7 @@ describe("CopyPlugin", () => {
         .then(({ compiler, stats }) => {
           // expect(spy).toHaveBeenCalledTimes(1);
           expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
           ).toEqual(expectedAssetKeys);
 
           spy.mockRestore();
@@ -774,11 +774,11 @@ describe("CopyPlugin", () => {
     it('should work with the "filesystem" cache and multi compiler mode', async () => {
       const cacheDirectoryA = path.resolve(
         __dirname,
-        "./outputs/.cache/multi-compiler/a"
+        "./outputs/.cache/multi-compiler/a",
       );
       const cacheDirectoryB = path.resolve(
         __dirname,
-        "./outputs/.cache/multi-compiler/b"
+        "./outputs/.cache/multi-compiler/b",
       );
 
       try {
@@ -851,7 +851,7 @@ describe("CopyPlugin", () => {
         expect(item.compilation.errors).toMatchSnapshot("errors");
         expect(item.compilation.warnings).toMatchSnapshot("warnings");
         expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-          "assets"
+          "assets",
         );
       });
 
@@ -863,7 +863,7 @@ describe("CopyPlugin", () => {
           expect(item.compilation.errors).toMatchSnapshot("errors");
           expect(item.compilation.warnings).toMatchSnapshot("warnings");
           expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-            "assets"
+            "assets",
           );
         });
 
@@ -878,7 +878,7 @@ describe("CopyPlugin", () => {
         fs.rmdirSync(cacheDirectory, { recursive: true });
         fs.rmdirSync(
           path.resolve(__dirname, "../node_modules/.cache/copy-webpack-plugin"),
-          { recursive: true }
+          { recursive: true },
         );
       } catch (_) {
         // Nothing
@@ -898,14 +898,14 @@ describe("CopyPlugin", () => {
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new0.txt",
           },
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new1.txt",
             transform: {
@@ -916,7 +916,7 @@ describe("CopyPlugin", () => {
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new1-2.txt",
             transform: {
@@ -927,7 +927,7 @@ describe("CopyPlugin", () => {
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new2.txt",
             transform: {
@@ -938,7 +938,7 @@ describe("CopyPlugin", () => {
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new3.txt",
             transform: {
@@ -949,7 +949,7 @@ describe("CopyPlugin", () => {
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new4.txt",
             transform: {
@@ -964,7 +964,7 @@ describe("CopyPlugin", () => {
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new5.txt",
             transform: {
@@ -979,7 +979,7 @@ describe("CopyPlugin", () => {
           {
             from: path.resolve(
               __dirname,
-              "./fixtures/directory/directoryfile.txt"
+              "./fixtures/directory/directoryfile.txt",
             ),
             to: "new6.txt",
             transform: {
@@ -1060,7 +1060,7 @@ describe("CopyPlugin", () => {
           }
 
           return 0;
-        })
+        }),
       ).toMatchSnapshot("assets info");
     });
   });
@@ -1081,12 +1081,12 @@ describe("CopyPlugin", () => {
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join(".")
+              entry.args[0].replace(/\\/g, "/").split(root).join("."),
             )
             .sort();
 
           expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
           ).toEqual(expectedAssetKeys);
           expect({ logs }).toMatchSnapshot("logs");
         })
@@ -1114,12 +1114,12 @@ describe("CopyPlugin", () => {
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join(".")
+              entry.args[0].replace(/\\/g, "/").split(root).join("."),
             )
             .sort();
 
           expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
           ).toEqual(expectedAssetKeys);
           expect({ logs }).toMatchSnapshot("logs");
         })
@@ -1149,12 +1149,12 @@ describe("CopyPlugin", () => {
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join(".")
+              entry.args[0].replace(/\\/g, "/").split(root).join("."),
             )
             .sort();
 
           expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
           ).toEqual(expectedAssetKeys);
           expect({ logs }).toMatchSnapshot("logs");
         })
@@ -1180,12 +1180,12 @@ describe("CopyPlugin", () => {
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join(".")
+              entry.args[0].replace(/\\/g, "/").split(root).join("."),
             )
             .sort();
 
           expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort()
+            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
           ).toEqual(expectedAssetKeys);
           expect({ logs }).toMatchSnapshot("logs");
         })

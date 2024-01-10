@@ -89,7 +89,7 @@ describe("toType option", () => {
       expectedAssetKeys: [],
       expectedErrors: [
         new Error(
-          `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent.txt' glob`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/nonexistent.txt' glob`,
         ),
       ],
       patterns: [

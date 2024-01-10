@@ -205,7 +205,7 @@ describe("transform option", () => {
           transform: {
             transformer() {
               return new Promise((resolve, reject) =>
-                reject(new Error("a failure happened"))
+                reject(new Error("a failure happened")),
               );
             },
           },
@@ -255,7 +255,7 @@ describe("transform option", () => {
       .then(({ compilation }) => {
         expect(
           compilation.assets["file.txt"].size() !==
-            compilation.assets["file.txt.gz"].size()
+            compilation.assets["file.txt.gz"].size(),
         ).toBe(true);
       })
       .then(done)

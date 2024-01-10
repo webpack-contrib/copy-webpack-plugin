@@ -320,7 +320,7 @@ describe("validate options", () => {
         new CopyPlugin(
           key === "options"
             ? { patterns: [{ from: "file.txt" }], [key]: value }
-            : { [key]: value }
+            : { [key]: value },
         );
       } catch (errorFromPlugin) {
         if (errorFromPlugin.name !== "ValidationError") {
