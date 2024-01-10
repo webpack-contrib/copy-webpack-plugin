@@ -226,7 +226,7 @@ type To = string | ToFunction;
 type ToType = "dir" | "file" | "template";
 type TransformerFunction = (
   input: Buffer,
-  absoluteFilename: string
+  absoluteFilename: string,
 ) => string | Buffer | Promise<string> | Promise<Buffer>;
 type TransformerCacheObject =
   | {
@@ -239,7 +239,7 @@ type TransformerCacheObject =
         defaultCacheKeys: {
           [key: string]: any;
         },
-        absoluteFilename: string
+        absoluteFilename: string,
       ) => Promise<{
         [key: string]: any;
       }>;
@@ -255,7 +255,7 @@ type TransformAllFunction = (
     data: Buffer;
     sourceFilename: string;
     absoluteFilename: string;
-  }[]
+  }[],
 ) => string | Buffer | Promise<string> | Promise<Buffer>;
 type Info =
   | Record<string, any>

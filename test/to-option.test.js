@@ -526,7 +526,7 @@ describe("to option", () => {
             from: "file.txt",
             to({ context, absoluteFilename }) {
               expect(absoluteFilename).toBe(
-                path.join(FIXTURES_DIR, "file.txt")
+                path.join(FIXTURES_DIR, "file.txt"),
               );
 
               const targetPath = path.relative(context, absoluteFilename);
@@ -554,7 +554,7 @@ describe("to option", () => {
             toType: "file",
             to({ context, absoluteFilename }) {
               expect(
-                absoluteFilename.includes(path.join(FIXTURES_DIR, "directory"))
+                absoluteFilename.includes(path.join(FIXTURES_DIR, "directory")),
               ).toBe(true);
 
               const targetPath = path.relative(context, absoluteFilename);
@@ -585,7 +585,7 @@ describe("to option", () => {
 
               return path.resolve(
                 __dirname,
-                `${path.basename(targetPath)}.tst`
+                `${path.basename(targetPath)}.tst`,
               );
             },
           },
@@ -667,7 +667,7 @@ describe("to option", () => {
             from: "file.txt",
             to() {
               return new Promise((resolve, reject) =>
-                reject(new Error("a failure happened"))
+                reject(new Error("a failure happened")),
               );
             },
           },

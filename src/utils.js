@@ -23,7 +23,7 @@ function stat(inputFileSystem, path) {
         }
 
         resolve(stats);
-      }
+      },
     );
   });
 }
@@ -49,7 +49,7 @@ function readFile(inputFileSystem, path) {
         }
 
         resolve(/** @type {string | Buffer} */ (data));
-      }
+      },
     );
   });
 }
@@ -71,7 +71,7 @@ const notSettled = Symbol(`not-settled`);
 function throttleAll(limit, tasks) {
   if (!Number.isInteger(limit) || limit < 1) {
     throw new TypeError(
-      `Expected \`limit\` to be a finite number > 0, got \`${limit}\` (${typeof limit})`
+      `Expected \`limit\` to be a finite number > 0, got \`${limit}\` (${typeof limit})`,
     );
   }
 
@@ -80,7 +80,7 @@ function throttleAll(limit, tasks) {
     !tasks.every((task) => typeof task === `function`)
   ) {
     throw new TypeError(
-      `Expected \`tasks\` to be a list of functions returning a promise`
+      `Expected \`tasks\` to be a list of functions returning a promise`,
     );
   }
 

@@ -52,12 +52,12 @@ function run(opts) {
 
     if (opts.breakContenthash) {
       new BreakContenthashPlugin({ options: opts.breakContenthash }).apply(
-        compiler
+        compiler,
       );
     }
 
     new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
-      compiler
+      compiler,
     );
 
     if (opts.withChildCompilation) {
@@ -103,9 +103,9 @@ function runEmit(opts) {
       expect(
         Object.keys(compilation.assets)
           .filter((a) => a !== "main.js")
-          .sort()
+          .sort(),
       ).toEqual(
-        opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
+        opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows),
       );
     } else {
       // eslint-disable-next-line no-param-reassign
@@ -153,7 +153,7 @@ function runChange(opts) {
     const compiler = getCompiler();
 
     new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
-      compiler
+      compiler,
     );
 
     // Create two test files
@@ -196,7 +196,7 @@ function runChange(opts) {
         changedFiles.length > 0
       ) {
         expect(lastFiles.sort()).toEqual(
-          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows)
+          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows),
         );
       } else {
         expect(lastFiles).toEqual({});

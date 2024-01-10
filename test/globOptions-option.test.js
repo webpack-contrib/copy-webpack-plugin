@@ -80,7 +80,7 @@ describe("globOptions option", () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate '${FIXTURES_DIR_NORMALIZED}/file.txt' glob`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/file.txt' glob`,
         ),
       ],
       patterns: [
@@ -282,7 +282,7 @@ describe("globOptions option", () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate '${FIXTURES_DIR_NORMALIZED}/directory/**/*' glob`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/directory/**/*' glob`,
         ),
       ],
       patterns: [
@@ -302,7 +302,7 @@ describe("globOptions option", () => {
     runEmit({
       expectedErrors: [
         new Error(
-          `unable to locate '${FIXTURES_DIR_NORMALIZED}/file.txt' glob`
+          `unable to locate '${FIXTURES_DIR_NORMALIZED}/file.txt' glob`,
         ),
       ],
       patterns: [

@@ -24,7 +24,7 @@ class BreakContenthashPlugin {
           });
 
           callback();
-        }
+        },
       );
     });
   }
