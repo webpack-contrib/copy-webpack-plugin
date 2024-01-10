@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [12.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v11.0.0...v12.0.0) (2024-01-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* update `globby` to `14.0.0`
+* minimum supported `Node.js` version is `18.12.0` ([#759](https://github.com/webpack-contrib/copy-webpack-plugin/issues/759)) ([a5b7d06](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a5b7d06a051b7404b3300ed4d071b4948cb440f1))
+
 ## [11.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v10.2.4...v11.0.0) (2022-05-17)
 
 
