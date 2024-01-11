@@ -1,18 +1,47 @@
 const path = require("path");
 
 const { validate } = require("schema-utils");
-const serialize = require("serialize-javascript");
-const normalizePath = require("normalize-path");
-const globParent = require("glob-parent");
-const fastGlob = require("fast-glob");
 
 // @ts-ignore
 const { version } = require("../package.json");
 
 const schema = require("./options.json");
-const { readFile, stat, throttleAll } = require("./utils");
+const {
+  readFile,
+  stat,
+  throttleAll,
+  memoize,
+  asyncMemoize,
+} = require("./utils");
 
 const template = /\[\\*([\w:]+)\\*\]/i;
+
+const getNormalizePath = memoize(() =>
+  // eslint-disable-next-line global-require
+  require("normalize-path"),
+);
+
+const getGlobParent = memoize(() =>
+  // eslint-disable-next-line global-require
+  require("glob-parent"),
+);
+
+const getSerializeJavascript = memoize(() =>
+  // eslint-disable-next-line global-require
+  require("serialize-javascript"),
+);
+
+const getFastGlob = memoize(() =>
+  // eslint-disable-next-line global-require
+  require("fast-glob"),
+);
+
+const getGlobby = asyncMemoize(async () => {
+  // @ts-ignore
+  const { globby } = await import("globby");
+
+  return globby;
+});
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
@@ -334,7 +363,9 @@ class CopyPlugin {
 
         pattern.context = absoluteFrom;
         glob = path.posix.join(
-          fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom))),
+          getFastGlob().escapePath(
+            getNormalizePath()(path.resolve(absoluteFrom)),
+          ),
           "**/*",
         );
         absoluteFrom = path.join(absoluteFrom, "**/*");
@@ -349,7 +380,9 @@ class CopyPlugin {
         logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
         pattern.context = path.dirname(absoluteFrom);
-        glob = fastGlob.escapePath(normalizePath(path.resolve(absoluteFrom)));
+        glob = getFastGlob().escapePath(
+          getNormalizePath()(path.resolve(absoluteFrom)),
+        );
 
         if (typeof globOptions.dot === "undefined") {
           globOptions.dot = true;
@@ -357,7 +390,9 @@ class CopyPlugin {
         break;
       case "glob":
       default: {
-        const contextDependencies = path.normalize(globParent(absoluteFrom));
+        const contextDependencies = path.normalize(
+          getGlobParent()(absoluteFrom),
+        );
 
         compilation.contextDependencies.add(contextDependencies);
 
@@ -366,7 +401,9 @@ class CopyPlugin {
         glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
-              fastGlob.escapePath(normalizePath(path.resolve(pattern.context))),
+              getFastGlob().escapePath(
+                getNormalizePath()(path.resolve(pattern.context)),
+              ),
               originalFrom,
             );
       }
@@ -481,7 +518,7 @@ class CopyPlugin {
               `determined that '${from}' should write to '${filename}'`,
             );
 
-            const sourceFilename = normalizePath(
+            const sourceFilename = getNormalizePath()(
               path.relative(compiler.context, absoluteFilename),
             );
 
@@ -628,7 +665,7 @@ class CopyPlugin {
                     contentHash: hasher.update(buffer).digest("hex"),
                     index,
                   };
-                  const cacheKeys = `transform|${serialize(
+                  const cacheKeys = `transform|${getSerializeJavascript()(
                     typeof transformObj.cache === "boolean"
                       ? defaultCacheKeys
                       : typeof transformObj.cache.keys === "function"
@@ -708,7 +745,7 @@ class CopyPlugin {
               const base = path.basename(sourceFilename);
               const name = base.slice(0, base.length - ext.length);
               const data = {
-                filename: normalizePath(
+                filename: getNormalizePath()(
                   path.relative(pattern.context, absoluteFilename),
                 ),
                 contentHash,
@@ -719,7 +756,7 @@ class CopyPlugin {
                 },
               };
               const { path: interpolatedFilename, info: assetInfo } =
-                compilation.getPathWithInfo(normalizePath(filename), data);
+                compilation.getPathWithInfo(getNormalizePath()(filename), data);
 
               info = { ...info, ...assetInfo };
               filename = interpolatedFilename;
@@ -728,7 +765,7 @@ class CopyPlugin {
                 `interpolated template '${filename}' for '${sourceFilename}'`,
               );
             } else {
-              filename = normalizePath(filename);
+              filename = getNormalizePath()(filename);
             }
 
             // eslint-disable-next-line consistent-return
@@ -798,8 +835,7 @@ class CopyPlugin {
         async (unusedAssets, callback) => {
           if (typeof globby === "undefined") {
             try {
-              // @ts-ignore
-              ({ globby } = await import("globby"));
+              globby = await getGlobby();
             } catch (error) {
               callback(/** @type {Error} */ (error));
 
@@ -925,7 +961,7 @@ class CopyPlugin {
                         );
 
                   const cacheItem = cache.getItemCache(
-                    `transformAll|${serialize({
+                    `transformAll|${getSerializeJavascript()({
                       version,
                       from: normalizedPattern.from,
                       to: normalizedPattern.to,
@@ -970,13 +1006,16 @@ class CopyPlugin {
                       );
 
                       const { path: interpolatedFilename, info: assetInfo } =
-                        compilation.getPathWithInfo(normalizePath(filename), {
-                          contentHash,
-                          chunk: {
-                            id: "unknown-copied-asset",
-                            hash: contentHash,
+                        compilation.getPathWithInfo(
+                          getNormalizePath()(filename),
+                          {
+                            contentHash,
+                            chunk: {
+                              id: "unknown-copied-asset",
+                              hash: contentHash,
+                            },
                           },
-                        });
+                        );
 
                       transformedAsset.filename = interpolatedFilename;
                       transformedAsset.info = assetInfo;
