@@ -119,4 +119,57 @@ function throttleAll(limit, tasks) {
   });
 }
 
-module.exports = { stat, readFile, throttleAll };
+/**
+ * @template T
+ * @param fn {(function(): any) | undefined}
+ * @returns {function(): T}
+ */
+function memoize(fn) {
+  let cache = false;
+  /** @type {T} */
+  let result;
+
+  return () => {
+    if (cache) {
+      return result;
+    }
+
+    result = /** @type {function(): any} */ (fn)();
+    cache = true;
+    // Allow to clean up memory for fn
+    // and all dependent resources
+    // eslint-disable-next-line no-undefined, no-param-reassign
+    fn = undefined;
+
+    return result;
+  };
+}
+
+/**
+ * @template T
+ * @param fn {(function(): any) | undefined}
+ * @returns {function(): Promise<T>}
+ */
+function asyncMemoize(fn) {
+  let cache = false;
+  /** @type {T} */
+  let result;
+
+  return async () => {
+    if (cache) {
+      return result;
+    }
+
+    result = await /** @type {function(): any} */ (fn)();
+    cache = true;
+
+    // Allow to clean up memory for fn
+    // and all dependent resources
+    // eslint-disable-next-line no-undefined, no-param-reassign
+    fn = undefined;
+
+    return result;
+  };
+}
+
+module.exports = { stat, readFile, throttleAll, memoize, asyncMemoize };
