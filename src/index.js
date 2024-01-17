@@ -6,13 +6,7 @@ const { validate } = require("schema-utils");
 const { version } = require("../package.json");
 
 const schema = require("./options.json");
-const {
-  readFile,
-  stat,
-  throttleAll,
-  memoize,
-  asyncMemoize,
-} = require("./utils");
+const { readFile, stat, throttleAll, memoize } = require("./utils");
 
 const template = /\[\\*([\w:]+)\\*\]/i;
 
@@ -36,7 +30,7 @@ const getFastGlob = memoize(() =>
   require("fast-glob"),
 );
 
-const getGlobby = asyncMemoize(async () => {
+const getGlobby = memoize(async () => {
   // @ts-ignore
   const { globby } = await import("globby");
 
