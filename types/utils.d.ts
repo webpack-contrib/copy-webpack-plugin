@@ -39,9 +39,3 @@ export function throttleAll<T>(limit: number, tasks: Task<T>[]): Promise<T[]>;
  * @returns {function(): T}
  */
 export function memoize<T>(fn: (() => any) | undefined): () => T;
-/**
- * @template T
- * @param fn {(function(): any) | undefined}
- * @returns {function(): Promise<T>}
- */
-export function asyncMemoize<T>(fn: (() => any) | undefined): () => Promise<T>;
