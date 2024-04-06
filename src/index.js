@@ -310,6 +310,7 @@ class CopyPlugin {
     let stats;
 
     try {
+      // @ts-ignore
       stats = await stat(inputFileSystem, absoluteFrom);
     } catch (error) {
       // Nothing
@@ -582,6 +583,7 @@ class CopyPlugin {
               let data;
 
               try {
+                // @ts-ignore
                 data = await readFile(inputFileSystem, absoluteFilename);
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
