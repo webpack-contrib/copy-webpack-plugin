@@ -55,15 +55,15 @@ module.exports = {
 };
 ```
 
-> **Note**
+> [!NOTE]
 >
 > `copy-webpack-plugin` is not designed to copy files generated from the build process; rather, it is to copy files that already exist in the source tree, as part of the build process.
 
-> **Note**
+> [!NOTE]
 >
 > If you want `webpack-dev-server` to write files to the output directory during development, you can force it with the [`writeToDisk`](https://github.com/webpack/webpack-dev-middleware#writetodisk) option or the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
 
-> **Note**
+> [!NOTE]
 >
 > You can get the original source filename from [Asset Objects](https://webpack.js.org/api/stats/#asset-objects).
 
@@ -123,7 +123,7 @@ Glob or path from where we copy files.
 Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
 Glob can only be a `string`.
 
-> **Warning**
+> [!WARNING]
 >
 > Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -213,7 +213,7 @@ Default: `compiler.options.output`
 
 Output path.
 
-> **Warning**
+> [!WARNING]
 >
 > Don't use directly `\\` in `to` (i.e `path\to\dest`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -248,7 +248,7 @@ module.exports = {
 
 Allows to modify the writing path.
 
-> **Warning**
+> [!WARNING]
 >
 > Don't return directly `\\` in `to` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -304,7 +304,7 @@ Default: `options.context|compiler.options.context`
 
 A path to be (1) prepended to `from` and (2) removed from the start of the result path(s).
 
-> **Warning**
+> [!WARNING]
 >
 > Don't use directly `\\` in `context` (i.e `path\to\context`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
 > On Windows, the forward slash and the backward slash are both separators.
@@ -382,7 +382,7 @@ type filter = (filepath: string) => boolean;
 
 Default: `undefined`
 
-> **Note**
+> [!NOTE]
 >
 > To ignore files by path please use the [`globOptions.ignore`](#globoptions) option.
 
@@ -849,7 +849,7 @@ Default: `undefined`
 
 Allows you to modify the contents of multiple files and save the result to one file.
 
-> **Note**
+> [!NOTE]
 >
 > The `to` option must be specified and point to a file. It is allowed to use only `[contenthash]` and `[fullhash]` template strings.
 
@@ -1196,7 +1196,7 @@ module.exports = {
 
 Removes all directory references and only copies file names.
 
-> **Warning**
+> [!WARNING]
 >
 > If files have the same name, the result is non-deterministic.
 
