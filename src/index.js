@@ -340,9 +340,11 @@ class CopyPlugin {
 
     /** @type {GlobbyOptions & { objectMode: true }} */
     const globOptions = {
-      ...{ followSymbolicLinks: true },
+      followSymbolicLinks: true,
       ...(pattern.globOptions || {}),
-      ...{ cwd: pattern.context, objectMode: true },
+      cwd: pattern.context,
+      objectMode: true,
+      onlyFiles: true,
     };
 
     // @ts-ignore
@@ -412,7 +414,9 @@ class CopyPlugin {
     let globEntries;
 
     try {
-      globEntries = await globby(glob, globOptions);
+      globEntries = globOptions.onlyDirectories
+        ? []
+        : await globby(glob, globOptions);
     } catch (error) {
       compilation.errors.push(/** @type {WebpackError} */ (error));
 
@@ -448,11 +452,6 @@ class CopyPlugin {
            * @returns {Promise<CopiedResult | undefined>}
            */
           async (globEntry) => {
-            // Exclude directories
-            if (!globEntry.dirent.isFile()) {
-              return;
-            }
-
             if (pattern.filter) {
               let isFiltered;
 
