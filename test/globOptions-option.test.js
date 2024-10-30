@@ -400,23 +400,6 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should work with the "onlyDirectories" option', (done) => {
-    runEmit({
-      expectedAssetKeys: [],
-      patterns: [
-        {
-          noErrorOnMissing: true,
-          from: "directory",
-          globOptions: {
-            onlyDirectories: true,
-          },
-        },
-      ],
-    })
-      .then(done)
-      .catch(done);
-  });
-
   it("should emit error when not found assets for copy", (done) => {
     expect.assertions(1);
 

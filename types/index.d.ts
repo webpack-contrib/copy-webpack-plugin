@@ -5,7 +5,6 @@ export = CopyPlugin;
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("globby").Options} GlobbyOptions */
-/** @typedef {import("globby").GlobEntry} GlobEntry */
 /** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
 /** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
 /** @typedef {ReturnType<ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]>} Etag */
@@ -165,7 +164,6 @@ declare namespace CopyPlugin {
     WebpackError,
     Asset,
     GlobbyOptions,
-    GlobEntry,
     WebpackLogger,
     CacheFacade,
     Etag,
@@ -198,7 +196,6 @@ type Compilation = import("webpack").Compilation;
 type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
 type GlobbyOptions = import("globby").Options;
-type GlobEntry = import("globby").GlobEntry;
 type WebpackLogger = ReturnType<Compilation["getLogger"]>;
 type CacheFacade = ReturnType<Compilation["getCache"]>;
 type Etag = ReturnType<

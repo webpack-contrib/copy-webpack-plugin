@@ -43,7 +43,6 @@ const getGlobby = memoize(async () => {
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("globby").Options} GlobbyOptions */
-/** @typedef {import("globby").GlobEntry} GlobEntry */
 /** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
 /** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
 /** @typedef {ReturnType<ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]>} Etag */
@@ -338,11 +337,13 @@ class CopyPlugin {
       logger.debug(`determined '${absoluteFrom}' is a glob`);
     }
 
-    /** @type {GlobbyOptions & { objectMode: true }} */
+    /** @type {GlobbyOptions} */
     const globOptions = {
-      ...{ followSymbolicLinks: true },
+      followSymbolicLinks: true,
       ...(pattern.globOptions || {}),
-      ...{ cwd: pattern.context, objectMode: true },
+      cwd: pattern.context,
+      objectMode: false,
+      onlyFiles: true,
     };
 
     // @ts-ignore
@@ -407,7 +408,7 @@ class CopyPlugin {
     logger.log(`begin globbing '${glob}'...`);
 
     /**
-     * @type {GlobEntry[]}
+     * @type {string[]}
      */
     let globEntries;
 
@@ -444,20 +445,15 @@ class CopyPlugin {
       copiedResult = await Promise.all(
         globEntries.map(
           /**
-           * @param {GlobEntry} globEntry
+           * @param {string} globEntry
            * @returns {Promise<CopiedResult | undefined>}
            */
           async (globEntry) => {
-            // Exclude directories
-            if (!globEntry.dirent.isFile()) {
-              return;
-            }
-
             if (pattern.filter) {
               let isFiltered;
 
               try {
-                isFiltered = await pattern.filter(globEntry.path);
+                isFiltered = await pattern.filter(globEntry);
               } catch (error) {
                 compilation.errors.push(/** @type {WebpackError} */ (error));
 
@@ -465,13 +461,13 @@ class CopyPlugin {
               }
 
               if (!isFiltered) {
-                logger.log(`skip '${globEntry.path}', because it was filtered`);
+                logger.log(`skip '${globEntry}', because it was filtered`);
 
                 return;
               }
             }
 
-            const from = globEntry.path;
+            const from = globEntry;
 
             logger.debug(`found '${from}'`);
 
