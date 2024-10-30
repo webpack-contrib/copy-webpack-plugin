@@ -342,7 +342,7 @@ The use of `context` is illustrated by these [`examples`](#examples).
 
 > [!WARNING]
 >
-> The *onlyDirectories* does not work because the plugin is designed to copy files.
+> The _onlyDirectories_ does not work because the plugin is designed to copy files.
 
 Type:
 
