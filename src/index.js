@@ -413,9 +413,7 @@ class CopyPlugin {
     let globEntries;
 
     try {
-      globEntries = globOptions.onlyDirectories
-        ? []
-        : await globby(glob, globOptions);
+      globEntries = await globby(glob, globOptions);
     } catch (error) {
       compilation.errors.push(/** @type {WebpackError} */ (error));
 
