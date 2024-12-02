@@ -49,12 +49,12 @@
     "webpack": "^5.1.0"
   },
   "dependencies": {
-    "fast-glob": "^3.3.2",
     "glob-parent": "^6.0.1",
     "globby": "^14.0.1",
     "normalize-path": "^3.0.0",
     "schema-utils": "^4.2.0",
-    "serialize-javascript": "^6.0.2"
+    "serialize-javascript": "^6.0.2",
+    "tinyglobby": "^0.2.10"
   },
   "devDependencies": {
     "@babel/cli": "^7.24.6",

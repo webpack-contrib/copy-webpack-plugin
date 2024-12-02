@@ -25,9 +25,9 @@ const getSerializeJavascript = memoize(() =>
   require("serialize-javascript"),
 );
 
-const getFastGlob = memoize(() =>
+const getTinyGlobby = memoize(() =>
   // eslint-disable-next-line global-require
-  require("fast-glob"),
+  require("tinyglobby"),
 );
 
 const getGlobby = memoize(async () => {
@@ -359,7 +359,7 @@ class CopyPlugin {
 
         pattern.context = absoluteFrom;
         glob = path.posix.join(
-          getFastGlob().escapePath(
+          getTinyGlobby().escapePath(
             getNormalizePath()(path.resolve(absoluteFrom)),
           ),
           "**/*",
@@ -376,7 +376,7 @@ class CopyPlugin {
         logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
         pattern.context = path.dirname(absoluteFrom);
-        glob = getFastGlob().escapePath(
+        glob = getTinyGlobby().escapePath(
           getNormalizePath()(path.resolve(absoluteFrom)),
         );
 
@@ -397,7 +397,7 @@ class CopyPlugin {
         glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
-              getFastGlob().escapePath(
+              getTinyGlobby().escapePath(
                 getNormalizePath()(path.resolve(pattern.context)),
               ),
               originalFrom,
