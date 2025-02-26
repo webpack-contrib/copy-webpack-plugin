@@ -25,24 +25,17 @@ const getSerializeJavascript = memoize(() =>
   require("serialize-javascript"),
 );
 
-const getFastGlob = memoize(() =>
+const getTinyGlobby = memoize(() =>
   // eslint-disable-next-line global-require
-  require("fast-glob"),
+  require("tinyglobby"),
 );
-
-const getGlobby = memoize(async () => {
-  // @ts-ignore
-  const { globby } = await import("globby");
-
-  return globby;
-});
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").Compilation} Compilation */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
-/** @typedef {import("globby").Options} GlobbyOptions */
+/** @typedef {import("tinyglobby").GlobOptions} GlobbyOptions */
 /** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
 /** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
 /** @typedef {ReturnType<ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]>} Etag */
@@ -267,7 +260,7 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {typeof import("globby").globby} globby
+   * @param {typeof import("tinyglobby").glob} globby
    * @param {Compiler} compiler
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
@@ -339,10 +332,10 @@ class CopyPlugin {
 
     /** @type {GlobbyOptions} */
     const globOptions = {
+      absolute: true,
       followSymbolicLinks: true,
       ...(pattern.globOptions || {}),
       cwd: pattern.context,
-      objectMode: false,
       onlyFiles: true,
     };
 
@@ -359,7 +352,7 @@ class CopyPlugin {
 
         pattern.context = absoluteFrom;
         glob = path.posix.join(
-          getFastGlob().escapePath(
+          getTinyGlobby().escapePath(
             getNormalizePath()(path.resolve(absoluteFrom)),
           ),
           "**/*",
@@ -376,7 +369,7 @@ class CopyPlugin {
         logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
         pattern.context = path.dirname(absoluteFrom);
-        glob = getFastGlob().escapePath(
+        glob = getTinyGlobby().escapePath(
           getNormalizePath()(path.resolve(absoluteFrom)),
         );
 
@@ -397,7 +390,7 @@ class CopyPlugin {
         glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
-              getFastGlob().escapePath(
+              getTinyGlobby().escapePath(
                 getNormalizePath()(path.resolve(pattern.context)),
               ),
               originalFrom,
@@ -815,7 +808,7 @@ class CopyPlugin {
       const cache = compilation.getCache("CopyWebpackPlugin");
 
       /**
-       * @type {typeof import("globby").globby}
+       * @type {typeof import("tinyglobby").glob}
        */
       let globby;
 
@@ -827,7 +820,7 @@ class CopyPlugin {
         async (unusedAssets, callback) => {
           if (typeof globby === "undefined") {
             try {
-              globby = await getGlobby();
+              globby = await getTinyGlobby().glob;
             } catch (error) {
               callback(/** @type {Error} */ (error));
 

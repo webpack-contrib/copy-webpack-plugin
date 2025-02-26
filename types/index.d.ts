@@ -4,7 +4,7 @@ export = CopyPlugin;
 /** @typedef {import("webpack").Compilation} Compilation */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
-/** @typedef {import("globby").Options} GlobbyOptions */
+/** @typedef {import("tinyglobby").GlobOptions} GlobbyOptions */
 /** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
 /** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
 /** @typedef {ReturnType<ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]>} Etag */
@@ -127,7 +127,7 @@ declare class CopyPlugin {
   private static getContentHash;
   /**
    * @private
-   * @param {typeof import("globby").globby} globby
+   * @param {typeof import("tinyglobby").glob} globby
    * @param {Compiler} compiler
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
@@ -195,7 +195,7 @@ type Compiler = import("webpack").Compiler;
 type Compilation = import("webpack").Compilation;
 type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
-type GlobbyOptions = import("globby").Options;
+type GlobbyOptions = import("tinyglobby").GlobOptions;
 type WebpackLogger = ReturnType<Compilation["getLogger"]>;
 type CacheFacade = ReturnType<Compilation["getCache"]>;
 type Etag = ReturnType<
@@ -264,7 +264,7 @@ type Info =
     }) => Record<string, any>);
 type ObjectPattern = {
   from: From;
-  globOptions?: import("globby").Options | undefined;
+  globOptions?: import("tinyglobby").GlobOptions | undefined;
   context?: string | undefined;
   to?: To | undefined;
   toType?: ToType | undefined;
