@@ -1,106 +1,4 @@
 export = CopyPlugin;
-/** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
-/** @typedef {import("webpack").Compiler} Compiler */
-/** @typedef {import("webpack").Compilation} Compilation */
-/** @typedef {import("webpack").WebpackError} WebpackError */
-/** @typedef {import("webpack").Asset} Asset */
-/** @typedef {import("tinyglobby").GlobOptions} GlobbyOptions */
-/** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
-/** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
-/** @typedef {ReturnType<ReturnType<Compilation["getCache"]>["getLazyHashedEtag"]>} Etag */
-/** @typedef {ReturnType<Compilation["fileSystemInfo"]["mergeSnapshots"]>} Snapshot */
-/**
- * @typedef {boolean} Force
- */
-/**
- * @typedef {Object} CopiedResult
- * @property {string} sourceFilename
- * @property {string} absoluteFilename
- * @property {string} filename
- * @property {Asset["source"]} source
- * @property {Force | undefined} force
- * @property {Record<string, any>} info
- */
-/**
- * @typedef {string} StringPattern
- */
-/**
- * @typedef {boolean} NoErrorOnMissing
- */
-/**
- * @typedef {string} Context
- */
-/**
- * @typedef {string} From
- */
-/**
- * @callback ToFunction
- * @param {{ context: string, absoluteFilename?: string }} pathData
- * @return {string | Promise<string>}
- */
-/**
- * @typedef {string | ToFunction} To
- */
-/**
- * @typedef {"dir" | "file" | "template"} ToType
- */
-/**
- * @callback TransformerFunction
- * @param {Buffer} input
- * @param {string} absoluteFilename
- * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
- */
-/**
- * @typedef {{ keys: { [key: string]: any } } | { keys: ((defaultCacheKeys: { [key: string]: any }, absoluteFilename: string) => Promise<{ [key: string]: any }>) }} TransformerCacheObject
- */
-/**
- * @typedef {Object} TransformerObject
- * @property {TransformerFunction} transformer
- * @property {boolean | TransformerCacheObject} [cache]
- */
-/**
- * @typedef {TransformerFunction | TransformerObject} Transform
- */
-/**
- * @callback Filter
- * @param {string} filepath
- * @returns {boolean | Promise<boolean>}
- */
-/**
- * @callback TransformAllFunction
- * @param {{ data: Buffer, sourceFilename: string, absoluteFilename: string }[]} data
- * @returns {string | Buffer | Promise<string> | Promise<Buffer>}
- */
-/**
- * @typedef { Record<string, any> | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => Record<string, any>) } Info
- */
-/**
- * @typedef {Object} ObjectPattern
- * @property {From} from
- * @property {GlobbyOptions} [globOptions]
- * @property {Context} [context]
- * @property {To} [to]
- * @property {ToType} [toType]
- * @property {Info} [info]
- * @property {Filter} [filter]
- * @property {Transform} [transform]
- * @property {TransformAllFunction} [transformAll]
- * @property {Force} [force]
- * @property {number} [priority]
- * @property {NoErrorOnMissing} [noErrorOnMissing]
- */
-/**
- * @typedef {StringPattern | ObjectPattern} Pattern
- */
-/**
- * @typedef {Object} AdditionalOptions
- * @property {number} [concurrency]
- */
-/**
- * @typedef {Object} PluginOptions
- * @property {Pattern[]} patterns
- * @property {AdditionalOptions} [options]
- */
 declare class CopyPlugin {
   /**
    * @private
@@ -132,15 +30,16 @@ declare class CopyPlugin {
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
    * @param {CacheFacade} cache
+   * @param {number} concurrency
    * @param {ObjectPattern & { context: string }} inputPattern
    * @param {number} index
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
    */
-  private static runPattern;
+  private static glob;
   /**
    * @param {PluginOptions} [options]
    */
-  constructor(options?: PluginOptions | undefined);
+  constructor(options?: PluginOptions);
   /**
    * @private
    * @type {Pattern[]}
