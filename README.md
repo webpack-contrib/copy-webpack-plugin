@@ -347,7 +347,7 @@ The use of `context` is illustrated by these [`examples`](#examples).
 Type:
 
 ```ts
-type globOptions = import("globby").Options;
+type globOptions = import("tinyglobby").GlobOptions;
 ```
 
 Default: `undefined`
@@ -943,7 +943,7 @@ module.exports = {
         "relative/path/to/file.ext",
         {
           from: "**/*",
-          // Terser skip this file for minimization
+          // Terser skip this file for minification
           info: { minimized: true },
         },
       ],
@@ -1330,4 +1330,4 @@ Please take a moment to read our contributing guidelines if you haven't yet done
 [discussion-url]: https://github.com/webpack/webpack/discussions
 [size]: https://packagephobia.now.sh/badge?p=copy-webpack-plugin
 [size-url]: https://packagephobia.now.sh/result?p=copy-webpack-plugin
-[glob-options]: https://github.com/sindresorhus/globby#options
+[glob-options]: https://github.com/SuperchupuDev/tinyglobby#options
