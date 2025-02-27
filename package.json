@@ -71,7 +71,7 @@
     "cross-env": "^7.0.3",
     "cspell": "^8.15.6",
     "del": "^6.1.1",
-    "del-cli": "^5.1.0",
+    "del-cli": "^6.0.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",

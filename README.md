@@ -983,9 +983,9 @@ type:
 type concurrency = number;
 ```
 
-default: `100`
+Default: `100`
 
-limits the number of simultaneous requests to fs
+Limits the number of simultaneous requests to fs.
 
 **webpack.config.js**
 

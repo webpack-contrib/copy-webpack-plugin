@@ -132,15 +132,16 @@ declare class CopyPlugin {
    * @param {Compilation} compilation
    * @param {WebpackLogger} logger
    * @param {CacheFacade} cache
+   * @param {number} concurrency
    * @param {ObjectPattern & { context: string }} inputPattern
    * @param {number} index
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
    */
-  private static runPattern;
+  private static glob;
   /**
    * @param {PluginOptions} [options]
    */
-  constructor(options?: PluginOptions | undefined);
+  constructor(options?: PluginOptions);
   /**
    * @private
    * @type {Pattern[]}

@@ -27,7 +27,7 @@ describe("CopyPlugin", () => {
         .catch(done);
     });
 
-    it("should copy files", (done) => {
+    it.only("should copy files", (done) => {
       runEmit({
         expectedAssetKeys: [
           ".dottedfile",
@@ -36,6 +36,12 @@ describe("CopyPlugin", () => {
           "nested/nestedfile.txt",
         ],
         patterns: [
+          {
+            from: "directory",
+          },
+          {
+            from: "directory",
+          },
           {
             from: "directory",
           },
