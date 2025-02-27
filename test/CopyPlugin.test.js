@@ -27,7 +27,7 @@ describe("CopyPlugin", () => {
         .catch(done);
     });
 
-    it.only("should copy files", (done) => {
+    it("should copy files", (done) => {
       runEmit({
         expectedAssetKeys: [
           ".dottedfile",
