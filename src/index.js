@@ -343,8 +343,9 @@ class CopyPlugin {
       onlyFiles: true,
     };
 
-    // Uncomment when will be resolved https://github.com/SuperchupuDev/tinyglobby/issues/81
-    // globOptions.fs = inputFileSystem;
+    // Will work when https://github.com/SuperchupuDev/tinyglobby/issues/81 will be resolved, so let's pass it to `tinyglobby` right now
+    // @ts-ignore
+    globOptions.fs = inputFileSystem;
 
     let glob;
 
@@ -821,6 +822,7 @@ class CopyPlugin {
           logger.log("starting to add additional assets...");
 
           const concurrency = this.options.concurrency || 100;
+          /** @type {Map<number, Map<number, CopiedResult[]>>} */
           const copiedResultMap = new Map();
 
           await throttleAll(
@@ -1006,10 +1008,11 @@ class CopyPlugin {
               const priority = normalizedPattern.priority || 0;
 
               if (!copiedResultMap.has(priority)) {
-                copiedResultMap.set(priority, []);
+                copiedResultMap.set(priority, new Map());
               }
 
-              copiedResultMap.get(priority).push(...filteredCopiedResult);
+              /** @type {Map<index, CopiedResult[]>} */
+              (copiedResultMap.get(priority)).set(index, filteredCopiedResult);
             }),
           );
 
@@ -1020,67 +1023,74 @@ class CopyPlugin {
           // Avoid writing assets inside `throttleAll`, because it creates concurrency.
           // It could potentially lead to an error - 'Multiple assets emit different content to the same filename'
           copiedResult
-            .reduce((acc, val) => acc.concat(val[1]), [])
+            .reduce(
+              (acc, val) => {
+                const sortedByIndex = [...val[1]].sort((a, b) => a[0] - b[0]);
+
+                for (const [, item] of sortedByIndex) {
+                  // eslint-disable-next-line no-param-reassign
+                  acc = acc.concat(item);
+                }
+
+                return acc;
+              },
+              /** @type {CopiedResult[]} */
+              ([]),
+            )
             .filter(Boolean)
-            .forEach(
-              /**
-               * @param {CopiedResult} result
-               * @returns {void}
-               */
-              (result) => {
-                const {
-                  absoluteFilename,
-                  sourceFilename,
-                  filename,
-                  source,
-                  force,
-                } = result;
+            .forEach((result) => {
+              const {
+                absoluteFilename,
+                sourceFilename,
+                filename,
+                source,
+                force,
+              } = result;
 
-                const existingAsset = compilation.getAsset(filename);
+              const existingAsset = compilation.getAsset(filename);
 
-                if (existingAsset) {
-                  if (force) {
-                    const info = { copied: true, sourceFilename };
-
-                    logger.log(
-                      `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`,
-                    );
-
-                    compilation.updateAsset(filename, source, {
-                      ...info,
-                      ...result.info,
-                    });
-
-                    logger.log(
-                      `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
-                    );
-
-                    return;
-                  }
+              if (existingAsset) {
+                if (force) {
+                  const info = { copied: true, sourceFilename };
 
                   logger.log(
-                    `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
+                    `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`,
+                  );
+
+                  compilation.updateAsset(filename, source, {
+                    ...info,
+                    ...result.info,
+                  });
+
+                  logger.log(
+                    `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
                   );
 
                   return;
                 }
 
-                const info = { copied: true, sourceFilename };
-
                 logger.log(
-                  `writing '${filename}' from '${absoluteFilename}' to compilation assets...`,
+                  `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
                 );
 
-                compilation.emitAsset(filename, source, {
-                  ...info,
-                  ...result.info,
-                });
+                return;
+              }
 
-                logger.log(
-                  `written '${filename}' from '${absoluteFilename}' to compilation assets`,
-                );
-              },
-            );
+              const info = { copied: true, sourceFilename };
+
+              logger.log(
+                `writing '${filename}' from '${absoluteFilename}' to compilation assets...`,
+              );
+
+              compilation.emitAsset(filename, source, {
+                ...info,
+                ...result.info,
+              });
+
+              logger.log(
+                `written '${filename}' from '${absoluteFilename}' to compilation assets`,
+              );
+            });
 
           logger.log("finished to adding additional assets");
 
