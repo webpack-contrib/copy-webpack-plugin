@@ -39,12 +39,6 @@ describe("CopyPlugin", () => {
           {
             from: "directory",
           },
-          {
-            from: "directory",
-          },
-          {
-            from: "directory",
-          },
         ],
       })
         .then(done)
