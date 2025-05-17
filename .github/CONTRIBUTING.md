@@ -43,7 +43,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 - Search Github for an open or closed PR related to your submission to avoid duplicating effort.
 - Commit your changes using a descriptive commit message that follows our [commit message conventions](#commit). This is important because release notes are automatically generated from these messages.
-- Complete the `Pull Request Template`.- Complete the `Pull Request Template`. Pull requests that ignore the template will not be reviewed.
+- Complete the `Pull Request Template`. Pull requests that ignore the template will not be reviewed.
 - Please sign the `Contributor License Agreement (CLA)` when you open your pull request. We cannot accept your contribution without it. Be sure to sign using the primary email address associated with your local and github account.
 
 ## <a name="commit"></a> Webpack Contrib Commit Conventions
