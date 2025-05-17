@@ -36,6 +36,12 @@ or
 pnpm add -D copy-webpack-plugin
 ```
 
+or
+
+```console
+bun add -D copy-webpack-plugin
+```
+
 Then add the plugin to your `webpack` config. For example:
 
 **webpack.config.js**
