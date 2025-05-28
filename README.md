@@ -14,7 +14,7 @@
 
 # copy-webpack-plugin
 
-Copies individual files or entire directories, which already exist, to the build directory.
+Copies existing individual files or entire directories to the build directory.
 
 ## Getting Started
 
@@ -36,7 +36,7 @@ or
 pnpm add -D copy-webpack-plugin
 ```
 
-Then add the plugin to your `webpack` config. For example:
+Then add the plugin to your `webpack` configuration. For example:
 
 **webpack.config.js**
 
@@ -57,22 +57,22 @@ module.exports = {
 
 > [!NOTE]
 >
-> `copy-webpack-plugin` is not designed to copy files generated from the build process; rather, it is to copy files that already exist in the source tree, as part of the build process.
+> `copy-webpack-plugin` is not designed to copy files generated during the build process. Instead, it is meant to copy files that already exist in the source tree, as part of the build process.
 
 > [!NOTE]
 >
-> If you want `webpack-dev-server` to write files to the output directory during development, you can force it with the [`writeToDisk`](https://github.com/webpack/webpack-dev-middleware#writetodisk) option or the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
+> If you want `webpack-dev-server` to write files to the output directory during development, you can enable the [`writeToDisk`](https://github.com/webpack/webpack-dev-middleware#writetodisk) option or use the [`write-file-webpack-plugin`](https://github.com/gajus/write-file-webpack-plugin).
 
 > [!NOTE]
 >
-> You can get the original source filename from [Asset Objects](https://webpack.js.org/api/stats/#asset-objects).
+> You can get the original source filename from the [Asset Objects](https://webpack.js.org/api/stats/#asset-objects) in the webpack stats API.
 
 ## Options
 
 - **[`patterns`](#patterns)**
 - **[`options`](#options-1)**
 
-The plugin's signature:
+The plugin's usage:
 
 **webpack.config.js**
 
@@ -84,7 +84,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: "source", to: "dest" },
-        "path/to/source", // absolute or relative, files/directories/globs - see below for examples
+        "path/to/source", // Absolute or relative path, can be files, directories or globs. See examples below.
       ],
       options: {
         concurrency: 100,
@@ -120,14 +120,14 @@ type from = string;
 Default: `undefined`
 
 Glob or path from where we copy files.
-Globs accept [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
-Glob can only be a `string`.
+Globs follow the [fast-glob pattern-syntax](https://github.com/mrmlnc/fast-glob#pattern-syntax).
+Note: Globs must be a `string`.
 
 > [!WARNING]
 >
-> Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
-> On Windows, the forward slash and the backward slash are both separators.
-> Instead please use `/`.
+> Don't use directly `\\` in `from` option if it is a `glob` (i.e `path\to\file.ext`) option, as backslashes are treated as regular characters on UNIX systems(not as path separators).
+> On Windows, both forward slashes and backslashes act as separators.
+> Use `/` instead, or use Node's `path` utilities to normalize paths.
 
 **webpack.config.js**
 
@@ -157,7 +157,7 @@ module.exports = {
 
 ##### `For windows`
 
-If you define `from` as absolute file path or absolute folder path on `Windows`, you can use windows path segment (`\\`)
+If you're using an absolute file or folder path in the `from` option on `Windows`, you can use windows path segment (`\\`)
 
 ```js
 module.exports = {
@@ -173,8 +173,8 @@ module.exports = {
 };
 ```
 
-But you should always use forward-slashes in `glob` expressions
-See [fast-glob manual](https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows).
+However, when writing `glob` expressions, always use forward slashes.
+See the [fast-glob manual](https://github.com/mrmlnc/fast-glob#how-to-write-patterns-on-windows) for more details.
 
 ```js
 module.exports = {
@@ -194,8 +194,8 @@ module.exports = {
 };
 ```
 
-The `context` behaves differently depending on what the `from` is (`glob`, `file` or `dir`).
-More [`examples`](#examples)
+The behavior of the `context` option varies depending on whether the `from` value is a `glob`, `file` or `dir`.
+See more [`examples`](#examples).
 
 #### `to`
 
@@ -211,13 +211,13 @@ Default: `compiler.options.output`
 
 ##### `string`
 
-Output path.
+Specifies the output path.
 
 > [!WARNING]
 >
-> Don't use directly `\\` in `to` (i.e `path\to\dest`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
-> On Windows, the forward slash and the backward slash are both separators.
-> Instead please use `/` or `path` methods.
+> Don't use directly `\\` in the `to` path (i.e `path\to\dest`) option, as backslashes are treated as regular characters on UNIX systems(not as path separators).
+> On Windows, both forward slashes and backslashes act as separators.
+> Use `/` instead, or use Node's `path` utilities to normalize paths.
 
 **webpack.config.js**
 
@@ -250,9 +250,9 @@ Allows to modify the writing path.
 
 > [!WARNING]
 >
-> Don't return directly `\\` in `to` (i.e `path\to\newFile`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
-> On Windows, the forward slash and the backward slash are both separators.
-> Instead please use `/` or `path` methods.
+> Don't use directly `\\` in `to` (i.e `path\to\newFile`) option, as backslashes are treated as regular characters on UNIX systems(not as path separators).
+> On Windows, both forward slashes and backslashes act as separators.
+> Use `/` instead, or use Node's `path` utilities to normalize paths.
 
 **webpack.config.js**
 
@@ -302,13 +302,17 @@ type context = string;
 
 Default: `options.context|compiler.options.context`
 
-A path to be (1) prepended to `from` and (2) removed from the start of the result path(s).
+Defines the base directory used for two purposes:
+
+1. It is prepended to the `from` path.
+
+2. It is removed from the beginning of the result path(s).
 
 > [!WARNING]
 >
-> Don't use directly `\\` in `context` (i.e `path\to\context`) option because on UNIX the backslash is a valid character inside a path component, i.e., it's not a separator.
-> On Windows, the forward slash and the backward slash are both separators.
-> Instead please use `/` or `path` methods.
+> Don't use directly `\\` in `to` (i.e `path\to\newFile`) option, as backslashes are treated as regular characters on UNIX systems(not as path separators).
+> On Windows, both forward slashes and backslashes act as separators.
+> Use `/` instead, or use Node's `path` utilities to normalize paths.
 
 **webpack.config.js**
 
@@ -328,13 +332,13 @@ module.exports = {
 };
 ```
 
-`context` can be an absolute path or a relative path. If it is a relative path, then it will be converted to an absolute path based on `compiler.options.context`.
+The `context` can be an absolute or relative path. If it's relative, then it will be converted to an absolute path based on `compiler.options.context`.
 
-`context` should be explicitly set only when `from` contains a glob. Otherwise, `context` is automatically set, based on whether `from` is a file or a directory:
+You should explicitly define `context` when `from` uses a glob pattern. Otherwise, the plugin sets it automatically based on the nature of `from`:
 
-If `from` is a file, then `context` is its directory. The result path will be the filename alone.
+- If `from` is a file, then `context` defaults to the file’s directory. The result path will be just the filename alone.
 
-If `from` is a directory, then `context` equals `from`. The result paths will be the paths of the directory's contents (including nested contents), relative to the directory.
+- If `from` is a directory, `context` is set to the same directory. The result paths include the directory’s contents (including subdirectories), relative to it.
 
 The use of `context` is illustrated by these [`examples`](#examples).
 
@@ -342,7 +346,7 @@ The use of `context` is illustrated by these [`examples`](#examples).
 
 > [!WARNING]
 >
-> The _onlyDirectories_ does not work because the plugin is designed to copy files.
+> The _onlyDirectories_ does not work because the plugin is designed to copy files, not directories alone.
 
 Type:
 
@@ -352,8 +356,8 @@ type globOptions = import("tinyglobby").GlobOptions;
 
 Default: `undefined`
 
-Allows to configure the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
-To exclude files from the selection, you should use [globOptions.ignore option](https://github.com/mrmlnc/fast-glob#ignore)
+Allows you to configure the glob pattern matching library used by the plugin. [See the list of supported options][glob-options]
+To exclude files from being copied, use the [globOptions.ignore option](https://github.com/mrmlnc/fast-glob#ignore)
 
 **webpack.config.js**
 
@@ -388,7 +392,7 @@ Default: `undefined`
 
 > [!NOTE]
 >
-> To ignore files by path please use the [`globOptions.ignore`](#globoptions) option.
+> To ignore files by path (e.g., by extension or name), prefer using the [`globOptions.ignore`] option.
 
 **webpack.config.js**
 
@@ -428,16 +432,16 @@ type toType = "dir" | "file" | "template";
 
 Default: `undefined`
 
-Determinate what is `to` option - directory, file or template.
+Determines the type of the `to` option — whether it's a directory, file, or template.
 Sometimes it is hard to say what is `to`, example `path/to/dir-with.ext`.
-If you want to copy files in directory you need use `dir` option.
-We try to automatically determine the `type` so you most likely do not need this option.
+If you want to copy files in directory you should explicitly set the type to `dir`.
+In most cases, the plugin will automatically determine the correct `type`, so you typically don't need to set this option manually.
 
-|             Name              |   Type   |   Default   | Description                                                                                          |
-| :---------------------------: | :------: | :---------: | :--------------------------------------------------------------------------------------------------- |
-|      **[`'dir'`](#dir)**      | `string` | `undefined` | If `to` has no extension or ends on `'/'`                                                            |
-|     **[`'file'`](#file)**     | `string` | `undefined` | If `to` is not a directory and is not a template                                                     |
-| **[`'template'`](#template)** | `string` | `undefined` | If `to` contains [a template pattern](https://webpack.js.org/configuration/output/#template-strings) |
+|             Name              |   Type   |   Default   | Description                                                                                                 |
+| :---------------------------: | :------: | :---------: | :---------------------------------------------------------------------------------------------------------- |
+|      **[`'dir'`](#dir)**      | `string` | `undefined` | Used `to` has no extension or ends with a `'/'`.                                                            |
+|     **[`'file'`](#file)**     | `string` | `undefined` | Used when `to` is a file path that is not a directory or template.                                          |
+| **[`'template'`](#template)** | `string` | `undefined` | Used when `to` contains [a template pattern](https://webpack.js.org/configuration/output/#template-strings) |
 
 ##### `'dir'`
 
@@ -509,7 +513,7 @@ type force = boolean;
 
 Default: `false`
 
-Overwrites files already in `compilation.assets` (usually added by other plugins/loaders).
+Overwrites files that already exist in `compilation.assets` (typically added by other plugins or loaders).
 
 **webpack.config.js**
 
@@ -541,8 +545,7 @@ Default: `0`
 
 Allows to specify the priority of copying files with the same destination name.
 Files for patterns with higher priority will be copied later.
-To overwrite files, the [`force`](#force) option must be enabled.
-
+To enable overwriting, the [`force`](#force) option must be set to `true`.
 **webpack.config.js**
 
 ```js
@@ -584,7 +587,7 @@ type transform =
 
 Default: `undefined`
 
-Allows to modify the file contents.
+Allows you to modify the contents of a file before it is written to the output directory.
 
 ##### `function`
 
@@ -612,10 +615,10 @@ module.exports = {
 
 ##### `object`
 
-|               Name                |   Default   | Description                                                                                                      |
-| :-------------------------------: | :---------: | :--------------------------------------------------------------------------------------------------------------- |
-| **[`transformer`](#transformer)** | `undefined` | Allows to modify the file contents.                                                                              |
-|       **[`cache`](#cache)**       |   `false`   | Enable `transform` caching. You can use `transform: { cache: { key: 'my-cache-key' } }` to invalidate the cache. |
+|               Name                |   Default   | Description                                                                                                                                |
+| :-------------------------------: | :---------: | :----------------------------------------------------------------------------------------------------------------------------------------- |
+| **[`transformer`](#transformer)** | `undefined` | Allows you to modify the contents of the file.                                                                                             |
+|       **[`cache`](#cache)**       |   `false`   | Enables caching for `transform`. You can use `transform: { cache: { key: 'my-cache-key' } }` to manually invalidate the cache when needed. |
 
 ###### `transformer`
 
@@ -702,8 +705,8 @@ Default: `false`
 
 **webpack.config.js**
 
-Enable/disable and configure caching.
-Default path to cache directory: `node_modules/.cache/copy-webpack-plugin`.
+Enable or disable caching and configure its behavior.
+By default, the cache directory is located at: `node_modules/.cache/copy-webpack-plugin`.
 
 ###### `boolean`
 
@@ -851,11 +854,11 @@ type transformAll = (
 
 Default: `undefined`
 
-Allows you to modify the contents of multiple files and save the result to one file.
+Allows you to modify the contents of multiple files and save the combined result into a single file.
 
 > [!NOTE]
 >
-> The `to` option must be specified and point to a file. It is allowed to use only `[contenthash]` and `[fullhash]` template strings.
+> The `to` option must be specified and point to a file. Only the `[contenthash]` and `[fullhash]` template strings are allowed in the filename.
 
 **webpack.config.js**
 
@@ -867,7 +870,7 @@ module.exports = {
         {
           from: "src/**/*.txt",
           to: "dest/file.txt",
-          // The `assets` argument is an assets array for the pattern.from ("src/**/*.txt")
+          // The `assets` argument is an array of assets matched by the pattern `from` ("src/**/*.txt")
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
               // The asset content can be obtained from `asset.source` using `source` method.
@@ -897,7 +900,7 @@ type noErrorOnMissing = boolean;
 
 Default: `false`
 
-Doesn't generate an error on missing file(s).
+Doesn't generate an error if file(s) are missing.
 
 ```js
 module.exports = {
@@ -1004,7 +1007,7 @@ module.exports = {
 
 #### Different variants of `from` (`glob`, `file` or `dir`).
 
-Take for example the following file structure:
+Consider the following file structure:
 
 ```
 src/directory-nested/deep-nested/deepnested-file.txt
@@ -1089,7 +1092,7 @@ deep-nested/deepnested-file.txt,
 nested-file.txt
 ```
 
-Technically, this is `**/*` with a predefined context equal to the specified directory.
+Technically, this is equivalent to using `**/*` with a predefined context set to the specified directory
 
 **webpack.config.js**
 
@@ -1142,7 +1145,7 @@ Result:
 nested-file.txt
 ```
 
-Technically, this is a filename with a predefined context equal to `path.dirname(pathToFile)`.
+Technically, this is a filename with a predefined context equal to the file's directory `path.dirname(pathToFile)`.
 
 **webpack.config.js**
 
@@ -1198,7 +1201,7 @@ module.exports = {
 
 #### Flatten copy
 
-Removes all directory references and only copies file names.
+Removes all directory references and copies only file names.
 
 > [!WARNING]
 >
@@ -1286,8 +1289,8 @@ module.exports = {
 
 ##### `yarn workspaces` and `monorepos`
 
-When using `yarn workspaces` or` monorepos`, relative copy paths from node_modules can be broken due to the way packages are hoisting.
-To avoid this, should explicitly specify where to copy the files from using `require.resolve`.
+When using `yarn workspaces` or` monorepos`, relative copy paths from `node_modules` can be broken due to the way packages are hoisting.
+To avoid this, you should explicitly specify where to copy the files from; by using `require.resolve`.
 
 **webpack.config.js**
 
