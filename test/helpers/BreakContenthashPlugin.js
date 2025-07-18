@@ -13,7 +13,7 @@ class BreakContenthashPlugin {
           stage: compiler.webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE,
         },
         (unusedAssets, callback) => {
-          this.options.targetAssets.forEach(({ name, newName, newHash }) => {
+          for (const { name, newName, newHash } of this.options.targetAssets) {
             const asset = compilation.getAsset(name);
 
             compilation.updateAsset(asset.name, asset.source, {
@@ -21,7 +21,7 @@ class BreakContenthashPlugin {
               contenthash: newHash,
             });
             compilation.renameAsset(asset.name, newName);
-          });
+          }
 
           callback();
         },

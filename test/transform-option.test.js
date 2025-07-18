@@ -1,5 +1,5 @@
-import path from "path";
-import zlib from "zlib";
+import path from "node:path";
+import zlib from "node:zlib";
 
 import { run, runEmit } from "./helpers/run";
 
@@ -17,7 +17,7 @@ describe("transform option", () => {
           from: "file.txt",
           transform: {
             transformer(content, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFrom).toContain(FIXTURES_DIR);
 
               return `${content}changed`;
             },
@@ -48,7 +48,7 @@ describe("transform option", () => {
           from: "directory",
           transform: {
             transformer(content, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFrom).toContain(FIXTURES_DIR);
 
               return `${content}changed`;
             },
@@ -77,7 +77,7 @@ describe("transform option", () => {
           from: "directory/**/*",
           transform: {
             transformer(content, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFrom).toContain(FIXTURES_DIR);
 
               return `${content}changed`;
             },
@@ -184,7 +184,6 @@ describe("transform option", () => {
           from: "file.txt",
           transform: {
             transformer() {
-              // eslint-disable-next-line no-throw-literal
               throw new Error("a failure happened");
             },
           },
@@ -262,7 +261,7 @@ describe("transform option", () => {
       .catch(done);
   });
 
-  it('should transform file when "from" is a file', (done) => {
+  it('should transform file when "from" is a file and it contains specific content', (done) => {
     runEmit({
       expectedAssetKeys: ["subdir/test.txt"],
       expectedAssetContent: {
@@ -273,7 +272,7 @@ describe("transform option", () => {
           from: "file.txt",
           transform: {
             transformer(content, absoluteFrom) {
-              expect(absoluteFrom.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFrom).toContain(FIXTURES_DIR);
 
               return `${content}changed`;
             },

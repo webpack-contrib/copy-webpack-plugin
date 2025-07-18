@@ -1,14 +1,13 @@
-import path from "path";
-import fs from "fs";
+import fs from "node:fs";
+import path from "node:path";
 
+import { Volume, createFsFromVolume } from "memfs";
 import webpack from "webpack";
-import { createFsFromVolume, Volume } from "memfs";
 
 import CopyPlugin from "../src/index";
 
-import { run, runEmit, runChange } from "./helpers/run";
-
-import { readAssets, getCompiler, compile } from "./helpers";
+import { compile, getCompiler, readAssets } from "./helpers";
+import { run, runChange, runEmit } from "./helpers/run";
 
 const FIXTURES_DIR = path.join(__dirname, "fixtures");
 
@@ -23,8 +22,14 @@ describe("CopyPlugin", () => {
           },
         ],
       })
-        .then(done)
+       .then(() => {
+          // Add an assertion to check the expected result
+          expect(someResult).toContain("file.txt");  // Replace `someResult` with actual variable holding the result
+          done();
+        })
         .catch(done);
+    });
+  });
     });
 
     it("should copy files", (done) => {
@@ -350,7 +355,7 @@ describe("CopyPlugin", () => {
         .catch(done);
     });
 
-    it('should copy files and print "copied" in the string representation ', (done) => {
+    it('should copy files and print "copied" in the string representation', (done) => {
       expect.assertions(1);
 
       const expectedAssetKeys = [
@@ -372,7 +377,7 @@ describe("CopyPlugin", () => {
         .then(({ stats }) => {
           const stringStats = stats.toString();
 
-          expect(stringStats.match(/\[copied]/g).length).toBe(4);
+          expect(stringStats.match(/\[copied]/g)).toHaveLength(4);
         })
         .then(done)
         .catch(done);
@@ -422,23 +427,21 @@ describe("CopyPlugin", () => {
         },
       ]);
 
-      compiler.compilers.forEach((item) => {
-        // eslint-disable-next-line no-param-reassign
+      for (const item of compiler.compilers) {
         item.outputFileSystem = createFsFromVolume(new Volume());
-      });
+      }
 
       const { stats } = await compile(compiler);
 
-      stats.stats.forEach((item, index) => {
+      for (const [index, item] of stats.stats.entries()) {
         expect(item.compilation.errors).toMatchSnapshot("errors");
         expect(item.compilation.warnings).toMatchSnapshot("warnings");
         expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
           "assets",
         );
-      });
+      }
     });
-  });
-
+ 
   describe("watch mode", () => {
     it('should add the file to the watch list when "from" is a file', (done) => {
       const expectedAssetKeys = ["file.txt"];
@@ -451,9 +454,9 @@ describe("CopyPlugin", () => {
         ],
       })
         .then(({ compiler, stats }) => {
-          expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
-          ).toEqual(expectedAssetKeys);
+          expect(Object.keys(readAssets(compiler, stats)).sort()).toEqual(
+            expectedAssetKeys,
+          );
         })
         .then(done)
         .catch(done);
@@ -510,7 +513,7 @@ describe("CopyPlugin", () => {
         ],
       })
         .then(({ compiler, stats }) => {
-          expect(Array.from(Object.keys(readAssets(compiler, stats)))).toEqual(
+          expect(Object.keys(readAssets(compiler, stats))).toEqual(
             expectedAssetKeys,
           );
         })
@@ -682,9 +685,9 @@ describe("CopyPlugin", () => {
       })
         .then(({ compiler, stats }) => {
           // expect(spy).toHaveBeenCalledTimes(1);
-          expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
-          ).toEqual(expectedAssetKeys);
+          expect(Object.keys(readAssets(compiler, stats)).sort()).toEqual(
+            expectedAssetKeys,
+          );
 
           spy.mockRestore();
         })
@@ -733,7 +736,7 @@ describe("CopyPlugin", () => {
 
       try {
         fs.rmdirSync(cacheDirectory, { recursive: true });
-      } catch (_) {
+      } catch {
         // Nothing
       }
 
@@ -784,7 +787,7 @@ describe("CopyPlugin", () => {
       try {
         fs.rmdirSync(cacheDirectoryA, { recursive: true });
         fs.rmdirSync(cacheDirectoryB, { recursive: true });
-      } catch (_) {
+      } catch {
         // Nothing
       }
 
@@ -839,33 +842,32 @@ describe("CopyPlugin", () => {
         },
       ]);
 
-      compiler.compilers.forEach((item) => {
-        // eslint-disable-next-line no-param-reassign
+      for (const item of compiler.compilers) {
         item.outputFileSystem = createFsFromVolume(new Volume());
-      });
+      }
 
       const { stats } = await compile(compiler);
 
-      stats.stats.forEach((item, index) => {
+      for (const [index, item] of stats.stats.entries()) {
         expect(item.compilation.emittedAssets.size).toBe(5);
         expect(item.compilation.errors).toMatchSnapshot("errors");
         expect(item.compilation.warnings).toMatchSnapshot("warnings");
         expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
           "assets",
         );
-      });
+      }
 
       await new Promise(async (resolve) => {
         const { stats: newStats } = await compile(compiler);
 
-        newStats.stats.forEach((item, index) => {
+        for (const [index, item] of newStats.stats.entries()) {
           expect(item.compilation.emittedAssets.size).toBe(0);
           expect(item.compilation.errors).toMatchSnapshot("errors");
           expect(item.compilation.warnings).toMatchSnapshot("warnings");
           expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
             "assets",
           );
-        });
+        }
 
         resolve();
       });
@@ -880,7 +882,7 @@ describe("CopyPlugin", () => {
           path.resolve(__dirname, "../node_modules/.cache/copy-webpack-plugin"),
           { recursive: true },
         );
-      } catch (_) {
+      } catch {
         // Nothing
       }
 
@@ -985,11 +987,9 @@ describe("CopyPlugin", () => {
             transform: {
               transformer: (content) => `${content.toString()}${getMyVar()}`,
               cache: {
-                keys: () => {
-                  return {
-                    foo: "bazz",
-                  };
-                },
+                keys: () => ({
+                  foo: "bazz",
+                }),
               },
             },
           },
@@ -1077,17 +1077,17 @@ describe("CopyPlugin", () => {
         ],
       })
         .then(({ compiler, stats }) => {
-          const root = path.resolve(__dirname).replace(/\\/g, "/");
+          const root = path.resolve(__dirname).replaceAll("\\", "/");
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join("."),
+              entry.args[0].replaceAll("\\", "/").split(root).join("."),
             )
             .sort();
 
-          expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
-          ).toEqual(expectedAssetKeys);
+          expect(Object.keys(readAssets(compiler, stats)).sort()).toEqual(
+            expectedAssetKeys,
+          );
           expect({ logs }).toMatchSnapshot("logs");
         })
         .then(done)
@@ -1110,17 +1110,17 @@ describe("CopyPlugin", () => {
         ],
       })
         .then(({ compiler, stats }) => {
-          const root = path.resolve(__dirname).replace(/\\/g, "/");
+          const root = path.resolve(__dirname).replaceAll("\\", "/");
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join("."),
+              entry.args[0].replaceAll("\\", "/").split(root).join("."),
             )
             .sort();
 
-          expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
-          ).toEqual(expectedAssetKeys);
+          expect(Object.keys(readAssets(compiler, stats)).sort()).toEqual(
+            expectedAssetKeys,
+          );
           expect({ logs }).toMatchSnapshot("logs");
         })
         .then(done)
@@ -1145,17 +1145,17 @@ describe("CopyPlugin", () => {
         ],
       })
         .then(({ compiler, stats }) => {
-          const root = path.resolve(__dirname).replace(/\\/g, "/");
+          const root = path.resolve(__dirname).replaceAll("\\", "/");
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join("."),
+              entry.args[0].replaceAll("\\", "/").split(root).join("."),
             )
             .sort();
 
-          expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
-          ).toEqual(expectedAssetKeys);
+          expect(Object.keys(readAssets(compiler, stats)).sort()).toEqual(
+            expectedAssetKeys,
+          );
           expect({ logs }).toMatchSnapshot("logs");
         })
         .then(done)
@@ -1176,17 +1176,17 @@ describe("CopyPlugin", () => {
         ],
       })
         .then(({ compiler, stats }) => {
-          const root = path.resolve(__dirname).replace(/\\/g, "/");
+          const root = path.resolve(__dirname).replaceAll("\\", "/");
           const logs = stats.compilation.logging
             .get("copy-webpack-plugin")
             .map((entry) =>
-              entry.args[0].replace(/\\/g, "/").split(root).join("."),
+              entry.args[0].replaceAll("\\", "/").split(root).join("."),
             )
             .sort();
 
-          expect(
-            Array.from(Object.keys(readAssets(compiler, stats))).sort(),
-          ).toEqual(expectedAssetKeys);
+          expect(Object.keys(readAssets(compiler, stats)).sort()).toEqual(
+            expectedAssetKeys,
+          );
           expect({ logs }).toMatchSnapshot("logs");
         })
         .then(done)

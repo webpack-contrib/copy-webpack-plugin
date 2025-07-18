@@ -1,18 +1,16 @@
 // Ideally we pass in patterns and confirm the resulting assets
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 import CopyPlugin from "../../src/index";
 
+import BreakContenthashPlugin from "./BreakContenthashPlugin";
 import ChildCompilerPlugin from "./ChildCompiler";
 import PreCopyPlugin from "./PreCopyPlugin";
-import BreakContenthashPlugin from "./BreakContenthashPlugin";
 
 import removeIllegalCharacterForWindows from "./removeIllegalCharacterForWindows";
 
 import { compile, getCompiler, readAssets } from "./";
-
-/* eslint-disable no-param-reassign */
 
 const isWin = process.platform === "win32";
 
@@ -23,25 +21,25 @@ const ignore = [
   "**/watch/**/*",
 ];
 
+/**
+ * @param opts // opts.patterns is required
+ */
 function run(opts) {
   return new Promise((resolve, reject) => {
     if (Array.isArray(opts.patterns)) {
-      opts.patterns.forEach((pattern) => {
+      for (const pattern of opts.patterns) {
         if (pattern.context) {
-          // eslint-disable-next-line no-param-reassign
           pattern.context = removeIllegalCharacterForWindows(pattern.context);
         }
 
-        if (typeof pattern !== "string") {
-          if (!opts.symlink || isWin) {
-            pattern.globOptions = pattern.globOptions || {};
-            pattern.globOptions.ignore = [
-              ...ignore,
-              ...(pattern.globOptions.ignore || []),
-            ];
-          }
+        if (typeof pattern !== "string" && (!opts.symlink || isWin)) {
+          pattern.globOptions = pattern.globOptions || {};
+          pattern.globOptions.ignore = [
+            ...ignore,
+            ...(pattern.globOptions.ignore || []),
+          ];
         }
-      });
+      }
     }
 
     const compiler = opts.compiler || getCompiler();
@@ -93,6 +91,9 @@ function run(opts) {
   });
 }
 
+/**
+ * @param opts // opts.expectedAssetKeys is required
+ */
 function runEmit(opts) {
   return run(opts).then(({ compilation, compiler, stats }) => {
     if (opts.skipAssetsTesting) {
@@ -108,13 +109,11 @@ function runEmit(opts) {
         opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows),
       );
     } else {
-      // eslint-disable-next-line no-param-reassign
       delete compilation.assets["main.js"];
       expect(compilation.assets).toEqual({});
     }
 
     if (opts.expectedAssetContent) {
-      // eslint-disable-next-line guard-for-in
       for (const assetName in opts.expectedAssetContent) {
         expect(compilation.assets[assetName]).toBeDefined();
 
@@ -137,8 +136,10 @@ function runEmit(opts) {
   });
 }
 
+/**
+ * @param opts // opts.compiler is required
+ */
 function runForce(opts) {
-  // eslint-disable-next-line no-param-reassign
   opts.compiler = getCompiler();
 
   new PreCopyPlugin({ options: opts }).apply(opts.compiler);
@@ -148,6 +149,9 @@ function runForce(opts) {
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * @param opts // opts.patterns is required
+ */
 function runChange(opts) {
   return new Promise(async (resolve) => {
     const compiler = getCompiler();
@@ -182,11 +186,11 @@ function runChange(opts) {
       const filesForCompare = Object.keys(assetsBefore);
       const changedFiles = [];
 
-      filesForCompare.forEach((file) => {
+      for (const file of filesForCompare) {
         if (assetsBefore[file] === assetsAfter[file]) {
           changedFiles.push(file);
         }
-      });
+      }
 
       const lastFiles = Object.keys(assetsAfter);
 

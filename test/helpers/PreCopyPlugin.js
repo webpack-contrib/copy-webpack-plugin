@@ -10,12 +10,12 @@ class PreCopyPlugin {
       compilation.hooks.additionalAssets.tapAsync(
         "pre-copy-webpack-plugin",
         (callback) => {
-          this.options.additionalAssets.forEach(({ name, data, info }) => {
+          for (const { name, data, info } of this.options.additionalAssets) {
             const { RawSource } = compiler.webpack.sources;
             const source = new RawSource(data);
 
             compilation.emitAsset(name, source, info);
-          });
+          }
 
           callback();
         },

@@ -1,26 +1,32 @@
 export type InputFileSystem = import("webpack").Compilation["inputFileSystem"];
 export type Stats = import("fs").Stats;
 export type Task<T> = () => Promise<T>;
-/** @typedef {import("webpack").Compilation["inputFileSystem"] } InputFileSystem */
-/** @typedef {import("fs").Stats } Stats */
 /**
- * @param {InputFileSystem} inputFileSystem
- * @param {string} path
- * @return {Promise<undefined | Stats>}
+ * @template T
+ * @param fn {(function(): any) | undefined}
+ * @returns {function(): T}
  */
-export function stat(
-  inputFileSystem: InputFileSystem,
-  path: string,
-): Promise<undefined | Stats>;
+export function memoize<T>(fn: (() => any) | undefined): () => T;
 /**
  * @param {InputFileSystem} inputFileSystem
  * @param {string} path
- * @return {Promise<string | Buffer>}
+ * @returns {Promise<string | Buffer>}
  */
 export function readFile(
   inputFileSystem: InputFileSystem,
   path: string,
 ): Promise<string | Buffer>;
+/** @typedef {import("webpack").Compilation["inputFileSystem"] } InputFileSystem */
+/** @typedef {import("fs").Stats } Stats */
+/**
+ * @param {InputFileSystem} inputFileSystem
+ * @param {string} path
+ * @returns {Promise<undefined | Stats>}
+ */
+export function stat(
+  inputFileSystem: InputFileSystem,
+  path: string,
+): Promise<undefined | Stats>;
 /**
  * @template T
  * @typedef {() => Promise<T>} Task
@@ -28,14 +34,8 @@ export function readFile(
 /**
  * Run tasks with limited concurrency.
  * @template T
- * @param {number} limit - Limit of tasks that run at once.
- * @param {Task<T>[]} tasks - List of tasks to run.
+ * @param {number} limit Limit of tasks that run at once.
+ * @param {Task<T>[]} tasks List of tasks to run.
  * @returns {Promise<T[]>} A promise that fulfills to an array of the results
  */
 export function throttleAll<T>(limit: number, tasks: Task<T>[]): Promise<T[]>;
-/**
- * @template T
- * @param fn {(function(): any) | undefined}
- * @returns {function(): T}
- */
-export function memoize<T>(fn: (() => any) | undefined): () => T;

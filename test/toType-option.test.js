@@ -1,10 +1,10 @@
-import path from "path";
+import path from "node:path";
 
 import { runEmit } from "./helpers/run";
 
 const FIXTURES_DIR_NORMALIZED = path
   .join(__dirname, "fixtures")
-  .replace(/\\/g, "/");
+  .replaceAll("\\", "/");
 
 describe("toType option", () => {
   it("should copy a file to a new file", (done) => {

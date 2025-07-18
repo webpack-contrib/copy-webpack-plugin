@@ -1,1 +1,1 @@
-module.exports = require("url");
+module.exports = require("node:url");

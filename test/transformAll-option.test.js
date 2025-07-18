@@ -1,7 +1,7 @@
 import CopyPlugin from "../src";
 
-import { runEmit } from "./helpers/run";
 import { compile, getCompiler, readAssets } from "./helpers";
+import { runEmit } from "./helpers/run";
 
 describe("transformAll option", () => {
   it('should be defined "assets"', (done) => {
@@ -37,7 +37,7 @@ describe("transformAll option", () => {
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
               const content = asset.data.toString() || asset.sourceFilename;
-              // eslint-disable-next-line no-param-reassign
+
               accumulator = `${accumulator}${content}::`;
               return accumulator;
             }, "");
@@ -47,12 +47,17 @@ describe("transformAll option", () => {
         },
       ],
     })
-      .then(done)
+      .then((result) => {
+        // Assertion to check if the transformed content is correct
+        expect(result.assets["file.txt"]).toBe(
+          "new::directory/nested/deep-nested/deepnested.txt::directory/nested/nestedfile.txt::",
+        );
+        done();
+      })
       .catch(done);
   });
 
-  it("should transform files when async function used", (done) => {
-    runEmit({
+  it("should transform files when async function used", () => runEmit({
       expectedAssetKeys: ["file.txt"],
       expectedAssetContent: {
         "file.txt":
@@ -63,19 +68,20 @@ describe("transformAll option", () => {
           from: "directory/**/*.txt",
           to: "file.txt",
           async transformAll(assets) {
-            const result = assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
-              accumulator = `${accumulator}${asset.sourceFilename}::`;
-              return accumulator;
-            }, "");
-
-            return result;
+            // Use implicit return and remove the block statement
+            return assets.reduce(
+              (accumulator, asset) => `${accumulator}${asset.sourceFilename}::`,
+              "",
+            );
           },
         },
       ],
-    })
-      .then(done)
-      .catch(done);
+    }).then((result) => {
+      // Assert that "file.txt" was transformed as expected
+      expect(result.assets["file.txt"]).toBe(
+        "directory/directoryfile.txt::directory/nested/deep-nested/deepnested.txt::directory/nested/nestedfile.txt::",
+      );
+    });
   });
 
   it("should transform files with force option enabled", (done) => {
@@ -94,7 +100,6 @@ describe("transformAll option", () => {
           to: "file.txt",
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${asset.sourceFilename}::`;
               return accumulator;
             }, "");
@@ -114,7 +119,7 @@ describe("transformAll option", () => {
       expectedAssetKeys: [],
       expectedErrors: [
         new Error(
-          `Invalid "pattern.to" for the "pattern.from": "file.txt" and "pattern.transformAll" function. The "to" option must be specified.`,
+          'Invalid "pattern.to" for the "pattern.from": "file.txt" and "pattern.transformAll" function. The "to" option must be specified.',
         ),
       ],
       patterns: [
@@ -139,7 +144,6 @@ describe("transformAll option", () => {
           from: "directory/**/*.txt",
           to: "file.txt",
           transformAll() {
-            // eslint-disable-next-line no-throw-literal
             throw new Error("a failure happened");
           },
         },
@@ -162,7 +166,6 @@ describe("transformAll option", () => {
           to: "[contenthash]-[fullhash]-file.txt",
           transformAll(assets) {
             return assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${asset.data}::`;
               return accumulator;
             }, "");
@@ -187,7 +190,6 @@ describe("transformAll option", () => {
           to: () => "[contenthash]-[fullhash]-file.txt",
           transformAll(assets) {
             return assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${asset.data}::`;
 
               return accumulator;
@@ -213,7 +215,7 @@ describe("cache", () => {
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
               const content = asset.data.toString() || asset.sourceFilename;
-              // eslint-disable-next-line no-param-reassign
+
               accumulator = `${accumulator}${content}::`;
               return accumulator;
             }, "");

@@ -1,9 +1,7 @@
-import path from "path";
+import path from "node:path";
 
-// eslint-disable-next-line import/no-extraneous-dependencies
+import { Volume, createFsFromVolume } from "memfs";
 import webpack from "webpack";
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { createFsFromVolume, Volume } from "memfs";
 
 export default (config = {}) => {
   const fullConfig = {

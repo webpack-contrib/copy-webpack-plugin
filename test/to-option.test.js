@@ -1,7 +1,7 @@
-import path from "path";
+import path from "node:path";
 
-import { runEmit } from "./helpers/run";
 import { getCompiler } from "./helpers";
+import { runEmit } from "./helpers/run";
 
 const BUILD_DIR = path.join(__dirname, "build");
 const TEMP_DIR = path.join(__dirname, "tempdir");
@@ -19,7 +19,11 @@ describe("to option", () => {
           },
         ],
       })
-        .then(done)
+        .then((result) => {
+          // Assertion to check that the new file exists in the expected assets
+          expect(result.assetKeys).toContain("newfile.txt");
+          done();
+        })
         .catch(done);
     });
 
@@ -553,9 +557,9 @@ describe("to option", () => {
             from: "directory",
             toType: "file",
             to({ context, absoluteFilename }) {
-              expect(
-                absoluteFilename.includes(path.join(FIXTURES_DIR, "directory")),
-              ).toBe(true);
+              expect(absoluteFilename).toContain(
+                path.join(FIXTURES_DIR, "directory"),
+              );
 
               const targetPath = path.relative(context, absoluteFilename);
 
@@ -579,7 +583,7 @@ describe("to option", () => {
           {
             from: "directory/**/*",
             to({ context, absoluteFilename }) {
-              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFilename).toContain(FIXTURES_DIR);
 
               const targetPath = path.relative(context, absoluteFilename);
 
@@ -602,7 +606,7 @@ describe("to option", () => {
           {
             from: "file.txt",
             to({ context, absoluteFilename }) {
-              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFilename).toContain(FIXTURES_DIR);
 
               const targetPath = path.relative(context, absoluteFilename);
 
@@ -624,7 +628,7 @@ describe("to option", () => {
           {
             from: "file.txt",
             async to({ context, absoluteFilename }) {
-              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFilename).toContain(FIXTURES_DIR);
 
               const targetPath = path.relative(context, absoluteFilename);
 
@@ -707,7 +711,7 @@ describe("to option", () => {
           {
             from: "directory/**/*",
             to({ absoluteFilename }) {
-              expect(absoluteFilename.includes(FIXTURES_DIR)).toBe(true);
+              expect(absoluteFilename).toContain(FIXTURES_DIR);
 
               return "transformed/[path][name]-[contenthash:6][ext]";
             },
@@ -977,7 +981,6 @@ describe("to option", () => {
     runEmit({
       compiler,
       breakContenthash: {
-        // eslint-disable-next-line no-useless-escape
         targetAssets: [
           {
             name: "5d7817ed5bc246756d73-directoryfile.txt",

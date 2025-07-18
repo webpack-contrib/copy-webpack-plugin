@@ -19,7 +19,7 @@ describe("priority option", () => {
       .then(({ stats }) => {
         const { info } = stats.compilation.getAsset("newfile.txt");
 
-        expect(info.sourceFilename).toEqual("file.txt");
+        expect(info.sourceFilename).toBe("file.txt");
 
         done();
       })
@@ -46,7 +46,7 @@ describe("priority option", () => {
       .then(({ stats }) => {
         const { info } = stats.compilation.getAsset("newfile.txt");
 
-        expect(info.sourceFilename).toEqual("dir (86)/file.txt");
+        expect(info.sourceFilename).toBe("dir (86)/file.txt");
 
         done();
       })
@@ -77,7 +77,7 @@ describe("priority option", () => {
       .then(({ stats }) => {
         const { info } = stats.compilation.getAsset("newfile.txt");
 
-        expect(info.sourceFilename).toEqual("dir (86)/file.txt");
+        expect(info.sourceFilename).toBe("dir (86)/file.txt");
 
         done();
       })
@@ -104,7 +104,7 @@ describe("priority option", () => {
       .then(({ stats }) => {
         const { info } = stats.compilation.getAsset("newfile.txt");
 
-        expect(info.sourceFilename).toEqual("file.txt");
+        expect(info.sourceFilename).toBe("file.txt");
 
         done();
       })

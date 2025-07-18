@@ -1,13 +1,17 @@
 import readAsset from "./readAsset";
 
+/**
+ * @param compiler // compiler is required
+ * @param stats // stats is required
+ */
 export default function readAssets(compiler, stats) {
   const assets = {};
 
-  Object.keys(stats.compilation.assets)
-    .filter((a) => a !== "main.js")
-    .forEach((asset) => {
-      assets[asset] = readAsset(asset, compiler, stats);
-    });
+  for (const asset of Object.keys(stats.compilation.assets).filter(
+    (a) => a !== "main.js",
+  )) {
+    assets[asset] = readAsset(asset, compiler, stats);
+  }
 
   return assets;
 }
