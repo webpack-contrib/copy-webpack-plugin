@@ -251,7 +251,7 @@ class CopyPlugin {
    * @param {Compilation} compilation // The current compilation
    * @param {WebpackLogger} logger // The logger to use for logging
    * @param {CacheFacade} cache // The cache facade to use for caching
-   * @param {number} concurrency // Maximum number of concurrent operations  
+   * @param {number} concurrency // Maximum number of concurrent operations
    * @param {ObjectPattern & { context: string }} inputPattern // The pattern to process
    * @param {number} index // The index of the pattern in the patterns array
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>} // Processes the pattern and returns an array of copied results
@@ -889,7 +889,7 @@ class CopyPlugin {
                     ? cache.getLazyHashedEtag(filteredCopiedResult[0].source)
                     : filteredCopiedResult.reduce(
                         /**
-                         * @param {Etag} accumulator // Merged Etag accumulator    
+                         * @param {Etag} accumulator // Merged Etag accumulator
                          * @param {CopiedResult} asset // Copied asset to merge Etag with
                          * @param {number} i // Index of the asset in the array
                          * @returns {Etag} // Merged Etag
