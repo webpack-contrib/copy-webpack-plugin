@@ -3,10 +3,10 @@ export type Stats = import("fs").Stats;
 export type Task<T> = () => Promise<T>;
 /**
  * @template T
- * @param fn {(function(): any) | undefined} // The function to memoize.
- * @returns {function(): T} // A memoized function that returns the result of the original function.
+ * @param {(() => unknown) | undefined} fn The function to memoize.
+ * @returns {() => T} A memoized function that returns the result of the original function.
  */
-export function memoize<T>(fn: (() => any) | undefined): () => T;
+export function memoize<T>(fn: (() => unknown) | undefined): () => T;
 /**
  * @param {InputFileSystem} inputFileSystem // The input file system to use for reading the file.
  * @param {string} path // The path to the file to read.

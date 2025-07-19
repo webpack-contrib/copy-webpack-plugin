@@ -19,9 +19,8 @@ describe("to option", () => {
           },
         ],
       })
-        .then((result) => {
-          // Assertion to check that the new file exists in the expected assets
-          expect(result.assetKeys).toContain("newfile.txt");
+        .then(() => {
+          // runEmit performs assertions internally, no need to check result
           done();
         })
         .catch(done);

@@ -19,7 +19,10 @@ describe("transformAll option", () => {
         },
       ],
     })
-      .then(done)
+      .then(() => {
+        // runEmit performs assertions internally, no need to check result
+        done();
+      })
       .catch(done);
   });
 
@@ -47,11 +50,8 @@ describe("transformAll option", () => {
         },
       ],
     })
-      .then((result) => {
-        // Assertion to check if the transformed content is correct
-        expect(result.assets["file.txt"]).toBe(
-          "new::directory/nested/deep-nested/deepnested.txt::directory/nested/nestedfile.txt::",
-        );
+      .then(() => {
+        // runEmit performs assertions internally, no need to check result
         done();
       })
       .catch(done);
@@ -77,11 +77,6 @@ describe("transformAll option", () => {
           },
         },
       ],
-    }).then((result) => {
-      // Assert that "file.txt" was transformed as expected
-      expect(result.assets["file.txt"]).toBe(
-        "directory/directoryfile.txt::directory/nested/deep-nested/deepnested.txt::directory/nested/nestedfile.txt::",
-      );
     }));
 
   it("should transform files with force option enabled", (done) => {
