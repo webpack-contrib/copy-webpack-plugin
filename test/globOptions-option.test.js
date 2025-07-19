@@ -24,7 +24,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should copy files exclude dot files when "from" is a directory', (done) => {
+  it('should copy files exclude dot files when "from" is a directory (variant 2)', (done) => {
     runEmit({
       expectedAssetKeys: [
         "directoryfile.txt",
@@ -44,7 +44,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should copy files exclude dot files when "from" is a glob', (done) => {
+  it('should copy files exclude dot files when "from" is a glob (variant 2)', (done) => {
     runEmit({
       expectedAssetKeys: ["file.txt"],
       patterns: [
@@ -60,7 +60,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it("should copy files include dot files", (done) => {
+  it("should copy files include dot files (variant 2)", (done) => {
     runEmit({
       expectedAssetKeys: [".file.txt", "file.txt"],
       patterns: [
@@ -76,7 +76,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should ignore files when "from" is a file', (done) => {
+  it('should ignore files when "from" is a file (variant 2)', (done) => {
     runEmit({
       expectedErrors: [
         new Error(
@@ -96,7 +96,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should files when "from" is a directory', (done) => {
+  it('should files when "from" is a directory (variant 2)', (done) => {
     runEmit({
       expectedAssetKeys: [
         ".dottedfile",
@@ -138,7 +138,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it('should files in nested directory when "from" is a directory', (done) => {
+  it('should files in nested directory when "from" is a directory (variant 2)', (done) => {
     runEmit({
       expectedAssetKeys: [".dottedfile", "directoryfile.txt"],
       patterns: [
@@ -154,7 +154,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it("should files when from is a glob", (done) => {
+  it("should files when from is a glob (variant 2)", (done) => {
     runEmit({
       expectedAssetKeys: [
         "directory/directoryfile.txt",
@@ -173,7 +173,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it("should files in nested directory when from is a glob", (done) => {
+  it("should files in nested directory when from is a glob (variant 2)", (done) => {
     runEmit({
       expectedAssetKeys: ["directory/directoryfile.txt"],
       patterns: [
@@ -189,7 +189,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it("should ignore files with a certain extension", (done) => {
+  it("should ignore files with a certain extension (variant 2)", (done) => {
     runEmit({
       expectedAssetKeys: [".dottedfile"],
       patterns: [
@@ -205,7 +205,7 @@ describe("globOptions option", () => {
       .catch(done);
   });
 
-  it("should ignore files with multiple ignore patterns", (done) => {
+  it("should ignore files with multiple ignore patterns (variant 2)", (done) => {
     runEmit({
       expectedAssetKeys: ["directory/nested/nestedfile.txt"],
       patterns: [

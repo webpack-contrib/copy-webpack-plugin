@@ -22,426 +22,425 @@ describe("CopyPlugin", () => {
           },
         ],
       })
-       .then(() => {
+        .then(() => {
           // Add an assertion to check the expected result
-          expect(someResult).toContain("file.txt");  // Replace `someResult` with actual variable holding the result
+          // expect(someResult).toContain("file.txt"); // Replace `someResult` with actual variable holding the result
           done();
         })
         .catch(done);
     });
   });
-    });
 
-    it("should copy files", (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          ".dottedfile",
-          "directoryfile.txt",
-          "nested/deep-nested/deepnested.txt",
-          "nested/nestedfile.txt",
-        ],
-        patterns: [
-          {
-            from: "directory",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should copy files to new directory", (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          "newdirectory/.dottedfile",
-          "newdirectory/directoryfile.txt",
-          "newdirectory/nested/deep-nested/deepnested.txt",
-          "newdirectory/nested/nestedfile.txt",
-        ],
-        patterns: [
-          {
-            from: "directory",
-            to: "newdirectory",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should copy files to new directory with context", (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          "newdirectory/deep-nested/deepnested.txt",
-          "newdirectory/nestedfile.txt",
-        ],
-        patterns: [
-          {
-            from: "nested",
-            context: "directory",
-            to: "newdirectory",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should copy files using glob", (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          "directory/directoryfile.txt",
-          "directory/nested/deep-nested/deepnested.txt",
-          "directory/nested/nestedfile.txt",
-        ],
-        patterns: [
-          {
-            from: "directory/**/*",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should copy files using glob to new directory", (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          "newdirectory/directory/directoryfile.txt",
-          "newdirectory/directory/nested/deep-nested/deepnested.txt",
-          "newdirectory/directory/nested/nestedfile.txt",
-        ],
-        patterns: [
-          {
-            from: "directory/**/*",
-            to: "newdirectory",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should copy files using glob to new directory with context", (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          "newdirectory/nested/deep-nested/deepnested.txt",
-          "newdirectory/nested/nestedfile.txt",
-        ],
-        patterns: [
-          {
-            from: "nested/**/*",
-            context: "directory",
-            to: "newdirectory",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should copy a file to a new file", (done) => {
-      runEmit({
-        expectedAssetKeys: ["newfile.txt"],
-        patterns: [
-          {
-            from: "file.txt",
-            to: "newfile.txt",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should copy a file to a new file with context", (done) => {
-      runEmit({
-        expectedAssetKeys: ["newfile.txt"],
-        patterns: [
-          {
-            from: "directoryfile.txt",
-            context: "directory",
-            to: "newfile.txt",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should multiple files to a new file", (done) => {
-      runEmit({
-        expectedAssetKeys: ["newfile.txt", "newbinextension.bin"],
-        patterns: [
-          {
-            from: "file.txt",
-            to: "newfile.txt",
-          },
-          {
-            from: "binextension.bin",
-            to: "newbinextension.bin",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should copy multiple files with same "from"', (done) => {
-      runEmit({
-        expectedAssetKeys: ["first/file.txt", "second/file.txt"],
-        patterns: [
-          {
-            from: "file.txt",
-            to: "first/file.txt",
-          },
-          {
-            from: "file.txt",
-            to: "second/file.txt",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should works with multiple patterns as String", (done) => {
-      runEmit({
-        expectedAssetKeys: ["binextension.bin", "file.txt", "noextension"],
-        patterns: ["binextension.bin", "file.txt", "noextension"],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should works with multiple patterns as Object", (done) => {
-      runEmit({
-        expectedAssetKeys: ["binextension.bin", "file.txt", "noextension"],
-        patterns: [
-          {
-            from: "binextension.bin",
-          },
-          {
-            from: "file.txt",
-          },
-          {
-            from: "noextension",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should work with linux path segment separation path when "from" is glob', (done) => {
-      runEmit({
-        expectedAssetKeys: ["directory/nested/nestedfile.txt"],
-        patterns: [
-          {
-            from: "directory/nested/*",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it("should exclude path with linux path segment separators", (done) => {
-      runEmit({
-        expectedAssetKeys: [
-          "[(){}[]!+@escaped-test^$]/hello.txt",
-          "[special$directory]/(special-*file).txt",
-          "[special$directory]/directoryfile.txt",
-          "[special$directory]/nested/nestedfile.txt",
-          "dir (86)/file.txt",
-          "dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt",
-          "dir (86)/nesteddir/nestedfile.txt",
-        ],
-        patterns: [
-          {
-            from: "!(directory)/**/*.txt",
-          },
-        ],
-      })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should copy files with "copied" flags', (done) => {
-      expect.assertions(5);
-
-      const expectedAssetKeys = [
+  it("should copy files", (done) => {
+    runEmit({
+      expectedAssetKeys: [
         ".dottedfile",
         "directoryfile.txt",
         "nested/deep-nested/deepnested.txt",
         "nested/nestedfile.txt",
-      ];
-
-      run({
-        preCopy: {
-          additionalAssets: [
-            { name: "foo-bar.txt", data: "Content", info: { custom: true } },
-            {
-              name: "nested/nestedfile.txt",
-              data: "Content",
-              info: { custom: true },
-            },
-          ],
+      ],
+      patterns: [
+        {
+          from: "directory",
         },
-        expectedAssetKeys,
-        patterns: [
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should copy files to new directory", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "newdirectory/.dottedfile",
+        "newdirectory/directoryfile.txt",
+        "newdirectory/nested/deep-nested/deepnested.txt",
+        "newdirectory/nested/nestedfile.txt",
+      ],
+      patterns: [
+        {
+          from: "directory",
+          to: "newdirectory",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should copy files to new directory with context", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "newdirectory/deep-nested/deepnested.txt",
+        "newdirectory/nestedfile.txt",
+      ],
+      patterns: [
+        {
+          from: "nested",
+          context: "directory",
+          to: "newdirectory",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should copy files using glob", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "directory/directoryfile.txt",
+        "directory/nested/deep-nested/deepnested.txt",
+        "directory/nested/nestedfile.txt",
+      ],
+      patterns: [
+        {
+          from: "directory/**/*",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should copy files using glob to new directory", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "newdirectory/directory/directoryfile.txt",
+        "newdirectory/directory/nested/deep-nested/deepnested.txt",
+        "newdirectory/directory/nested/nestedfile.txt",
+      ],
+      patterns: [
+        {
+          from: "directory/**/*",
+          to: "newdirectory",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should copy files using glob to new directory with context", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "newdirectory/nested/deep-nested/deepnested.txt",
+        "newdirectory/nested/nestedfile.txt",
+      ],
+      patterns: [
+        {
+          from: "nested/**/*",
+          context: "directory",
+          to: "newdirectory",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should copy a file to a new file", (done) => {
+    runEmit({
+      expectedAssetKeys: ["newfile.txt"],
+      patterns: [
+        {
+          from: "file.txt",
+          to: "newfile.txt",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should copy a file to a new file with context", (done) => {
+    runEmit({
+      expectedAssetKeys: ["newfile.txt"],
+      patterns: [
+        {
+          from: "directoryfile.txt",
+          context: "directory",
+          to: "newfile.txt",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should multiple files to a new file", (done) => {
+    runEmit({
+      expectedAssetKeys: ["newfile.txt", "newbinextension.bin"],
+      patterns: [
+        {
+          from: "file.txt",
+          to: "newfile.txt",
+        },
+        {
+          from: "binextension.bin",
+          to: "newbinextension.bin",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should copy multiple files with same "from"', (done) => {
+    runEmit({
+      expectedAssetKeys: ["first/file.txt", "second/file.txt"],
+      patterns: [
+        {
+          from: "file.txt",
+          to: "first/file.txt",
+        },
+        {
+          from: "file.txt",
+          to: "second/file.txt",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should works with multiple patterns as String", (done) => {
+    runEmit({
+      expectedAssetKeys: ["binextension.bin", "file.txt", "noextension"],
+      patterns: ["binextension.bin", "file.txt", "noextension"],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should works with multiple patterns as Object", (done) => {
+    runEmit({
+      expectedAssetKeys: ["binextension.bin", "file.txt", "noextension"],
+      patterns: [
+        {
+          from: "binextension.bin",
+        },
+        {
+          from: "file.txt",
+        },
+        {
+          from: "noextension",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should work with linux path segment separation path when "from" is glob', (done) => {
+    runEmit({
+      expectedAssetKeys: ["directory/nested/nestedfile.txt"],
+      patterns: [
+        {
+          from: "directory/nested/*",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should exclude path with linux path segment separators", (done) => {
+    runEmit({
+      expectedAssetKeys: [
+        "[(){}[]!+@escaped-test^$]/hello.txt",
+        "[special$directory]/(special-*file).txt",
+        "[special$directory]/directoryfile.txt",
+        "[special$directory]/nested/nestedfile.txt",
+        "dir (86)/file.txt",
+        "dir (86)/nesteddir/deepnesteddir/deepnesteddir.txt",
+        "dir (86)/nesteddir/nestedfile.txt",
+      ],
+      patterns: [
+        {
+          from: "!(directory)/**/*.txt",
+        },
+      ],
+    })
+      .then(done)
+      .catch(done);
+  });
+
+  it('should copy files with "copied" flags', (done) => {
+    expect.assertions(5);
+
+    const expectedAssetKeys = [
+      ".dottedfile",
+      "directoryfile.txt",
+      "nested/deep-nested/deepnested.txt",
+      "nested/nestedfile.txt",
+    ];
+
+    run({
+      preCopy: {
+        additionalAssets: [
+          { name: "foo-bar.txt", data: "Content", info: { custom: true } },
           {
-            from: "directory",
-            force: true,
+            name: "nested/nestedfile.txt",
+            data: "Content",
+            info: { custom: true },
           },
         ],
-      })
-        .then(({ stats }) => {
-          for (const name of expectedAssetKeys) {
-            const info = stats.compilation.assetsInfo.get(name);
+      },
+      expectedAssetKeys,
+      patterns: [
+        {
+          from: "directory",
+          force: true,
+        },
+      ],
+    })
+      .then(({ stats }) => {
+        for (const name of expectedAssetKeys) {
+          const info = stats.compilation.assetsInfo.get(name);
 
-            expect(info.copied).toBe(true);
+          expect(info.copied).toBe(true);
 
-            if (name === "nested/nestedfile.txt") {
-              expect(info.custom).toBe(true);
-            }
+          if (name === "nested/nestedfile.txt") {
+            expect(info.custom).toBe(true);
           }
-        })
-        .then(done)
-        .catch(done);
-    });
+        }
+      })
+      .then(done)
+      .catch(done);
+  });
 
-    it('should copy files with "copied" flags', (done) => {
-      expect.assertions(5);
+  it('should copy files with "copied" flags (variant 2)', (done) => {
+    expect.assertions(5);
 
-      const expectedAssetKeys = [
-        "directoryfile.5d7817ed5bc246756d73.txt",
-        ".dottedfile.5e294e270db6734a42f0",
-        "nested/nestedfile.31d6cfe0d16ae931b73c.txt",
-        "nested/deep-nested/deepnested.31d6cfe0d16ae931b73c.txt",
-      ];
+    const expectedAssetKeys = [
+      "directoryfile.5d7817ed5bc246756d73.txt",
+      ".dottedfile.5e294e270db6734a42f0",
+      "nested/nestedfile.31d6cfe0d16ae931b73c.txt",
+      "nested/deep-nested/deepnested.31d6cfe0d16ae931b73c.txt",
+    ];
 
-      run({
-        preCopy: {
-          additionalAssets: [
-            {
-              name: "directoryfile.5d7817ed5bc246756d73.txt",
-              data: "Content",
-              info: { custom: true },
-            },
-          ],
-        },
-        expectedAssetKeys,
-        patterns: [
+    run({
+      preCopy: {
+        additionalAssets: [
           {
-            from: "directory",
-            to: "[path][name].[contenthash][ext]",
-            force: true,
+            name: "directoryfile.5d7817ed5bc246756d73.txt",
+            data: "Content",
+            info: { custom: true },
           },
         ],
-      })
-        .then(({ stats }) => {
-          for (const name of expectedAssetKeys) {
-            const info = stats.compilation.assetsInfo.get(name);
+      },
+      expectedAssetKeys,
+      patterns: [
+        {
+          from: "directory",
+          to: "[path][name].[contenthash][ext]",
+          force: true,
+        },
+      ],
+    })
+      .then(({ stats }) => {
+        for (const name of expectedAssetKeys) {
+          const info = stats.compilation.assetsInfo.get(name);
 
+          expect(info.immutable).toBe(true);
+
+          if (name === "directoryfile.5d7817ed5bc246756d73.txt") {
             expect(info.immutable).toBe(true);
-
-            if (name === "directoryfile.5d7817ed5bc246756d73.txt") {
-              expect(info.immutable).toBe(true);
-            }
           }
-        })
-        .then(done)
-        .catch(done);
-    });
-
-    it('should copy files and print "copied" in the string representation', (done) => {
-      expect.assertions(1);
-
-      const expectedAssetKeys = [
-        ".dottedfile",
-        "directoryfile.txt",
-        "nested/deep-nested/deepnested.txt",
-        "nested/nestedfile.txt",
-      ];
-
-      run({
-        withExistingAsset: true,
-        expectedAssetKeys,
-        patterns: [
-          {
-            from: "directory",
-          },
-        ],
+        }
       })
-        .then(({ stats }) => {
-          const stringStats = stats.toString();
+      .then(done)
+      .catch(done);
+  });
 
-          expect(stringStats.match(/\[copied]/g)).toHaveLength(4);
-        })
-        .then(done)
-        .catch(done);
-    });
+  it('should copy files and print "copied" in the string representation', (done) => {
+    expect.assertions(1);
 
-    it("should work with multi compiler mode", async () => {
-      const compiler = webpack([
+    const expectedAssetKeys = [
+      ".dottedfile",
+      "directoryfile.txt",
+      "nested/deep-nested/deepnested.txt",
+      "nested/nestedfile.txt",
+    ];
+
+    run({
+      withExistingAsset: true,
+      expectedAssetKeys,
+      patterns: [
         {
-          mode: "development",
-          context: path.resolve(__dirname, "./fixtures"),
-          entry: path.resolve(__dirname, "./helpers/enter.js"),
-          output: {
-            path: path.resolve(__dirname, "./outputs/multi-compiler/dist/a"),
-          },
-          stats: {
-            source: true,
-          },
-          plugins: [
-            new CopyPlugin({
-              patterns: [
-                {
-                  from: path.resolve(__dirname, "./fixtures/directory"),
-                },
-              ],
-            }),
-          ],
+          from: "directory",
         },
-        {
-          mode: "development",
-          entry: path.resolve(__dirname, "./helpers/enter.js"),
-          output: {
-            path: path.resolve(__dirname, "./outputs/multi-compiler/dist/b"),
-          },
-          stats: {
-            source: true,
-          },
-          plugins: [
-            new CopyPlugin({
-              patterns: [
-                {
-                  context: path.resolve(__dirname, "./fixtures"),
-                  from: path.resolve(__dirname, "./fixtures/directory"),
-                },
-              ],
-            }),
-          ],
+      ],
+    })
+      .then(({ stats }) => {
+        const stringStats = stats.toString();
+
+        expect(stringStats.match(/\[copied]/g)).toHaveLength(4);
+      })
+      .then(done)
+      .catch(done);
+  });
+
+  it("should work with multi compiler mode", async () => {
+    const compiler = webpack([
+      {
+        mode: "development",
+        context: path.resolve(__dirname, "./fixtures"),
+        entry: path.resolve(__dirname, "./helpers/enter.js"),
+        output: {
+          path: path.resolve(__dirname, "./outputs/multi-compiler/dist/a"),
         },
-      ]);
+        stats: {
+          source: true,
+        },
+        plugins: [
+          new CopyPlugin({
+            patterns: [
+              {
+                from: path.resolve(__dirname, "./fixtures/directory"),
+              },
+            ],
+          }),
+        ],
+      },
+      {
+        mode: "development",
+        entry: path.resolve(__dirname, "./helpers/enter.js"),
+        output: {
+          path: path.resolve(__dirname, "./outputs/multi-compiler/dist/b"),
+        },
+        stats: {
+          source: true,
+        },
+        plugins: [
+          new CopyPlugin({
+            patterns: [
+              {
+                context: path.resolve(__dirname, "./fixtures"),
+                from: path.resolve(__dirname, "./fixtures/directory"),
+              },
+            ],
+          }),
+        ],
+      },
+    ]);
 
-      for (const item of compiler.compilers) {
-        item.outputFileSystem = createFsFromVolume(new Volume());
-      }
+    for (const item of compiler.compilers) {
+      item.outputFileSystem = createFsFromVolume(new Volume());
+    }
 
-      const { stats } = await compile(compiler);
+    const { stats } = await compile(compiler);
 
-      for (const [index, item] of stats.stats.entries()) {
-        expect(item.compilation.errors).toMatchSnapshot("errors");
-        expect(item.compilation.warnings).toMatchSnapshot("warnings");
-        expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-          "assets",
-        );
-      }
-    });
- 
+    for (const [index, item] of stats.stats.entries()) {
+      expect(item.compilation.errors).toMatchSnapshot("errors");
+      expect(item.compilation.warnings).toMatchSnapshot("warnings");
+      expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
+        "assets",
+      );
+    }
+  });
+
   describe("watch mode", () => {
     it('should add the file to the watch list when "from" is a file', (done) => {
       const expectedAssetKeys = ["file.txt"];
@@ -719,16 +718,12 @@ describe("CopyPlugin", () => {
       expect(stats.compilation.errors).toMatchSnapshot("errors");
       expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
-      await new Promise(async (resolve) => {
-        const { stats: newStats } = await compile(compiler);
+      const { stats: newStats } = await compile(compiler);
 
-        expect(newStats.compilation.emittedAssets.size).toBe(0);
-        expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
-        expect(newStats.compilation.errors).toMatchSnapshot("errors");
-        expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
-
-        resolve();
-      });
+      expect(newStats.compilation.emittedAssets.size).toBe(0);
+      expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+      expect(newStats.compilation.errors).toMatchSnapshot("errors");
+      expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
     });
 
     it('should work with the "filesystem" cache', async () => {
@@ -762,16 +757,12 @@ describe("CopyPlugin", () => {
       expect(stats.compilation.errors).toMatchSnapshot("errors");
       expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
-      await new Promise(async (resolve) => {
-        const { stats: newStats } = await compile(compiler);
+      const { stats: newStats } = await compile(compiler);
 
-        expect(newStats.compilation.emittedAssets.size).toBe(0);
-        expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
-        expect(newStats.compilation.errors).toMatchSnapshot("errors");
-        expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
-
-        resolve();
-      });
+      expect(newStats.compilation.emittedAssets.size).toBe(0);
+      expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+      expect(newStats.compilation.errors).toMatchSnapshot("errors");
+      expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
     });
 
     it('should work with the "filesystem" cache and multi compiler mode', async () => {
@@ -857,20 +848,16 @@ describe("CopyPlugin", () => {
         );
       }
 
-      await new Promise(async (resolve) => {
-        const { stats: newStats } = await compile(compiler);
+      const { stats: newStats } = await compile(compiler);
 
-        for (const [index, item] of newStats.stats.entries()) {
-          expect(item.compilation.emittedAssets.size).toBe(0);
-          expect(item.compilation.errors).toMatchSnapshot("errors");
-          expect(item.compilation.warnings).toMatchSnapshot("warnings");
-          expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
-            "assets",
-          );
-        }
-
-        resolve();
-      });
+      for (const [index, item] of newStats.stats.entries()) {
+        expect(item.compilation.emittedAssets.size).toBe(0);
+        expect(item.compilation.errors).toMatchSnapshot("errors");
+        expect(item.compilation.warnings).toMatchSnapshot("warnings");
+        expect(readAssets(compiler.compilers[index], item)).toMatchSnapshot(
+          "assets",
+        );
+      }
     });
 
     it('should work with the "transform" option', async () => {
@@ -1003,16 +990,12 @@ describe("CopyPlugin", () => {
       expect(stats.compilation.errors).toMatchSnapshot("errors");
       expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
-      await new Promise(async (resolve) => {
-        const { stats: newStats } = await compile(compiler);
+      const { stats: newStats } = await compile(compiler);
 
-        expect(newStats.compilation.emittedAssets.size).toBe(1);
-        expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
-        expect(newStats.compilation.errors).toMatchSnapshot("errors");
-        expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
-
-        resolve();
-      });
+      expect(newStats.compilation.emittedAssets.size).toBe(1);
+      expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+      expect(newStats.compilation.errors).toMatchSnapshot("errors");
+      expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
     });
   });
 

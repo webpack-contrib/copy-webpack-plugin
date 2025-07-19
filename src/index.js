@@ -177,7 +177,7 @@ class CopyPlugin {
       compilation.fileSystemInfo.createSnapshot(
         startTime,
         [dependency],
-        // @ts-ignore
+        // @ts-expect-error - webpack types are incomplete
         undefined,
 
         undefined,
@@ -288,7 +288,7 @@ class CopyPlugin {
     let stats;
 
     try {
-      // @ts-ignore
+      // @ts-expect-error - webpack types are incomplete
       stats = await stat(inputFileSystem, absoluteFrom);
     } catch {
       // Nothing
@@ -326,7 +326,7 @@ class CopyPlugin {
     };
 
     // Will work when https://github.com/SuperchupuDev/tinyglobby/issues/81 will be resolved, so let's pass it to `tinyglobby` right now
-    // @ts-ignore
+    // @ts-expect-error - tinyglobby types are incomplete
     globOptions.fs = inputFileSystem;
 
     let glob;
@@ -458,13 +458,13 @@ class CopyPlugin {
               : path.normalize(
                   typeof pattern.to !== "undefined" ? pattern.to : "",
                 );
-          const toType = pattern.toType
-            ? pattern.toType
-            : template.test(to)
+          const toType =
+            pattern.toType ||
+            (template.test(to)
               ? "template"
               : path.extname(to) === "" || to.slice(-1) === path.sep
                 ? "dir"
-                : "file";
+                : "file");
 
           logger.log(`'to' option '${to}' determinated as '${toType}'`);
 
@@ -550,7 +550,7 @@ class CopyPlugin {
             let data;
 
             try {
-              // @ts-ignore
+              // @ts-expect-error - webpack types are incomplete
               data = await readFile(inputFileSystem, absoluteFilename);
             } catch (error) {
               compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -856,10 +856,10 @@ class CopyPlugin {
                */
               let filteredCopiedResult = copiedResult.filter(
                 /**
-                 * @param {CopiedResult | undefined} result
-                 * @returns {result is CopiedResult}
+                 * @param {CopiedResult | undefined} result The result to filter
+                 * @returns {result is CopiedResult} True if the result is defined
                  */
-                Boolean,
+                (result) => result !== undefined,
               );
 
               if (typeof normalizedPattern.transformAll !== "undefined") {
@@ -894,7 +894,7 @@ class CopyPlugin {
                          * @param {number} i // Index of the asset in the array
                          * @returns {Etag} // Merged Etag
                          */
-                        // @ts-ignore
+                        // @ts-expect-error - webpack cache types are incomplete
                         (accumulator, asset, i) => {
                           accumulator = cache.mergeEtags(
                             i === 1
@@ -1005,7 +1005,7 @@ class CopyPlugin {
                 const sortedByIndex = [...val[1]].sort((a, b) => a[0] - b[0]);
 
                 for (const [, item] of sortedByIndex) {
-                  acc = acc.concat(item);
+                  acc = [...acc, ...item];
                 }
 
                 return acc;
@@ -1079,8 +1079,10 @@ class CopyPlugin {
             .for("asset.info.copied")
             .tap(PLUGIN_NAME, (copied, { green, formatFlag }) =>
               copied
-                ? /** @type {Function} */ (green)(
-                    /** @type {Function} */ (formatFlag)("copied"),
+                ? /** @type {(text: string) => string} */ (green)(
+                    /** @type {(flag: string) => string} */ (formatFlag)(
+                      "copied",
+                    ),
                   )
                 : "",
             );

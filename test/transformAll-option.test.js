@@ -57,7 +57,8 @@ describe("transformAll option", () => {
       .catch(done);
   });
 
-  it("should transform files when async function used", () => runEmit({
+  it("should transform files when async function used", () =>
+    runEmit({
       expectedAssetKeys: ["file.txt"],
       expectedAssetContent: {
         "file.txt":
@@ -81,8 +82,7 @@ describe("transformAll option", () => {
       expect(result.assets["file.txt"]).toBe(
         "directory/directoryfile.txt::directory/nested/deep-nested/deepnested.txt::directory/nested/nestedfile.txt::",
       );
-    });
-  });
+    }));
 
   it("should transform files with force option enabled", (done) => {
     runEmit({
@@ -233,15 +233,11 @@ describe("cache", () => {
     expect(stats.compilation.errors).toMatchSnapshot("errors");
     expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
-    await new Promise(async (resolve) => {
-      const { stats: newStats } = await compile(compiler);
+    const { stats: newStats } = await compile(compiler);
 
-      expect(newStats.compilation.emittedAssets.size).toBe(0);
-      expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
-      expect(newStats.compilation.errors).toMatchSnapshot("errors");
-      expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
-
-      resolve();
-    });
+    expect(newStats.compilation.emittedAssets.size).toBe(0);
+    expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+    expect(newStats.compilation.errors).toMatchSnapshot("errors");
+    expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
   });
 });

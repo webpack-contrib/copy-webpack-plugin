@@ -670,9 +670,9 @@ describe("to option", () => {
           {
             from: "file.txt",
             to() {
-              return new Promise((resolve, reject) =>
-                reject(new Error("a failure happened")),
-              );
+              return new Promise((resolve, reject) => {
+                reject(new Error("a failure happened"));
+              });
             },
           },
         ],
@@ -764,7 +764,7 @@ describe("to option", () => {
         .catch(done);
     });
 
-    it("should copy files", (done) => {
+    it("should copy files (variant 2)", (done) => {
       runEmit({
         expectedAssetKeys: [
           "deep-nested-deepnested.txt",

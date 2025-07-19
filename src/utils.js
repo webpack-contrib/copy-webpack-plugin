@@ -14,7 +14,6 @@ function stat(inputFileSystem, path) {
        * @param {null | undefined | NodeJS.ErrnoException} err // An error that occurred while trying to get the stats.
        * @param {undefined | Stats} stats // The stats of the file or directory, if available.
        */
-      // @ts-ignore
       (err, stats) => {
         if (err) {
           reject(err);
@@ -96,7 +95,7 @@ function throttleAll(limit, tasks) {
         const isLast = !result.includes(notSettled);
 
         if (isLast) {
-          resolve(/** @type{T[]} * */ (result));
+          resolve(/** @type {T[]} */ (result));
         }
 
         return;
@@ -105,24 +104,26 @@ function throttleAll(limit, tasks) {
       const [index, task] = value;
 
       /**
-       * @param {T} x // The result of the task that was fulfilled.
+       * @param {T} taskResult The result of the task that was fulfilled.
        */
-      const onFulfilled = (x) => {
-        result[index] = x;
+      const onFulfilled = (taskResult) => {
+        result[index] = taskResult;
         next();
       };
 
       task().then(onFulfilled, reject);
     };
 
-    new Array(limit).fill(0).forEach(next);
+    for (let i = 0; i < limit; i++) {
+      next();
+    }
   });
 }
 
 /**
  * @template T
- * @param fn {(function(): any) | undefined} // The function to memoize.
- * @returns {function(): T} // A memoized function that returns the result of the original function.
+ * @param {(() => unknown) | undefined} fn The function to memoize.
+ * @returns {() => T} A memoized function that returns the result of the original function.
  */
 function memoize(fn) {
   let cache = false;
@@ -134,7 +135,7 @@ function memoize(fn) {
       return result;
     }
 
-    result = /** @type {function(): any} */ (fn)();
+    result = /** @type {T} */ (/** @type {() => unknown} */ (fn)());
     cache = true;
     // Allow to clean up memory for fn
     // and all dependent resources

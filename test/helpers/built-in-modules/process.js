@@ -1,1 +1,1 @@
-module.exports = require("node:process");
+module.exports = process;
