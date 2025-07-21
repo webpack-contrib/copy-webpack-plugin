@@ -69,7 +69,6 @@
     "@types/node": "^22.13.5",
     "@types/normalize-path": "^3.0.2",
     "@types/serialize-javascript": "^5.0.4",
-    "@webpack-contrib/eslint-config-webpack": "^3.0.0",
     "babel-jest": "^30.0.0",
     "cross-env": "^7.0.3",
     "cspell": "^8.15.6",
