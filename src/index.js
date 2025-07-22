@@ -34,12 +34,12 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 
 /**
  * @typedef {object} CopiedResult
- * @property {string} sourceFilename // Relative path to the file from the context
- * @property {string} absoluteFilename // Absolute path to the file
- * @property {string} filename // Relative path to the file from the output path
- * @property {Asset["source"]} source // Source of the file
- * @property {Force | undefined} force // Whether to force update the asset if it already exists
- * @property {Record<string, unknown>} info // Additional information about the asset
+ * @property {string} sourceFilename relative path to the file from the context
+ * @property {string} absoluteFilename absolute path to the file
+ * @property {string} filename relative path to the file from the output path
+ * @property {Asset["source"]} source source of the file
+ * @property {Force | undefined} force whether to force update the asset if it already exists
+ * @property {Record<string, unknown>} info additional information about the asset
  */
 
 /**
@@ -85,8 +85,8 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 
 /**
  * @typedef {object} TransformerObject
- * @property {TransformerFunction} transformer // Function to transform the file content
- * @property {boolean | TransformerCacheObject=} cache // Whether to cache the transformed content or an object with keys for caching
+ * @property {TransformerFunction} transformer function to transform the file content
+ * @property {boolean | TransformerCacheObject=} cache whether to cache the transformed content or an object with keys for caching
  */
 
 /**
@@ -111,18 +111,18 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 
 /**
  * @typedef {object} ObjectPattern
- * @property {From} from // Source path or glob pattern to copy files from
- * @property {GlobbyOptions=} globOptions // Options for globbing
- * @property {Context=} context // Context for the source path or glob pattern
- * @property {To=} to // Destination path or function to determine the destination path
- * @property {ToType=} toType // Type of the destination path, can be "dir", "file" or "template"
- * @property {Info=} info // Additional information about the asset
- * @property {Filter=} filter // Function to filter files, if it returns false, the file will be skipped
- * @property {Transform=} transform // Function to transform the file content, can be a function or an object with a transformer function and cache options
- * @property {TransformAllFunction=} transformAll // Function to transform all files, it receives an array of objects with data, sourceFilename and absoluteFilename properties
- * @property {Force=} force // Whether to force update the asset if it already exists
- * @property {number=} priority // Priority of the pattern, patterns with higher priority will be processed first
- * @property {NoErrorOnMissing=} noErrorOnMissing // Whether to skip errors when no files are found for the pattern
+ * @property {From} from source path or glob pattern to copy files from
+ * @property {GlobbyOptions=} globOptions options for globbing
+ * @property {Context=} context context for the source path or glob pattern
+ * @property {To=} to destination path or function to determine the destination path
+ * @property {ToType=} toType type of the destination path, can be "dir", "file" or "template"
+ * @property {Info=} info additional information about the asset
+ * @property {Filter=} filter function to filter files, if it returns false, the file will be skipped
+ * @property {Transform=} transform function to transform the file content, can be a function or an object with a transformer function and cache options
+ * @property {TransformAllFunction=} transformAll function to transform all files, it receives an array of objects with data, sourceFilename and absoluteFilename properties
+ * @property {Force=} force whether to force update the asset if it already exists
+ * @property {number=} priority priority of the pattern, patterns with higher priority will be processed first
+ * @property {NoErrorOnMissing=} noErrorOnMissing whether to skip errors when no files are found for the pattern
  */
 
 /**
@@ -131,20 +131,20 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 
 /**
  * @typedef {object} AdditionalOptions
- * @property {number=} concurrency // Maximum number of concurrent operations, default is 100
+ * @property {number=} concurrency maximum number of concurrent operations, default is 100
  */
 
 /**
  * @typedef {object} PluginOptions
- * @property {Pattern[]} patterns // Array of patterns to copy files from
- * @property {AdditionalOptions=} options // Additional options for the plugin
+ * @property {Pattern[]} patterns array of patterns to copy files from
+ * @property {AdditionalOptions=} options additional options for the plugin
  */
 
 const PLUGIN_NAME = "CopyPlugin";
 
 class CopyPlugin {
   /**
-   * @param {PluginOptions=} options // Options for the plugin
+   * @param {PluginOptions=} options options for the plugin
    */
   constructor(options = { patterns: [] }) {
     validate(/** @type {Schema} */ (schema), options, {
@@ -167,20 +167,18 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {Compilation} compilation // The current compilation
-   * @param {number} startTime // The start time of the snapshot creation
-   * @param {string} dependency // The dependency for which the snapshot is created
-   * @returns {Promise<Snapshot | undefined>} // Creates a snapshot for the given dependency
+   * @param {Compilation} compilation the compilation
+   * @param {number} startTime the start time of the snapshot creation
+   * @param {string} dependency the dependency for which the snapshot is created
+   * @returns {Promise<Snapshot | undefined>} creates a snapshot for the given dependency
    */
   static async createSnapshot(compilation, startTime, dependency) {
     return new Promise((resolve, reject) => {
       compilation.fileSystemInfo.createSnapshot(
         startTime,
         [dependency],
-        // @ts-expect-error - webpack types are incomplete
-        undefined,
-
-        undefined,
+        null,
+        null,
         null,
         (error, snapshot) => {
           if (error) {
@@ -197,9 +195,9 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {Compilation} compilation // The current compilation
-   * @param {Snapshot} snapshot // The snapshot to check
-   * @returns {Promise<boolean | undefined>} // Checks if the snapshot is valid
+   * @param {Compilation} compilation the compilation
+   * @param {Snapshot} snapshot /the snapshot to check
+   * @returns {Promise<boolean | undefined>} checks if the snapshot is valid
    */
   static async checkSnapshotValid(compilation, snapshot) {
     return new Promise((resolve, reject) => {
@@ -220,10 +218,10 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {Compiler} compiler // The current compiler
-   * @param {Compilation} compilation // The current compilation
-   * @param {Buffer} source // The source content to hash
-   * @returns {string} // Returns the content hash of the source
+   * @param {Compiler} compiler the compiler
+   * @param {Compilation} compilation the compilation
+   * @param {Buffer} source the source content to hash
+   * @returns {string} returns the content hash of the source
    */
   static getContentHash(compiler, compilation, source) {
     const { outputOptions } = compilation;
@@ -246,15 +244,15 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {typeof import("tinyglobby").glob} globby // The globby function to use for globbing
-   * @param {Compiler} compiler // The current compiler
-   * @param {Compilation} compilation // The current compilation
-   * @param {WebpackLogger} logger // The logger to use for logging
-   * @param {CacheFacade} cache // The cache facade to use for caching
-   * @param {number} concurrency // Maximum number of concurrent operations
-   * @param {ObjectPattern & { context: string }} inputPattern // The pattern to process
-   * @param {number} index // The index of the pattern in the patterns array
-   * @returns {Promise<Array<CopiedResult | undefined> | undefined>} // Processes the pattern and returns an array of copied results
+   * @param {typeof import("tinyglobby").glob} globby the globby function to use for globbing
+   * @param {Compiler} compiler the compiler
+   * @param {Compilation} compilation the compilation
+   * @param {WebpackLogger} logger the logger to use for logging
+   * @param {CacheFacade} cache the cache facade to use for caching
+   * @param {number} concurrency /maximum number of concurrent operations
+   * @param {ObjectPattern & { context: string }} inputPattern the pattern to process
+   * @param {number} index the index of the pattern in the patterns array
+   * @returns {Promise<Array<CopiedResult | undefined> | undefined>} processes the pattern and returns an array of copied results
    */
   static async glob(
     globby,
@@ -275,9 +273,7 @@ class CopyPlugin {
       `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
     );
 
-    let absoluteFrom;
-
-    absoluteFrom = path.isAbsolute(normalizedOriginalFrom)
+    let absoluteFrom = path.isAbsolute(normalizedOriginalFrom)
       ? normalizedOriginalFrom
       : path.resolve(pattern.context, normalizedOriginalFrom);
 
@@ -769,7 +765,7 @@ class CopyPlugin {
   }
 
   /**
-   * @param {Compiler} compiler // The current compiler
+   * @param {Compiler} compiler the compiler
    */
   apply(compiler) {
     const pluginName = this.constructor.name;
@@ -889,10 +885,10 @@ class CopyPlugin {
                     ? cache.getLazyHashedEtag(filteredCopiedResult[0].source)
                     : filteredCopiedResult.reduce(
                         /**
-                         * @param {Etag} accumulator // Merged Etag accumulator
-                         * @param {CopiedResult} asset // Copied asset to merge Etag with
-                         * @param {number} i // Index of the asset in the array
-                         * @returns {Etag} // Merged Etag
+                         * @param {Etag} accumulator merged Etag accumulator
+                         * @param {CopiedResult} asset /copied asset to merge Etag with
+                         * @param {number} i index of the asset in the array
+                         * @returns {Etag} merged Etag
                          */
                         // @ts-expect-error - webpack cache types are incomplete
                         (accumulator, asset, i) => {

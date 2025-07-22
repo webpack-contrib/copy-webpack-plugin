@@ -684,13 +684,13 @@ Type:
 type cache =
   | boolean
   | {
-      keys: Record<string>;
+      keys: Record<string, any>;
     }
   | {
       keys: (
-        defaultCacheKeys: Record<string>,
+        defaultCacheKeys: Record<string, any>,
         absoluteFilename: string,
-      ) => Promise<Record<string>>;
+      ) => Promise<Record<string, any>>;
     }
   | undefined;
 ```
@@ -917,13 +917,13 @@ Type:
 
 ```ts
 type info =
-  | Record<string>
+  | Record<string, any>
   | ((item: {
       absoluteFilename: string;
       sourceFilename: string;
       filename: string;
       toType: ToType;
-    }) => Record<string>);
+    }) => Record<string, any>);
 ```
 
 Default: `undefined`

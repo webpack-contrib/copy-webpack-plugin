@@ -2,17 +2,17 @@
 /** @typedef {import("fs").Stats } Stats */
 
 /**
- * @param {InputFileSystem} inputFileSystem // The input file system to use for reading the file stats.
- * @param {string} path // The path to the file or directory to get stats for.
- * @returns {Promise<undefined | Stats>} // A promise that resolves to the stats of the file or directory.
+ * @param {InputFileSystem} inputFileSystem the input file system to use for reading the file stats.
+ * @param {string} path the path to the file or directory to get stats for.
+ * @returns {Promise<undefined | Stats>} a promise that resolves to the stats of the file or directory.
  */
 function stat(inputFileSystem, path) {
   return new Promise((resolve, reject) => {
     inputFileSystem.stat(
       path,
       /**
-       * @param {null | undefined | NodeJS.ErrnoException} err // An error that occurred while trying to get the stats.
-       * @param {undefined | Stats} stats // The stats of the file or directory, if available.
+       * @param {null | undefined | NodeJS.ErrnoException} err an error that occurred while trying to get the stats.
+       * @param {undefined | Stats} stats the stats of the file or directory, if available.
        */
       (err, stats) => {
         if (err) {
@@ -28,17 +28,17 @@ function stat(inputFileSystem, path) {
 }
 
 /**
- * @param {InputFileSystem} inputFileSystem // The input file system to use for reading the file.
- * @param {string} path // The path to the file to read.
- * @returns {Promise<string | Buffer>} // A promise that resolves to the content of the file.
+ * @param {InputFileSystem} inputFileSystem the input file system to use for reading the file.
+ * @param {string} path the path to the file to read.
+ * @returns {Promise<string | Buffer>} a promise that resolves to the content of the file.
  */
 function readFile(inputFileSystem, path) {
   return new Promise((resolve, reject) => {
     inputFileSystem.readFile(
       path,
       /**
-       * @param {null | undefined | NodeJS.ErrnoException} err // An error that occurred while trying to read the file.
-       * @param {undefined | string | Buffer} data // The content of the file, if available.
+       * @param {null | undefined | NodeJS.ErrnoException} err /an error that occurred while trying to read the file.
+       * @param {undefined | string | Buffer} data the content of the file, if available.
        */
       (err, data) => {
         if (err) {

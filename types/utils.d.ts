@@ -8,9 +8,9 @@ export type Task<T> = () => Promise<T>;
  */
 export function memoize<T>(fn: (() => unknown) | undefined): () => T;
 /**
- * @param {InputFileSystem} inputFileSystem // The input file system to use for reading the file.
- * @param {string} path // The path to the file to read.
- * @returns {Promise<string | Buffer>} // A promise that resolves to the content of the file.
+ * @param {InputFileSystem} inputFileSystem the input file system to use for reading the file.
+ * @param {string} path the path to the file to read.
+ * @returns {Promise<string | Buffer>} a promise that resolves to the content of the file.
  */
 export function readFile(
   inputFileSystem: InputFileSystem,
@@ -19,9 +19,9 @@ export function readFile(
 /** @typedef {import("webpack").Compilation["inputFileSystem"] } InputFileSystem */
 /** @typedef {import("fs").Stats } Stats */
 /**
- * @param {InputFileSystem} inputFileSystem // The input file system to use for reading the file stats.
- * @param {string} path // The path to the file or directory to get stats for.
- * @returns {Promise<undefined | Stats>} // A promise that resolves to the stats of the file or directory.
+ * @param {InputFileSystem} inputFileSystem the input file system to use for reading the file stats.
+ * @param {string} path the path to the file or directory to get stats for.
+ * @returns {Promise<undefined | Stats>} a promise that resolves to the stats of the file or directory.
  */
 export function stat(
   inputFileSystem: InputFileSystem,
