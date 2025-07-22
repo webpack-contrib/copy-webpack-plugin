@@ -2,44 +2,44 @@ export = CopyPlugin;
 declare class CopyPlugin {
   /**
    * @private
-   * @param {Compilation} compilation
-   * @param {number} startTime
-   * @param {string} dependency
-   * @returns {Promise<Snapshot | undefined>}
+   * @param {Compilation} compilation the compilation
+   * @param {number} startTime the start time of the snapshot creation
+   * @param {string} dependency the dependency for which the snapshot is created
+   * @returns {Promise<Snapshot | undefined>} creates a snapshot for the given dependency
    */
   private static createSnapshot;
   /**
    * @private
-   * @param {Compilation} compilation
-   * @param {Snapshot} snapshot
-   * @returns {Promise<boolean | undefined>}
+   * @param {Compilation} compilation the compilation
+   * @param {Snapshot} snapshot /the snapshot to check
+   * @returns {Promise<boolean | undefined>} checks if the snapshot is valid
    */
   private static checkSnapshotValid;
   /**
    * @private
-   * @param {Compiler} compiler
-   * @param {Compilation} compilation
-   * @param {Buffer} source
-   * @returns {string}
+   * @param {Compiler} compiler the compiler
+   * @param {Compilation} compilation the compilation
+   * @param {Buffer} source the source content to hash
+   * @returns {string} returns the content hash of the source
    */
   private static getContentHash;
   /**
    * @private
-   * @param {typeof import("tinyglobby").glob} globby
-   * @param {Compiler} compiler
-   * @param {Compilation} compilation
-   * @param {WebpackLogger} logger
-   * @param {CacheFacade} cache
-   * @param {number} concurrency
-   * @param {ObjectPattern & { context: string }} inputPattern
-   * @param {number} index
-   * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
+   * @param {typeof import("tinyglobby").glob} globby the globby function to use for globbing
+   * @param {Compiler} compiler the compiler
+   * @param {Compilation} compilation the compilation
+   * @param {WebpackLogger} logger the logger to use for logging
+   * @param {CacheFacade} cache the cache facade to use for caching
+   * @param {number} concurrency /maximum number of concurrent operations
+   * @param {ObjectPattern & { context: string }} inputPattern the pattern to process
+   * @param {number} index the index of the pattern in the patterns array
+   * @returns {Promise<Array<CopiedResult | undefined> | undefined>} processes the pattern and returns an array of copied results
    */
   private static glob;
   /**
-   * @param {PluginOptions} [options]
+   * @param {PluginOptions=} options options for the plugin
    */
-  constructor(options?: PluginOptions);
+  constructor(options?: PluginOptions | undefined);
   /**
    * @private
    * @type {Pattern[]}
@@ -51,7 +51,7 @@ declare class CopyPlugin {
    */
   private options;
   /**
-   * @param {Compiler} compiler
+   * @param {Compiler} compiler the compiler
    */
   apply(compiler: Compiler): void;
 }
@@ -103,12 +103,30 @@ type Etag = ReturnType<
 type Snapshot = ReturnType<Compilation["fileSystemInfo"]["mergeSnapshots"]>;
 type Force = boolean;
 type CopiedResult = {
+  /**
+   * relative path to the file from the context
+   */
   sourceFilename: string;
+  /**
+   * absolute path to the file
+   */
   absoluteFilename: string;
+  /**
+   * relative path to the file from the output path
+   */
   filename: string;
+  /**
+   * source of the file
+   */
   source: Asset["source"];
+  /**
+   * whether to force update the asset if it already exists
+   */
   force: Force | undefined;
-  info: Record<string, any>;
+  /**
+   * additional information about the asset
+   */
+  info: Record<string, unknown>;
 };
 type StringPattern = string;
 type NoErrorOnMissing = boolean;
@@ -127,22 +145,28 @@ type TransformerFunction = (
 type TransformerCacheObject =
   | {
       keys: {
-        [key: string]: any;
+        [key: string]: unknown;
       };
     }
   | {
       keys: (
         defaultCacheKeys: {
-          [key: string]: any;
+          [key: string]: unknown;
         },
         absoluteFilename: string,
       ) => Promise<{
-        [key: string]: any;
+        [key: string]: unknown;
       }>;
     };
 type TransformerObject = {
+  /**
+   * function to transform the file content
+   */
   transformer: TransformerFunction;
-  cache?: boolean | TransformerCacheObject | undefined;
+  /**
+   * whether to cache the transformed content or an object with keys for caching
+   */
+  cache?: (boolean | TransformerCacheObject) | undefined;
 };
 type Transform = TransformerFunction | TransformerObject;
 type Filter = (filepath: string) => boolean | Promise<boolean>;
@@ -154,32 +178,77 @@ type TransformAllFunction = (
   }[],
 ) => string | Buffer | Promise<string> | Promise<Buffer>;
 type Info =
-  | Record<string, any>
+  | Record<string, unknown>
   | ((item: {
       absoluteFilename: string;
       sourceFilename: string;
       filename: string;
       toType: ToType;
-    }) => Record<string, any>);
+    }) => Record<string, unknown>);
 type ObjectPattern = {
+  /**
+   * source path or glob pattern to copy files from
+   */
   from: From;
-  globOptions?: import("tinyglobby").GlobOptions | undefined;
-  context?: string | undefined;
+  /**
+   * options for globbing
+   */
+  globOptions?: GlobbyOptions | undefined;
+  /**
+   * context for the source path or glob pattern
+   */
+  context?: Context | undefined;
+  /**
+   * destination path or function to determine the destination path
+   */
   to?: To | undefined;
+  /**
+   * type of the destination path, can be "dir", "file" or "template"
+   */
   toType?: ToType | undefined;
+  /**
+   * additional information about the asset
+   */
   info?: Info | undefined;
+  /**
+   * function to filter files, if it returns false, the file will be skipped
+   */
   filter?: Filter | undefined;
+  /**
+   * function to transform the file content, can be a function or an object with a transformer function and cache options
+   */
   transform?: Transform | undefined;
+  /**
+   * function to transform all files, it receives an array of objects with data, sourceFilename and absoluteFilename properties
+   */
   transformAll?: TransformAllFunction | undefined;
-  force?: boolean | undefined;
+  /**
+   * whether to force update the asset if it already exists
+   */
+  force?: Force | undefined;
+  /**
+   * priority of the pattern, patterns with higher priority will be processed first
+   */
   priority?: number | undefined;
-  noErrorOnMissing?: boolean | undefined;
+  /**
+   * whether to skip errors when no files are found for the pattern
+   */
+  noErrorOnMissing?: NoErrorOnMissing | undefined;
 };
 type Pattern = StringPattern | ObjectPattern;
 type AdditionalOptions = {
+  /**
+   * maximum number of concurrent operations, default is 100
+   */
   concurrency?: number | undefined;
 };
 type PluginOptions = {
+  /**
+   * array of patterns to copy files from
+   */
   patterns: Pattern[];
+  /**
+   * additional options for the plugin
+   */
   options?: AdditionalOptions | undefined;
 };

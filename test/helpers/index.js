@@ -1,6 +1,4 @@
-import compile from "./compile";
-import getCompiler from "./getCompiler";
-import readAsset from "./readAsset";
-import readAssets from "./readAssets";
-
-export { compile, getCompiler, readAsset, readAssets };
+export { default as compile } from "./compile";
+export { default as readAsset } from "./readAsset";
+export { default as getCompiler } from "./getCompiler";
+export { default as readAssets } from "./readAssets";

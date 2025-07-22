@@ -1,32 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`CopyPlugin basic should work with multi compiler mode: assets 1`] = `
-{
-  ".dottedfile": "dottedfile contents
-",
-  "directoryfile.txt": "new",
-  "nested/deep-nested/deepnested.txt": "",
-  "nested/nestedfile.txt": "",
-}
-`;
-
-exports[`CopyPlugin basic should work with multi compiler mode: assets 2`] = `
-{
-  ".dottedfile": "dottedfile contents
-",
-  "directoryfile.txt": "new",
-  "nested/deep-nested/deepnested.txt": "",
-  "nested/nestedfile.txt": "",
-}
-`;
-
-exports[`CopyPlugin basic should work with multi compiler mode: errors 1`] = `[]`;
-
-exports[`CopyPlugin basic should work with multi compiler mode: errors 2`] = `[]`;
-
-exports[`CopyPlugin basic should work with multi compiler mode: warnings 1`] = `[]`;
-
-exports[`CopyPlugin basic should work with multi compiler mode: warnings 2`] = `[]`;
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`CopyPlugin cache should work with the "filesystem" cache and multi compiler mode: assets 1`] = `
 {
@@ -357,6 +329,34 @@ exports[`CopyPlugin logging should logging when 'to' is a function: logs 1`] = `
   ],
 }
 `;
+
+exports[`CopyPlugin should work with multi compiler mode: assets 1`] = `
+{
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin should work with multi compiler mode: assets 2`] = `
+{
+  ".dottedfile": "dottedfile contents
+",
+  "directoryfile.txt": "new",
+  "nested/deep-nested/deepnested.txt": "",
+  "nested/nestedfile.txt": "",
+}
+`;
+
+exports[`CopyPlugin should work with multi compiler mode: errors 1`] = `[]`;
+
+exports[`CopyPlugin should work with multi compiler mode: errors 2`] = `[]`;
+
+exports[`CopyPlugin should work with multi compiler mode: warnings 1`] = `[]`;
+
+exports[`CopyPlugin should work with multi compiler mode: warnings 2`] = `[]`;
 
 exports[`CopyPlugin stats should work have assets info: assets 1`] = `
 {

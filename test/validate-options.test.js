@@ -90,11 +90,9 @@ describe("validate options", () => {
             context: "context",
             transform: {
               cache: {
-                keys: () => {
-                  return {
-                    foo: "bar",
-                  };
-                },
+                keys: () => ({
+                  foo: "bar",
+                }),
               },
             },
           },
@@ -106,11 +104,9 @@ describe("validate options", () => {
             context: "context",
             transform: {
               cache: {
-                keys: async () => {
-                  return {
-                    foo: "bar",
-                  };
-                },
+                keys: async () => ({
+                  foo: "bar",
+                }),
               },
             },
           },
@@ -128,9 +124,7 @@ describe("validate options", () => {
           },
           {
             from: "test.txt",
-            info: () => {
-              return { custom: true };
-            },
+            info: () => ({ custom: true }),
           },
         ],
         [
@@ -150,7 +144,6 @@ describe("validate options", () => {
         ],
       ],
       failure: [
-        // eslint-disable-next-line no-undefined
         undefined,
         true,
         "true",
@@ -322,12 +315,12 @@ describe("validate options", () => {
             ? { patterns: [{ from: "file.txt" }], [key]: value }
             : { [key]: value },
         );
-      } catch (errorFromPlugin) {
-        if (errorFromPlugin.name !== "ValidationError") {
-          throw errorFromPlugin;
+      } catch (err) {
+        if (err.name !== "ValidationError") {
+          throw err;
         }
 
-        error = errorFromPlugin;
+        error = err;
       } finally {
         if (type === "success") {
           expect(error).toBeUndefined();

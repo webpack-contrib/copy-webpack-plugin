@@ -1,18 +1,19 @@
 // Ideally we pass in patterns and confirm the resulting assets
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 
 import CopyPlugin from "../../src/index";
 
+import BreakContenthashPlugin from "./BreakContenthashPlugin";
 import ChildCompilerPlugin from "./ChildCompiler";
 import PreCopyPlugin from "./PreCopyPlugin";
-import BreakContenthashPlugin from "./BreakContenthashPlugin";
 
 import removeIllegalCharacterForWindows from "./removeIllegalCharacterForWindows";
 
 import { compile, getCompiler, readAssets } from "./";
 
-/* eslint-disable no-param-reassign */
+// ESLint disable for expect since this file is only used in test contexts
+/* eslint-disable no-undef */
 
 const isWin = process.platform === "win32";
 
@@ -23,25 +24,26 @@ const ignore = [
   "**/watch/**/*",
 ];
 
+/**
+ * @param {{ patterns?: Array<unknown>, compiler?: unknown, preCopy?: unknown, breakContenthash?: unknown, withChildCompilation?: unknown, expectedErrors?: Array<Error>, expectedWarnings?: Array<Error> }} opts Options for running the test
+ * @returns {Promise<{ compilation: unknown, compiler: unknown, stats: unknown }>} Resolves with compilation, compiler, and stats
+ */
 function run(opts) {
   return new Promise((resolve, reject) => {
     if (Array.isArray(opts.patterns)) {
-      opts.patterns.forEach((pattern) => {
+      for (const pattern of opts.patterns) {
         if (pattern.context) {
-          // eslint-disable-next-line no-param-reassign
           pattern.context = removeIllegalCharacterForWindows(pattern.context);
         }
 
-        if (typeof pattern !== "string") {
-          if (!opts.symlink || isWin) {
-            pattern.globOptions = pattern.globOptions || {};
-            pattern.globOptions.ignore = [
-              ...ignore,
-              ...(pattern.globOptions.ignore || []),
-            ];
-          }
+        if (typeof pattern !== "string" && (!opts.symlink || isWin)) {
+          pattern.globOptions ||= {};
+          pattern.globOptions.ignore = [
+            ...ignore,
+            ...(pattern.globOptions.ignore || []),
+          ];
         }
-      });
+      }
     }
 
     const compiler = opts.compiler || getCompiler();
@@ -65,7 +67,7 @@ function run(opts) {
     }
 
     // Execute the functions in series
-    return compile(compiler)
+    compile(compiler)
       .then(({ stats }) => {
         const { compilation } = stats;
 
@@ -93,6 +95,10 @@ function run(opts) {
   });
 }
 
+/**
+ * @param {{ expectedAssetKeys?: Array<string>, expectedAssetContent?: { [key: string]: unknown }, skipAssetsTesting?: boolean }} opts Options for running the test
+ * @returns {Promise<void>} Resolves when the test is complete
+ */
 function runEmit(opts) {
   return run(opts).then(({ compilation, compiler, stats }) => {
     if (opts.skipAssetsTesting) {
@@ -108,13 +114,11 @@ function runEmit(opts) {
         opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows),
       );
     } else {
-      // eslint-disable-next-line no-param-reassign
       delete compilation.assets["main.js"];
       expect(compilation.assets).toEqual({});
     }
 
     if (opts.expectedAssetContent) {
-      // eslint-disable-next-line guard-for-in
       for (const assetName in opts.expectedAssetContent) {
         expect(compilation.assets[assetName]).toBeDefined();
 
@@ -137,19 +141,33 @@ function runEmit(opts) {
   });
 }
 
+/**
+ * @param {{ compiler?: unknown }} opts Options for running the test
+ * @returns {Promise<void>} Resolves when the test is complete
+ */
 function runForce(opts) {
-  // eslint-disable-next-line no-param-reassign
-  opts.compiler = getCompiler();
+  opts.compiler ||= getCompiler();
 
   new PreCopyPlugin({ options: opts }).apply(opts.compiler);
 
   return runEmit(opts).then(() => {});
 }
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+/**
+ * @param {number} ms Milliseconds to delay
+ * @returns {Promise<void>} Resolves after the delay
+ */
+const delay = (ms) =>
+  new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
 
+/**
+ * @param {{ patterns?: Array<unknown>, options?: unknown, newFileLoc1?: string, newFileLoc2?: string, expectedAssetKeys?: Array<string> }} opts Options for running the test
+ * @returns {Promise<void>} Resolves when the test is complete
+ */
 function runChange(opts) {
-  return new Promise(async (resolve) => {
+  return new Promise((resolve) => {
     const compiler = getCompiler();
 
     new CopyPlugin({ patterns: opts.patterns, options: opts.options }).apply(
@@ -170,43 +188,46 @@ function runChange(opts) {
       arrayOfStats.push(stats);
     });
 
-    await delay(500);
+    delay(500)
+      .then(() => {
+        fs.appendFileSync(opts.newFileLoc1, "extra");
 
-    fs.appendFileSync(opts.newFileLoc1, "extra");
+        return delay(500);
+      })
+      .then(() => {
+        watching.close(() => {
+          const assetsBefore = readAssets(compiler, arrayOfStats[0]);
+          const assetsAfter = readAssets(compiler, arrayOfStats.pop());
+          const filesForCompare = Object.keys(assetsBefore);
+          const changedFiles = [];
 
-    await delay(500);
+          for (const file of filesForCompare) {
+            if (assetsBefore[file] === assetsAfter[file]) {
+              changedFiles.push(file);
+            }
+          }
 
-    watching.close(() => {
-      const assetsBefore = readAssets(compiler, arrayOfStats[0]);
-      const assetsAfter = readAssets(compiler, arrayOfStats.pop());
-      const filesForCompare = Object.keys(assetsBefore);
-      const changedFiles = [];
+          const lastFiles = Object.keys(assetsAfter);
 
-      filesForCompare.forEach((file) => {
-        if (assetsBefore[file] === assetsAfter[file]) {
-          changedFiles.push(file);
-        }
+          if (
+            opts.expectedAssetKeys &&
+            opts.expectedAssetKeys.length > 0 &&
+            changedFiles.length > 0
+          ) {
+            expect(changedFiles.sort()).toEqual(
+              opts.expectedAssetKeys
+                .sort()
+                .map(removeIllegalCharacterForWindows),
+            );
+          }
+
+          if (lastFiles.length > 0) {
+            expect(lastFiles.sort()).toEqual(Object.keys(assetsAfter).sort());
+          }
+
+          resolve();
+        });
       });
-
-      const lastFiles = Object.keys(assetsAfter);
-
-      if (
-        opts.expectedAssetKeys &&
-        opts.expectedAssetKeys.length > 0 &&
-        changedFiles.length > 0
-      ) {
-        expect(lastFiles.sort()).toEqual(
-          opts.expectedAssetKeys.sort().map(removeIllegalCharacterForWindows),
-        );
-      } else {
-        expect(lastFiles).toEqual({});
-      }
-
-      resolve(watching);
-    });
-  }).then(() => {
-    fs.unlinkSync(opts.newFileLoc1);
-    fs.unlinkSync(opts.newFileLoc2);
   });
 }
 

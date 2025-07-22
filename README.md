@@ -146,7 +146,7 @@ module.exports = {
         },
         // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
         path.posix.join(
-          path.resolve(__dirname, "src").replace(/\\/g, "/"),
+          path.resolve(__dirname, "src").replaceAll("\\", "/"),
           "*.txt",
         ),
       ],
@@ -184,7 +184,7 @@ module.exports = {
         {
           // If absolute path is a `glob` we replace backslashes with forward slashes, because only forward slashes can be used in the `glob`
           from: path.posix.join(
-            path.resolve(__dirname, "fixtures").replace(/\\/g, "/"),
+            path.resolve(__dirname, "fixtures").replaceAll("\\", "/"),
             "*.txt",
           ),
         },
@@ -397,7 +397,7 @@ Default: `undefined`
 **webpack.config.js**
 
 ```js
-const fs = require("fs").promise;
+const fs = require("node:fs").promise;
 
 module.exports = {
   plugins: [
@@ -684,19 +684,13 @@ Type:
 type cache =
   | boolean
   | {
-      keys: {
-        [key: string]: any;
-      };
+      keys: Record<string, any>;
     }
   | {
       keys: (
-        defaultCacheKeys: {
-          [key: string]: any;
-        },
+        defaultCacheKeys: Record<string, any>,
         absoluteFilename: string,
-      ) => Promise<{
-        [key: string]: any;
-      }>;
+      ) => Promise<Record<string, any>>;
     }
   | undefined;
 ```
@@ -849,7 +843,7 @@ type transformAll = (
     sourceFilename: string;
     absoluteFilename: string;
   }[],
-) => any;
+) => string[];
 ```
 
 Default: `undefined`
@@ -1181,7 +1175,7 @@ module.exports = {
       patterns: [
         {
           from: path.posix.join(
-            path.resolve(__dirname, "src").replace(/\\/g, "/"),
+            path.resolve(__dirname, "src").replaceAll("\\", "/"),
             "**/*",
           ),
           globOptions: {

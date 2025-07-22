@@ -1,7 +1,7 @@
 import CopyPlugin from "../src";
 
-import { runEmit } from "./helpers/run";
 import { compile, getCompiler, readAssets } from "./helpers";
+import { runEmit } from "./helpers/run";
 
 describe("transformAll option", () => {
   it('should be defined "assets"', (done) => {
@@ -19,7 +19,10 @@ describe("transformAll option", () => {
         },
       ],
     })
-      .then(done)
+      .then(() => {
+        // runEmit performs assertions internally, no need to check result
+        done();
+      })
       .catch(done);
   });
 
@@ -37,7 +40,7 @@ describe("transformAll option", () => {
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
               const content = asset.data.toString() || asset.sourceFilename;
-              // eslint-disable-next-line no-param-reassign
+
               accumulator = `${accumulator}${content}::`;
               return accumulator;
             }, "");
@@ -47,11 +50,14 @@ describe("transformAll option", () => {
         },
       ],
     })
-      .then(done)
+      .then(() => {
+        // runEmit performs assertions internally, no need to check result
+        done();
+      })
       .catch(done);
   });
 
-  it("should transform files when async function used", (done) => {
+  it("should transform files when async function used", () =>
     runEmit({
       expectedAssetKeys: ["file.txt"],
       expectedAssetContent: {
@@ -63,20 +69,15 @@ describe("transformAll option", () => {
           from: "directory/**/*.txt",
           to: "file.txt",
           async transformAll(assets) {
-            const result = assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
-              accumulator = `${accumulator}${asset.sourceFilename}::`;
-              return accumulator;
-            }, "");
-
-            return result;
+            // Use implicit return and remove the block statement
+            return assets.reduce(
+              (accumulator, asset) => `${accumulator}${asset.sourceFilename}::`,
+              "",
+            );
           },
         },
       ],
-    })
-      .then(done)
-      .catch(done);
-  });
+    }));
 
   it("should transform files with force option enabled", (done) => {
     runEmit({
@@ -94,7 +95,6 @@ describe("transformAll option", () => {
           to: "file.txt",
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${asset.sourceFilename}::`;
               return accumulator;
             }, "");
@@ -114,7 +114,7 @@ describe("transformAll option", () => {
       expectedAssetKeys: [],
       expectedErrors: [
         new Error(
-          `Invalid "pattern.to" for the "pattern.from": "file.txt" and "pattern.transformAll" function. The "to" option must be specified.`,
+          'Invalid "pattern.to" for the "pattern.from": "file.txt" and "pattern.transformAll" function. The "to" option must be specified.',
         ),
       ],
       patterns: [
@@ -139,7 +139,6 @@ describe("transformAll option", () => {
           from: "directory/**/*.txt",
           to: "file.txt",
           transformAll() {
-            // eslint-disable-next-line no-throw-literal
             throw new Error("a failure happened");
           },
         },
@@ -162,7 +161,6 @@ describe("transformAll option", () => {
           to: "[contenthash]-[fullhash]-file.txt",
           transformAll(assets) {
             return assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${asset.data}::`;
               return accumulator;
             }, "");
@@ -187,7 +185,6 @@ describe("transformAll option", () => {
           to: () => "[contenthash]-[fullhash]-file.txt",
           transformAll(assets) {
             return assets.reduce((accumulator, asset) => {
-              // eslint-disable-next-line no-param-reassign
               accumulator = `${accumulator}${asset.data}::`;
 
               return accumulator;
@@ -213,7 +210,7 @@ describe("cache", () => {
           transformAll(assets) {
             const result = assets.reduce((accumulator, asset) => {
               const content = asset.data.toString() || asset.sourceFilename;
-              // eslint-disable-next-line no-param-reassign
+
               accumulator = `${accumulator}${content}::`;
               return accumulator;
             }, "");
@@ -231,15 +228,11 @@ describe("cache", () => {
     expect(stats.compilation.errors).toMatchSnapshot("errors");
     expect(stats.compilation.warnings).toMatchSnapshot("warnings");
 
-    await new Promise(async (resolve) => {
-      const { stats: newStats } = await compile(compiler);
+    const { stats: newStats } = await compile(compiler);
 
-      expect(newStats.compilation.emittedAssets.size).toBe(0);
-      expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
-      expect(newStats.compilation.errors).toMatchSnapshot("errors");
-      expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
-
-      resolve();
-    });
+    expect(newStats.compilation.emittedAssets.size).toBe(0);
+    expect(readAssets(compiler, newStats)).toMatchSnapshot("assets");
+    expect(newStats.compilation.errors).toMatchSnapshot("errors");
+    expect(newStats.compilation.warnings).toMatchSnapshot("warnings");
   });
 });

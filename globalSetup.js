@@ -1,5 +1,5 @@
-const path = require("path");
-const fs = require("fs");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const removeIllegalCharacterForWindows = require("./test/helpers/removeIllegalCharacterForWindows");
 
@@ -12,11 +12,11 @@ const specialFiles = {
 };
 
 module.exports = () => {
-  Object.keys(specialFiles).forEach((originFile) => {
+  for (const originFile of Object.keys(specialFiles)) {
     const file = removeIllegalCharacterForWindows(originFile);
     const dir = path.dirname(file);
 
     fs.mkdirSync(path.join(baseDir, dir), { recursive: true });
     fs.writeFileSync(path.join(baseDir, file), specialFiles[originFile]);
-  });
+  }
 };

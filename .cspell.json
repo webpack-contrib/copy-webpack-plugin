@@ -43,6 +43,7 @@
     "package-lock.json",
     "node_modules",
     "coverage",
-    "*.log"
+    "*.log",
+    "test/fixtures/**"
   ]
 }

@@ -1,34 +1,21 @@
-const path = require("path");
+const path = require("node:path");
 
 const { validate } = require("schema-utils");
 
-// @ts-ignore
 const { version } = require("../package.json");
 
 const schema = require("./options.json");
-const { readFile, stat, throttleAll, memoize } = require("./utils");
+const { memoize, readFile, stat, throttleAll } = require("./utils");
 
 const template = /\[\\*([\w:]+)\\*\]/i;
 
-const getNormalizePath = memoize(() =>
-  // eslint-disable-next-line global-require
-  require("normalize-path"),
-);
+const getNormalizePath = memoize(() => require("normalize-path"));
 
-const getGlobParent = memoize(() =>
-  // eslint-disable-next-line global-require
-  require("glob-parent"),
-);
+const getGlobParent = memoize(() => require("glob-parent"));
 
-const getSerializeJavascript = memoize(() =>
-  // eslint-disable-next-line global-require
-  require("serialize-javascript"),
-);
+const getSerializeJavascript = memoize(() => require("serialize-javascript"));
 
-const getTinyGlobby = memoize(() =>
-  // eslint-disable-next-line global-require
-  require("tinyglobby"),
-);
+const getTinyGlobby = memoize(() => require("tinyglobby"));
 
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
@@ -46,13 +33,13 @@ const getTinyGlobby = memoize(() =>
  */
 
 /**
- * @typedef {Object} CopiedResult
- * @property {string} sourceFilename
- * @property {string} absoluteFilename
- * @property {string} filename
- * @property {Asset["source"]} source
- * @property {Force | undefined} force
- * @property {Record<string, any>} info
+ * @typedef {object} CopiedResult
+ * @property {string} sourceFilename relative path to the file from the context
+ * @property {string} absoluteFilename absolute path to the file
+ * @property {string} filename relative path to the file from the output path
+ * @property {Asset["source"]} source source of the file
+ * @property {Force | undefined} force whether to force update the asset if it already exists
+ * @property {Record<string, unknown>} info additional information about the asset
  */
 
 /**
@@ -74,7 +61,7 @@ const getTinyGlobby = memoize(() =>
 /**
  * @callback ToFunction
  * @param {{ context: string, absoluteFilename?: string }} pathData
- * @return {string | Promise<string>}
+ * @returns {string | Promise<string>}
  */
 
 /**
@@ -93,13 +80,13 @@ const getTinyGlobby = memoize(() =>
  */
 
 /**
- * @typedef {{ keys: { [key: string]: any } } | { keys: ((defaultCacheKeys: { [key: string]: any }, absoluteFilename: string) => Promise<{ [key: string]: any }>) }} TransformerCacheObject
+ * @typedef {{ keys: { [key: string]: unknown } } | { keys: ((defaultCacheKeys: { [key: string]: unknown }, absoluteFilename: string) => Promise<{ [key: string]: unknown }>) }} TransformerCacheObject
  */
 
 /**
- * @typedef {Object} TransformerObject
- * @property {TransformerFunction} transformer
- * @property {boolean | TransformerCacheObject} [cache]
+ * @typedef {object} TransformerObject
+ * @property {TransformerFunction} transformer function to transform the file content
+ * @property {boolean | TransformerCacheObject=} cache whether to cache the transformed content or an object with keys for caching
  */
 
 /**
@@ -119,23 +106,23 @@ const getTinyGlobby = memoize(() =>
  */
 
 /**
- * @typedef { Record<string, any> | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => Record<string, any>) } Info
+ * @typedef { Record<string, unknown> | ((item: { absoluteFilename: string, sourceFilename: string, filename: string, toType: ToType }) => Record<string, unknown>) } Info
  */
 
 /**
- * @typedef {Object} ObjectPattern
- * @property {From} from
- * @property {GlobbyOptions} [globOptions]
- * @property {Context} [context]
- * @property {To} [to]
- * @property {ToType} [toType]
- * @property {Info} [info]
- * @property {Filter} [filter]
- * @property {Transform} [transform]
- * @property {TransformAllFunction} [transformAll]
- * @property {Force} [force]
- * @property {number} [priority]
- * @property {NoErrorOnMissing} [noErrorOnMissing]
+ * @typedef {object} ObjectPattern
+ * @property {From} from source path or glob pattern to copy files from
+ * @property {GlobbyOptions=} globOptions options for globbing
+ * @property {Context=} context context for the source path or glob pattern
+ * @property {To=} to destination path or function to determine the destination path
+ * @property {ToType=} toType type of the destination path, can be "dir", "file" or "template"
+ * @property {Info=} info additional information about the asset
+ * @property {Filter=} filter function to filter files, if it returns false, the file will be skipped
+ * @property {Transform=} transform function to transform the file content, can be a function or an object with a transformer function and cache options
+ * @property {TransformAllFunction=} transformAll function to transform all files, it receives an array of objects with data, sourceFilename and absoluteFilename properties
+ * @property {Force=} force whether to force update the asset if it already exists
+ * @property {number=} priority priority of the pattern, patterns with higher priority will be processed first
+ * @property {NoErrorOnMissing=} noErrorOnMissing whether to skip errors when no files are found for the pattern
  */
 
 /**
@@ -143,21 +130,21 @@ const getTinyGlobby = memoize(() =>
  */
 
 /**
- * @typedef {Object} AdditionalOptions
- * @property {number} [concurrency]
+ * @typedef {object} AdditionalOptions
+ * @property {number=} concurrency maximum number of concurrent operations, default is 100
  */
 
 /**
- * @typedef {Object} PluginOptions
- * @property {Pattern[]} patterns
- * @property {AdditionalOptions} [options]
+ * @typedef {object} PluginOptions
+ * @property {Pattern[]} patterns array of patterns to copy files from
+ * @property {AdditionalOptions=} options additional options for the plugin
  */
 
 const PLUGIN_NAME = "CopyPlugin";
 
 class CopyPlugin {
   /**
-   * @param {PluginOptions} [options]
+   * @param {PluginOptions=} options options for the plugin
    */
   constructor(options = { patterns: [] }) {
     validate(/** @type {Schema} */ (schema), options, {
@@ -180,22 +167,18 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {Compilation} compilation
-   * @param {number} startTime
-   * @param {string} dependency
-   * @returns {Promise<Snapshot | undefined>}
+   * @param {Compilation} compilation the compilation
+   * @param {number} startTime the start time of the snapshot creation
+   * @param {string} dependency the dependency for which the snapshot is created
+   * @returns {Promise<Snapshot | undefined>} creates a snapshot for the given dependency
    */
   static async createSnapshot(compilation, startTime, dependency) {
-    // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
       compilation.fileSystemInfo.createSnapshot(
         startTime,
         [dependency],
-        // @ts-ignore
-        // eslint-disable-next-line no-undefined
-        undefined,
-        // eslint-disable-next-line no-undefined
-        undefined,
+        null,
+        null,
         null,
         (error, snapshot) => {
           if (error) {
@@ -212,12 +195,11 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {Compilation} compilation
-   * @param {Snapshot} snapshot
-   * @returns {Promise<boolean | undefined>}
+   * @param {Compilation} compilation the compilation
+   * @param {Snapshot} snapshot /the snapshot to check
+   * @returns {Promise<boolean | undefined>} checks if the snapshot is valid
    */
   static async checkSnapshotValid(compilation, snapshot) {
-    // eslint-disable-next-line consistent-return
     return new Promise((resolve, reject) => {
       compilation.fileSystemInfo.checkSnapshotValid(
         snapshot,
@@ -236,10 +218,10 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {Compiler} compiler
-   * @param {Compilation} compilation
-   * @param {Buffer} source
-   * @returns {string}
+   * @param {Compiler} compiler the compiler
+   * @param {Compilation} compilation the compilation
+   * @param {Buffer} source the source content to hash
+   * @returns {string} returns the content hash of the source
    */
   static getContentHash(compiler, compilation, source) {
     const { outputOptions } = compilation;
@@ -262,15 +244,15 @@ class CopyPlugin {
 
   /**
    * @private
-   * @param {typeof import("tinyglobby").glob} globby
-   * @param {Compiler} compiler
-   * @param {Compilation} compilation
-   * @param {WebpackLogger} logger
-   * @param {CacheFacade} cache
-   * @param {number} concurrency
-   * @param {ObjectPattern & { context: string }} inputPattern
-   * @param {number} index
-   * @returns {Promise<Array<CopiedResult | undefined> | undefined>}
+   * @param {typeof import("tinyglobby").glob} globby the globby function to use for globbing
+   * @param {Compiler} compiler the compiler
+   * @param {Compilation} compilation the compilation
+   * @param {WebpackLogger} logger the logger to use for logging
+   * @param {CacheFacade} cache the cache facade to use for caching
+   * @param {number} concurrency /maximum number of concurrent operations
+   * @param {ObjectPattern & { context: string }} inputPattern the pattern to process
+   * @param {number} index the index of the pattern in the patterns array
+   * @returns {Promise<Array<CopiedResult | undefined> | undefined>} processes the pattern and returns an array of copied results
    */
   static async glob(
     globby,
@@ -291,13 +273,9 @@ class CopyPlugin {
       `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
     );
 
-    let absoluteFrom;
-
-    if (path.isAbsolute(normalizedOriginalFrom)) {
-      absoluteFrom = normalizedOriginalFrom;
-    } else {
-      absoluteFrom = path.resolve(pattern.context, normalizedOriginalFrom);
-    }
+    let absoluteFrom = path.isAbsolute(normalizedOriginalFrom)
+      ? normalizedOriginalFrom
+      : path.resolve(pattern.context, normalizedOriginalFrom);
 
     logger.debug(`getting stats for '${absoluteFrom}'...`);
 
@@ -306,9 +284,9 @@ class CopyPlugin {
     let stats;
 
     try {
-      // @ts-ignore
+      // @ts-expect-error - webpack types are incomplete
       stats = await stat(inputFileSystem, absoluteFrom);
-    } catch (error) {
+    } catch {
       // Nothing
     }
 
@@ -338,13 +316,13 @@ class CopyPlugin {
     const globOptions = {
       absolute: true,
       followSymbolicLinks: true,
-      ...(pattern.globOptions || {}),
+      ...pattern.globOptions,
       cwd: pattern.context,
       onlyFiles: true,
     };
 
     // Will work when https://github.com/SuperchupuDev/tinyglobby/issues/81 will be resolved, so let's pass it to `tinyglobby` right now
-    // @ts-ignore
+    // @ts-expect-error - tinyglobby types are incomplete
     globOptions.fs = inputFileSystem;
 
     let glob;
@@ -476,13 +454,13 @@ class CopyPlugin {
               : path.normalize(
                   typeof pattern.to !== "undefined" ? pattern.to : "",
                 );
-          const toType = pattern.toType
-            ? pattern.toType
-            : template.test(to)
+          const toType =
+            pattern.toType ||
+            (template.test(to)
               ? "template"
               : path.extname(to) === "" || to.slice(-1) === path.sep
                 ? "dir"
-                : "file";
+                : "file");
 
           logger.log(`'to' option '${to}' determinated as '${toType}'`);
 
@@ -568,7 +546,7 @@ class CopyPlugin {
             let data;
 
             try {
-              // @ts-ignore
+              // @ts-expect-error - webpack types are incomplete
               data = await readFile(inputFileSystem, absoluteFilename);
             } catch (error) {
               compilation.errors.push(/** @type {WebpackError} */ (error));
@@ -745,7 +723,6 @@ class CopyPlugin {
             filename = getNormalizePath()(filename);
           }
 
-          // eslint-disable-next-line consistent-return
           return {
             sourceFilename,
             absoluteFilename,
@@ -784,12 +761,11 @@ class CopyPlugin {
       `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
     );
 
-    // eslint-disable-next-line consistent-return
     return copiedResult;
   }
 
   /**
-   * @param {Compiler} compiler
+   * @param {Compiler} compiler the compiler
    */
   apply(compiler) {
     const pluginName = this.constructor.name;
@@ -876,10 +852,10 @@ class CopyPlugin {
                */
               let filteredCopiedResult = copiedResult.filter(
                 /**
-                 * @param {CopiedResult | undefined} result
-                 * @returns {result is CopiedResult}
+                 * @param {CopiedResult | undefined} result The result to filter
+                 * @returns {result is CopiedResult} True if the result is defined
                  */
-                (result) => Boolean(result),
+                (result) => result !== undefined,
               );
 
               if (typeof normalizedPattern.transformAll !== "undefined") {
@@ -909,18 +885,17 @@ class CopyPlugin {
                     ? cache.getLazyHashedEtag(filteredCopiedResult[0].source)
                     : filteredCopiedResult.reduce(
                         /**
-                         * @param {Etag} accumulator
-                         * @param {CopiedResult} asset
-                         * @param {number} i
-                         * @return {Etag}
+                         * @param {Etag} accumulator merged Etag accumulator
+                         * @param {CopiedResult} asset /copied asset to merge Etag with
+                         * @param {number} i index of the asset in the array
+                         * @returns {Etag} merged Etag
                          */
-                        // @ts-ignore
+                        // @ts-expect-error - webpack cache types are incomplete
                         (accumulator, asset, i) => {
-                          // eslint-disable-next-line no-param-reassign
                           accumulator = cache.mergeEtags(
                             i === 1
                               ? cache.getLazyHashedEtag(
-                                  /** @type {CopiedResult}*/ (accumulator)
+                                  /** @type {CopiedResult} */ (accumulator)
                                     .source,
                                 )
                               : accumulator,
@@ -948,13 +923,11 @@ class CopyPlugin {
                   try {
                     transformedAsset.data =
                       await normalizedPattern.transformAll(
-                        filteredCopiedResult.map((asset) => {
-                          return {
-                            data: asset.source.buffer(),
-                            sourceFilename: asset.sourceFilename,
-                            absoluteFilename: asset.absoluteFilename,
-                          };
-                        }),
+                        filteredCopiedResult.map((asset) => ({
+                          data: asset.source.buffer(),
+                          sourceFilename: asset.sourceFilename,
+                          absoluteFilename: asset.absoluteFilename,
+                        })),
                       );
                   } catch (error) {
                     compilation.errors.push(
@@ -1022,14 +995,13 @@ class CopyPlugin {
 
           // Avoid writing assets inside `throttleAll`, because it creates concurrency.
           // It could potentially lead to an error - 'Multiple assets emit different content to the same filename'
-          copiedResult
+          for (const result of copiedResult
             .reduce(
               (acc, val) => {
                 const sortedByIndex = [...val[1]].sort((a, b) => a[0] - b[0]);
 
                 for (const [, item] of sortedByIndex) {
-                  // eslint-disable-next-line no-param-reassign
-                  acc = acc.concat(item);
+                  acc = [...acc, ...item];
                 }
 
                 return acc;
@@ -1037,60 +1009,59 @@ class CopyPlugin {
               /** @type {CopiedResult[]} */
               ([]),
             )
-            .filter(Boolean)
-            .forEach((result) => {
-              const {
-                absoluteFilename,
-                sourceFilename,
-                filename,
-                source,
-                force,
-              } = result;
+            .filter(Boolean)) {
+            const {
+              absoluteFilename,
+              sourceFilename,
+              filename,
+              source,
+              force,
+            } = result;
 
-              const existingAsset = compilation.getAsset(filename);
+            const existingAsset = compilation.getAsset(filename);
 
-              if (existingAsset) {
-                if (force) {
-                  const info = { copied: true, sourceFilename };
-
-                  logger.log(
-                    `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`,
-                  );
-
-                  compilation.updateAsset(filename, source, {
-                    ...info,
-                    ...result.info,
-                  });
-
-                  logger.log(
-                    `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
-                  );
-
-                  return;
-                }
+            if (existingAsset) {
+              if (force) {
+                const info = { copied: true, sourceFilename };
 
                 logger.log(
-                  `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
+                  `force updating '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists...`,
                 );
 
-                return;
+                compilation.updateAsset(filename, source, {
+                  ...info,
+                  ...result.info,
+                });
+
+                logger.log(
+                  `force updated '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
+                );
+
+                continue;
               }
 
-              const info = { copied: true, sourceFilename };
-
               logger.log(
-                `writing '${filename}' from '${absoluteFilename}' to compilation assets...`,
+                `skip adding '${filename}' from '${absoluteFilename}' to compilation assets, because it already exists`,
               );
 
-              compilation.emitAsset(filename, source, {
-                ...info,
-                ...result.info,
-              });
+              continue;
+            }
 
-              logger.log(
-                `written '${filename}' from '${absoluteFilename}' to compilation assets`,
-              );
+            const info = { copied: true, sourceFilename };
+
+            logger.log(
+              `writing '${filename}' from '${absoluteFilename}' to compilation assets...`,
+            );
+
+            compilation.emitAsset(filename, source, {
+              ...info,
+              ...result.info,
             });
+
+            logger.log(
+              `written '${filename}' from '${absoluteFilename}' to compilation assets`,
+            );
+          }
 
           logger.log("finished to adding additional assets");
 
@@ -1104,8 +1075,10 @@ class CopyPlugin {
             .for("asset.info.copied")
             .tap(PLUGIN_NAME, (copied, { green, formatFlag }) =>
               copied
-                ? /** @type {Function} */ (green)(
-                    /** @type {Function} */ (formatFlag)("copied"),
+                ? /** @type {(text: string) => string} */ (green)(
+                    /** @type {(flag: string) => string} */ (formatFlag)(
+                      "copied",
+                    ),
                   )
                 : "",
             );

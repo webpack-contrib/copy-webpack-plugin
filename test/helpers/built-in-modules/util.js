@@ -1,1 +1,1 @@
-module.exports = require("util");
+module.exports = require("node:util");
