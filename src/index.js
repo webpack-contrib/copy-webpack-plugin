@@ -336,7 +336,7 @@ class CopyPlugin {
 
         pattern.context = absoluteFrom;
         glob = path.posix.join(
-          getTinyGlobby().escapePath(absoluteFrom),
+          getTinyGlobby().escapePath(getNormalizePath()(absoluteFrom)),
           "**/*",
         );
 
@@ -350,7 +350,7 @@ class CopyPlugin {
         logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
         pattern.context = path.dirname(absoluteFrom);
-        glob = getTinyGlobby().escapePath(absoluteFrom);
+        glob = getTinyGlobby().escapePath(getNormalizePath()(absoluteFrom));
 
         if (typeof globOptions.dot === "undefined") {
           globOptions.dot = true;
