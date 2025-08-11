@@ -447,9 +447,9 @@ class CopyPlugin {
                   context: pattern.context,
                   absoluteFilename,
                 })
-              : typeof pattern.to !== "undefined"
-                ? path.normalize(pattern.to)
-                : "";
+              : path.normalize(
+                  typeof pattern.to !== "undefined" ? pattern.to : "",
+                );
           const toType =
             pattern.toType ||
             (template.test(to)
