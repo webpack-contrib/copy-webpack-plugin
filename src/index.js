@@ -229,7 +229,8 @@ class CopyPlugin {
     const { hashDigest, hashDigestLength, hashFunction, hashSalt } =
       outputOptions;
     const hash = compiler.webpack.util.createHash(
-      /** @type {string} */ (hashFunction),
+      /** @type {string} */
+      (hashFunction),
     );
 
     if (hashSalt) {
@@ -446,9 +447,9 @@ class CopyPlugin {
                   context: pattern.context,
                   absoluteFilename,
                 })
-              : path.normalize(
-                  typeof pattern.to !== "undefined" ? pattern.to : "",
-                );
+              : typeof pattern.to !== "undefined"
+                ? path.normalize(pattern.to)
+                : "";
           const toType =
             pattern.toType ||
             (template.test(to)
@@ -475,6 +476,11 @@ class CopyPlugin {
           const sourceFilename = getNormalizePath()(
             path.relative(compiler.context, absoluteFilename),
           );
+
+          // eslint-disable-next-line no-console
+          console.log(sourceFilename);
+          // eslint-disable-next-line no-console
+          console.log(path.relative(compiler.context, absoluteFilename));
 
           // If this came from a glob or dir, add it to the file dependencies
           if (fromType === "dir" || fromType === "glob") {
