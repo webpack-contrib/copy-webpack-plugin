@@ -362,10 +362,9 @@ class CopyPlugin {
         break;
       case "glob":
       default: {
-        const contextDependencies = getGlobParent()(absoluteFrom);
-
-        // eslint-disable-next-line no-console
-        console.log(contextDependencies);
+        const contextDependencies = getGlobParent()(absoluteFrom, {
+          flipBackslashes: false,
+        });
 
         compilation.contextDependencies.add(contextDependencies);
 
