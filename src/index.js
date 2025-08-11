@@ -370,9 +370,7 @@ class CopyPlugin {
         glob = path.isAbsolute(originalFrom)
           ? originalFrom
           : path.posix.join(
-              getTinyGlobby().escapePath(
-                getNormalizePath()(path.resolve(pattern.context)),
-              ),
+              getTinyGlobby().escapePath(getNormalizePath()(pattern.context)),
               originalFrom,
             );
       }
@@ -476,11 +474,6 @@ class CopyPlugin {
           const sourceFilename = getNormalizePath()(
             path.relative(compiler.context, absoluteFilename),
           );
-
-          // eslint-disable-next-line no-console
-          console.log(sourceFilename);
-          // eslint-disable-next-line no-console
-          console.log(path.relative(compiler.context, absoluteFilename));
 
           // If this came from a glob or dir, add it to the file dependencies
           if (fromType === "dir" || fromType === "glob") {
@@ -703,9 +696,7 @@ class CopyPlugin {
             const base = path.basename(sourceFilename);
             const name = base.slice(0, base.length - ext.length);
             const data = {
-              filename: getNormalizePath()(
-                path.relative(pattern.context, absoluteFilename),
-              ),
+              filename: getNormalizePath()(relativeFrom),
               contentHash,
               chunk: {
                 name,
