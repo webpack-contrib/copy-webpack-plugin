@@ -31,7 +31,7 @@ declare class CopyPlugin {
    * @param {WebpackLogger} logger the logger to use for logging
    * @param {CacheFacade} cache the cache facade to use for caching
    * @param {number} concurrency /maximum number of concurrent operations
-   * @param {ObjectPattern & { context: string }} inputPattern the pattern to process
+   * @param {ObjectPattern & { context: string }} pattern the pattern to process
    * @param {number} index the index of the pattern in the patterns array
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>} processes the pattern and returns an array of copied results
    */
@@ -60,8 +60,8 @@ declare namespace CopyPlugin {
     Schema,
     Compiler,
     Compilation,
-    WebpackError,
     Asset,
+    AssetInfo,
     GlobbyOptions,
     WebpackLogger,
     CacheFacade,
@@ -92,8 +92,8 @@ declare namespace CopyPlugin {
 type Schema = import("schema-utils/declarations/validate").Schema;
 type Compiler = import("webpack").Compiler;
 type Compilation = import("webpack").Compilation;
-type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
+type AssetInfo = import("webpack").AssetInfo;
 type GlobbyOptions = import("tinyglobby").GlobOptions;
 type WebpackLogger = ReturnType<Compilation["getLogger"]>;
 type CacheFacade = ReturnType<Compilation["getCache"]>;

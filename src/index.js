@@ -20,8 +20,8 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").Compilation} Compilation */
-/** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("tinyglobby").GlobOptions} GlobbyOptions */
 /** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
 /** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
@@ -228,7 +228,8 @@ class CopyPlugin {
     const { hashDigest, hashDigestLength, hashFunction, hashSalt } =
       outputOptions;
     const hash = compiler.webpack.util.createHash(
-      /** @type {string} */ (hashFunction),
+      /** @type {string} */
+      (hashFunction),
     );
 
     if (hashSalt) {
@@ -250,7 +251,7 @@ class CopyPlugin {
    * @param {WebpackLogger} logger the logger to use for logging
    * @param {CacheFacade} cache the cache facade to use for caching
    * @param {number} concurrency /maximum number of concurrent operations
-   * @param {ObjectPattern & { context: string }} inputPattern the pattern to process
+   * @param {ObjectPattern & { context: string }} pattern the pattern to process
    * @param {number} index the index of the pattern in the patterns array
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>} processes the pattern and returns an array of copied results
    */
@@ -261,21 +262,18 @@ class CopyPlugin {
     logger,
     cache,
     concurrency,
-    inputPattern,
+    pattern,
     index,
   ) {
     const { RawSource } = compiler.webpack.sources;
-    const pattern = { ...inputPattern };
-    const originalFrom = pattern.from;
-    const normalizedOriginalFrom = path.normalize(originalFrom);
 
     logger.log(
-      `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
+      `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context`,
     );
 
-    let absoluteFrom = path.isAbsolute(normalizedOriginalFrom)
-      ? normalizedOriginalFrom
-      : path.resolve(pattern.context, normalizedOriginalFrom);
+    const absoluteFrom = path.isAbsolute(pattern.from)
+      ? path.normalize(pattern.from)
+      : path.resolve(pattern.context, pattern.from);
 
     logger.debug(`getting stats for '${absoluteFrom}'...`);
 
@@ -335,12 +333,9 @@ class CopyPlugin {
 
         pattern.context = absoluteFrom;
         glob = path.posix.join(
-          getTinyGlobby().escapePath(
-            getNormalizePath()(path.resolve(absoluteFrom)),
-          ),
+          getTinyGlobby().escapePath(getNormalizePath()(absoluteFrom)),
           "**/*",
         );
-        absoluteFrom = path.join(absoluteFrom, "**/*");
 
         if (typeof globOptions.dot === "undefined") {
           globOptions.dot = true;
@@ -352,9 +347,7 @@ class CopyPlugin {
         logger.debug(`added '${absoluteFrom}' as a file dependency`);
 
         pattern.context = path.dirname(absoluteFrom);
-        glob = getTinyGlobby().escapePath(
-          getNormalizePath()(path.resolve(absoluteFrom)),
-        );
+        glob = getTinyGlobby().escapePath(getNormalizePath()(absoluteFrom));
 
         if (typeof globOptions.dot === "undefined") {
           globOptions.dot = true;
@@ -370,13 +363,11 @@ class CopyPlugin {
 
         logger.debug(`added '${contextDependencies}' as a context dependency`);
 
-        glob = path.isAbsolute(originalFrom)
-          ? originalFrom
+        glob = path.isAbsolute(pattern.from)
+          ? pattern.from
           : path.posix.join(
-              getTinyGlobby().escapePath(
-                getNormalizePath()(path.resolve(pattern.context)),
-              ),
-              originalFrom,
+              getTinyGlobby().escapePath(getNormalizePath()(pattern.context)),
+              pattern.from,
             );
       }
     }
@@ -391,7 +382,7 @@ class CopyPlugin {
     try {
       globEntries = await globby(glob, globOptions);
     } catch (error) {
-      compilation.errors.push(/** @type {WebpackError} */ (error));
+      compilation.errors.push(/** @type {Error} */ (error));
 
       return;
     }
@@ -399,15 +390,13 @@ class CopyPlugin {
     if (globEntries.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`,
+          `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`,
         );
 
         return;
       }
 
-      const missingError = new Error(`unable to locate '${glob}' glob`);
-
-      compilation.errors.push(/** @type {WebpackError} */ (missingError));
+      compilation.errors.push(new Error(`unable to locate '${glob}' glob`));
 
       return;
     }
@@ -427,7 +416,7 @@ class CopyPlugin {
             try {
               isFiltered = await pattern.filter(globEntry);
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -439,12 +428,10 @@ class CopyPlugin {
             }
           }
 
-          const from = globEntry;
+          const absoluteFilename = path.normalize(globEntry);
 
-          logger.debug(`found '${from}'`);
+          logger.debug(`found '${absoluteFilename}'`);
 
-          // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-          const absoluteFilename = path.resolve(pattern.context, from);
           const to =
             typeof pattern.to === "function"
               ? await pattern.to({
@@ -464,17 +451,24 @@ class CopyPlugin {
 
           logger.log(`'to' option '${to}' determinated as '${toType}'`);
 
-          const relativeFrom = path.relative(pattern.context, absoluteFilename);
-          let filename = toType === "dir" ? path.join(to, relativeFrom) : to;
+          const relativeFilename = path.relative(
+            pattern.context,
+            absoluteFilename,
+          );
+          let filename =
+            toType === "dir" ? path.join(to, relativeFilename) : to;
 
           if (path.isAbsolute(filename)) {
             filename = path.relative(
-              /** @type {string} */ (compiler.options.output.path),
+              /** @type {string} */
+              (compiler.options.output.path),
               filename,
             );
           }
 
-          logger.log(`determined that '${from}' should write to '${filename}'`);
+          logger.log(
+            `determined that '${absoluteFilename}' should write to '${filename}'`,
+          );
 
           const sourceFilename = getNormalizePath()(
             path.relative(compiler.context, absoluteFilename),
@@ -497,7 +491,7 @@ class CopyPlugin {
               null,
             );
           } catch (error) {
-            compilation.errors.push(/** @type {WebpackError} */ (error));
+            compilation.errors.push(/** @type {Error} */ (error));
 
             return;
           }
@@ -522,7 +516,7 @@ class CopyPlugin {
                 cacheEntry.snapshot,
               );
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -549,7 +543,7 @@ class CopyPlugin {
               // @ts-expect-error - webpack types are incomplete
               data = await readFile(inputFileSystem, absoluteFilename);
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -569,7 +563,7 @@ class CopyPlugin {
                 absoluteFilename,
               );
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -584,7 +578,7 @@ class CopyPlugin {
                   snapshot,
                 });
               } catch (error) {
-                compilation.errors.push(/** @type {WebpackError} */ (error));
+                compilation.errors.push(/** @type {Error} */ (error));
 
                 return;
               }
@@ -674,6 +668,7 @@ class CopyPlugin {
             }
           }
 
+          /** @type {AssetInfo} */
           let info =
             typeof pattern.info === "undefined"
               ? {}
@@ -700,9 +695,7 @@ class CopyPlugin {
             const base = path.basename(sourceFilename);
             const name = base.slice(0, base.length - ext.length);
             const data = {
-              filename: getNormalizePath()(
-                path.relative(pattern.context, absoluteFilename),
-              ),
+              filename: getNormalizePath()(relativeFilename),
               contentHash,
               chunk: {
                 name,
@@ -734,7 +727,7 @@ class CopyPlugin {
         }),
       );
     } catch (error) {
-      compilation.errors.push(/** @type {WebpackError} */ (error));
+      compilation.errors.push(/** @type {Error} */ (error));
 
       return;
     }
@@ -742,23 +735,21 @@ class CopyPlugin {
     if (copiedResult.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`,
+          `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`,
         );
 
         return;
       }
 
-      const missingError = new Error(
-        `unable to locate '${glob}' glob after filtering paths`,
+      compilation.errors.push(
+        new Error(`Unable to locate '${glob}' glob after filtering paths`),
       );
-
-      compilation.errors.push(/** @type {WebpackError} */ (missingError));
 
       return;
     }
 
     logger.log(
-      `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
+      `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context`,
     );
 
     return copiedResult;
@@ -809,16 +800,16 @@ class CopyPlugin {
               /**
                * @type {ObjectPattern}
                */
-              const normalizedPattern =
+              const pattern =
                 typeof item === "string" ? { from: item } : { ...item };
               const context =
-                typeof normalizedPattern.context === "undefined"
+                typeof pattern.context === "undefined"
                   ? compiler.context
-                  : path.isAbsolute(normalizedPattern.context)
-                    ? normalizedPattern.context
-                    : path.join(compiler.context, normalizedPattern.context);
+                  : path.isAbsolute(pattern.context)
+                    ? pattern.context
+                    : path.join(compiler.context, pattern.context);
 
-              normalizedPattern.context = context;
+              pattern.context = context;
 
               /**
                * @type {Array<CopiedResult | undefined> | undefined}
@@ -834,11 +825,11 @@ class CopyPlugin {
                   cache,
                   concurrency,
                   /** @type {ObjectPattern & { context: string }} */
-                  (normalizedPattern),
+                  (pattern),
                   index,
                 );
               } catch (error) {
-                compilation.errors.push(/** @type {WebpackError} */ (error));
+                compilation.errors.push(/** @type {Error} */ (error));
 
                 return;
               }
@@ -858,14 +849,11 @@ class CopyPlugin {
                 (result) => result !== undefined,
               );
 
-              if (typeof normalizedPattern.transformAll !== "undefined") {
-                if (typeof normalizedPattern.to === "undefined") {
+              if (typeof pattern.transformAll !== "undefined") {
+                if (typeof pattern.to === "undefined") {
                   compilation.errors.push(
-                    /** @type {WebpackError} */
-                    (
-                      new Error(
-                        `Invalid "pattern.to" for the "pattern.from": "${normalizedPattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`,
-                      )
+                    new Error(
+                      `Invalid "pattern.to" for the "pattern.from": "${pattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`,
                     ),
                   );
 
@@ -909,38 +897,35 @@ class CopyPlugin {
                 const cacheItem = cache.getItemCache(
                   `transformAll|${getSerializeJavascript()({
                     version,
-                    from: normalizedPattern.from,
-                    to: normalizedPattern.to,
-                    transformAll: normalizedPattern.transformAll,
+                    from: pattern.from,
+                    to: pattern.to,
+                    transformAll: pattern.transformAll,
                   })}`,
                   mergedEtag,
                 );
                 let transformedAsset = await cacheItem.getPromise();
 
                 if (!transformedAsset) {
-                  transformedAsset = { filename: normalizedPattern.to };
+                  transformedAsset = { filename: pattern.to };
 
                   try {
-                    transformedAsset.data =
-                      await normalizedPattern.transformAll(
-                        filteredCopiedResult.map((asset) => ({
-                          data: asset.source.buffer(),
-                          sourceFilename: asset.sourceFilename,
-                          absoluteFilename: asset.absoluteFilename,
-                        })),
-                      );
-                  } catch (error) {
-                    compilation.errors.push(
-                      /** @type {WebpackError} */ (error),
+                    transformedAsset.data = await pattern.transformAll(
+                      filteredCopiedResult.map((asset) => ({
+                        data: asset.source.buffer(),
+                        sourceFilename: asset.sourceFilename,
+                        absoluteFilename: asset.absoluteFilename,
+                      })),
                     );
+                  } catch (error) {
+                    compilation.errors.push(/** @type {Error} */ (error));
 
                     return;
                   }
 
                   const filename =
-                    typeof normalizedPattern.to === "function"
-                      ? await normalizedPattern.to({ context })
-                      : normalizedPattern.to;
+                    typeof pattern.to === "function"
+                      ? await pattern.to({ context })
+                      : pattern.to;
 
                   if (template.test(filename)) {
                     const contentHash = CopyPlugin.getContentHash(
@@ -970,7 +955,7 @@ class CopyPlugin {
                   transformedAsset.source = new RawSource(
                     transformedAsset.data,
                   );
-                  transformedAsset.force = normalizedPattern.force;
+                  transformedAsset.force = pattern.force;
 
                   await cacheItem.storePromise(transformedAsset);
                 }
@@ -978,7 +963,7 @@ class CopyPlugin {
                 filteredCopiedResult = [transformedAsset];
               }
 
-              const priority = normalizedPattern.priority || 0;
+              const priority = pattern.priority || 0;
 
               if (!copiedResultMap.has(priority)) {
                 copiedResultMap.set(priority, new Map());
