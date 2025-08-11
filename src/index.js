@@ -20,7 +20,6 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 /** @typedef {import("schema-utils/declarations/validate").Schema} Schema */
 /** @typedef {import("webpack").Compiler} Compiler */
 /** @typedef {import("webpack").Compilation} Compilation */
-/** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("tinyglobby").GlobOptions} GlobbyOptions */
@@ -383,7 +382,7 @@ class CopyPlugin {
     try {
       globEntries = await globby(glob, globOptions);
     } catch (error) {
-      compilation.errors.push(/** @type {WebpackError} */ (error));
+      compilation.errors.push(/** @type {Error} */ (error));
 
       return;
     }
@@ -397,9 +396,7 @@ class CopyPlugin {
         return;
       }
 
-      const missingError = new Error(`unable to locate '${glob}' glob`);
-
-      compilation.errors.push(/** @type {WebpackError} */ (missingError));
+      compilation.errors.push(new Error(`unable to locate '${glob}' glob`));
 
       return;
     }
@@ -419,7 +416,7 @@ class CopyPlugin {
             try {
               isFiltered = await pattern.filter(globEntry);
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -431,11 +428,10 @@ class CopyPlugin {
             }
           }
 
-          const from = globEntry;
+          const absoluteFilename = path.normalize(globEntry);
 
-          logger.debug(`found '${from}'`);
+          logger.debug(`found '${absoluteFilename}'`);
 
-          const absoluteFilename = path.normalize(from);
           const to =
             typeof pattern.to === "function"
               ? await pattern.to({
@@ -455,8 +451,12 @@ class CopyPlugin {
 
           logger.log(`'to' option '${to}' determinated as '${toType}'`);
 
-          const relativeFrom = path.relative(pattern.context, absoluteFilename);
-          let filename = toType === "dir" ? path.join(to, relativeFrom) : to;
+          const relativeFilename = path.relative(
+            pattern.context,
+            absoluteFilename,
+          );
+          let filename =
+            toType === "dir" ? path.join(to, relativeFilename) : to;
 
           if (path.isAbsolute(filename)) {
             filename = path.relative(
@@ -466,7 +466,9 @@ class CopyPlugin {
             );
           }
 
-          logger.log(`determined that '${from}' should write to '${filename}'`);
+          logger.log(
+            `determined that '${absoluteFilename}' should write to '${filename}'`,
+          );
 
           const sourceFilename = getNormalizePath()(
             path.relative(compiler.context, absoluteFilename),
@@ -489,7 +491,7 @@ class CopyPlugin {
               null,
             );
           } catch (error) {
-            compilation.errors.push(/** @type {WebpackError} */ (error));
+            compilation.errors.push(/** @type {Error} */ (error));
 
             return;
           }
@@ -514,7 +516,7 @@ class CopyPlugin {
                 cacheEntry.snapshot,
               );
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -541,7 +543,7 @@ class CopyPlugin {
               // @ts-expect-error - webpack types are incomplete
               data = await readFile(inputFileSystem, absoluteFilename);
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -561,7 +563,7 @@ class CopyPlugin {
                 absoluteFilename,
               );
             } catch (error) {
-              compilation.errors.push(/** @type {WebpackError} */ (error));
+              compilation.errors.push(/** @type {Error} */ (error));
 
               return;
             }
@@ -576,7 +578,7 @@ class CopyPlugin {
                   snapshot,
                 });
               } catch (error) {
-                compilation.errors.push(/** @type {WebpackError} */ (error));
+                compilation.errors.push(/** @type {Error} */ (error));
 
                 return;
               }
@@ -693,7 +695,7 @@ class CopyPlugin {
             const base = path.basename(sourceFilename);
             const name = base.slice(0, base.length - ext.length);
             const data = {
-              filename: getNormalizePath()(relativeFrom),
+              filename: getNormalizePath()(relativeFilename),
               contentHash,
               chunk: {
                 name,
@@ -725,7 +727,7 @@ class CopyPlugin {
         }),
       );
     } catch (error) {
-      compilation.errors.push(/** @type {WebpackError} */ (error));
+      compilation.errors.push(/** @type {Error} */ (error));
 
       return;
     }
@@ -739,11 +741,9 @@ class CopyPlugin {
         return;
       }
 
-      const missingError = new Error(
-        `unable to locate '${glob}' glob after filtering paths`,
+      compilation.errors.push(
+        new Error(`Unable to locate '${glob}' glob after filtering paths`),
       );
-
-      compilation.errors.push(/** @type {WebpackError} */ (missingError));
 
       return;
     }
@@ -829,7 +829,7 @@ class CopyPlugin {
                   index,
                 );
               } catch (error) {
-                compilation.errors.push(/** @type {WebpackError} */ (error));
+                compilation.errors.push(/** @type {Error} */ (error));
 
                 return;
               }
@@ -852,11 +852,8 @@ class CopyPlugin {
               if (typeof pattern.transformAll !== "undefined") {
                 if (typeof pattern.to === "undefined") {
                   compilation.errors.push(
-                    /** @type {WebpackError} */
-                    (
-                      new Error(
-                        `Invalid "pattern.to" for the "pattern.from": "${pattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`,
-                      )
+                    new Error(
+                      `Invalid "pattern.to" for the "pattern.from": "${pattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`,
                     ),
                   );
 
@@ -920,9 +917,7 @@ class CopyPlugin {
                       })),
                     );
                   } catch (error) {
-                    compilation.errors.push(
-                      /** @type {WebpackError} */ (error),
-                    );
+                    compilation.errors.push(/** @type {Error} */ (error));
 
                     return;
                   }
