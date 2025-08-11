@@ -31,7 +31,7 @@ declare class CopyPlugin {
    * @param {WebpackLogger} logger the logger to use for logging
    * @param {CacheFacade} cache the cache facade to use for caching
    * @param {number} concurrency /maximum number of concurrent operations
-   * @param {ObjectPattern & { context: string }} inputPattern the pattern to process
+   * @param {ObjectPattern & { context: string }} pattern the pattern to process
    * @param {number} index the index of the pattern in the patterns array
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>} processes the pattern and returns an array of copied results
    */
