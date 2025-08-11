@@ -806,16 +806,16 @@ class CopyPlugin {
               /**
                * @type {ObjectPattern}
                */
-              const normalizedPattern =
+              const pattern =
                 typeof item === "string" ? { from: item } : { ...item };
               const context =
-                typeof normalizedPattern.context === "undefined"
+                typeof pattern.context === "undefined"
                   ? compiler.context
-                  : path.isAbsolute(normalizedPattern.context)
-                    ? normalizedPattern.context
-                    : path.join(compiler.context, normalizedPattern.context);
+                  : path.isAbsolute(pattern.context)
+                    ? pattern.context
+                    : path.join(compiler.context, pattern.context);
 
-              normalizedPattern.context = context;
+              pattern.context = context;
 
               /**
                * @type {Array<CopiedResult | undefined> | undefined}
@@ -831,7 +831,7 @@ class CopyPlugin {
                   cache,
                   concurrency,
                   /** @type {ObjectPattern & { context: string }} */
-                  (normalizedPattern),
+                  (pattern),
                   index,
                 );
               } catch (error) {
@@ -855,13 +855,13 @@ class CopyPlugin {
                 (result) => result !== undefined,
               );
 
-              if (typeof normalizedPattern.transformAll !== "undefined") {
-                if (typeof normalizedPattern.to === "undefined") {
+              if (typeof pattern.transformAll !== "undefined") {
+                if (typeof pattern.to === "undefined") {
                   compilation.errors.push(
                     /** @type {WebpackError} */
                     (
                       new Error(
-                        `Invalid "pattern.to" for the "pattern.from": "${normalizedPattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`,
+                        `Invalid "pattern.to" for the "pattern.from": "${pattern.from}" and "pattern.transformAll" function. The "to" option must be specified.`,
                       )
                     ),
                   );
@@ -906,26 +906,25 @@ class CopyPlugin {
                 const cacheItem = cache.getItemCache(
                   `transformAll|${getSerializeJavascript()({
                     version,
-                    from: normalizedPattern.from,
-                    to: normalizedPattern.to,
-                    transformAll: normalizedPattern.transformAll,
+                    from: pattern.from,
+                    to: pattern.to,
+                    transformAll: pattern.transformAll,
                   })}`,
                   mergedEtag,
                 );
                 let transformedAsset = await cacheItem.getPromise();
 
                 if (!transformedAsset) {
-                  transformedAsset = { filename: normalizedPattern.to };
+                  transformedAsset = { filename: pattern.to };
 
                   try {
-                    transformedAsset.data =
-                      await normalizedPattern.transformAll(
-                        filteredCopiedResult.map((asset) => ({
-                          data: asset.source.buffer(),
-                          sourceFilename: asset.sourceFilename,
-                          absoluteFilename: asset.absoluteFilename,
-                        })),
-                      );
+                    transformedAsset.data = await pattern.transformAll(
+                      filteredCopiedResult.map((asset) => ({
+                        data: asset.source.buffer(),
+                        sourceFilename: asset.sourceFilename,
+                        absoluteFilename: asset.absoluteFilename,
+                      })),
+                    );
                   } catch (error) {
                     compilation.errors.push(
                       /** @type {WebpackError} */ (error),
@@ -935,9 +934,9 @@ class CopyPlugin {
                   }
 
                   const filename =
-                    typeof normalizedPattern.to === "function"
-                      ? await normalizedPattern.to({ context })
-                      : normalizedPattern.to;
+                    typeof pattern.to === "function"
+                      ? await pattern.to({ context })
+                      : pattern.to;
 
                   if (template.test(filename)) {
                     const contentHash = CopyPlugin.getContentHash(
@@ -967,7 +966,7 @@ class CopyPlugin {
                   transformedAsset.source = new RawSource(
                     transformedAsset.data,
                   );
-                  transformedAsset.force = normalizedPattern.force;
+                  transformedAsset.force = pattern.force;
 
                   await cacheItem.storePromise(transformedAsset);
                 }
@@ -975,7 +974,7 @@ class CopyPlugin {
                 filteredCopiedResult = [transformedAsset];
               }
 
-              const priority = normalizedPattern.priority || 0;
+              const priority = pattern.priority || 0;
 
               if (!copiedResultMap.has(priority)) {
                 copiedResultMap.set(priority, new Map());
