@@ -252,7 +252,7 @@ class CopyPlugin {
    * @param {WebpackLogger} logger the logger to use for logging
    * @param {CacheFacade} cache the cache facade to use for caching
    * @param {number} concurrency /maximum number of concurrent operations
-   * @param {ObjectPattern & { context: string }} inputPattern the pattern to process
+   * @param {ObjectPattern & { context: string }} pattern the pattern to process
    * @param {number} index the index of the pattern in the patterns array
    * @returns {Promise<Array<CopiedResult | undefined> | undefined>} processes the pattern and returns an array of copied results
    */
@@ -263,21 +263,18 @@ class CopyPlugin {
     logger,
     cache,
     concurrency,
-    inputPattern,
+    pattern,
     index,
   ) {
     const { RawSource } = compiler.webpack.sources;
-    const pattern = { ...inputPattern };
-    const originalFrom = pattern.from;
-    const normalizedOriginalFrom = path.normalize(originalFrom);
 
     logger.log(
-      `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
+      `starting to process a pattern from '${pattern.from}' using '${pattern.context}' context`,
     );
 
-    const absoluteFrom = path.isAbsolute(normalizedOriginalFrom)
-      ? normalizedOriginalFrom
-      : path.resolve(pattern.context, normalizedOriginalFrom);
+    const absoluteFrom = path.isAbsolute(pattern.from)
+      ? path.normalize(pattern.from)
+      : path.resolve(pattern.context, pattern.from);
 
     logger.debug(`getting stats for '${absoluteFrom}'...`);
 
@@ -367,11 +364,11 @@ class CopyPlugin {
 
         logger.debug(`added '${contextDependencies}' as a context dependency`);
 
-        glob = path.isAbsolute(originalFrom)
-          ? originalFrom
+        glob = path.isAbsolute(pattern.from)
+          ? pattern.from
           : path.posix.join(
               getTinyGlobby().escapePath(getNormalizePath()(pattern.context)),
-              originalFrom,
+              pattern.from,
             );
       }
     }
@@ -394,7 +391,7 @@ class CopyPlugin {
     if (globEntries.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`,
+          `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`,
         );
 
         return;
@@ -736,7 +733,7 @@ class CopyPlugin {
     if (copiedResult.length === 0) {
       if (pattern.noErrorOnMissing) {
         logger.log(
-          `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context to '${pattern.to}'`,
+          `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`,
         );
 
         return;
@@ -752,7 +749,7 @@ class CopyPlugin {
     }
 
     logger.log(
-      `finished to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
+      `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context`,
     );
 
     return copiedResult;
