@@ -443,7 +443,7 @@ class CopyPlugin {
 
           logger.debug(`found '${from}'`);
 
-          const absoluteFilename = from;
+          const absoluteFilename = path.normalize(from);
           const to =
             typeof pattern.to === "function"
               ? await pattern.to({

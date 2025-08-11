@@ -62,6 +62,7 @@ declare namespace CopyPlugin {
     Compilation,
     WebpackError,
     Asset,
+    AssetInfo,
     GlobbyOptions,
     WebpackLogger,
     CacheFacade,
@@ -94,6 +95,7 @@ type Compiler = import("webpack").Compiler;
 type Compilation = import("webpack").Compilation;
 type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
+type AssetInfo = import("webpack").AssetInfo;
 type GlobbyOptions = import("tinyglobby").GlobOptions;
 type WebpackLogger = ReturnType<Compilation["getLogger"]>;
 type CacheFacade = ReturnType<Compilation["getCache"]>;
