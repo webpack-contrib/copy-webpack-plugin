@@ -60,7 +60,6 @@ declare namespace CopyPlugin {
     Schema,
     Compiler,
     Compilation,
-    WebpackError,
     Asset,
     AssetInfo,
     GlobbyOptions,
@@ -93,7 +92,6 @@ declare namespace CopyPlugin {
 type Schema = import("schema-utils/declarations/validate").Schema;
 type Compiler = import("webpack").Compiler;
 type Compilation = import("webpack").Compilation;
-type WebpackError = import("webpack").WebpackError;
 type Asset = import("webpack").Asset;
 type AssetInfo = import("webpack").AssetInfo;
 type GlobbyOptions = import("tinyglobby").GlobOptions;
