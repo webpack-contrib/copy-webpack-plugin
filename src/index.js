@@ -362,9 +362,10 @@ class CopyPlugin {
         break;
       case "glob":
       default: {
-        const contextDependencies = path.normalize(
-          getGlobParent()(absoluteFrom),
-        );
+        const contextDependencies = getGlobParent()(absoluteFrom);
+
+        // eslint-disable-next-line no-console
+        console.log(contextDependencies);
 
         compilation.contextDependencies.add(contextDependencies);
 
