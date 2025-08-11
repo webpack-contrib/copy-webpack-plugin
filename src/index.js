@@ -22,6 +22,7 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 /** @typedef {import("webpack").Compilation} Compilation */
 /** @typedef {import("webpack").WebpackError} WebpackError */
 /** @typedef {import("webpack").Asset} Asset */
+/** @typedef {import("webpack").AssetInfo} AssetInfo */
 /** @typedef {import("tinyglobby").GlobOptions} GlobbyOptions */
 /** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
 /** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
@@ -273,7 +274,7 @@ class CopyPlugin {
       `starting to process a pattern from '${normalizedOriginalFrom}' using '${pattern.context}' context`,
     );
 
-    let absoluteFrom = path.isAbsolute(normalizedOriginalFrom)
+    const absoluteFrom = path.isAbsolute(normalizedOriginalFrom)
       ? normalizedOriginalFrom
       : path.resolve(pattern.context, normalizedOriginalFrom);
 
@@ -340,7 +341,6 @@ class CopyPlugin {
           ),
           "**/*",
         );
-        absoluteFrom = path.join(absoluteFrom, "**/*");
 
         if (typeof globOptions.dot === "undefined") {
           globOptions.dot = true;
@@ -443,8 +443,7 @@ class CopyPlugin {
 
           logger.debug(`found '${from}'`);
 
-          // `globby`/`fast-glob` return the relative path when the path contains special characters on windows
-          const absoluteFilename = path.resolve(pattern.context, from);
+          const absoluteFilename = from;
           const to =
             typeof pattern.to === "function"
               ? await pattern.to({
@@ -469,7 +468,8 @@ class CopyPlugin {
 
           if (path.isAbsolute(filename)) {
             filename = path.relative(
-              /** @type {string} */ (compiler.options.output.path),
+              /** @type {string} */
+              (compiler.options.output.path),
               filename,
             );
           }
@@ -674,6 +674,7 @@ class CopyPlugin {
             }
           }
 
+          /** @type {AssetInfo} */
           let info =
             typeof pattern.info === "undefined"
               ? {}
