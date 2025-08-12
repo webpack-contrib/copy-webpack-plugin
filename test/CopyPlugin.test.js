@@ -473,7 +473,7 @@ describe("CopyPlugin", () => {
         .then(({ stats }) => {
           const { missingDependencies } = stats.compilation;
           const isIncludeDependency = missingDependencies.has(
-            path.join(FIXTURES_DIR, "directory-does-not-exist"),
+            path.join(FIXTURES_DIR, "directory-does-not-exist/file.txt"),
           );
 
           expect(isIncludeDependency).toBe(true);
