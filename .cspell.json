@@ -2,6 +2,7 @@
   "version": "0.2",
   "language": "en,en-gb",
   "words": [
+    "eslintcache",
     "commitlint",
     "nestedfile",
     "directoryfile",
@@ -34,7 +35,6 @@
     "dottedfile",
     "tempfile"
   ],
-
   "ignorePaths": [
     "CHANGELOG.md",
     "package.json",

@@ -25,6 +25,16 @@ declare class CopyPlugin {
   private static getContentHash;
   /**
    * @private
+   * @param {Compilation} compilation the compilation
+   * @param {"file" | "dir" | "glob"} typeOfFrom the type of from
+   * @param {string} absoluteFrom the source content to hash
+   * @param {InputFileSystem | null} inputFileSystem input file system
+   * @param {WebpackLogger} logger the logger to use for logging
+   * @returns {Promise<void>}
+   */
+  private static addCompilationDependency;
+  /**
+   * @private
    * @param {typeof import("tinyglobby").glob} globby the globby function to use for globbing
    * @param {Compiler} compiler the compiler
    * @param {Compilation} compilation the compilation
@@ -62,6 +72,7 @@ declare namespace CopyPlugin {
     Compilation,
     Asset,
     AssetInfo,
+    InputFileSystem,
     GlobbyOptions,
     WebpackLogger,
     CacheFacade,
@@ -94,6 +105,7 @@ type Compiler = import("webpack").Compiler;
 type Compilation = import("webpack").Compilation;
 type Asset = import("webpack").Asset;
 type AssetInfo = import("webpack").AssetInfo;
+type InputFileSystem = import("webpack").InputFileSystem;
 type GlobbyOptions = import("tinyglobby").GlobOptions;
 type WebpackLogger = ReturnType<Compilation["getLogger"]>;
 type CacheFacade = ReturnType<Compilation["getCache"]>;

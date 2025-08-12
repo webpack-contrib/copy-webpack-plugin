@@ -442,7 +442,7 @@ describe("CopyPlugin", () => {
   });
 
   describe("watch mode", () => {
-    it('should add the file to the watch list when "from" is a file', (done) => {
+    it('should add a file to the watch list when "from" is a file', (done) => {
       const expectedAssetKeys = ["file.txt"];
 
       run({
@@ -456,6 +456,27 @@ describe("CopyPlugin", () => {
           expect(Object.keys(readAssets(compiler, stats)).sort()).toEqual(
             expectedAssetKeys,
           );
+        })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should add a file to the watch list when "from" is a file that does not exist.', (done) => {
+      run({
+        patterns: [
+          {
+            from: "directory-does-not-exist/file.txt",
+            noErrorOnMissing: true,
+          },
+        ],
+      })
+        .then(({ stats }) => {
+          const { missingDependencies } = stats.compilation;
+          const isIncludeDependency = missingDependencies.has(
+            path.join(FIXTURES_DIR, "directory-does-not-exist/file.txt"),
+          );
+
+          expect(isIncludeDependency).toBe(true);
         })
         .then(done)
         .catch(done);
@@ -481,6 +502,27 @@ describe("CopyPlugin", () => {
         .catch(done);
     });
 
+    it('should add a directory to the watch list when "from" is a directory and that does not exist.', (done) => {
+      run({
+        patterns: [
+          {
+            from: "directory-does-not-exist/",
+            noErrorOnMissing: true,
+          },
+        ],
+      })
+        .then(({ stats }) => {
+          const { missingDependencies } = stats.compilation;
+          const isIncludeDependency = missingDependencies.has(
+            path.join(FIXTURES_DIR, "directory-does-not-exist"),
+          );
+
+          expect(isIncludeDependency).toBe(true);
+        })
+        .then(done)
+        .catch(done);
+    });
+
     it('should add a directory to the watch list when "from" is a glob', (done) => {
       run({
         patterns: [
@@ -493,6 +535,27 @@ describe("CopyPlugin", () => {
           const { contextDependencies } = stats.compilation;
           const isIncludeDependency = contextDependencies.has(
             path.join(FIXTURES_DIR, "directory"),
+          );
+
+          expect(isIncludeDependency).toBe(true);
+        })
+        .then(done)
+        .catch(done);
+    });
+
+    it('should add a directory to the watch list when "from" is a glob and that does not exist.', (done) => {
+      run({
+        patterns: [
+          {
+            from: "directory-does-not-exist/**/*",
+            noErrorOnMissing: true,
+          },
+        ],
+      })
+        .then(({ stats }) => {
+          const { missingDependencies } = stats.compilation;
+          const isIncludeDependency = missingDependencies.has(
+            path.join(FIXTURES_DIR, "directory-does-not-exist"),
           );
 
           expect(isIncludeDependency).toBe(true);
