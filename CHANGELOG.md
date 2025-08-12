@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [13.0.1](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v13.0.0...v13.0.1) (2025-08-12)
+
+
+### Bug Fixes
+
+* better handling globs for watching ([#808](https://github.com/webpack-contrib/copy-webpack-plugin/issues/808)) ([a527c89](https://github.com/webpack-contrib/copy-webpack-plugin/commit/a527c8985ab1fcd32b9a581df26653268e12ce2c))
+
 ## [13.0.0](https://github.com/webpack-contrib/copy-webpack-plugin/compare/v12.0.2...v13.0.0) (2025-02-27)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "copy-webpack-plugin",
-  "version": "13.0.0",
+  "version": "13.0.1",
   "description": "Copy files && directories with webpack",
   "keywords": [
     "webpack",
