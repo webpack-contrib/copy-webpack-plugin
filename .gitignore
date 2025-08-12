@@ -10,6 +10,7 @@ npm-debug.log*
 /reports
 /node_modules
 /test/fixtures/\[special\$directory\]
+/test/fixtures/watch/**/*.txt
 /test/outputs
 /test/bundled
 

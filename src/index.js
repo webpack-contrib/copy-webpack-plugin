@@ -22,6 +22,7 @@ const getTinyGlobby = memoize(() => require("tinyglobby"));
 /** @typedef {import("webpack").Compilation} Compilation */
 /** @typedef {import("webpack").Asset} Asset */
 /** @typedef {import("webpack").AssetInfo} AssetInfo */
+/** @typedef {import("webpack").InputFileSystem} InputFileSystem */
 /** @typedef {import("tinyglobby").GlobOptions} GlobbyOptions */
 /** @typedef {ReturnType<Compilation["getLogger"]>} WebpackLogger */
 /** @typedef {ReturnType<Compilation["getCache"]>} CacheFacade */
@@ -245,6 +246,63 @@ class CopyPlugin {
 
   /**
    * @private
+   * @param {Compilation} compilation the compilation
+   * @param {"file" | "dir" | "glob"} typeOfFrom the type of from
+   * @param {string} absoluteFrom the source content to hash
+   * @param {InputFileSystem | null} inputFileSystem input file system
+   * @param {WebpackLogger} logger the logger to use for logging
+   * @returns {Promise<void>}
+   */
+  static async addCompilationDependency(
+    compilation,
+    typeOfFrom,
+    absoluteFrom,
+    inputFileSystem,
+    logger,
+  ) {
+    switch (typeOfFrom) {
+      case "dir":
+        compilation.contextDependencies.add(absoluteFrom);
+        logger.debug(`added '${absoluteFrom}' as a context dependency`);
+        break;
+      case "file":
+        compilation.fileDependencies.add(absoluteFrom);
+        logger.debug(`added '${absoluteFrom}' as a file dependency`);
+        break;
+      case "glob":
+      default: {
+        const contextDependency = getTinyGlobby().isDynamicPattern(absoluteFrom)
+          ? path.normalize(getGlobParent()(absoluteFrom))
+          : path.normalize(absoluteFrom);
+
+        let stats;
+
+        // If we have `inputFileSystem` we should check the glob is existing or not
+        if (inputFileSystem) {
+          try {
+            stats = await stat(inputFileSystem, contextDependency);
+          } catch {
+            // Nothing
+          }
+        }
+
+        // To prevent double compilation during aggregation (initial run) - https://github.com/webpack-contrib/copy-webpack-plugin/issues/806.
+        // On first run we don't know if the glob exists or not, adding the dependency to the context dependencies triggers the `removed` event during aggregation.
+        // To prevent this behavior we should add the glob to the missing dependencies if the glob doesn't exist,
+        // otherwise we should add the dependency to the context dependencies.
+        if (inputFileSystem && !stats) {
+          compilation.missingDependencies.add(contextDependency);
+          logger.debug(`added '${contextDependency}' as a missing dependency`);
+        } else {
+          compilation.contextDependencies.add(contextDependency);
+          logger.debug(`added '${contextDependency}' as a context dependency`);
+        }
+      }
+    }
+  }
+
+  /**
+   * @private
    * @param {typeof import("tinyglobby").glob} globby the globby function to use for globbing
    * @param {Compiler} compiler the compiler
    * @param {Compilation} compilation the compilation
@@ -277,12 +335,13 @@ class CopyPlugin {
 
     logger.debug(`getting stats for '${absoluteFrom}'...`);
 
-    const { inputFileSystem } = compiler;
+    const { inputFileSystem } =
+      /** @type {Compiler & { inputFileSystem: InputFileSystem }} */
+      (compiler);
 
     let stats;
 
     try {
-      // @ts-expect-error - webpack types are incomplete
       stats = await stat(inputFileSystem, absoluteFrom);
     } catch {
       // Nothing
@@ -291,22 +350,22 @@ class CopyPlugin {
     /**
      * @type {"file" | "dir" | "glob"}
      */
-    let fromType;
+    let typeOfFrom;
 
     if (stats) {
       if (stats.isDirectory()) {
-        fromType = "dir";
+        typeOfFrom = "dir";
         logger.debug(`determined '${absoluteFrom}' is a directory`);
       } else if (stats.isFile()) {
-        fromType = "file";
+        typeOfFrom = "file";
         logger.debug(`determined '${absoluteFrom}' is a file`);
       } else {
         // Fallback
-        fromType = "glob";
+        typeOfFrom = "glob";
         logger.debug(`determined '${absoluteFrom}' is unknown`);
       }
     } else {
-      fromType = "glob";
+      typeOfFrom = "glob";
       logger.debug(`determined '${absoluteFrom}' is a glob`);
     }
 
@@ -325,12 +384,8 @@ class CopyPlugin {
 
     let glob;
 
-    switch (fromType) {
+    switch (typeOfFrom) {
       case "dir":
-        compilation.contextDependencies.add(absoluteFrom);
-
-        logger.debug(`added '${absoluteFrom}' as a context dependency`);
-
         pattern.context = absoluteFrom;
         glob = path.posix.join(
           getTinyGlobby().escapePath(getNormalizePath()(absoluteFrom)),
@@ -342,10 +397,6 @@ class CopyPlugin {
         }
         break;
       case "file":
-        compilation.fileDependencies.add(absoluteFrom);
-
-        logger.debug(`added '${absoluteFrom}' as a file dependency`);
-
         pattern.context = path.dirname(absoluteFrom);
         glob = getTinyGlobby().escapePath(getNormalizePath()(absoluteFrom));
 
@@ -355,14 +406,6 @@ class CopyPlugin {
         break;
       case "glob":
       default: {
-        const contextDependencies = path.normalize(
-          getGlobParent()(absoluteFrom),
-        );
-
-        compilation.contextDependencies.add(contextDependencies);
-
-        logger.debug(`added '${contextDependencies}' as a context dependency`);
-
         glob = path.isAbsolute(pattern.from)
           ? pattern.from
           : path.posix.join(
@@ -388,6 +431,14 @@ class CopyPlugin {
     }
 
     if (globEntries.length === 0) {
+      await CopyPlugin.addCompilationDependency(
+        compilation,
+        typeOfFrom,
+        absoluteFrom,
+        inputFileSystem,
+        logger,
+      );
+
       if (pattern.noErrorOnMissing) {
         logger.log(
           `finished to process a pattern from '${pattern.from}' using '${pattern.context}' context to '${pattern.to}'`,
@@ -400,6 +451,14 @@ class CopyPlugin {
 
       return;
     }
+
+    await CopyPlugin.addCompilationDependency(
+      compilation,
+      typeOfFrom,
+      absoluteFrom,
+      null,
+      logger,
+    );
 
     /**
      * @type {Array<CopiedResult | undefined>}
@@ -475,7 +534,7 @@ class CopyPlugin {
           );
 
           // If this came from a glob or dir, add it to the file dependencies
-          if (fromType === "dir" || fromType === "glob") {
+          if (typeOfFrom === "dir" || typeOfFrom === "glob") {
             compilation.fileDependencies.add(absoluteFilename);
 
             logger.debug(`added '${absoluteFilename}' as a file dependency`);
@@ -540,7 +599,6 @@ class CopyPlugin {
             let data;
 
             try {
-              // @ts-expect-error - webpack types are incomplete
               data = await readFile(inputFileSystem, absoluteFilename);
             } catch (error) {
               compilation.errors.push(/** @type {Error} */ (error));
